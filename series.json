@@ -1,0 +1,2491 @@
+{
+  "sets": [
+    {
+      "id": "suhdanne",
+      "label": "Suhdannetilanne",
+      "freq": "M",
+      "default": true,
+      "groups": [
+        "Luottamus",
+        "Tilaukset ja luvat",
+        "Kulutus",
+        "Tuotanto",
+        "Työmarkkinat"
+      ],
+      "contribs": {
+        "ek_teol": {
+          "id": "luot_ek_teol",
+          "title": "Teollisuuden luottamus: osatekijät",
+          "wide": true,
+          "unit": "",
+          "stackUnit": "",
+          "dec": 1,
+          "lines": [
+            "kc_ek_teol"
+          ],
+          "stack": [
+            "kc_ek_teol_1",
+            "kc_ek_teol_2",
+            "kc_ek_teol_3"
+          ],
+          "lineColor": "var(--fg)",
+          "from": 2016,
+          "note": "Kysymysten saldoluvut / 3, varastot käänteisinä. Lähde: EK, Euroopan komissio."
+        },
+        "ek_rak": {
+          "id": "luot_ek_rak",
+          "title": "Rakentamisen luottamus: osatekijät",
+          "wide": true,
+          "unit": "",
+          "stackUnit": "",
+          "dec": 1,
+          "lines": [
+            "kc_ek_rak"
+          ],
+          "stack": [
+            "kc_ek_rak_1",
+            "kc_ek_rak_2"
+          ],
+          "lineColor": "var(--fg)",
+          "from": 2016,
+          "note": "Kysymysten saldoluvut / 2. Lähde: EK, Euroopan komissio."
+        },
+        "ek_palv": {
+          "id": "luot_ek_palv",
+          "title": "Palveluiden luottamus: osatekijät",
+          "wide": true,
+          "unit": "",
+          "stackUnit": "",
+          "dec": 1,
+          "lines": [
+            "kc_ek_palv"
+          ],
+          "stack": [
+            "kc_ek_palv_1",
+            "kc_ek_palv_2",
+            "kc_ek_palv_3"
+          ],
+          "lineColor": "var(--fg)",
+          "from": 2016,
+          "note": "Kysymysten saldoluvut / 3. Lähde: EK, Euroopan komissio."
+        },
+        "ek_kau": {
+          "id": "luot_ek_kau",
+          "title": "Kaupan luottamus: osatekijät",
+          "wide": true,
+          "unit": "",
+          "stackUnit": "",
+          "dec": 1,
+          "lines": [
+            "kc_ek_kau"
+          ],
+          "stack": [
+            "kc_ek_kau_1",
+            "kc_ek_kau_2",
+            "kc_ek_kau_3"
+          ],
+          "lineColor": "var(--fg)",
+          "from": 2016,
+          "note": "Kysymysten saldoluvut / 3, varastot käänteisinä. Lähde: EK, Euroopan komissio."
+        },
+        "kul_luot": {
+          "id": "luot_kul_luot",
+          "title": "Kuluttajien luottamus: osatekijät",
+          "wide": true,
+          "unit": "",
+          "stackUnit": "",
+          "dec": 1,
+          "lines": [
+            "kc_kul_luot"
+          ],
+          "stack": [
+            "kc_kul_luot_1",
+            "kc_kul_luot_2",
+            "kc_kul_luot_3",
+            "kc_kul_luot_4"
+          ],
+          "lineColor": "var(--fg)",
+          "from": 2016,
+          "note": "Kysymysten saldoluvut / 4, kausitasoittamaton. Lähde: Tilastokeskus."
+        },
+        "teoltuot": {
+          "id": "kontr_teoltuot",
+          "title": "Teollisuustuotanto: toimialojen kontribuutiot",
+          "wide": true,
+          "calc": "weighted",
+          "ma": 3,
+          "residual": "Muut ja laskentaero",
+          "unit": "%",
+          "stackUnit": "%-yks.",
+          "dec": 1,
+          "lineColor": "var(--fg)",
+          "from": 2016,
+          "lines": [
+            "kc_teoltuot"
+          ],
+          "stack": [
+            "kc_teoltuot_1",
+            "kc_teoltuot_2",
+            "kc_teoltuot_3",
+            "kc_teoltuot_4",
+            "kc_teoltuot_5",
+            "kc_teoltuot_muu"
+          ],
+          "note": "3 kk liukuva keskiarvo. Muut-erässä muut toimialat ja laskentaero. Lähde: Tilastokeskus."
+        },
+        "rak_luv": {
+          "id": "kontr_rak_luv",
+          "title": "Rakennusluvat: rakennustyyppien kontribuutiot",
+          "wide": true,
+          "calc": "additive",
+          "residual": "Muut rakennukset",
+          "unit": "%",
+          "stackUnit": "%-yks.",
+          "dec": 1,
+          "lineColor": "var(--fg)",
+          "from": 2016,
+          "lines": [
+            "kc_rak_luv"
+          ],
+          "stack": [
+            "kc_rak_luv_1",
+            "kc_rak_luv_2",
+            "kc_rak_luv_3",
+            "kc_rak_luv_4",
+            "kc_rak_luv_5",
+            "kc_rak_luv_muu"
+          ],
+          "note": "Kerrosala, 12 kk summa. Lähde: Tilastokeskus."
+        },
+        "rak_alo": {
+          "id": "kontr_rak_alo",
+          "title": "Rakennusaloitukset: rakennustyyppien kontribuutiot",
+          "wide": true,
+          "calc": "additive",
+          "residual": "Muut rakennukset",
+          "unit": "%",
+          "stackUnit": "%-yks.",
+          "dec": 1,
+          "lineColor": "var(--fg)",
+          "from": 2016,
+          "lines": [
+            "kc_rak_alo"
+          ],
+          "stack": [
+            "kc_rak_alo_1",
+            "kc_rak_alo_2",
+            "kc_rak_alo_3",
+            "kc_rak_alo_4",
+            "kc_rak_alo_5",
+            "kc_rak_alo_muu"
+          ],
+          "note": "Kerrosala, 12 kk summa. Lähde: Tilastokeskus."
+        },
+        "konkurssit": {
+          "id": "kontr_konkurssit",
+          "title": "Konkurssit: toimialojen kontribuutiot",
+          "wide": true,
+          "calc": "additive",
+          "residual": "Muut ja tuntematon",
+          "unit": "%",
+          "stackUnit": "%-yks.",
+          "dec": 1,
+          "lineColor": "var(--fg)",
+          "from": 2016,
+          "lines": [
+            "kc_konkurssit"
+          ],
+          "stack": [
+            "kc_konkurssit_1",
+            "kc_konkurssit_2",
+            "kc_konkurssit_3",
+            "kc_konkurssit_4",
+            "kc_konkurssit_5",
+            "kc_konkurssit_6",
+            "kc_konkurssit_muu"
+          ],
+          "note": "12 kk summa. Kartassa käänteisenä ja ilman trendiä, ei kokonaisindikaattorissa. Lähde: Tilastokeskus."
+        },
+        "comp": {
+          "id": "validointi",
+          "title": "Kokonaisindikaattori ja BKT",
+          "wide": true,
+          "unit": "",
+          "dec": 2,
+          "connect": true,
+          "from": 2010,
+          "lines": [
+            "val_comp",
+            "val_gdp"
+          ],
+          "labels": {
+            "val_comp": "Kokonaisindikaattori, neljänneksen keskiarvo",
+            "val_gdp": "BKT:n trendipoikkeama"
+          },
+          "lineColor": "var(--fg)",
+          "note": "Standardoidut poikkeamat trendistä. BKT: Tilastokeskus."
+        },
+        "g:Työmarkkinat": {
+          "id": "tyomarkkinat",
+          "title": "Työllisyys- ja työttömyysaste",
+          "lines": [
+            "raw:tyoll",
+            "raw:tyottom"
+          ],
+          "y2": [
+            "raw:tyottom"
+          ],
+          "labels": {
+            "raw:tyoll": "Työllisyysaste, 15–64-v.",
+            "raw:tyottom": "Työttömyysaste"
+          },
+          "unit": "%",
+          "dec": 1,
+          "from": 2010,
+          "note": "Trendisarjat, %. Lähde: Tilastokeskus."
+        }
+      }
+    },
+    {
+      "id": "bkt",
+      "label": "Reaalitalous",
+      "freq": "Q",
+      "default": false,
+      "groups": [
+        "Kysyntä",
+        "Ulkomaankauppa",
+        "Työpanos",
+        "Asuntomarkkina",
+        "Hinnat ja palkat",
+        "Kokonaistuotanto"
+      ],
+      "view": "growth",
+      "from": 2015,
+      "charts": [
+        {
+          "id": "bktkasvu",
+          "title": "Kasvu",
+          "wide": true,
+          "unit": "%",
+          "dec": 1,
+          "lines": [
+            "bkt_yy"
+          ],
+          "bars": "bkt_qq",
+          "barsName": "q/q",
+          "barsUnit": "%",
+          "barsLegend": [
+            "Neljännesmuutos, kasvu",
+            "Neljännesmuutos, supistuminen"
+          ],
+          "note": "Palkit q/q, viiva v/v.",
+          "lineColor": "var(--fg)",
+          "contrib": {
+            "title": "BKT:n kasvu ja kontribuutiot",
+            "line": "k_bkt",
+            "stack": [
+              "k_kulutus",
+              "k_julk",
+              "k_inv",
+              "k_netto",
+              "k_muu"
+            ],
+            "note": "Edellisen vuoden hinnoin. Lähde: Tilastokeskus."
+          },
+          "contribs": {
+            "tyottomat": {
+              "title": "Työttömien määrän muutos ja tekijät",
+              "line": "tu_d",
+              "stack": [
+                "tu_vaesto",
+                "tu_osall",
+                "tu_tyoll"
+              ],
+              "unit": "tuhatta",
+              "stackUnit": "tuhatta",
+              "dec": 0,
+              "note": "15–64-vuotiaat, tuhatta. Positiivinen osa lisää työttömiä. Lähde: työvoimatutkimus."
+            },
+            "inflaatio": {
+              "title": "Inflaatio ja kontribuutiot",
+              "line": "ki_tot",
+              "stack": [
+                "ki_nrg",
+                "ki_food",
+                "ki_igd",
+                "ki_serv"
+              ],
+              "unit": "%",
+              "stackUnit": "%-yks.",
+              "dec": 1,
+              "note": "Neljänneksen keskiarvo. Lähde: Eurostat."
+            }
+          },
+          "views": {
+            "palkat": {
+              "title": "Ansiotaso ja reaaliansiot",
+              "lines": [
+                "palkat_yy",
+                "reaalipalkat_yy"
+              ],
+              "labels": {
+                "palkat_yy": "Ansiotasoindeksi",
+                "reaalipalkat_yy": "Reaaliansioindeksi"
+              },
+              "lineColor": "var(--accent)",
+              "unit": "%",
+              "dec": 1,
+              "note": "Reaaliansiot deflatoitu KHI:llä. Lähde: Tilastokeskus."
+            }
+          },
+          "size": "tt"
+        }
+      ]
+    },
+    {
+      "id": "rahoitus",
+      "label": "Rahoitusmarkkinat",
+      "freq": "M",
+      "default": false,
+      "view": "charts",
+      "from": 2000,
+      "charts": [
+        {
+          "id": "lyhyt",
+          "title": "Ohjauskorko ja Euribor",
+          "size": "half",
+          "unit": "%",
+          "dec": 2,
+          "lines": [
+            "euribor3m",
+            "dfr",
+            "fwd1y",
+            "fwd2y"
+          ],
+          "step": [
+            "dfr"
+          ],
+          "note": "Katkoviivat: forward-korot EKP:n tuottokäyrästä, sisältävät termipreemion.",
+          "section": "Korot ja rahapolitiikka",
+          "dash": [
+            "fwd1y",
+            "fwd2y"
+          ],
+          "labels": {
+            "fwd1y": "Markkinat: 1 v päästä",
+            "fwd2y": "Markkinat: 2 v päästä"
+          }
+        },
+        {
+          "id": "reaali",
+          "section": "Korot ja rahapolitiikka",
+          "title": "Reaalikorot",
+          "size": "half",
+          "unit": "%",
+          "dec": 2,
+          "lines": [
+            "reaali_lyh",
+            "reaali_10"
+          ],
+          "labels": {
+            "reaali_lyh": "3 kk Euribor − inflaatio",
+            "reaali_10": "Suomen 10 v − inflaatio"
+          },
+          "note": "Korko miinus inflaatio (YKHI)."
+        },
+        {
+          "id": "korot",
+          "title": "Pitkät korot ja korkokäyrä",
+          "size": "half",
+          "unit": "%",
+          "dec": 2,
+          "lines": [
+            "fi10y",
+            "de10y"
+          ],
+          "dash": [
+            "de10y"
+          ],
+          "bars": "korkokayra",
+          "note": "Palkit: 10 v korko miinus 3 kk Euribor. Punainen = käänteinen käyrä.",
+          "section": "Korot ja rahapolitiikka"
+        },
+        {
+          "id": "riski",
+          "title": "Riskilisä Saksaan",
+          "unit": "%-yks.",
+          "dec": 2,
+          "lines": [
+            "riskilisa"
+          ],
+          "note": "",
+          "section": "Korot ja rahapolitiikka",
+          "size": "half"
+        },
+        {
+          "id": "maat",
+          "title": "10 vuoden valtionlainojen korot",
+          "unit": "%",
+          "dec": 2,
+          "lines": [
+            "fi10y",
+            "de10y",
+            "us10y",
+            "jp10y"
+          ],
+          "labels": {
+            "fi10y": "Suomi",
+            "de10y": "Saksa"
+          },
+          "note": "Kuukausikeskiarvot. Lähteet: EKP, FRED, OECD.",
+          "section": "Korot ja rahapolitiikka",
+          "size": "half"
+        },
+        {
+          "id": "ohjausmaat",
+          "section": "Korot ja rahapolitiikka",
+          "title": "Ohjauskorot",
+          "size": "half",
+          "unit": "%",
+          "dec": 2,
+          "lines": [
+            "dfr",
+            "fed",
+            "jp_short"
+          ],
+          "step": [
+            "dfr"
+          ],
+          "labels": {
+            "dfr": "Euroalue (EKP:n talletuskorko)",
+            "fed": "Yhdysvallat",
+            "jp_short": "Japani"
+          },
+          "note": "Yhdysvallat: Fed funds. Japani: lyhyt markkinakorko (OECD)."
+        },
+        {
+          "id": "lainakorot",
+          "section": "Luotonanto",
+          "title": "Uusien lainojen korot",
+          "size": "half",
+          "unit": "%",
+          "dec": 2,
+          "from": 2010,
+          "lines": [
+            "asuntokorko",
+            "yrityskorko",
+            "euribor3m"
+          ],
+          "labels": {
+            "asuntokorko": "Asuntolainat",
+            "yrityskorko": "Yritys- ja taloyhtiölainat"
+          },
+          "note": "Yrityslainoissa mukana taloyhtiöt. Lähde: Suomen Pankki."
+        },
+        {
+          "id": "uudet",
+          "section": "Luotonanto",
+          "title": "Uudet lainat, mrd. € (12 kk)",
+          "unit": "mrd. €",
+          "dec": 1,
+          "lines": [
+            "uudet_asunto",
+            "uudet_yrit"
+          ],
+          "note": "Sisältää uudelleenneuvotellut lainat. Lähde: Suomen Pankki.",
+          "size": "half",
+          "from": 2010
+        },
+        {
+          "id": "kanta",
+          "title": "Lainakannan kasvu, %",
+          "unit": "%",
+          "dec": 1,
+          "lines": [
+            "kanta_kotit",
+            "kanta_yrit",
+            "kanta_taloy"
+          ],
+          "note": "Lähde: Suomen Pankki.",
+          "from": 2010,
+          "section": "Luotonanto",
+          "size": "half"
+        },
+        {
+          "id": "velka",
+          "section": "Luotonanto",
+          "title": "Kotitalouksien velkaantumisaste",
+          "unit": "%",
+          "dec": 1,
+          "lines": [
+            "velkaaste"
+          ],
+          "connect": true,
+          "note": "Velat suhteessa käytettävissä oleviin tuloihin. Lähde: Tilastokeskus.",
+          "size": "half",
+          "from": 2010
+        },
+        {
+          "id": "clifs",
+          "title": "Rahoitusstressi",
+          "unit": "",
+          "dec": 2,
+          "lines": [
+            "clifs"
+          ],
+          "note": "0 = ei stressiä, 1 = äärimmäinen. Lähde: EKP.",
+          "section": "Riskit ja epävarmuus",
+          "size": "half"
+        },
+        {
+          "id": "epu",
+          "title": "Talouspoliittinen epävarmuus",
+          "unit": "",
+          "dec": 0,
+          "lines": [
+            "epu"
+          ],
+          "note": "Uutisointiin perustuva indeksi. Lähde: FRED.",
+          "section": "Riskit ja epävarmuus",
+          "size": "half"
+        }
+      ],
+      "colors": {
+        "euribor3m": "var(--fg)",
+        "dfr": "var(--q-turn)",
+        "us10y": "#b5523b",
+        "jp10y": "var(--g3)",
+        "fwd1y": "var(--accent)",
+        "fwd2y": "var(--g2)",
+        "fed": "#b5523b",
+        "jp_short": "var(--g3)",
+        "asuntokorko": "var(--accent)",
+        "uudet_asunto": "var(--accent)",
+        "kanta_kotit": "var(--accent)",
+        "yrityskorko": "var(--g2)",
+        "uudet_yrit": "var(--g2)",
+        "kanta_yrit": "var(--g2)",
+        "kanta_taloy": "var(--g3)"
+      }
+    }
+  ],
+  "series": [
+    {
+      "id": "ek_teol",
+      "label": "Teollisuuden luottamus",
+      "set": "suhdanne",
+      "group": "Luottamus",
+      "source": "eurostat",
+      "ds": "ei_bsin_m_r2",
+      "pick": {
+        "indic": "BS-ICI",
+        "s_adj": "SA",
+        "unit": "BAL"
+      },
+      "handling": "none",
+      "kind": "balance",
+      "invert": false,
+      "unit": "saldo",
+      "raw_desc": "Kausitasoitettu saldoluku"
+    },
+    {
+      "id": "ek_rak",
+      "label": "Rakentamisen luottamus",
+      "set": "suhdanne",
+      "group": "Luottamus",
+      "source": "eurostat",
+      "ds": "ei_bsbu_m_r2",
+      "pick": {
+        "indic": "BS-CCI-BAL",
+        "s_adj": "SA"
+      },
+      "handling": "none",
+      "kind": "balance",
+      "invert": false,
+      "unit": "saldo",
+      "raw_desc": "Kausitasoitettu saldoluku"
+    },
+    {
+      "id": "ek_palv",
+      "label": "Palveluiden luottamus",
+      "set": "suhdanne",
+      "group": "Luottamus",
+      "source": "eurostat",
+      "ds": "ei_bsse_m_r2",
+      "pick": {
+        "indic": "BS-SCI",
+        "s_adj": "SA",
+        "unit": "BAL"
+      },
+      "handling": "none",
+      "kind": "balance",
+      "invert": false,
+      "unit": "saldo",
+      "raw_desc": "Kausitasoitettu saldoluku"
+    },
+    {
+      "id": "ek_kau",
+      "label": "Kaupan luottamus",
+      "set": "suhdanne",
+      "group": "Luottamus",
+      "source": "eurostat",
+      "ds": "ei_bsrt_m_r2",
+      "pick": {
+        "indic": "BS-RCI",
+        "s_adj": "SA",
+        "unit": "BAL"
+      },
+      "handling": "none",
+      "kind": "balance",
+      "invert": false,
+      "unit": "saldo",
+      "raw_desc": "Kausitasoitettu saldoluku"
+    },
+    {
+      "id": "kul_luot",
+      "label": "Kuluttajien luottamus",
+      "set": "suhdanne",
+      "group": "Luottamus",
+      "source": "statfin",
+      "table": "kbar/11cc.px",
+      "pick": {
+        "contentscode": "CCI_A1"
+      },
+      "handling": "sa",
+      "kind": "balance",
+      "invert": false,
+      "unit": "saldo",
+      "raw_desc": "Kausitasoittamaton saldoluku"
+    },
+    {
+      "id": "ek_til",
+      "label": "Tilauskanta, teollisuus (EK)",
+      "set": "suhdanne",
+      "group": "Tilaukset ja luvat",
+      "source": "eurostat",
+      "ds": "ei_bsin_m_r2",
+      "pick": {
+        "indic": "BS-IOB",
+        "s_adj": "SA",
+        "unit": "BAL"
+      },
+      "handling": "none",
+      "kind": "balance",
+      "invert": false,
+      "unit": "saldo",
+      "raw_desc": "Kausitasoitettu saldoluku"
+    },
+    {
+      "id": "tilaukset",
+      "label": "Teollisuuden uudet tilaukset",
+      "set": "suhdanne",
+      "group": "Tilaukset ja luvat",
+      "source": "statfin",
+      "table": "teul/14mi.px",
+      "pick": {
+        "toimiala_17_20220818": "C",
+        "contentscode": "teul-Trendi"
+      },
+      "handling": "trend",
+      "kind": "volume",
+      "invert": false,
+      "unit": "ind. 2021=100",
+      "raw_desc": "Trendisarja"
+    },
+    {
+      "id": "rak_luv",
+      "label": "Rakentaminen, luvat",
+      "set": "suhdanne",
+      "group": "Tilaukset ja luvat",
+      "source": "statfin",
+      "table": "raku/156f.px",
+      "pick": {
+        "rakennusvaihe_1_20250101": "1",
+        "alue_23_20260101": "SSS",
+        "rakennus_6_20180101": "SSS",
+        "contentscode": "raku-kerrosalaToimenpide"
+      },
+      "handling": "sa_trend",
+      "kind": "volume",
+      "invert": false,
+      "unit": "1 000 m²",
+      "raw_scale": 0.001,
+      "raw_desc": "Kausitasoittamaton kuukausiluku"
+    },
+    {
+      "id": "asuntolainat",
+      "label": "Uudet asuntolainat",
+      "set": "suhdanne",
+      "group": "Luotonanto",
+      "source": "bof",
+      "dataset": "MFI_PUBL",
+      "key": "M.A.0.C.A2A.A.A.U2.2250.ZZ.EUR.H.A.0.A.0.A.0",
+      "handling": "sa_trend",
+      "kind": "volume",
+      "invert": false,
+      "enabled": false
+    },
+    {
+      "id": "yrityslainat",
+      "label": "Uudet yritys- ja taloyhtiölainat",
+      "set": "suhdanne",
+      "group": "Luotonanto",
+      "source": "bof",
+      "dataset": "MFI_PUBL",
+      "key": "M.A.0.C.A2A.A.A.U2.2240.ZZ.EUR.A.ANR.0.A.0.A.0",
+      "handling": "sa_trend",
+      "kind": "volume",
+      "invert": false,
+      "enabled": false
+    },
+    {
+      "id": "vahittais",
+      "label": "Vähittäiskaupan myynti",
+      "set": "suhdanne",
+      "group": "Kulutus",
+      "source": "eurostat",
+      "ds": "sts_trtu_m",
+      "pick": {
+        "indic_bt": "VOL_SLS",
+        "nace_r2": "G47",
+        "s_adj": "SCA",
+        "unit": "I21"
+      },
+      "handling": "none",
+      "kind": "volume",
+      "invert": false,
+      "unit": "ind. 2021=100",
+      "raw_desc": "Kausitasoitettu volyymi-indeksi"
+    },
+    {
+      "id": "ravitsemus",
+      "label": "Majoitus- ja ravitsemuspalvelut",
+      "set": "suhdanne",
+      "group": "Kulutus",
+      "source": "eurostat",
+      "ds": "sts_setu_m",
+      "pick": {
+        "indic_bt": "NETTUR",
+        "nace_r2": "I",
+        "s_adj": "SCA",
+        "unit": "I21"
+      },
+      "handling": "none",
+      "kind": "volume",
+      "invert": false,
+      "deflate": {
+        "source": "eurostat",
+        "ds": "prc_hicp_minr",
+        "pick": {
+          "coicop18": "CP11",
+          "unit": "I15"
+        }
+      },
+      "note": "Liikevaihto deflatoitu alan kuluttajahintaindeksillä (HICP CP11).",
+      "unit": "ind. 2021=100",
+      "raw_desc": "Kausitasoitettu, deflatoitu liikevaihto"
+    },
+    {
+      "id": "teoltuot",
+      "label": "Teollisuustuotanto",
+      "set": "suhdanne",
+      "group": "Tuotanto",
+      "source": "statfin",
+      "table": "ttvi/14mh.px",
+      "pick": {
+        "toimiala_78_20180201": "BTD",
+        "contentscode": "ttvi-Trendi"
+      },
+      "handling": "trend",
+      "kind": "volume",
+      "invert": false,
+      "unit": "ind. 2021=100",
+      "raw_desc": "Trendisarja"
+    },
+    {
+      "id": "tsk",
+      "label": "Tuotannon suhdannekuvaaja",
+      "set": "suhdanne",
+      "group": "Tuotanto",
+      "source": "statfin",
+      "table": "ktkk/132f.px",
+      "pick": {
+        "toimiala_79_20180101": "SSS",
+        "contentscode": "ind_trendi_2015"
+      },
+      "handling": "trend",
+      "kind": "volume",
+      "invert": false,
+      "unit": "ind. 2015=100",
+      "raw_desc": "Trendisarja"
+    },
+    {
+      "id": "rak_alo",
+      "label": "Rakentaminen, aloitukset",
+      "set": "suhdanne",
+      "group": "Tuotanto",
+      "source": "statfin",
+      "table": "raku/156f.px",
+      "pick": {
+        "rakennusvaihe_1_20250101": "2",
+        "alue_23_20260101": "SSS",
+        "rakennus_6_20180101": "SSS",
+        "contentscode": "raku-kerrosalaToimenpide"
+      },
+      "handling": "sa_trend",
+      "kind": "volume",
+      "invert": false,
+      "unit": "1 000 m²",
+      "raw_scale": 0.001,
+      "raw_desc": "Kausitasoittamaton kuukausiluku"
+    },
+    {
+      "id": "konkurssit",
+      "label": "Konkurssit",
+      "set": "suhdanne",
+      "group": "Tuotanto",
+      "source": "statfin",
+      "table": "kony/13fb.px",
+      "pick": {
+        "contentscode": "kony-ylkm_sum"
+      },
+      "handling": "none",
+      "kind": "level",
+      "invert": true,
+      "in_composite": false,
+      "unit": "kpl",
+      "raw_desc": "12 kuukauden liukuva summa"
+    },
+    {
+      "id": "tyoll",
+      "label": "Työllisyysaste",
+      "set": "suhdanne",
+      "group": "Työmarkkinat",
+      "source": "statfin",
+      "table": "tyti/135z.px",
+      "pick": {
+        "contentscode": "tyollaste_15_64_trendi"
+      },
+      "handling": "trend",
+      "kind": "balance",
+      "invert": false,
+      "unit": "%",
+      "raw_desc": "Trendisarja, 15–64-vuotiaat"
+    },
+    {
+      "id": "tyottom",
+      "label": "Työttömyysaste",
+      "set": "suhdanne",
+      "group": "Työmarkkinat",
+      "source": "statfin",
+      "table": "tyti/135z.px",
+      "pick": {
+        "contentscode": "tyottaste_trendi"
+      },
+      "handling": "trend",
+      "kind": "balance",
+      "invert": true,
+      "unit": "%",
+      "raw_desc": "Trendisarja"
+    },
+    {
+      "id": "avoimet",
+      "label": "Avoimet työpaikat (TE-palvelut)",
+      "set": "suhdanne",
+      "group": "Työmarkkinat",
+      "source": "statfin",
+      "table": "tyonv/12r5.px",
+      "pick": {
+        "Alue": "SSS",
+        "contentscode": "AVPAIKATLOPUSSA"
+      },
+      "handling": "sa_trend",
+      "kind": "volume",
+      "invert": false,
+      "unit": "kpl",
+      "raw_desc": "Kausitasoittamaton kuukausiluku"
+    },
+    {
+      "id": "lomautetut",
+      "label": "Lomautetut (kokoaikaisesti)",
+      "set": "suhdanne",
+      "group": "Työmarkkinat",
+      "source": "statfin",
+      "table": "tyonv/12r5.px",
+      "pick": {
+        "Alue": "SSS",
+        "contentscode": "LOMAUTETTU"
+      },
+      "handling": "sa_trend",
+      "kind": "volume",
+      "invert": true,
+      "enabled": false
+    },
+    {
+      "id": "kc_ek_teol",
+      "label": "Teollisuuden luottamus",
+      "set": "suhdanne",
+      "contrib": true,
+      "contrib_group": "ek_teol",
+      "contrib_total": true,
+      "source": "eurostat",
+      "ds": "ei_bsin_m_r2",
+      "pick": {
+        "indic": "BS-ICI",
+        "s_adj": "SA",
+        "unit": "BAL"
+      },
+      "handling": "none",
+      "kind": "level"
+    },
+    {
+      "id": "kc_ek_teol_1",
+      "label": "Tuotanto-odotukset",
+      "set": "suhdanne",
+      "contrib": true,
+      "contrib_group": "ek_teol",
+      "contrib_total": false,
+      "source": "eurostat",
+      "ds": "ei_bsin_m_r2",
+      "pick": {
+        "indic": "BS-IPE",
+        "s_adj": "SA",
+        "unit": "BAL"
+      },
+      "handling": "none",
+      "kind": "level",
+      "scale": 0.3333333333
+    },
+    {
+      "id": "kc_ek_teol_2",
+      "label": "Tilauskanta",
+      "set": "suhdanne",
+      "contrib": true,
+      "contrib_group": "ek_teol",
+      "contrib_total": false,
+      "source": "eurostat",
+      "ds": "ei_bsin_m_r2",
+      "pick": {
+        "indic": "BS-IOB",
+        "s_adj": "SA",
+        "unit": "BAL"
+      },
+      "handling": "none",
+      "kind": "level",
+      "scale": 0.3333333333
+    },
+    {
+      "id": "kc_ek_teol_3",
+      "label": "Valmisvarastot (käänteinen)",
+      "set": "suhdanne",
+      "contrib": true,
+      "contrib_group": "ek_teol",
+      "contrib_total": false,
+      "source": "eurostat",
+      "ds": "ei_bsin_m_r2",
+      "pick": {
+        "indic": "BS-ISFP",
+        "s_adj": "SA",
+        "unit": "BAL"
+      },
+      "handling": "none",
+      "kind": "level",
+      "scale": -0.3333333333
+    },
+    {
+      "id": "kc_ek_rak",
+      "label": "Rakentamisen luottamus",
+      "set": "suhdanne",
+      "contrib": true,
+      "contrib_group": "ek_rak",
+      "contrib_total": true,
+      "source": "eurostat",
+      "ds": "ei_bsbu_m_r2",
+      "pick": {
+        "indic": "BS-CCI-BAL",
+        "s_adj": "SA"
+      },
+      "handling": "none",
+      "kind": "level"
+    },
+    {
+      "id": "kc_ek_rak_1",
+      "label": "Tilauskanta",
+      "set": "suhdanne",
+      "contrib": true,
+      "contrib_group": "ek_rak",
+      "contrib_total": false,
+      "source": "eurostat",
+      "ds": "ei_bsbu_m_r2",
+      "pick": {
+        "indic": "BS-COB-BAL",
+        "s_adj": "SA"
+      },
+      "handling": "none",
+      "kind": "level",
+      "scale": 0.5
+    },
+    {
+      "id": "kc_ek_rak_2",
+      "label": "Henkilöstöodotukset",
+      "set": "suhdanne",
+      "contrib": true,
+      "contrib_group": "ek_rak",
+      "contrib_total": false,
+      "source": "eurostat",
+      "ds": "ei_bsbu_m_r2",
+      "pick": {
+        "indic": "BS-CEME-BAL",
+        "s_adj": "SA"
+      },
+      "handling": "none",
+      "kind": "level",
+      "scale": 0.5
+    },
+    {
+      "id": "kc_ek_palv",
+      "label": "Palveluiden luottamus",
+      "set": "suhdanne",
+      "contrib": true,
+      "contrib_group": "ek_palv",
+      "contrib_total": true,
+      "source": "eurostat",
+      "ds": "ei_bsse_m_r2",
+      "pick": {
+        "indic": "BS-SCI",
+        "s_adj": "SA",
+        "unit": "BAL"
+      },
+      "handling": "none",
+      "kind": "level"
+    },
+    {
+      "id": "kc_ek_palv_1",
+      "label": "Liiketilanne, 3 kk",
+      "set": "suhdanne",
+      "contrib": true,
+      "contrib_group": "ek_palv",
+      "contrib_total": false,
+      "source": "eurostat",
+      "ds": "ei_bsse_m_r2",
+      "pick": {
+        "indic": "BS-SABC",
+        "s_adj": "SA",
+        "unit": "BAL"
+      },
+      "handling": "none",
+      "kind": "level",
+      "scale": 0.3333333333
+    },
+    {
+      "id": "kc_ek_palv_2",
+      "label": "Kysyntä, 3 kk",
+      "set": "suhdanne",
+      "contrib": true,
+      "contrib_group": "ek_palv",
+      "contrib_total": false,
+      "source": "eurostat",
+      "ds": "ei_bsse_m_r2",
+      "pick": {
+        "indic": "BS-SARM",
+        "s_adj": "SA",
+        "unit": "BAL"
+      },
+      "handling": "none",
+      "kind": "level",
+      "scale": 0.3333333333
+    },
+    {
+      "id": "kc_ek_palv_3",
+      "label": "Kysyntäodotukset",
+      "set": "suhdanne",
+      "contrib": true,
+      "contrib_group": "ek_palv",
+      "contrib_total": false,
+      "source": "eurostat",
+      "ds": "ei_bsse_m_r2",
+      "pick": {
+        "indic": "BS-SAEM",
+        "s_adj": "SA",
+        "unit": "BAL"
+      },
+      "handling": "none",
+      "kind": "level",
+      "scale": 0.3333333333
+    },
+    {
+      "id": "kc_ek_kau",
+      "label": "Kaupan luottamus",
+      "set": "suhdanne",
+      "contrib": true,
+      "contrib_group": "ek_kau",
+      "contrib_total": true,
+      "source": "eurostat",
+      "ds": "ei_bsrt_m_r2",
+      "pick": {
+        "indic": "BS-RCI",
+        "s_adj": "SA",
+        "unit": "BAL"
+      },
+      "handling": "none",
+      "kind": "level"
+    },
+    {
+      "id": "kc_ek_kau_1",
+      "label": "Myynti, 3 kk",
+      "set": "suhdanne",
+      "contrib": true,
+      "contrib_group": "ek_kau",
+      "contrib_total": false,
+      "source": "eurostat",
+      "ds": "ei_bsrt_m_r2",
+      "pick": {
+        "indic": "BS-RPBS",
+        "s_adj": "SA",
+        "unit": "BAL"
+      },
+      "handling": "none",
+      "kind": "level",
+      "scale": 0.3333333333
+    },
+    {
+      "id": "kc_ek_kau_2",
+      "label": "Myyntiodotukset",
+      "set": "suhdanne",
+      "contrib": true,
+      "contrib_group": "ek_kau",
+      "contrib_total": false,
+      "source": "eurostat",
+      "ds": "ei_bsrt_m_r2",
+      "pick": {
+        "indic": "BS-REBS",
+        "s_adj": "SA",
+        "unit": "BAL"
+      },
+      "handling": "none",
+      "kind": "level",
+      "scale": 0.3333333333
+    },
+    {
+      "id": "kc_ek_kau_3",
+      "label": "Varastot (käänteinen)",
+      "set": "suhdanne",
+      "contrib": true,
+      "contrib_group": "ek_kau",
+      "contrib_total": false,
+      "source": "eurostat",
+      "ds": "ei_bsrt_m_r2",
+      "pick": {
+        "indic": "BS-RAS",
+        "s_adj": "SA",
+        "unit": "BAL"
+      },
+      "handling": "none",
+      "kind": "level",
+      "scale": -0.3333333333
+    },
+    {
+      "id": "kc_kul_luot",
+      "label": "Kuluttajien luottamus",
+      "set": "suhdanne",
+      "contrib": true,
+      "contrib_group": "kul_luot",
+      "contrib_total": true,
+      "source": "statfin",
+      "handling": "none",
+      "kind": "level",
+      "table": "kbar/11cc.px",
+      "pick": {
+        "contentscode": "CCI_A1"
+      }
+    },
+    {
+      "id": "kc_kul_luot_1",
+      "label": "Oma talous nyt",
+      "set": "suhdanne",
+      "contrib": true,
+      "contrib_group": "kul_luot",
+      "contrib_total": false,
+      "source": "statfin",
+      "handling": "none",
+      "kind": "level",
+      "table": "kbar/11cc.px",
+      "pick": {
+        "contentscode": "CCI_B1"
+      },
+      "scale": 0.25
+    },
+    {
+      "id": "kc_kul_luot_2",
+      "label": "Oma talous 12 kk:n kuluttua",
+      "set": "suhdanne",
+      "contrib": true,
+      "contrib_group": "kul_luot",
+      "contrib_total": false,
+      "source": "statfin",
+      "handling": "none",
+      "kind": "level",
+      "table": "kbar/11cc.px",
+      "pick": {
+        "contentscode": "CCI_B2"
+      },
+      "scale": 0.25
+    },
+    {
+      "id": "kc_kul_luot_3",
+      "label": "Suomen talous 12 kk:n kuluttua",
+      "set": "suhdanne",
+      "contrib": true,
+      "contrib_group": "kul_luot",
+      "contrib_total": false,
+      "source": "statfin",
+      "handling": "none",
+      "kind": "level",
+      "table": "kbar/11cc.px",
+      "pick": {
+        "contentscode": "CCI_B4"
+      },
+      "scale": 0.25
+    },
+    {
+      "id": "kc_kul_luot_4",
+      "label": "Kestotavaroiden ostoaikeet",
+      "set": "suhdanne",
+      "contrib": true,
+      "contrib_group": "kul_luot",
+      "contrib_total": false,
+      "source": "statfin",
+      "handling": "none",
+      "kind": "level",
+      "table": "kbar/11cc.px",
+      "pick": {
+        "contentscode": "CCI_E1"
+      },
+      "scale": 0.25
+    },
+    {
+      "id": "kc_teoltuot",
+      "label": "Teollisuustuotanto v/v",
+      "set": "suhdanne",
+      "contrib": true,
+      "contrib_group": "teoltuot",
+      "contrib_total": true,
+      "source": "statfin",
+      "table": "ttvi/14mh.px",
+      "pick": {
+        "toimiala_78_20180201": "BTD",
+        "contentscode": "ttvi-tyopaivakorjattu"
+      },
+      "handling": "none",
+      "kind": "level"
+    },
+    {
+      "id": "kc_teoltuot_1",
+      "label": "Metsäteollisuus",
+      "set": "suhdanne",
+      "contrib": true,
+      "contrib_group": "teoltuot",
+      "contrib_total": false,
+      "source": "statfin",
+      "table": "ttvi/14mh.px",
+      "pick": {
+        "toimiala_78_20180201": "C16_C17",
+        "contentscode": "ttvi-tyopaivakorjattu"
+      },
+      "handling": "none",
+      "kind": "level",
+      "wpick": "Paino_osuus"
+    },
+    {
+      "id": "kc_teoltuot_2",
+      "label": "Kemianteollisuus",
+      "set": "suhdanne",
+      "contrib": true,
+      "contrib_group": "teoltuot",
+      "contrib_total": false,
+      "source": "statfin",
+      "table": "ttvi/14mh.px",
+      "pick": {
+        "toimiala_78_20180201": "C19TC22",
+        "contentscode": "ttvi-tyopaivakorjattu"
+      },
+      "handling": "none",
+      "kind": "level",
+      "wpick": "Paino_osuus"
+    },
+    {
+      "id": "kc_teoltuot_3",
+      "label": "Teknologiateollisuus",
+      "set": "suhdanne",
+      "contrib": true,
+      "contrib_group": "teoltuot",
+      "contrib_total": false,
+      "source": "statfin",
+      "table": "ttvi/14mh.px",
+      "pick": {
+        "toimiala_78_20180201": "C24TC30_C33",
+        "contentscode": "ttvi-tyopaivakorjattu"
+      },
+      "handling": "none",
+      "kind": "level",
+      "wpick": "Paino_osuus"
+    },
+    {
+      "id": "kc_teoltuot_4",
+      "label": "Elintarviketeollisuus",
+      "set": "suhdanne",
+      "contrib": true,
+      "contrib_group": "teoltuot",
+      "contrib_total": false,
+      "source": "statfin",
+      "table": "ttvi/14mh.px",
+      "pick": {
+        "toimiala_78_20180201": "C10_C11",
+        "contentscode": "ttvi-tyopaivakorjattu"
+      },
+      "handling": "none",
+      "kind": "level",
+      "wpick": "Paino_osuus"
+    },
+    {
+      "id": "kc_teoltuot_5",
+      "label": "Energia",
+      "set": "suhdanne",
+      "contrib": true,
+      "contrib_group": "teoltuot",
+      "contrib_total": false,
+      "source": "statfin",
+      "table": "ttvi/14mh.px",
+      "pick": {
+        "toimiala_78_20180201": "D",
+        "contentscode": "ttvi-tyopaivakorjattu"
+      },
+      "handling": "none",
+      "kind": "level",
+      "wpick": "Paino_osuus"
+    },
+    {
+      "id": "kc_rak_luv",
+      "label": "Rakennusluvat v/v",
+      "set": "suhdanne",
+      "contrib": true,
+      "contrib_group": "rak_luv",
+      "contrib_total": true,
+      "source": "statfin",
+      "table": "raku/156f.px",
+      "pick": {
+        "rakennusvaihe_1_20250101": "1",
+        "alue_23_20260101": "SSS",
+        "rakennus_6_20180101": "SSS",
+        "contentscode": "raku-kerrosalaToimenpide_lvs"
+      },
+      "handling": "none",
+      "kind": "level"
+    },
+    {
+      "id": "kc_rak_luv_1",
+      "label": "Pientalot",
+      "set": "suhdanne",
+      "contrib": true,
+      "contrib_group": "rak_luv",
+      "contrib_total": false,
+      "source": "statfin",
+      "table": "raku/156f.px",
+      "pick": {
+        "rakennusvaihe_1_20250101": "1",
+        "alue_23_20260101": "SSS",
+        "rakennus_6_20180101": "011",
+        "contentscode": "raku-kerrosalaToimenpide_lvs"
+      },
+      "handling": "none",
+      "kind": "level"
+    },
+    {
+      "id": "kc_rak_luv_2",
+      "label": "Kerrostalot",
+      "set": "suhdanne",
+      "contrib": true,
+      "contrib_group": "rak_luv",
+      "contrib_total": false,
+      "source": "statfin",
+      "table": "raku/156f.px",
+      "pick": {
+        "rakennusvaihe_1_20250101": "1",
+        "alue_23_20260101": "SSS",
+        "rakennus_6_20180101": "012",
+        "contentscode": "raku-kerrosalaToimenpide_lvs"
+      },
+      "handling": "none",
+      "kind": "level"
+    },
+    {
+      "id": "kc_rak_luv_3",
+      "label": "Liike- ja toimistorakennukset",
+      "set": "suhdanne",
+      "contrib": true,
+      "contrib_group": "rak_luv",
+      "contrib_total": false,
+      "source": "statfin",
+      "table": "raku/156f.px",
+      "pick": {
+        "rakennusvaihe_1_20250101": "1",
+        "alue_23_20260101": "SSS",
+        "rakennus_6_20180101": "03T05",
+        "contentscode": "raku-kerrosalaToimenpide_lvs"
+      },
+      "handling": "none",
+      "kind": "level"
+    },
+    {
+      "id": "kc_rak_luv_4",
+      "label": "Julkiset palvelurakennukset",
+      "set": "suhdanne",
+      "contrib": true,
+      "contrib_group": "rak_luv",
+      "contrib_total": false,
+      "source": "statfin",
+      "table": "raku/156f.px",
+      "pick": {
+        "rakennusvaihe_1_20250101": "1",
+        "alue_23_20260101": "SSS",
+        "rakennus_6_20180101": "06T08_13",
+        "contentscode": "raku-kerrosalaToimenpide_lvs"
+      },
+      "handling": "none",
+      "kind": "level"
+    },
+    {
+      "id": "kc_rak_luv_5",
+      "label": "Teollisuus- ja varastorakennukset",
+      "set": "suhdanne",
+      "contrib": true,
+      "contrib_group": "rak_luv",
+      "contrib_total": false,
+      "source": "statfin",
+      "table": "raku/156f.px",
+      "pick": {
+        "rakennusvaihe_1_20250101": "1",
+        "alue_23_20260101": "SSS",
+        "rakennus_6_20180101": "09T12",
+        "contentscode": "raku-kerrosalaToimenpide_lvs"
+      },
+      "handling": "none",
+      "kind": "level"
+    },
+    {
+      "id": "kc_rak_alo",
+      "label": "Rakennusaloitukset v/v",
+      "set": "suhdanne",
+      "contrib": true,
+      "contrib_group": "rak_alo",
+      "contrib_total": true,
+      "source": "statfin",
+      "table": "raku/156f.px",
+      "pick": {
+        "rakennusvaihe_1_20250101": "2",
+        "alue_23_20260101": "SSS",
+        "rakennus_6_20180101": "SSS",
+        "contentscode": "raku-kerrosalaToimenpide_lvs"
+      },
+      "handling": "none",
+      "kind": "level"
+    },
+    {
+      "id": "kc_rak_alo_1",
+      "label": "Pientalot",
+      "set": "suhdanne",
+      "contrib": true,
+      "contrib_group": "rak_alo",
+      "contrib_total": false,
+      "source": "statfin",
+      "table": "raku/156f.px",
+      "pick": {
+        "rakennusvaihe_1_20250101": "2",
+        "alue_23_20260101": "SSS",
+        "rakennus_6_20180101": "011",
+        "contentscode": "raku-kerrosalaToimenpide_lvs"
+      },
+      "handling": "none",
+      "kind": "level"
+    },
+    {
+      "id": "kc_rak_alo_2",
+      "label": "Kerrostalot",
+      "set": "suhdanne",
+      "contrib": true,
+      "contrib_group": "rak_alo",
+      "contrib_total": false,
+      "source": "statfin",
+      "table": "raku/156f.px",
+      "pick": {
+        "rakennusvaihe_1_20250101": "2",
+        "alue_23_20260101": "SSS",
+        "rakennus_6_20180101": "012",
+        "contentscode": "raku-kerrosalaToimenpide_lvs"
+      },
+      "handling": "none",
+      "kind": "level"
+    },
+    {
+      "id": "kc_rak_alo_3",
+      "label": "Liike- ja toimistorakennukset",
+      "set": "suhdanne",
+      "contrib": true,
+      "contrib_group": "rak_alo",
+      "contrib_total": false,
+      "source": "statfin",
+      "table": "raku/156f.px",
+      "pick": {
+        "rakennusvaihe_1_20250101": "2",
+        "alue_23_20260101": "SSS",
+        "rakennus_6_20180101": "03T05",
+        "contentscode": "raku-kerrosalaToimenpide_lvs"
+      },
+      "handling": "none",
+      "kind": "level"
+    },
+    {
+      "id": "kc_rak_alo_4",
+      "label": "Julkiset palvelurakennukset",
+      "set": "suhdanne",
+      "contrib": true,
+      "contrib_group": "rak_alo",
+      "contrib_total": false,
+      "source": "statfin",
+      "table": "raku/156f.px",
+      "pick": {
+        "rakennusvaihe_1_20250101": "2",
+        "alue_23_20260101": "SSS",
+        "rakennus_6_20180101": "06T08_13",
+        "contentscode": "raku-kerrosalaToimenpide_lvs"
+      },
+      "handling": "none",
+      "kind": "level"
+    },
+    {
+      "id": "kc_rak_alo_5",
+      "label": "Teollisuus- ja varastorakennukset",
+      "set": "suhdanne",
+      "contrib": true,
+      "contrib_group": "rak_alo",
+      "contrib_total": false,
+      "source": "statfin",
+      "table": "raku/156f.px",
+      "pick": {
+        "rakennusvaihe_1_20250101": "2",
+        "alue_23_20260101": "SSS",
+        "rakennus_6_20180101": "09T12",
+        "contentscode": "raku-kerrosalaToimenpide_lvs"
+      },
+      "handling": "none",
+      "kind": "level"
+    },
+    {
+      "id": "kc_konkurssit",
+      "label": "Konkurssit v/v",
+      "set": "suhdanne",
+      "contrib": true,
+      "contrib_group": "konkurssit",
+      "contrib_total": true,
+      "source": "statfin",
+      "table": "kony/13fe.px",
+      "pick": {
+        "velka_a_tol_1_20181023": "SSS",
+        "alue_23_20250101": "SSS",
+        "contentscode": "kylkm"
+      },
+      "roll": 12,
+      "handling": "none",
+      "kind": "level"
+    },
+    {
+      "id": "kc_konkurssit_1",
+      "label": "Teollisuus ja energia",
+      "set": "suhdanne",
+      "contrib": true,
+      "contrib_group": "konkurssit",
+      "contrib_total": false,
+      "source": "statfin",
+      "table": "kony/13fe.px",
+      "pick": {
+        "velka_a_tol_1_20181023": "B-E",
+        "alue_23_20250101": "SSS",
+        "contentscode": "kylkm"
+      },
+      "roll": 12,
+      "handling": "none",
+      "kind": "level"
+    },
+    {
+      "id": "kc_konkurssit_2",
+      "label": "Rakentaminen",
+      "set": "suhdanne",
+      "contrib": true,
+      "contrib_group": "konkurssit",
+      "contrib_total": false,
+      "source": "statfin",
+      "table": "kony/13fe.px",
+      "pick": {
+        "velka_a_tol_1_20181023": "F",
+        "alue_23_20250101": "SSS",
+        "contentscode": "kylkm"
+      },
+      "roll": 12,
+      "handling": "none",
+      "kind": "level"
+    },
+    {
+      "id": "kc_konkurssit_3",
+      "label": "Kauppa",
+      "set": "suhdanne",
+      "contrib": true,
+      "contrib_group": "konkurssit",
+      "contrib_total": false,
+      "source": "statfin",
+      "table": "kony/13fe.px",
+      "pick": {
+        "velka_a_tol_1_20181023": "G",
+        "alue_23_20250101": "SSS",
+        "contentscode": "kylkm"
+      },
+      "roll": 12,
+      "handling": "none",
+      "kind": "level"
+    },
+    {
+      "id": "kc_konkurssit_4",
+      "label": "Kuljetus ja varastointi",
+      "set": "suhdanne",
+      "contrib": true,
+      "contrib_group": "konkurssit",
+      "contrib_total": false,
+      "source": "statfin",
+      "table": "kony/13fe.px",
+      "pick": {
+        "velka_a_tol_1_20181023": "H",
+        "alue_23_20250101": "SSS",
+        "contentscode": "kylkm"
+      },
+      "roll": 12,
+      "handling": "none",
+      "kind": "level"
+    },
+    {
+      "id": "kc_konkurssit_5",
+      "label": "Majoitus ja ravitsemus",
+      "set": "suhdanne",
+      "contrib": true,
+      "contrib_group": "konkurssit",
+      "contrib_total": false,
+      "source": "statfin",
+      "table": "kony/13fe.px",
+      "pick": {
+        "velka_a_tol_1_20181023": "I",
+        "alue_23_20250101": "SSS",
+        "contentscode": "kylkm"
+      },
+      "roll": 12,
+      "handling": "none",
+      "kind": "level"
+    },
+    {
+      "id": "kc_konkurssit_6",
+      "label": "Muut palvelut",
+      "set": "suhdanne",
+      "contrib": true,
+      "contrib_group": "konkurssit",
+      "contrib_total": false,
+      "source": "statfin",
+      "table": "kony/13fe.px",
+      "pick": {
+        "velka_a_tol_1_20181023": "J-U",
+        "alue_23_20250101": "SSS",
+        "contentscode": "kylkm"
+      },
+      "roll": 12,
+      "handling": "none",
+      "kind": "level"
+    },
+    {
+      "id": "val_bkt",
+      "label": "BKT",
+      "set": "suhdanne",
+      "validation": true,
+      "source": "statfin",
+      "table": "ntp/132h.px",
+      "pick": {
+        "taloustoimi_1_20180101": "B1GMH",
+        "contentscode": "kausitvv2015"
+      },
+      "handling": "none",
+      "kind": "volume"
+    },
+    {
+      "id": "bkt_kulutus",
+      "label": "Yksityinen kulutus",
+      "set": "bkt",
+      "group": "Kysyntä",
+      "handling": "none",
+      "kind": "volume",
+      "invert": false,
+      "source": "statfin",
+      "table": "ntp/132h.px",
+      "pick": {
+        "taloustoimi_1_20180101": "P3KS14_S15",
+        "contentscode": "kausitvv2015"
+      },
+      "yy_pick": {
+        "contentscode": "tyopvv2015"
+      }
+    },
+    {
+      "id": "bkt_julk",
+      "label": "Julkinen kulutus",
+      "set": "bkt",
+      "group": "Kysyntä",
+      "handling": "none",
+      "kind": "volume",
+      "invert": false,
+      "source": "statfin",
+      "table": "ntp/132h.px",
+      "pick": {
+        "taloustoimi_1_20180101": "P3KS13",
+        "contentscode": "kausitvv2015"
+      },
+      "yy_pick": {
+        "contentscode": "tyopvv2015"
+      }
+    },
+    {
+      "id": "bkt_inv",
+      "label": "Investoinnit",
+      "set": "bkt",
+      "group": "Kysyntä",
+      "handling": "none",
+      "kind": "volume",
+      "invert": false,
+      "source": "statfin",
+      "table": "ntp/132h.px",
+      "pick": {
+        "taloustoimi_1_20180101": "P51K",
+        "contentscode": "kausitvv2015"
+      },
+      "yy_pick": {
+        "contentscode": "tyopvv2015"
+      }
+    },
+    {
+      "id": "inv_yks",
+      "label": "Yksityiset investoinnit",
+      "set": "bkt",
+      "group": "Kysyntä",
+      "source": "statfin",
+      "table": "ntp/132h.px",
+      "pick": {
+        "taloustoimi_1_20180101": "P51KXS13",
+        "contentscode": "kausitvv2015"
+      },
+      "yy_pick": {
+        "contentscode": "tyopvv2015"
+      },
+      "handling": "none",
+      "kind": "volume",
+      "invert": false,
+      "in_composite": false,
+      "in_clock": false,
+      "sub": true
+    },
+    {
+      "id": "inv_julk",
+      "label": "Julkiset investoinnit",
+      "set": "bkt",
+      "group": "Kysyntä",
+      "source": "statfin",
+      "table": "ntp/132h.px",
+      "pick": {
+        "taloustoimi_1_20180101": "P51KS13",
+        "contentscode": "kausitvv2015"
+      },
+      "yy_pick": {
+        "contentscode": "tyopvv2015"
+      },
+      "handling": "none",
+      "kind": "volume",
+      "invert": false,
+      "in_composite": false,
+      "in_clock": false,
+      "sub": true
+    },
+    {
+      "id": "bkt_vienti",
+      "label": "Vienti",
+      "set": "bkt",
+      "group": "Ulkomaankauppa",
+      "handling": "none",
+      "kind": "volume",
+      "invert": false,
+      "source": "statfin",
+      "table": "ntp/132h.px",
+      "pick": {
+        "taloustoimi_1_20180101": "P6K",
+        "contentscode": "kausitvv2015"
+      },
+      "yy_pick": {
+        "contentscode": "tyopvv2015"
+      }
+    },
+    {
+      "id": "bkt_tuonti",
+      "label": "Tuonti",
+      "set": "bkt",
+      "group": "Ulkomaankauppa",
+      "handling": "none",
+      "kind": "volume",
+      "invert": false,
+      "source": "statfin",
+      "table": "ntp/132h.px",
+      "pick": {
+        "taloustoimi_1_20180101": "P7R",
+        "contentscode": "kausitvv2015"
+      },
+      "yy_pick": {
+        "contentscode": "tyopvv2015"
+      },
+      "gap_after": true
+    },
+    {
+      "id": "tyotunnit",
+      "label": "Tehdyt työtunnit",
+      "set": "bkt",
+      "group": "Työpanos",
+      "handling": "none",
+      "kind": "volume",
+      "invert": false,
+      "source": "statfin",
+      "table": "ntp/11tj.px",
+      "pick": {
+        "taloustoimi_1_20180101": "E2",
+        "toimiala_79_20180101": "SSS",
+        "contentscode": "ntp-KAUSIT"
+      },
+      "yy_pick": {
+        "contentscode": "TYOP"
+      }
+    },
+    {
+      "id": "tyottomat",
+      "label": "Työttömät",
+      "set": "bkt",
+      "group": "Työpanos",
+      "source": "statfin",
+      "table": "tyti/137h.px",
+      "pick": {
+        "sukupuoli_9_20180101": "SSS",
+        "ikaryhma_19_20190101": "15-64",
+        "contentscode": "tyti-Tyottomat"
+      },
+      "handling": "sa",
+      "kind": "volume",
+      "invert": true,
+      "in_composite": false,
+      "yy_raw": true
+    },
+    {
+      "id": "asuntohinnat",
+      "label": "Asuntojen reaalihinnat",
+      "set": "bkt",
+      "group": "Asuntomarkkina",
+      "source": "statfin",
+      "table": "ashi/15it.px",
+      "pick": {
+        "alue_43_20260625": "SSS",
+        "talotyyppi_5_20111209": "0",
+        "huoneluku_1_20111212": "00",
+        "contentscode": "ashivq_realindeksi_2015"
+      },
+      "handling": "sa",
+      "kind": "volume",
+      "invert": false,
+      "yy_raw": true
+    },
+    {
+      "id": "inflaatio",
+      "label": "Kuluttajahinnat (HICP)",
+      "set": "bkt",
+      "group": "Hinnat ja palkat",
+      "handling": "sa",
+      "kind": "volume",
+      "invert": false,
+      "in_composite": false,
+      "neutral": true,
+      "source": "statfin",
+      "table": "khi/15b7.px",
+      "pick": {
+        "coicop_46_20231201": "SSS",
+        "contentscode": "ip_ykhi"
+      },
+      "to_quarter": true,
+      "yy_raw": true
+    },
+    {
+      "id": "palkat",
+      "label": "Ansiotaso",
+      "set": "bkt",
+      "group": "Hinnat ja palkat",
+      "in_composite": false,
+      "source": "statfin",
+      "table": "ati/14um.px",
+      "handling": "sa",
+      "kind": "volume",
+      "invert": false,
+      "yy_raw": true,
+      "pick": {
+        "tyonantajasekt_3_20190528": "SSS",
+        "palk_muo_2_20120101": "0",
+        "sukupuoli_9_20180101": "SSS",
+        "contentscode": "ati_2015_100"
+      },
+      "neutral": true
+    },
+    {
+      "id": "reaalipalkat",
+      "label": "Reaaliansiot",
+      "set": "bkt",
+      "group": "Hinnat ja palkat",
+      "in_composite": false,
+      "source": "statfin",
+      "table": "ati/14um.px",
+      "handling": "sa",
+      "kind": "volume",
+      "invert": false,
+      "yy_raw": true,
+      "pick": {
+        "tyonantajasekt_3_20190528": "SSS",
+        "palk_muo_2_20120101": "0",
+        "sukupuoli_9_20180101": "SSS",
+        "contentscode": "real_2015_100"
+      },
+      "in_table": false
+    },
+    {
+      "id": "bkt",
+      "label": "BKT",
+      "set": "bkt",
+      "group": "Kokonaistuotanto",
+      "handling": "none",
+      "kind": "volume",
+      "invert": false,
+      "in_composite": false,
+      "source": "statfin",
+      "table": "ntp/132h.px",
+      "pick": {
+        "taloustoimi_1_20180101": "B1GMH",
+        "contentscode": "kausitvv2015"
+      },
+      "yy_pick": {
+        "contentscode": "tyopvv2015"
+      }
+    },
+    {
+      "set": "rahoitus",
+      "id": "fi10y",
+      "label": "Suomen 10 v korko",
+      "source": "ecb",
+      "flow": "IRS",
+      "key": "M.FI.L.L40.CI.0000.EUR.N.Z",
+      "handling": "none",
+      "kind": "level"
+    },
+    {
+      "set": "rahoitus",
+      "id": "de10y",
+      "label": "Saksan 10 v korko",
+      "source": "ecb",
+      "flow": "IRS",
+      "key": "M.DE.L.L40.CI.0000.EUR.N.Z",
+      "handling": "none",
+      "kind": "level"
+    },
+    {
+      "set": "rahoitus",
+      "id": "euribor3m",
+      "label": "3 kk Euribor",
+      "source": "ecb",
+      "flow": "FM",
+      "key": "M.U2.EUR.RT.MM.EURIBOR3MD_.HSTA",
+      "handling": "none",
+      "kind": "level"
+    },
+    {
+      "set": "rahoitus",
+      "id": "korkokayra",
+      "label": "Korkokäyrä (10 v – 3 kk)",
+      "source": "spread",
+      "a": "fi10y",
+      "b": "euribor3m",
+      "handling": "none",
+      "kind": "level"
+    },
+    {
+      "id": "us10y",
+      "label": "Yhdysvallat",
+      "set": "rahoitus",
+      "source": "fred",
+      "fred_id": "GS10",
+      "handling": "none",
+      "kind": "level"
+    },
+    {
+      "id": "jp10y",
+      "label": "Japani",
+      "set": "rahoitus",
+      "source": "fred",
+      "fred_id": "IRLTLT01JPM156N",
+      "handling": "none",
+      "kind": "level"
+    },
+    {
+      "id": "fed",
+      "label": "Yhdysvallat (Fed)",
+      "set": "rahoitus",
+      "source": "fred",
+      "fred_id": "FEDFUNDS",
+      "handling": "none",
+      "kind": "level"
+    },
+    {
+      "id": "jp_short",
+      "label": "Japani",
+      "set": "rahoitus",
+      "source": "fred",
+      "fred_id": "IRSTCI01JPM156N",
+      "handling": "none",
+      "kind": "level"
+    },
+    {
+      "id": "dfr",
+      "label": "EKP:n talletuskorko",
+      "source": "ecb",
+      "flow": "FM",
+      "key": "D.U2.EUR.4F.KR.DFR.LEV",
+      "set": "rahoitus",
+      "handling": "none",
+      "kind": "level"
+    },
+    {
+      "id": "asuntokorko",
+      "label": "Uusien asuntolainojen korko",
+      "source": "bof",
+      "dataset": "MFI_PUBL",
+      "key": "M.A.1.C.A20.A.A.U2.2250.ZZ.EUR.H.A.0.A.0.A.0",
+      "set": "rahoitus",
+      "handling": "none",
+      "kind": "level"
+    },
+    {
+      "id": "asuntomarginaali",
+      "label": "Pankkien marginaali",
+      "source": "bof",
+      "dataset": "MFI_PUBL",
+      "key": "M.B.4.B.A22.A.A.Z5.2250.ZZ.Z01.H.A.0.A.0.A.0",
+      "set": "rahoitus",
+      "handling": "none",
+      "kind": "level"
+    },
+    {
+      "id": "kanta_kotit",
+      "label": "Kotitaloudet",
+      "source": "bof",
+      "dataset": "MFI_PUBL",
+      "key": "M.A.3.A.A20.A.A.U6.2251.ZZ.Z01.A.A.0.A.0.A.0",
+      "set": "rahoitus",
+      "handling": "none",
+      "kind": "level"
+    },
+    {
+      "id": "kanta_yrit",
+      "label": "Yritykset",
+      "source": "bof",
+      "dataset": "MFI_PUBL",
+      "key": "M.A.3.A.A20.A.A.U6.2241.ZZ.Z01.A.A.0.A.0.A.0",
+      "set": "rahoitus",
+      "handling": "none",
+      "kind": "level"
+    },
+    {
+      "id": "kanta_taloy",
+      "label": "Taloyhtiöt",
+      "source": "bof",
+      "dataset": "MFI_PUBL",
+      "key": "M.A.3.A.A20.A.A.U6.2242.ZZ.Z01.A.A.0.A.0.A.0",
+      "set": "rahoitus",
+      "handling": "none",
+      "kind": "level"
+    },
+    {
+      "set": "rahoitus",
+      "id": "riskilisa",
+      "label": "Riskilisä Saksaan (10 v)",
+      "source": "spread",
+      "a": "fi10y",
+      "b": "de10y",
+      "handling": "none",
+      "kind": "level"
+    },
+    {
+      "set": "rahoitus",
+      "id": "clifs",
+      "label": "Rahoitusstressi (CLIFS)",
+      "source": "ecb",
+      "flow": "CLIFS",
+      "key": "M.FI._Z.4F.EC.CLIFS_CI.IDX",
+      "handling": "none",
+      "kind": "level"
+    },
+    {
+      "set": "rahoitus",
+      "id": "epu",
+      "label": "Talouspoliittinen epävarmuus (Eurooppa)",
+      "source": "fred",
+      "fred_id": "EUEPUINDXM",
+      "handling": "none",
+      "kind": "level"
+    },
+    {
+      "id": "fwd1y",
+      "label": "Markkinakorko 1 v päästä",
+      "set": "rahoitus",
+      "source": "ecb",
+      "flow": "YC",
+      "key": "B.U2.EUR.4F.G_N_A.SV_C_YM.IF_1Y",
+      "handling": "none",
+      "kind": "level"
+    },
+    {
+      "id": "fwd2y",
+      "label": "Markkinakorko 2 v päästä",
+      "set": "rahoitus",
+      "source": "ecb",
+      "flow": "YC",
+      "key": "B.U2.EUR.4F.G_N_A.SV_C_YM.IF_2Y",
+      "handling": "none",
+      "kind": "level"
+    },
+    {
+      "id": "hicp_yy",
+      "label": "Inflaatio (YKHI)",
+      "set": "rahoitus",
+      "source": "statfin",
+      "table": "khi/15b7.px",
+      "pick": {
+        "coicop_46_20231201": "SSS",
+        "contentscode": "vm_ykhi"
+      },
+      "handling": "none",
+      "kind": "level"
+    },
+    {
+      "id": "reaali_lyh",
+      "label": "Reaalinen 3 kk Euribor",
+      "set": "rahoitus",
+      "source": "spread",
+      "a": "euribor3m",
+      "b": "hicp_yy",
+      "handling": "none",
+      "kind": "level"
+    },
+    {
+      "id": "reaali_10",
+      "label": "Reaalinen 10 v korko",
+      "set": "rahoitus",
+      "source": "spread",
+      "a": "fi10y",
+      "b": "hicp_yy",
+      "handling": "none",
+      "kind": "level"
+    },
+    {
+      "id": "velkaaste",
+      "label": "Velkaantumisaste",
+      "set": "rahoitus",
+      "source": "statfin",
+      "table": "ntp/15a8.px",
+      "pick": {
+        "sektoriluokitus_7_20230101": "S14",
+        "contentscode": "ntp-kausit_f4"
+      },
+      "q_to_m": true,
+      "handling": "none",
+      "kind": "level"
+    },
+    {
+      "id": "yrityskorko",
+      "label": "Uusien yrityslainojen korko",
+      "set": "rahoitus",
+      "source": "bof",
+      "dataset": "MFI_PUBL",
+      "key": "M.A.1.C.A2A.A.A.U2.2240.ZZ.EUR.A.ANR.0.A.0.A.0",
+      "handling": "none",
+      "kind": "level"
+    },
+    {
+      "id": "uudet_asunto",
+      "label": "Asuntolainat",
+      "set": "rahoitus",
+      "source": "bof",
+      "dataset": "MFI_PUBL",
+      "key": "M.A.0.C.A2A.A.A.U2.2250.ZZ.EUR.H.A.0.A.0.A.0",
+      "roll": 12,
+      "mult": 0.001,
+      "handling": "none",
+      "kind": "level"
+    },
+    {
+      "id": "uudet_yrit",
+      "label": "Yritys- ja taloyhtiölainat",
+      "set": "rahoitus",
+      "source": "bof",
+      "dataset": "MFI_PUBL",
+      "key": "M.A.0.C.A2A.A.A.U2.2240.ZZ.EUR.A.ANR.0.A.0.A.0",
+      "roll": 12,
+      "mult": 0.001,
+      "handling": "none",
+      "kind": "level"
+    },
+    {
+      "id": "estr",
+      "label": "€STR",
+      "source": "ecb",
+      "flow": "EST",
+      "key": "B.EU000A2X2A25.WT",
+      "unit": "%",
+      "dec": 3,
+      "abs": true,
+      "set": "rahoitus",
+      "tile": true,
+      "daily": true,
+      "handling": "none",
+      "kind": "level"
+    },
+    {
+      "id": "y10_ea",
+      "label": "Euroalueen 10 v korko",
+      "source": "ecb",
+      "flow": "YC",
+      "key": "B.U2.EUR.4F.G_N_A.SV_C_YM.SR_10Y",
+      "unit": "%",
+      "dec": 2,
+      "abs": true,
+      "set": "rahoitus",
+      "tile": true,
+      "daily": true,
+      "handling": "none",
+      "kind": "level"
+    },
+    {
+      "id": "eurusd",
+      "label": "EUR / USD",
+      "source": "ecb",
+      "flow": "EXR",
+      "key": "D.USD.EUR.SP00.A",
+      "unit": "",
+      "dec": 4,
+      "set": "rahoitus",
+      "tile": true,
+      "daily": true,
+      "handling": "none",
+      "kind": "level"
+    },
+    {
+      "id": "brent",
+      "label": "Brent-öljy",
+      "source": "fred",
+      "fred_id": "DCOILBRENTEU",
+      "unit": "$",
+      "dec": 2,
+      "set": "rahoitus",
+      "tile": true,
+      "daily": true,
+      "handling": "none",
+      "kind": "level"
+    },
+    {
+      "id": "k_bkt",
+      "label": "BKT v/v",
+      "set": "bkt",
+      "contrib": true,
+      "contrib_total": true,
+      "handling": "none",
+      "kind": "level",
+      "residual": "Varastot ja tilastollinen ero",
+      "source": "ntp_ctrb"
+    },
+    {
+      "id": "k_kulutus",
+      "label": "Yksityinen kulutus",
+      "set": "bkt",
+      "contrib": true,
+      "contrib_total": false,
+      "handling": "none",
+      "kind": "level",
+      "source": "ntp_ctrb",
+      "items": [
+        "P3KS14_S15"
+      ]
+    },
+    {
+      "id": "k_julk",
+      "label": "Julkinen kulutus",
+      "set": "bkt",
+      "contrib": true,
+      "contrib_total": false,
+      "handling": "none",
+      "kind": "level",
+      "source": "ntp_ctrb",
+      "items": [
+        "P3KS13"
+      ]
+    },
+    {
+      "id": "k_inv",
+      "label": "Investoinnit",
+      "set": "bkt",
+      "contrib": true,
+      "contrib_total": false,
+      "handling": "none",
+      "kind": "level",
+      "source": "ntp_ctrb",
+      "items": [
+        "P51K"
+      ]
+    },
+    {
+      "id": "k_netto",
+      "label": "Nettovienti",
+      "set": "bkt",
+      "contrib": true,
+      "contrib_total": false,
+      "handling": "none",
+      "kind": "level",
+      "source": "ntp_ctrb",
+      "items": [
+        "P6K",
+        "P7R"
+      ],
+      "signs": [
+        1,
+        -1
+      ]
+    },
+    {
+      "id": "tyti_p",
+      "label": "Väestö 15-64",
+      "set": "bkt",
+      "decomp": "P",
+      "source": "statfin",
+      "table": "tyti/137h.px",
+      "pick": {
+        "sukupuoli_9_20180101": "SSS",
+        "ikaryhma_19_20190101": "15-64",
+        "contentscode": "tyti-Vaesto"
+      },
+      "handling": "none",
+      "kind": "level"
+    },
+    {
+      "id": "tyti_e",
+      "label": "Työlliset 15-64",
+      "set": "bkt",
+      "decomp": "E",
+      "source": "statfin",
+      "table": "tyti/137h.px",
+      "pick": {
+        "sukupuoli_9_20180101": "SSS",
+        "ikaryhma_19_20190101": "15-64",
+        "contentscode": "tyti-Tyolliset"
+      },
+      "handling": "none",
+      "kind": "level"
+    },
+    {
+      "id": "tyti_u",
+      "label": "Työttömät 15-64",
+      "set": "bkt",
+      "decomp": "U",
+      "source": "statfin",
+      "table": "tyti/137h.px",
+      "pick": {
+        "sukupuoli_9_20180101": "SSS",
+        "ikaryhma_19_20190101": "15-64",
+        "contentscode": "tyti-Tyottomat"
+      },
+      "handling": "none",
+      "kind": "level"
+    },
+    {
+      "id": "ki_tot",
+      "label": "Kuluttajahinnat v/v",
+      "set": "bkt",
+      "contrib": true,
+      "contrib_group": "inflaatio",
+      "contrib_total": true,
+      "source": "hicp_ctrb",
+      "coicop18": "TOTAL",
+      "to_quarter": true,
+      "handling": "none",
+      "kind": "level"
+    },
+    {
+      "id": "ki_nrg",
+      "label": "Energia",
+      "set": "bkt",
+      "contrib": true,
+      "contrib_group": "inflaatio",
+      "contrib_total": false,
+      "source": "hicp_ctrb",
+      "coicop18": "NRG",
+      "to_quarter": true,
+      "handling": "none",
+      "kind": "level"
+    },
+    {
+      "id": "ki_food",
+      "label": "Ruoka, alkoholi ja tupakka",
+      "set": "bkt",
+      "contrib": true,
+      "contrib_group": "inflaatio",
+      "contrib_total": false,
+      "source": "hicp_ctrb",
+      "coicop18": "FOOD",
+      "to_quarter": true,
+      "handling": "none",
+      "kind": "level"
+    },
+    {
+      "id": "ki_igd",
+      "label": "Teollisuustavarat (pl. energia)",
+      "set": "bkt",
+      "contrib": true,
+      "contrib_group": "inflaatio",
+      "contrib_total": false,
+      "source": "hicp_ctrb",
+      "coicop18": "IGD_NNRG",
+      "to_quarter": true,
+      "handling": "none",
+      "kind": "level"
+    },
+    {
+      "id": "ki_serv",
+      "label": "Palvelut",
+      "set": "bkt",
+      "contrib": true,
+      "contrib_group": "inflaatio",
+      "contrib_total": false,
+      "source": "hicp_ctrb",
+      "coicop18": "SERV",
+      "to_quarter": true,
+      "handling": "none",
+      "kind": "level"
+    }
+  ]
+}

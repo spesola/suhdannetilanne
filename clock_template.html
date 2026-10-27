@@ -1,0 +1,974 @@
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Suhdannekartta</title>
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20viewBox%3D%220%200%2032%2032%22%3E%3Crect%20x%3D%22.5%22%20y%3D%22.5%22%20width%3D%2231%22%20height%3D%2231%22%20rx%3D%227%22%20fill%3D%22%23fff%22%20stroke%3D%22%23dfe3e8%22/%3E%3Cline%20x1%3D%223%22%20x2%3D%2229%22%20y1%3D%2216%22%20y2%3D%2216%22%20stroke%3D%22%236b7380%22%20stroke-width%3D%221%22%20stroke-dasharray%3D%222%201.6%22/%3E%3Cline%20y1%3D%223%22%20y2%3D%2229%22%20x1%3D%2216%22%20x2%3D%2216%22%20stroke%3D%22%236b7380%22%20stroke-width%3D%221%22%20stroke-dasharray%3D%222%201.6%22/%3E%3Cpath%20d%3D%22M4.0%208.0L5.0%208.3L6.0%209.1L7.0%2010.3L8.0%2012.0L9.0%2013.9L10.0%2016.0L11.0%2018.1L12.0%2020.0L13.0%2021.7L14.0%2022.9L15.0%2023.7L16.0%2024.0L17.0%2023.7L18.0%2022.9L19.0%2021.7L20.0%2020.0L21.0%2018.1L22.0%2016.0L23.0%2013.9L24.0%2012.0L25.0%2010.3L26.0%209.1L27.0%208.3L28.0%208.0%22%20fill%3D%22none%22%20stroke%3D%22%23b9bec6%22%20stroke-width%3D%221.6%22/%3E%3Cpath%20d%3D%22M10.0%2016.0L10.2%2016.5L10.5%2017.0L10.8%2017.6L11.0%2018.1L11.2%2018.6L11.5%2019.1L11.8%2019.5L12.0%2020.0L12.2%2020.4L12.5%2020.9L12.8%2021.3L13.0%2021.7L13.2%2022.0L13.5%2022.3L13.8%2022.7L14.0%2022.9L14.2%2023.2L14.5%2023.4L14.8%2023.6L15.0%2023.7L15.2%2023.8L15.5%2023.9L15.8%2024.0L16.0%2024.0%22%20fill%3D%22none%22%20stroke%3D%22%23d6716a%22%20stroke-width%3D%223.2%22%20stroke-linecap%3D%22round%22/%3E%3Cpath%20d%3D%22M22.0%2016.0L22.2%2015.5L22.5%2015.0L22.8%2014.4L23.0%2013.9L23.2%2013.4L23.5%2012.9L23.8%2012.5L24.0%2012.0L24.2%2011.6L24.5%2011.1L24.8%2010.7L25.0%2010.3L25.2%2010.0L25.5%209.7L25.8%209.3L26.0%209.1L26.2%208.8L26.5%208.6L26.8%208.4L27.0%208.3L27.2%208.2L27.5%208.1L27.8%208.0L28.0%208.0%22%20fill%3D%22none%22%20stroke%3D%22%235aa77a%22%20stroke-width%3D%223.2%22%20stroke-linecap%3D%22round%22/%3E%3Ccircle%20cx%3D%2228.0%22%20cy%3D%228.0%22%20r%3D%222.8%22%20fill%3D%22%235aa77a%22/%3E%3C/svg%3E">
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Manrope:wght@300;400;500;600&display=swap">
+<style>
+/* Layout: tasainen vaalea pohja, osiot erotettu ohuella ylaviivalla (ei kortteja). Ylapalkki, iso otsikko, kello + luettelo, yksityiskohdat alla. */
+:root {
+  --bg: #f6f7f9; --surface: #f6f7f9; --plot: #ffffff; --fg: #161b22; --muted: #6b7380; --line: #dfe3e8; --grid: #e7eaee; --rule: #1f2933;
+  --accent: #1d4f7f;
+  --q-up: #2b8a55; --q-turn: #c98417; --q-down: #bf3d36; --q-rec: #b89a00;
+  --g1: #1d4f7f; --g2: #7d7aa8; --g3: #2c8077; --g4: #5c6670; --g5: #a0785a;
+  --font-display: "Manrope", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --font-body: "Manrope", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --font-data: "Manrope", system-ui, -apple-system, "Segoe UI", sans-serif;
+  color-scheme: light;
+}
+
+* { box-sizing: border-box; }
+[hidden] { display: none !important; }
+html { background: var(--bg); }
+body { font-variant-numeric: tabular-nums; background: var(--bg); min-height: 100%; color: var(--fg); font-family: var(--font-body); font-size: 15px; line-height: 1.5;
+  padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px));
+  padding-block: 22px 56px; }
+.wrap { max-width: 1180px; margin: 0 auto; display: flex; flex-direction: column; gap: 40px; }
+
+.topbar { display: flex; justify-content: flex-end; }
+.sets { display: flex; flex-wrap: wrap; gap: 4px 22px; }
+.sets button { font: inherit; font-size: 0.95rem; color: var(--muted); background: none; border: 0; padding: 4px 0; cursor: pointer;
+  border-bottom: 1.5px solid transparent; }
+.sets button:hover { color: var(--fg); }
+.sets button[aria-pressed="true"] { color: var(--fg); border-bottom-color: var(--fg); }
+.sets button:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; }
+.hero { display: flex; flex-direction: column; gap: 14px; padding-top: 12px; }
+.eyebrow { font-family: var(--font-data); font-size: 0.78rem; letter-spacing: 0.12em; text-transform: uppercase; color: var(--muted); margin: 0; }
+h1 { font-family: var(--font-display); font-weight: 300; font-size: clamp(2.1rem, 5vw, 3.6rem); line-height: 1.08; letter-spacing: -0.03em; margin: 0; text-wrap: balance; }
+
+.top { display: grid; grid-template-columns: minmax(0, 1.3fr) minmax(0, 1fr); gap: 56px; align-items: start; }
+.top > .card:first-child { position: sticky; top: 16px; }
+@media (max-width: 860px) { .top { grid-template-columns: minmax(0, 1fr); gap: 40px; } .top > .card:first-child { position: static; } }
+.card { border-top: 1px solid var(--rule); padding-top: 14px; min-width: 0; }
+.phead { display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: 4px 12px; margin-bottom: 14px; }
+.phead h2 { font-family: var(--font-body); font-weight: 500; font-size: 1rem; margin: 0; }
+.phead .meta { font-size: 0.85rem; color: var(--muted); }
+#clock { width: 100%; height: auto; display: block; max-width: 640px; margin: 0 auto; }
+#clock text { font-family: var(--font-body); }
+.pt { cursor: pointer; }
+.pt .lbl { opacity: 0; transition: opacity .12s; pointer-events: none; }
+.pt:hover .lbl, .pt.sel .lbl { opacity: 1; }
+.clockbar { display: flex; justify-content: flex-end; margin: -4px 0 -6px; }
+.tg { display: inline-flex; align-items: center; gap: 6px; font-size: 0.82rem; color: var(--muted); cursor: pointer; }
+.tg input { accent-color: var(--accent); margin: 0; }
+.gh { display: flex; align-items: center; gap: 8px; width: 100%; font: inherit; background: none; border: 0; padding: 2px 4px; margin: 0; border-radius: 3px; cursor: pointer; color: var(--muted); text-align: left; }
+.gh:hover { background: var(--grid); }
+.gh:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.gh i { width: 9px; height: 9px; border-radius: 50%; background: var(--gc); display: inline-block; flex: none; }
+.gh .gn { flex: 1; font-family: var(--font-data); font-size: 0.72rem; text-transform: uppercase; letter-spacing: .14em; font-weight: 500; }
+.gh[aria-pressed="true"] { background: color-mix(in srgb, var(--accent) 14%, var(--surface)); }
+
+.timebar { display: flex; align-items: center; gap: 10px; margin-top: 12px; flex-wrap: wrap; }
+.timebar > label { font-family: var(--font-data); font-size: 0.74rem; text-transform: uppercase; letter-spacing: .14em; color: var(--muted); }
+.timebar input[type=range] { flex: 1 1 200px; min-width: 0; accent-color: var(--accent); }
+.timebar output { font-family: var(--font-data); font-size: 0.95rem; min-width: 6.5ch; text-align: right; }
+.step { font: inherit; border: 1px solid var(--line); background: transparent; color: var(--fg); border-radius: 3px;
+  width: 30px; height: 28px; cursor: pointer; }
+
+.summary { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 6px; margin-bottom: 8px; }
+.qbox { border-radius: 3px; padding: 4px 6px; display: flex; align-items: center; justify-content: center; gap: 10px; background: color-mix(in srgb, var(--qc) 9%, var(--bg));
+  font: inherit; color: inherit; border: 0; cursor: pointer; box-shadow: inset 0 0 0 1.5px transparent; transition: opacity .12s, box-shadow .12s; }
+.qbox:hover { box-shadow: inset 0 0 0 1.5px color-mix(in srgb, var(--qc) 35%, transparent); }
+.qbox.on { box-shadow: inset 0 0 0 1.5px var(--qc); }
+.qbox.dim { opacity: .45; }
+.qbox.dim:hover { opacity: .8; }
+.empty { color: var(--muted); font-size: 0.88rem; padding: 8px 4px; }
+.pt.off { opacity: .14; }
+.pt.hl { opacity: 1; }
+.pt.hl .lbl { opacity: 1; }
+.pt.hl > circle:last-of-type, .pt.hl > path:last-of-type { stroke: var(--fg); stroke-width: 2.5; }
+.ind.hl, .gh.hl { background: var(--grid); }
+.ind .nm sup { color: var(--muted); font-size: 0.7em; margin-left: 2px; }
+.lnote { font-size: 0.74rem; color: var(--muted); margin-top: 10px; }
+.qbox .picon { flex: none; display: block; }
+.qbox .n { font-family: var(--font-data); font-size: 1.05rem; font-weight: 400; color: var(--qc); line-height: 1.2; }
+.qbox .n span { font-size: 0.72rem; color: var(--muted); }
+.qbox .t { font-size: 0.74rem; color: var(--muted); }
+
+.list { display: flex; flex-direction: column; gap: 10px; }
+.grp h3 { font-size: 0.72rem; text-transform: uppercase; letter-spacing: .07em; color: var(--muted); font-weight: 600; margin: 0 0 4px; display: flex; align-items: center; gap: 7px; }
+.grp h3 i { width: 9px; height: 9px; border-radius: 50%; background: var(--gc); display: inline-block; }
+.ind { display: grid; grid-template-columns: minmax(0, 1fr) auto auto; gap: 10px; align-items: center; width: 100%;
+  font: inherit; color: inherit; text-align: left; background: none; border: 0; border-bottom: 1px solid var(--line); border-radius: 0; padding: 3px 4px; cursor: pointer; }
+.grp .ind:last-child { border-bottom: 0; }
+.ind:hover { background: var(--grid); }
+.ind[aria-pressed="true"] { background: color-mix(in srgb, var(--accent) 14%, var(--surface)); }
+.ind .nm { font-size: 0.88rem; overflow-wrap: anywhere; }
+.ind .per { font-family: var(--font-data); font-size: 0.76rem; color: var(--muted); }
+.chip { font-size: 0.78rem; font-weight: 500; white-space: nowrap; color: var(--qc); }
+.gh .chip { font-size: 0.72rem; color: var(--muted); font-weight: 400; }
+.ind.comp .nm { font-weight: 500; }
+.ind.comp .nm::before { content: "\25C6"; margin-right: 8px; font-size: 0.85em; }
+.grp:first-child .ind.comp { border-bottom: 1px solid var(--line); }
+
+.tabs { display: flex; gap: 22px; margin: 0 0 14px; flex-wrap: wrap; }
+.tabs button { font: inherit; font-size: 0.92rem; font-weight: 500; color: var(--muted); background: none; border: 0;
+  border-bottom: 1.5px solid transparent; padding: 2px 0; cursor: pointer; }
+.tabs button[aria-selected="true"] { color: var(--fg); border-bottom-color: var(--fg); }
+.tabs button:disabled { opacity: .4; cursor: default; }
+.viewhead { display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: 8px; margin-bottom: 6px; }
+.viewhead h2 { font-family: var(--font-body); font-weight: 500; font-size: 1rem; margin: 0; text-wrap: balance; }
+.viewhead .now { font-size: 0.85rem; color: var(--muted); }
+#ts { width: 100%; height: auto; display: block; }
+#ts text { font-family: var(--font-body); }
+.legend { display: flex; flex-wrap: wrap; gap: 14px; font-size: 0.8rem; color: var(--muted); margin-top: 8px; }
+.legend span.sq::before { height: 10px; width: 10px; border-radius: 2px; vertical-align: -1px; }
+.legend span::before { content: ""; display: inline-block; width: 14px; height: 3px; border-radius: 2px; background: var(--qc); vertical-align: middle; margin-right: 6px; }
+
+.tiles { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); border-top: 1px solid var(--rule); }
+.tile { padding: 16px 22px 14px; border-left: 1px solid var(--line); min-width: 0; display: flex; flex-direction: column; gap: 4px; }
+.tile:nth-child(4n + 1) { border-left: 0; padding-left: 0; }
+.tile .th { display: flex; justify-content: space-between; align-items: baseline; gap: 8px; }
+.tile .tn { font-weight: 500; font-size: 0.95rem; }
+.tile .td { font-size: 0.76rem; color: var(--muted); white-space: nowrap; }
+.tile .tcs { display: flex; gap: 14px; flex-wrap: wrap; }
+.tile .tcx { font-family: var(--font-data); font-size: 0.8rem; color: var(--tc); white-space: nowrap; }
+.tile .tcx b { font-weight: 400; color: var(--muted); margin-right: 5px; }
+.tile .tcx i { font-style: normal; font-size: 0.65em; vertical-align: 1px; margin-right: 2px; }
+.tile .tv { font-family: var(--font-data); font-size: 1.45rem; font-variant-numeric: tabular-nums; letter-spacing: -0.01em; }
+.tile svg { width: 100%; height: 64px; display: block; margin-top: 8px; }
+.tile .tf { font-size: 0.76rem; color: var(--muted); }
+@media (max-width: 860px) {
+  .tiles { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .tile:nth-child(4n + 1) { border-left: 1px solid var(--line); padding-left: 22px; }
+  .tile:nth-child(2n + 1) { border-left: 0; padding-left: 0; }
+  .tile:nth-child(n + 3) { border-top: 1px solid var(--line); }
+}
+@media (max-width: 560px) {
+  .tile { padding: 14px 12px 12px; }
+  .tile:nth-child(4n + 1) { padding-left: 12px; }
+  .tile:nth-child(2n + 1) { padding-left: 0; }
+  .tile .tn { font-size: 0.88rem; white-space: nowrap; }
+  .tile .tc { font-size: 0.74rem; }
+  .tile .tv { font-size: 1.2rem; }
+  .tile .tfn { display: none; }
+}
+.fgrid { display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); gap: 48px 48px; }
+.fcard { grid-column: span 2; }
+.tsgrid { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 48px; align-items: start; }
+.tsgrid.solo { grid-template-columns: minmax(0, 1fr); }
+#tsContrib { grid-template-columns: minmax(0, 1fr); }
+#tsContrib .card { border-top: 0; padding-top: 0; }
+@media (max-width: 860px) { .tsgrid { grid-template-columns: minmax(0, 1fr); } #tsContrib .card { border-top: 1px solid var(--rule); padding-top: 14px; } }
+.fcard.half { grid-column: span 3; }
+.fcard.wide { grid-column: 1 / -1; }
+.fcard.tt { grid-column: 1 / span 4; }
+@media (max-width: 980px) { .fgrid { grid-template-columns: repeat(2, minmax(0, 1fr)); } .fcard, .fcard.half { grid-column: auto; } .fcard.wide, .fcard.tt { grid-column: 1 / -1; } }
+@media (max-width: 640px) { .fgrid { grid-template-columns: minmax(0, 1fr); } }
+button.dl { font: inherit; font-size: 0.74rem; color: var(--muted); background: none; border: 1px solid var(--line); border-radius: 3px; padding: 2px 8px; cursor: pointer; margin-left: 10px; }
+button.dl:hover { color: var(--fg); border-color: var(--muted); }
+.fdl { display: flex; justify-content: flex-end; margin-top: 6px; }
+.step.play { font-size: 0.7rem; }
+.fsec { grid-column: 1 / -1; font-size: 0.74rem; text-transform: uppercase; letter-spacing: .14em; color: var(--muted); font-weight: 600; margin: 8px 0 -28px; }
+.fsec:first-child { margin-top: 0; }
+#finSum table { width: 100%; border-collapse: collapse; font-variant-numeric: tabular-nums; font-size: 0.88rem; }
+#finSum th, #finSum td { padding: 7px 6px; border-bottom: 1px solid var(--line); text-align: right; white-space: nowrap; }
+#finSum thead th { font-weight: 500; font-size: 0.74rem; color: var(--muted); text-transform: uppercase; letter-spacing: .08em; }
+#finSum th.l { text-align: left; font-weight: 400; white-space: normal; }
+#finSum td.v { font-weight: 500; }
+#finSum td.d { color: var(--muted); }
+#finSum .pb { display: inline-block; width: 70px; height: 6px; border-radius: 3px; background: var(--grid); vertical-align: middle; margin-left: 8px; position: relative; overflow: hidden; }
+#finSum .pb i { position: absolute; left: 0; top: 0; bottom: 0; background: var(--accent); opacity: .55; }
+@media (max-width: 640px) { #finSum .pb { display: none; } #finSum .hide-s { display: none; } }
+.fhead { display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: 4px 12px; }
+.fhead h2 { font-family: var(--font-body); font-weight: 500; font-size: 1rem; margin: 0; text-wrap: balance; }
+.fval { font-family: var(--font-data); font-size: 0.82rem; color: var(--muted); font-variant-numeric: tabular-nums; }
+.fval b { font-weight: 500; font-size: 0.95rem; color: var(--fg); }
+.fsub { color: var(--muted); font-size: 0.8rem; margin: 2px 0 0; min-height: 1.2em; }
+.fnote { color: var(--muted); font-size: 0.8rem; margin: 8px 0 0; }
+.fc { width: 100%; height: auto; display: block; margin-top: 8px; touch-action: pan-y; }
+.fc text { font-family: var(--font-body); }
+.hmwrap { overflow-x: auto; }
+.hmctl { display: flex; align-items: baseline; gap: 16px; flex-wrap: wrap; }
+.mini { display: inline-flex; gap: 14px; }
+.mini button { font: inherit; font-size: 0.85rem; color: var(--muted); background: none; border: 0; padding: 1px 0; cursor: pointer; border-bottom: 1.5px solid transparent; }
+.mini button[aria-pressed="true"] { color: var(--fg); border-bottom-color: var(--fg); }
+.mini button:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; }
+table.hm { border-collapse: separate; border-spacing: 2px; font-variant-numeric: tabular-nums; font-family: var(--font-data); font-size: 0.78rem; }
+.hm th { font-weight: 400; color: var(--muted); padding: 2px 6px; white-space: nowrap; }
+.hm th.rl { text-align: left; font-family: var(--font-body); font-size: 0.85rem; color: var(--fg); padding-right: 12px; }
+.hm td { width: 52px; min-width: 52px; text-align: center; padding: 5px 2px; border-radius: 4px; color: var(--fg); }
+.hm td.na { color: var(--muted); }
+.hm tr.tot th.rl { font-weight: 600; }
+.hm td.rawc { background: color-mix(in srgb, var(--fg) 4%, var(--surface)); }
+.hm td.unit { background: none; text-align: left; font-size: 0.72rem; color: var(--muted); white-space: nowrap; padding-left: 8px; }
+.hm tr.gap td { height: 12px; padding: 0; background: none; border: 0; }
+.hm th.rl.sub { padding-left: 16px; font-size: 0.8rem; color: var(--muted); }
+.hm tr.pick { cursor: pointer; }
+.hm tr.pick:hover th.rl { color: var(--accent); }
+.hm tr.on th.rl { color: var(--accent); box-shadow: inset 2px 0 0 var(--accent); }
+.hm tr.tot td { font-weight: 600; }
+.hm td .ar { font-size: 0.55rem; margin-left: 3px; opacity: 0.55; vertical-align: 1px; }
+
+.tip { position: fixed; pointer-events: none; background: var(--fg); color: var(--bg); font-size: 0.8rem; padding: 6px 9px;
+  border-radius: 3px; font-family: var(--font-data); white-space: nowrap; z-index: 20; }
+
+footer { color: var(--muted); font-size: 0.82rem; display: grid; gap: 6px; border-top: 1px solid var(--line); padding-top: 14px; }
+footer .fbody { max-width: 78ch; }
+footer p { margin: 0; }
+footer summary { cursor: pointer; color: var(--fg); font-weight: 500; font-size: 0.88rem; }
+footer .fbody { display: grid; gap: 6px; margin-top: 10px; }
+footer b { color: var(--fg); font-weight: 600; }
+@media (max-width: 560px) {
+  .sets { gap: 4px 16px; }
+  .summary { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .timebar > label { display: none; }
+  .timebar input[type=range] { flex-basis: 120px; }
+  #clock text { font-size: 17px; }
+  #ts text { font-size: 18px; }
+}
+@media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
+</style>
+
+<div class="wrap">
+  <header class="topbar">
+    <nav class="sets" id="sets" aria-label="Näkymä"></nav>
+  </header>
+
+  <section class="hero">
+    <p class="eyebrow" id="sub"></p>
+    <h1 id="headline"></h1>
+  </section>
+
+  <section class="top" id="topSec">
+    <div class="card">
+      <div class="phead"><h2>Kartta</h2><span class="meta" id="clockMeta"></span></div>
+      <div class="clockbar"><label class="tg" id="tailsTg"><input type="checkbox" id="tails"> <span id="tailsLbl">Trendi</span></label></div>
+      <svg id="clock" viewBox="0 22 561 578" role="img" aria-label="Suhdannekartta"></svg>
+      <div class="timebar">
+        <label for="per">Ajankohta</label>
+        <button class="step play" id="play" type="button" aria-label="Toista ajassa" title="Toista ajassa">&#9654;</button>
+        <button class="step" id="prev" type="button" aria-label="Edellinen jakso">&#8249;</button>
+        <input type="range" id="per" min="0" max="0" value="0">
+        <button class="step" id="next" type="button" aria-label="Seuraava jakso">&#8250;</button>
+        <output id="perOut" for="per"></output>
+      </div>
+    </div>
+    <div class="card">
+      <div class="phead"><h2>Indikaattorit</h2><span class="meta" id="listMeta"></span></div>
+      <div class="summary" id="summary"></div>
+      <div class="list" id="list"></div>
+    </div>
+  </section>
+
+  <section class="tiles" id="tiles" hidden></section>
+  <section class="card" id="growthSec" hidden>
+    <div class="phead"><h2 id="grTitle">Kasvu</h2>
+      <div class="hmctl"><span class="meta">Muutos, %. Hinnoissa ja palkoissa sininen väri.</span>
+        <div class="mini" role="group" aria-label="Kasvuvauhti"><button type="button" id="gr-yy" aria-pressed="true">v/v</button><button type="button" id="gr-qq" aria-pressed="false">q/q</button></div><button type="button" class="dl" id="gr-dl">CSV</button></div></div>
+    <div class="hmwrap"><table class="hm" id="grTable"></table></div>
+  </section>
+  <section class="card" id="finSum" hidden></section>
+  <section class="fgrid" id="charts" hidden></section>
+
+  <section class="card" id="detail">
+    <div class="tabs" role="tablist">
+      <button role="tab" id="tab-ts" aria-selected="true" type="button">Aikasarja</button>
+      <button role="tab" id="tab-hm" aria-selected="false" type="button">Taulukko</button>
+    </div>
+    <div id="view-ts">
+      <div class="tsgrid" id="tsGrid">
+        <div class="tsmain">
+          <div class="viewhead"><h2 id="tsTitle"></h2><span class="now" id="tsNow"></span></div>
+          <p class="fsub" id="tsSub">Standardoitu poikkeama sarjan omasta pitkän aikavälin trendistä. 0 = trendi, ±1 = tavanomainen vaihtelu.</p>
+          <svg id="ts" viewBox="0 0 560 300" role="img" aria-label="Poikkeama trendistä ajassa"></svg>
+          <div class="legend" id="tsLegend"></div>
+        </div>
+        <div class="fgrid" id="tsContrib"></div>
+      </div>
+    </div>
+    <div id="view-hm" hidden>
+      <div class="viewhead"><h2 id="hmTitle">Poikkeama trendistä</h2>
+        <div class="hmctl"><span class="now" id="hmNote"></span>
+          <div class="mini" role="group" aria-label="Taulukon arvo"><button type="button" id="hm-lvl" aria-pressed="true">Taso</button><button type="button" id="hm-chg" aria-pressed="false">Muutos</button><button type="button" id="hm-raw" aria-pressed="false">Arvo</button></div><button type="button" class="dl" id="hm-dl">CSV</button></div></div>
+      <div class="hmwrap"><table class="hm" id="hm"></table></div>
+    </div>
+  </section>
+
+  <footer id="foot"></footer>
+</div>
+<div class="tip" id="tip" hidden></div>
+
+<script id="data" type="application/json">__DATA__</script>
+<script>
+(async function () {
+  // Data upotettuna (pipeline.R:n tuottama suhdannekartta.html) tai haettuna viereisesta clock.json:sta (julkaisu)
+  const embedded = document.getElementById("data").textContent.trim();
+  let D;
+  try {
+    D = embedded.startsWith("__") ? await (await fetch("clock.json", { cache: "no-cache" })).json() : JSON.parse(embedded);
+  } catch (e) {
+    document.querySelector(".wrap").innerHTML = "<p>Dataa ei saatu ladattua. Aja pipeline.R ja avaa suhdannekartta.html, tai tarjoile sivu palvelimelta clock.json:n vierestä.</p>";
+    return;
+  }
+  const NS = "http://www.w3.org/2000/svg";
+  const Q = {
+    up:   { name: "Noususuhdanne", short: "Nousu",   v: "--q-up" },
+    turn: { name: "Hidastuminen",  short: "Hidastuminen", v: "--q-turn" },
+    down: { name: "Laskusuhdanne", short: "Lasku",   v: "--q-down" },
+    rec:  { name: "Elpyminen",     short: "Elpyminen", v: "--q-rec" }
+  };
+  const QORDER = ["up", "turn", "down", "rec"];
+  const GVARS = ["--g1", "--g2", "--g3", "--g4", "--g5"];
+  const LIM = 2.5;
+
+  let set = D.sets.find(s => s.default) || D.sets[0];
+  const defIdx = st => st.composite ? Math.max(0, st.periods.indexOf(st.composite.last)) : st.periods.length - 1;   // viimeisin kuukausi, jolta kaikki sarjat
+  let idx = defIdx(set);
+  let sel = null;            // indikaattorin id, "comp" tai null
+  let qf = null;             // vaihesuodatin: up/turn/down/rec tai null
+  let tab = "ts";
+  let showTails = false;
+  const gcache = new Map();
+
+  const $ = id => document.getElementById(id);
+  const el = (tag, attrs, parent) => { const e = document.createElementNS(NS, tag);
+    for (const k in attrs) e.setAttribute(k, attrs[k]); if (parent) parent.appendChild(e); return e; };
+  const quad = (l, c) => l >= 0 ? (c >= 0 ? "up" : "turn") : (c < 0 ? "down" : "rec");
+  const qcol = q => `var(${Q[q].v})`;
+  const gcol = g => `var(${GVARS[Math.max(0, set.groups.indexOf(g)) % GVARS.length]})`;
+  const fmtP = p => p.includes("Q") ? p.slice(5) + "/" + p.slice(0, 4) : (+p.slice(5)) + "/" + p.slice(0, 4);
+  const fmtN = v => { const r = Math.round(v * 10) / 10; return (r > 0 ? "+" : r < 0 ? "−" : "") + Math.abs(r).toFixed(1).replace(".", ","); };
+  const tick = v => (v > 0 ? "+" : v < 0 ? "−" : "") + Math.abs(v);
+  const clip = v => Math.max(-LIM + 0.08, Math.min(LIM - 0.08, v));
+
+  function comp() { return { id: "comp", label: "Kokonaisindikaattori", last: set.composite.last,
+    level: set.composite.level, change: set.composite.change, comp: true }; }
+  // ryhmapiste: ryhman sarjojen tasojen keskiarvo (vain jaksot, joilla kaikki sarjat ovat saatavilla)
+  function grp(g) {
+    const key = set.id + "|" + g; if (gcache.has(key)) return gcache.get(key);
+    const mem = set.indicators.filter(s => s.group === g), n = set.periods.length, lvl = new Array(n).fill(null);
+    for (let k = 0; k < n; k++) { let sum = 0, ok = true;
+      for (const s of mem) { const v = s.level[k]; if (v == null) { ok = false; break; } sum += v; }
+      if (ok) lvl[k] = sum / mem.length; }
+    const d = []; for (let k = 1; k < n; k++) if (lvl[k] != null && lvl[k - 1] != null) d.push(lvl[k] - lvl[k - 1]);
+    const m = d.reduce((a, b) => a + b, 0) / d.length, sd = Math.sqrt(d.reduce((a, b) => a + (b - m) ** 2, 0) / (d.length - 1)) || 1;
+    const chg = lvl.map((v, k) => k > 0 && v != null && lvl[k - 1] != null ? (v - lvl[k - 1]) / sd : null);
+    let li = 0; for (let k = n - 1; k >= 0; k--) if (lvl[k] != null && chg[k] != null) { li = k; break; }
+    const o = { id: "g:" + g, label: g, group: g, isGroup: true, last: set.periods[li], level: lvl, change: chg };
+    gcache.set(key, o); return o;
+  }
+  function findItem(id) { if (id === "comp") return comp(); if (id.startsWith("g:")) return grp(id.slice(2)); return set.indicators.find(x => x.id === id); }
+  function lastIdx(s) { return set.periods.indexOf(s.last); }
+  function at(s, i) {
+    const j = Math.min(i, lastIdx(s)); let k = j;
+    while (k >= 0 && (s.level[k] == null || s.change[k] == null)) k--;
+    return k < 0 ? null : { i: k, l: s.level[k], c: s.change[k], stale: k < i };
+  }
+
+  /* ---------- otsikko ja settivalitsin ---------- */
+  function renderHeader() {
+    const gen = new Date(D.meta.generated.replace(/(\+\d{2})(\d{2})$/, "$1:$2"));
+    const lastAll = set.view === "charts" ? set.periods[lastNN(set.series.find(x => x.id === (set.charts[0].bars || set.charts[0].lines[0])).values)] : set.periods[set.periods.length - 1];
+    $("headline").textContent = set.label;
+    $("sub").textContent = `Päivitetty ${gen.toLocaleDateString("fi-FI")} · viimeisin havainto ${fmtP(lastAll)}`;
+    const box = $("sets"); box.innerHTML = "";
+    D.sets.forEach(s => { const b = document.createElement("button"); b.type = "button"; b.textContent = s.label;
+      b.setAttribute("aria-pressed", s.id === set.id); b.onclick = () => { if (s.id === set.id) return;
+        stopPlay(); set = s; idx = defIdx(s); sel = null; qf = null; renderAll(); }; box.appendChild(b); });
+  }
+
+  /* ---------- kello ---------- */
+  // vaihekuvake: sykli y = cy - amp*cos(2*pi*t), pohja keskella kuten kellossa: vasen puoli laskee, oikea nousee.
+  // hidastuminen 0-0.25 (vasen ylä), lasku 0.25-0.5 (vasen ala), elpyminen 0.5-0.75 (oikea ala), nousu 0.75-1 (oikea ylä)
+  const PHASE = { turn: [0, 0.25], down: [0.25, 0.5], rec: [0.5, 0.75], up: [0.75, 1] };
+  const QPOS = { turn: [0, 0], up: [1, 0], down: [0, 1], rec: [1, 1] };
+  function phaseIcon(q, s = 32) {
+    const p = 4, w = s - 2 * p, amp = s / 2 - 8, cx = s / 2, cy = s / 2;
+    const pt = t => [p + t * w, cy - amp * Math.cos(2 * Math.PI * t)];
+    const seg = (a, b) => { let d = ""; for (let k = 0; k <= 24; k++) { const [x, y] = pt(a + (b - a) * k / 24); d += (k ? "L" : "M") + x.toFixed(1) + " " + y.toFixed(1); } return d; };
+    const [a, b] = PHASE[q], [ex, ey] = pt(b), c = qcol(q), [qx, qy] = QPOS[q];
+    return `<line x1="1" x2="${s - 1}" y1="${cy}" y2="${cy}" stroke="var(--muted)" stroke-width="0.8" stroke-dasharray="1.5 1.5"/>` +
+      `<line y1="1" y2="${s - 1}" x1="${cx}" x2="${cx}" stroke="var(--muted)" stroke-width="0.8" stroke-dasharray="1.5 1.5"/>` +
+      `<path d="${seg(0, 1)}" fill="none" stroke="var(--muted)" stroke-opacity="0.5" stroke-width="1.2"/>` +
+      `<path d="${seg(a, b)}" fill="none" stroke="${c}" stroke-width="3" stroke-linecap="round"/>` +
+      `<circle cx="${ex.toFixed(1)}" cy="${ey.toFixed(1)}" r="2.6" fill="${c}"/>`;
+  }
+  const iconHTML = (q, s = 30) => `<svg class="picon" width="${s}" height="${s}" viewBox="0 0 32 32" role="img" aria-label="${Q[q].name}"><title>${Q[q].name}</title>${phaseIcon(q)}</svg>`;
+
+  const W = 600, M = 40, S = (W - 2 * M) / (2 * LIM);
+  const X = c => M + (clip(c) + LIM) * S, Y = l => M + (LIM - clip(l)) * S;
+
+  function renderClock() {
+    const svg = $("clock"); svg.innerHTML = "";
+    const mid = W / 2, inner = W - 2 * M;
+    // tausta: lapinakyva; vaiheet kertovat kulmien kuvakkeet
+    for (let v = -2; v <= 2; v++) { if (!v) continue;
+      el("text", { x: X(v), y: W - M + 16, "text-anchor": "middle", "font-size": 11, fill: "var(--muted)" }, svg).textContent = tick(v);
+      el("text", { x: M - 8, y: Y(v) + 4, "text-anchor": "end", "font-size": 11, fill: "var(--muted)" }, svg).textContent = tick(v);
+    }
+    el("rect", { x: M, y: M, width: inner, height: inner, fill: "none", stroke: "var(--line)" }, svg);
+    el("line", { x1: mid, x2: mid, y1: M, y2: W - M, stroke: "var(--muted)", "stroke-width": 1, "stroke-dasharray": "6 4", "stroke-opacity": 0.7 }, svg);
+    el("line", { y1: mid, y2: mid, x1: M, x2: W - M, stroke: "var(--muted)", "stroke-width": 1, "stroke-dasharray": "6 4", "stroke-opacity": 0.7 }, svg);
+    // akselitekstit CBS:n kellon tapaan akselien paihin
+    const IS = 1.3, IW = 32 * IS;
+    [["turn", M + 8, M + 8], ["up", W - M - 8 - IW, M + 8], ["down", M + 8, W - M - 8 - IW], ["rec", W - M - 8 - IW, W - M - 8 - IW]].forEach(([q, x, y]) => {
+      const g = el("g", { transform: `translate(${x} ${y}) scale(${IS})`, class: "pic" }, svg); g.innerHTML = phaseIcon(q);
+      el("title", {}, g).textContent = Q[q].name; });
+    const growthClock = set.indicators.every(x => x.kind === "growth");
+    const T = growthClock ? ["Keskimääräistä nopeampi kasvu", "Keskimääräistä hitaampi kasvu", "Kasvu hidastuu", "Kasvu kiihtyy"]
+                          : ["Trendin yläpuolella", "Trendin alapuolella", "Heikentynyt", "Vahvistunut"];
+    const axl = (t, x, y, a, cls = "") => { el("text", { class: "axl " + cls, x, y, "text-anchor": a, "font-size": 11.5, fill: "var(--fg)", "fill-opacity": 0.75 }, svg).textContent = t; };
+    axl(T[0], mid + 8, M + 20, "start", "top"); axl(T[1], mid + 8, W - M - 12, "start", "bot");
+    axl(T[2], M + 10, mid + 18, "start"); axl(T[3], W - M - 10, mid + 18, "end");
+
+    const items = [];
+    set.groups.forEach(g => {
+      const mem = set.indicators.filter(s => s.group === g); if (!mem.length) return;
+      mem.forEach(s => items.push({ s, col: gcol(g) }));
+    });
+    items.push({ s: comp(), col: "var(--fg)" });
+    const placed = [];
+    const hi = s => sel === s.id || (!!sel && sel === "g:" + s.group && !s.isGroup && !s.comp);
+    items.forEach(({ s, col }) => {
+      const p = at(s, idx); if (!p) return;
+      const off = qf && (quad(p.l, p.c) !== qf || (!s.comp && !s.isGroup && !s.in_composite)) && !hi(s);
+      const g = el("g", { class: "pt" + (hi(s) ? " sel" : "") + (off ? " off" : ""), tabindex: -1, "data-id": s.id }, svg);
+      const pts = [], from = (showTails || hi(s)) ? Math.max(0, p.i - set.tail) : p.i;
+      for (let k = from; k <= p.i; k++)
+        if (s.level[k] != null && s.change[k] != null) pts.push([X(s.change[k]), Y(s.level[k])]);
+      if (pts.length > 1) {
+        el("polyline", { points: pts.map(q => q.join(",")).join(" "), fill: "none", stroke: col,
+          "stroke-width": s.comp || s.isGroup ? 2 : 1.5, "stroke-opacity": 0.5, "stroke-linejoin": "round" }, g);
+        pts.slice(0, -1).forEach((q, k) => el("circle", { cx: q[0], cy: q[1], r: 2.2, fill: col, "fill-opacity": 0.25 + 0.5 * k / pts.length }, g));
+      }
+      const [hx, hy] = pts[pts.length - 1];
+      const r = (s.isGroup ? 9 : 6.5) + (hi(s) ? 2 : 0);
+      if (s.comp) {
+        const d = r + 2;
+        el("path", { d: `M${hx} ${hy - d}L${hx + d} ${hy}L${hx} ${hy + d}L${hx - d} ${hy}Z`,
+          fill: p.stale ? "var(--surface)" : "var(--fg)", stroke: p.stale ? "var(--fg)" : "var(--surface)", "stroke-width": 2 }, g);
+      } else {
+        el("circle", { cx: hx, cy: hy, r, fill: p.stale ? "var(--surface)" : col, stroke: p.stale ? col : "var(--surface)", "stroke-width": 2 }, g);
+      }
+      const right = hx + r + 8 + s.label.length * 6.6 < W - M;   // nimi oikealle, jos mahtuu kehyksen sisaan
+      const lbl = el("text", { class: "lbl", x: hx + (right ? r + 6 : -r - 6), y: hy - 10, "text-anchor": right ? "start" : "end",
+        "font-size": s.isGroup ? 12.5 : 12, "font-weight": s.isGroup ? 600 : 500, fill: "var(--fg)", stroke: "var(--surface)", "stroke-width": 4, "paint-order": "stroke" }, g);
+      lbl.textContent = s.label;
+      el("title", {}, g).textContent = `${s.label}, ${fmtP(set.periods[p.i])}: taso ${fmtN(p.l)}, muutos ${fmtN(p.c)}`;
+      if (hi(s)) placed.push(lbl);
+      g.addEventListener("click", () => select(s.id));
+      g.addEventListener("mouseenter", () => hlRow(s.id)); g.addEventListener("mouseleave", () => hlRow(null));
+    });
+    // nimien tormaysten esto: ylhaalta alas, paallekkainen nimi siirtyy rivin alemmas
+    const boxes = [];
+    placed.map(t => ({ t, x: +t.getAttribute("x"), y: +t.getAttribute("y"), w: t.textContent.length * 7.4,
+                       end: t.getAttribute("text-anchor") === "end" }))
+      .sort((a, b) => a.y - b.y)
+      .forEach(o => {
+        const x0 = o.end ? o.x - o.w : o.x, x1 = x0 + o.w; let y = o.y;
+        for (let k = 0; k < 8; k++) {
+          const hit = boxes.find(b => x0 < b.x1 && x1 > b.x0 && Math.abs(y - b.y) < 15);
+          if (!hit) break; y = hit.y + 15;
+        }
+        o.t.setAttribute("y", y); boxes.push({ x0, x1, y });
+      });
+  }
+
+  /* ---------- aikavalitsin ---------- */
+  function renderTime() {
+    $("tailsTg").title = `Näytä pisteiden kulku ${set.tail} ${set.freq === "M" ? "kuukauden" : "neljänneksen"} ajalta`;
+    const r = $("per"); r.max = set.periods.length - 1; r.value = idx;
+    $("perOut").textContent = fmtP(set.periods[idx]);
+  }
+  $("tails").addEventListener("change", e => { showTails = e.target.checked; update(); });
+  $("per").addEventListener("input", e => { stopPlay(); idx = +e.target.value; update(); });
+  $("prev").onclick = () => { stopPlay(); if (idx > 0) { idx--; update(); } };
+  $("next").onclick = () => { stopPlay(); if (idx < set.periods.length - 1) { idx++; update(); } };
+
+  /* ---------- yhteenveto ja luettelo ---------- */
+  function renderPanel() {
+    const counts = { up: 0, turn: 0, down: 0, rec: 0 }; let n = 0;
+    set.indicators.forEach(s => { if (!s.in_composite) return; const p = at(s, idx); if (p) { counts[quad(p.l, p.c)]++; n++; } });
+    $("summary").innerHTML = QORDER.map(q => `<button type="button" class="qbox${qf === q ? " on" : qf ? " dim" : ""}" data-q="${q}" aria-pressed="${qf === q}" style="--qc:${qcol(q)}" title="${Q[q].name}">${iconHTML(q, 24)}<div class="n">${counts[q]}<span>/${n}</span></div></button>`).join("");
+    $("summary").querySelectorAll(".qbox").forEach(b => b.onclick = () => { qf = qf === b.dataset.q ? null : b.dataset.q; update(); });
+    const pass = s => { if (!qf) return true; if (!s.comp && !s.in_composite) return false; const p = at(s, idx); return !!p && quad(p.l, p.c) === qf; };
+
+    const list = $("list"); list.innerHTML = "";
+    const mk = (s, extraCls) => {
+      const p = at(s, idx); const b = document.createElement("button"); b.type = "button";
+      b.className = "ind" + (extraCls || ""); b.setAttribute("aria-pressed", sel === s.id);
+      const q = p ? quad(p.l, p.c) : null;
+      const out = !s.comp && !s.in_composite;
+      b.dataset.id = s.id;
+      b.innerHTML = `<span class="nm">${s.label}${out ? `<sup title="Ei mukana kokonaisindikaattorissa">*</sup>` : ""}</span><span class="per">${!p ? "–" : p.stale ? fmtP(set.periods[p.i]) : ""}</span>` +
+        (q ? `<span class="chip" style="--qc:${qcol(q)}">${Q[q].short}</span>` : `<span></span>`);
+      b.onclick = () => select(s.id);
+      b.onmouseenter = () => hlPoints([s.id]); b.onmouseleave = () => hlPoints([]);
+      return b;
+    };
+    if (pass(comp())) { const top = document.createElement("div"); top.className = "grp"; top.appendChild(mk(comp(), " comp")); list.appendChild(top); }
+    set.groups.forEach((g, gi) => {
+      const all = set.indicators.filter(s => s.group === g), mem = all.filter(pass); if (!mem.length) return;
+      const box = document.createElement("div"); box.className = "grp";
+      const h = document.createElement("button"); h.type = "button"; h.className = "gh";
+      h.style.setProperty("--gc", `var(${GVARS[gi % GVARS.length]})`);
+      const gp = all.length > 1 ? at(grp(g), idx) : null, gq = gp ? quad(gp.l, gp.c) : null;
+      h.setAttribute("aria-pressed", sel === "g:" + g);
+      h.innerHTML = `<i></i><span class="gn">${g}</span>` + (gq ? `<span class="chip" style="--qc:${qcol(gq)}">${Q[gq].short}</span>` : "") +
+        "";
+      h.onclick = () => select("g:" + g); h.dataset.g = g;
+      h.onmouseenter = () => hlPoints(all.map(x => x.id)); h.onmouseleave = () => hlPoints([]);
+      box.appendChild(h); mem.forEach(s => box.appendChild(mk(s))); list.appendChild(box);
+    });
+    if (!list.children.length) list.innerHTML = `<div class="empty">Ei indikaattoreita vaiheessa ${Q[qf].name.toLowerCase()}.</div>`;
+    if (set.indicators.some(s => !s.in_composite)) list.insertAdjacentHTML("beforeend", `<p class="lnote">* Ei mukana kokonaisindikaattorissa.</p>`);
+  }
+
+  // kartan ja luettelon kytkentä: rivin hover korostaa pisteen ja nayttaa nimen, pisteen hover korostaa rivin
+  function hlPoints(ids) {
+    const svg = $("clock");
+    svg.querySelectorAll(".pt.hl").forEach(g => g.classList.remove("hl"));
+    ids.forEach(id => { const g = svg.querySelector(`.pt[data-id="${CSS.escape(id)}"]`); if (g) { g.classList.add("hl"); svg.appendChild(g); } });
+  }
+  function hlRow(id) {
+    document.querySelectorAll("#list .ind.hl").forEach(r => r.classList.remove("hl"));
+    if (id) { const r = document.querySelector(`#list .ind[data-id="${CSS.escape(id)}"]`); if (r) r.classList.add("hl"); }
+  }
+
+  function select(id) {
+    sel = sel === id ? null : id;
+    if (sel) setTab("ts");
+    if (set.growth) grSel = sel && set.growth.some(r => r.id === sel) ? sel : "bkt";
+    update();
+  }
+
+  /* ---------- aikasarja ---------- */
+  function renderTS() {
+    const s = (sel && findItem(sel)) || comp();
+    const lvlKind = s.kind === "level";   // esim. konkurssit: taso suhteessa omaan historiaan, ei trendia
+    $("tsTitle").textContent = `${s.label}: ${lvlKind ? "suhteessa historiaan" : "poikkeama trendistä"}`;
+    $("tsSub").textContent = lvlKind ? `Standardoitu taso suhteessa omaan historiaan vuodesta 2010. 0 = keskiarvo.`
+      : "Standardoitu poikkeama sarjan omasta pitkän aikavälin trendistä. 0 = trendi, ±1 = tavanomainen vaihtelu.";
+    // oikea puoli: osatekijat (luottamus ym.), BKT-vertailu (kokonaisindikaattori) tai lahteen julkaisema arvo
+    let cc = set.contribs && set.contribs[sel || "comp"];
+    if (!cc && s.isGroup) {               // ryhma = sarjojen poikkeamien keskiarvo, joten osuus = poikkeama / n (tasmalleen)
+      const mem = set.indicators.filter(x => x.group === s.group), n0 = mem.length;
+      set.series = (set.series || []).filter(x => !x.id.startsWith("__g"))
+        .concat([{ id: "__gline", label: s.label, values: s.level }],
+                mem.map(x => ({ id: "__g_" + x.id, label: x.label, values: x.level.map((v, k) => s.level[k] == null || v == null ? null : v / n0) })));
+      cc = { id: "grp_" + s.group, title: `${s.label}: sarjojen osuudet`, lines: ["__gline"], stack: mem.map(x => "__g_" + x.id),
+             unit: "", stackUnit: "", dec: 2, from: 2010, lineColor: "var(--fg)",
+             note: `Ryhmän poikkeama on sarjojen keskiarvo; palkki = sarjan poikkeama / ${n0}.` };
+    }
+    if (!cc && s.raw && s.raw.some(v => v != null)) {
+      const hasTr = s.trend && s.trend.some(v => v != null);
+      // keskiarvo vuodesta 2010: tasovertailu trendin rinnalle (kartta vertaa trendiin, ei keskiarvoon)
+      const k10 = Math.max(0, set.periods.indexOf("2010-01")), r10 = s.raw.slice(k10).filter(v => v != null);
+      const avg = r10.reduce((a, b) => a + b, 0) / r10.length, avgVals = s.raw.map((v, k) => k >= k10 ? avg : null);
+      set.series = (set.series || []).filter(x => !["__raw", "__trend", "__avg"].includes(x.id))
+        .concat([{ id: "__raw", label: "Julkaistu arvo", values: s.raw }], hasTr ? [{ id: "__trend", label: "Pitkän aikavälin trendi", values: s.trend }] : [],
+                [{ id: "__avg", label: "Keskiarvo 2010–", values: avgVals }]);
+      const big = Math.max(...s.raw.filter(v => v != null).map(Math.abs)) >= 1000;
+      cc = { id: "raw_" + s.id, title: `${s.label}: julkaistu arvo`, lines: hasTr ? ["__raw", "__trend", "__avg"] : ["__raw", "__avg"], dash: ["__trend"], dot: ["__avg"],
+             unit: "", dec: big ? 0 : 1, from: 2010,
+             note: [s.raw_desc, s.unit].filter(Boolean).join(", ") + (hasTr ? ". Kartta vertaa trendiin, ei keskiarvoon." : ".") };
+      set.colors = { ...(set.colors || {}), __raw: "var(--accent)", __trend: "var(--muted)", __avg: "var(--q-turn)" };
+    }
+    if (cc) [...cc.lines, ...(cc.stack || [])].filter(id => id.startsWith("raw:")).forEach(id => {   // raw:<sarja> = julkaistu arvo
+      const ind = set.indicators.find(x => x.id === id.slice(4)); if (!ind) return;
+      set.series = (set.series || []).filter(x => x.id !== id).concat([{ id, label: ind.label, values: ind.raw }]); });
+    $("tsGrid").classList.toggle("solo", !cc);
+    if (cc) renderCharts($("tsContrib"), [{ ...cc, wide: true, w: 560, height: 300, defIdx: idx }]); else $("tsContrib").innerHTML = "";
+    const p = at(s, idx);
+    $("tsNow").innerHTML = p ? `${fmtP(set.periods[p.i])}: <b style="color:${qcol(quad(p.l, p.c))}">${Q[quad(p.l, p.c)].name}</b>, taso ${fmtN(p.l)}, muutos ${fmtN(p.c)}` : "";
+    const svg = $("ts"); svg.innerHTML = "";
+    const solo = !cc, W2 = solo ? 960 : 560, H2 = solo ? 230 : 300, ml = 40, mr = 14, mt = 12, mb = 28;
+    svg.setAttribute("viewBox", `0 0 ${W2} ${H2}`);
+    const n = set.periods.length, xs = i => ml + i * (W2 - ml - mr) / (n - 1);
+    const vals = s.level.filter(v => v != null);
+    const lim = Math.max(2.5, Math.ceil(Math.max(...vals.map(Math.abs)) * 2) / 2);
+    const ys = v => mt + (lim - v) / (2 * lim) * (H2 - mt - mb);
+    for (let v = -Math.floor(lim); v <= Math.floor(lim); v++) {
+      el("line", { x1: ml, x2: W2 - mr, y1: ys(v), y2: ys(v), stroke: v ? "var(--grid)" : "var(--muted)", "stroke-width": 1 }, svg);
+      el("text", { x: ml - 6, y: ys(v) + 4, "text-anchor": "end", "font-size": 11, fill: "var(--muted)" }, svg).textContent = tick(v);
+    }
+    set.periods.forEach((per, i) => {
+      const yr = per.slice(0, 4), first = i === 0 || set.periods[i - 1].slice(0, 4) !== yr;
+      if (first && (+yr % (solo ? 2 : 5) === 0)) {
+        el("line", { x1: xs(i), x2: xs(i), y1: H2 - mb, y2: H2 - mb + 4, stroke: "var(--muted)" }, svg);
+        el("text", { x: xs(i), y: H2 - 8, "text-anchor": "middle", "font-size": 11, fill: "var(--muted)" }, svg).textContent = yr;
+      }
+    });
+    el("rect", { x: xs(idx) - 0.5, y: mt, width: 1, height: H2 - mt - mb, fill: "var(--accent)", "fill-opacity": 0.6 }, svg);
+    for (let i = 1; i < n; i++) {
+      const a = s.level[i - 1], b = s.level[i], c = s.change[i];
+      if (a == null || b == null || c == null) continue;
+      el("line", { x1: xs(i - 1), y1: ys(a), x2: xs(i), y2: ys(b), stroke: qcol(quad(b, c)), "stroke-width": 2.6, "stroke-linecap": "round" }, svg);
+    }
+    if (p) el("circle", { cx: xs(p.i), cy: ys(p.l), r: 4.5, fill: qcol(quad(p.l, p.c)), stroke: "var(--surface)", "stroke-width": 2 }, svg);
+    // hover-viiva seuraa hiirta ja on synkassa viereisen kuvan kanssa (chartHooks)
+    const hov = el("line", { y1: mt, y2: H2 - mb, stroke: "var(--fg)", "stroke-opacity": 0.35, "stroke-width": 1, visibility: "hidden" }, svg);
+    const hovDot = el("circle", { r: 4, fill: "var(--surface)", stroke: "var(--fg)", "stroke-width": 1.5, visibility: "hidden" }, svg);
+    const moveHov = i => { if (i == null || i < 0 || i >= n) { hov.setAttribute("visibility", "hidden"); hovDot.setAttribute("visibility", "hidden"); return; }
+      hov.setAttribute("x1", xs(i)); hov.setAttribute("x2", xs(i)); hov.setAttribute("visibility", "visible");
+      if (s.level[i] != null) { hovDot.setAttribute("cx", xs(i)); hovDot.setAttribute("cy", ys(s.level[i])); hovDot.setAttribute("visibility", "visible"); }
+      else hovDot.setAttribute("visibility", "hidden"); };
+    const sideHooks = chartHooks.slice(); chartHooks.push(moveHov);
+    const hit = el("rect", { x: ml, y: mt, width: W2 - ml - mr, height: H2 - mt - mb, fill: "transparent" }, svg);
+    const tip = $("tip");
+    hit.addEventListener("mousemove", e => {
+      const box = svg.getBoundingClientRect(); const fx = (e.clientX - box.left) / box.width * W2;
+      const i = Math.round((fx - ml) / (W2 - ml - mr) * (n - 1));
+      moveHov(i); sideHooks.forEach(fn => fn(i));
+      if (i < 0 || i >= n || s.level[i] == null) { tip.hidden = true; return; }
+      const q = s.change[i] == null ? null : quad(s.level[i], s.change[i]);
+      tip.textContent = `${fmtP(set.periods[i])}  taso ${fmtN(s.level[i])}${q ? "  " + Q[q].name : ""}`;
+      tip.hidden = false; tip.style.left = Math.min(e.clientX + 12, innerWidth - tip.offsetWidth - 8) + "px"; tip.style.top = (e.clientY - 34) + "px";
+    });
+    hit.addEventListener("mouseleave", () => { tip.hidden = true; moveHov(null); sideHooks.forEach(fn => fn(null)); });
+    hit.addEventListener("click", e => { const box = svg.getBoundingClientRect();
+      const i = Math.round(((e.clientX - box.left) / box.width * W2 - ml) / (W2 - ml - mr) * (n - 1));
+      if (i >= 0 && i < n) { idx = i; update(); } });
+    $("tsLegend").innerHTML = QORDER.map(q => `<span style="--qc:${qcol(q)}">${Q[q].name}</span>`).join("") +
+      `<span style="--qc:var(--accent)">Valittu ajankohta (klikkaa kuvaa vaihtaaksesi)</span>`;
+  }
+
+  /* ---------- heatmap ---------- */
+  let hmMode = "lvl";
+  $("hm-lvl").onclick = () => { hmMode = "lvl"; update(); };
+  $("hm-chg").onclick = () => { hmMode = "chg"; update(); };
+  $("hm-raw").onclick = () => { hmMode = "raw"; update(); };
+  const fmtRaw = v => v == null ? "–" : Math.abs(v) >= 1000 ? Math.round(v).toLocaleString("fi-FI")
+    : (+v.toFixed(1) < 0 ? "−" : "") + Math.abs(v).toFixed(1).replace(".", ",");
+  function renderHM() {
+    const N = set.freq === "M" ? 12 : 8, start = Math.max(0, idx - N + 1);
+    const cols = set.periods.slice(start, idx + 1), lvl = hmMode === "lvl", raw = hmMode === "raw";
+    ["lvl", "chg", "raw"].forEach(m => $("hm-" + m).setAttribute("aria-pressed", hmMode === m));
+    $("hmTitle").textContent = raw ? "Julkaistu arvo" : lvl ? "Poikkeama trendistä" : `Muutos edellisestä ${set.freq === "M" ? "kuukaudesta" : "neljänneksestä"}`;
+    $("hmNote").textContent = raw ? "Lähteen julkaisema luku sarjan omassa yksikössä. Nuoli: suunta edelliseen jaksoon."
+      : lvl ? "Nuoli: suunta edelliseen jaksoon." : "Standardoitu, kuten kartan vaaka-akseli.";
+    const rawCell = (a, k) => { const v = a ? a[k] : null, p = a && k > 0 ? a[k - 1] : null;
+      if (v == null) return `<td class="na">–</td>`;
+      const rd = x => Math.abs(x) >= 1000 ? Math.round(x) : Math.round(x * 10) / 10;   // nuoli naytetyn tarkkuuden mukaan
+      const ar = p == null || rd(v) === rd(p) ? "" : `<span class="ar">${rd(v) > rd(p) ? "▲" : "▼"}</span>`;
+      return `<td class="rawc">${fmtRaw(v)}${ar}</td>`; };
+    const cell = (l, c) => {
+      const v = lvl ? l : c;
+      if (v == null) return `<td class="na">–</td>`;
+      const t = Math.min(1, Math.abs(v) / 2.5), base = v >= 0 ? "var(--q-up)" : "var(--q-down)";
+      const ar = !lvl || c == null ? "" : `<span class="ar">${c >= 0 ? "▲" : "▼"}</span>`;
+      return `<td style="background:color-mix(in srgb, ${base} ${Math.round(8 + 52 * t)}%, var(--surface))" title="taso ${l == null ? "–" : fmtN(l)}, muutos ${c == null ? "–" : fmtN(c)}">${fmtN(v)}${ar}</td>`;
+    };
+    let h = `<thead><tr><th></th>${cols.map(p => `<th>${fmtP(p)}</th>`).join("")}</tr></thead><tbody>`;
+    const row = s => raw
+      ? `<tr><th class="rl">${s.label}</th>${cols.map((_, k) => rawCell(s.raw, start + k)).join("")}<td class="unit">${s.unit || ""}</td></tr>`
+      : `<tr><th class="rl">${s.label}</th>${cols.map((_, k) => cell(s.level[start + k], s.change[start + k])).join("")}</tr>`;
+    h += raw ? `<tr><th class="rl">${comp().label}</th>${cols.map(() => `<td class="na">–</td>`).join("")}<td class="unit"></td></tr>` : row(comp());
+    set.indicators.forEach(s => { h += row(s); }); h += "</tbody>";
+    $("hm").innerHTML = h;
+  }
+
+  function setTab(t) { tab = t;
+    ["ts", "hm"].forEach(k => { $("tab-" + k).setAttribute("aria-selected", t === k); $("view-" + k).hidden = t !== k; }); }
+  $("tab-ts").onclick = () => { setTab("ts"); update(); };
+  $("tab-hm").onclick = () => { setTab("hm"); update(); };
+
+  function renderFoot() {
+    $("foot").innerHTML = `<details><summary>Menetelmä ja lähteet</summary><div class="fbody"><p><b>Menetelmä.</b> ${D.meta.method}</p><p>${D.meta.composite}</p><p>${D.meta.charts || ""}</p>
+      <p><b>Huomio.</b> ${D.meta.caveat} Ontot pisteet kartassa: sarjan viimeisin havainto on valittua ajankohtaa vanhempi.</p>
+      <p><b>Lähteet.</b> Tilastokeskus (StatFin: kansantalouden tilinpito, työvoimatutkimus, hinnat ja ansiot, rakentaminen, konkurssit, kuluttajabarometri), Eurostat (Euroopan komission yritysten luottamuskyselyt, HICP-painot, kaupan ja palvelujen liikevaihto), Suomen Pankki (luotonanto ja lainojen korot), EKP (korot, €STR, tuottokäyrä, valuuttakurssit, rahoitusstressi), FRED (epävarmuusindeksi, Yhdysvaltain ja Japanin korot © OECD, Brent © EIA).</p></div></details>`;
+  }
+
+  function renderMeta() {
+    const nAll = set.indicators.length, nComp = set.indicators.filter(s => s.in_composite).length;
+    $("clockMeta").textContent = `${nAll} sarjaa${nComp < nAll ? `, ${nComp} kokonaisindikaattorissa` : ""}, ${set.freq === "M" ? "kuukausittain" : "neljännesvuosittain"}`;
+    $("listMeta").textContent = `Tila ${fmtP(set.periods[idx])}`;
+  }
+
+  function update() {
+    const charts = set.view === "charts", clock = !!(set.indicators && set.indicators.length);
+    $("topSec").hidden = !clock; $("detail").hidden = charts; $("charts").hidden = !charts;
+    if (clock) { renderMeta(); renderTime(); renderClock(); renderPanel(); }
+    $("tiles").hidden = !(charts && set.tiles && set.tiles.length);
+    $("growthSec").hidden = !(charts && set.growth);
+    $("finSum").hidden = !(charts && set.summary && set.summary.length);
+    if (charts) { renderTiles(); if (set.growth) renderGrowth(); if (set.summary) renderSummary(); renderCharts(); return; }
+    if (tab === "ts") renderTS(); else renderHM();
+  }
+
+  /* ---------- kasvutaulukko (kansantalous) ---------- */
+  let grMode = "yy", grSel = "bkt";
+  $("gr-yy").onclick = () => { grMode = "yy"; renderGrowth(); };
+  $("gr-qq").onclick = () => { grMode = "qq"; renderGrowth(); };
+  function renderGrowth() {
+    $("gr-yy").setAttribute("aria-pressed", grMode === "yy"); $("gr-qq").setAttribute("aria-pressed", grMode === "qq");
+    $("grTitle").textContent = grMode === "yy" ? "Kasvu vuodentakaisesta" : "Kasvu edellisestä neljänneksestä";
+    const ser = id => set.series.find(x => x.id === id), N = 8, P = set.periods, n = P.length;
+    const lastOf = id => { const a = ser(id + "_" + grMode).values; for (let k = n - 1; k >= 0; k--) if (a[k] != null) return k; return 0; };
+    const end = set.growth.some(r => r.id === "bkt") ? lastOf("bkt") : Math.max(...set.growth.map(r => lastOf(r.id)));
+    const cols = P.slice(Math.max(0, end - N + 1), end + 1), i0 = Math.max(0, end - N + 1);
+    const rows = [...set.growth].sort((a, b) => (b.id === "bkt") - (a.id === "bkt"));
+    let h = `<thead><tr><th></th>${cols.map(p => `<th>${fmtP(p)}</th>`).join("")}</tr></thead><tbody>`;
+    rows.forEach(r => {
+      const a = ser(r.id + "_" + grMode).values.slice(i0, end + 1), mx = Math.max(...a.filter(v => v != null).map(Math.abs), 0.5);
+      h += `<tr data-id="${r.id}" class="pick${r.id === "bkt" ? " tot" : ""}${r.id === grSel ? " on" : ""}" title="Näytä kuvassa"><th class="rl${r.sub ? " sub" : ""}">${r.label}</th>` + a.map(v => {
+        if (v == null) return `<td class="na">–</td>`;
+        const t = Math.min(1, Math.abs(v) / mx), base = r.neutral ? "var(--accent)" : (v >= 0) !== !!r.invert ? "var(--q-up)" : "var(--q-down)";
+        return `<td style="background:color-mix(in srgb, ${base} ${Math.round(6 + (r.neutral ? 34 : 46) * t)}%, var(--surface))">${+v.toFixed(1) > 0 ? "+" : ""}${fmtV(v, 1)}</td>`;
+      }).join("") + "</tr>" + (r.gap_after ? `<tr class="gap" aria-hidden="true"><td colspan="${cols.length + 1}"></td></tr>` : "");
+    });
+    $("grTable").innerHTML = h + "</tbody>";
+    $("grTable").querySelectorAll("tr.pick").forEach(tr => tr.onclick = () => { grSel = tr.dataset.id; renderGrowth(); renderCharts(); });
+  }
+
+  /* ---------- markkinaruudut: paivittaiset sarjat ---------- */
+  const fmtNum = (v, dec) => v.toLocaleString("fi-FI", { minimumFractionDigits: dec, maximumFractionDigits: dec });
+  const fmtDay = d => `${+d.slice(8, 10)}.${+d.slice(5, 7)}.${d.slice(0, 4)}`;
+  function renderTiles() {
+    const box = $("tiles"); box.innerHTML = "";
+    const chg = (a, b) => (a / b - 1) * 100;
+    // korot (abs): muutos korkopisteina (kp = 0,01 %-yks.), muut: prosentteina; pyoristyksen jalkeen nolla = neutraali
+    const pill = (lbl, c, abs) => {
+      const x = abs ? c * 100 : c, dec = abs ? (Math.abs(x) < 10 ? 1 : 0) : (Math.abs(x) >= 10 ? 1 : 2), r = +x.toFixed(dec);
+      const txt = fmtNum(Math.abs(r), dec) + (abs ? " kp" : " %");
+      if (r === 0) return `<span class="tcx" style="--tc:var(--muted)"><b>${lbl}</b>${abs ? "0 kp" : "0 %"}</span>`;
+      return `<span class="tcx" style="--tc:${r > 0 ? "var(--q-up)" : "var(--q-down)"}"><b>${lbl}</b><i>${r > 0 ? "▲" : "▼"}</i>${txt}</span>`; };
+    (set.tiles || []).forEach(t0 => {
+      // sama kalenterijakso kaikille (3 kk), vaikka kaupankayntipaivien maara vaihtelee (esim. bitcoin 7 pv/vko)
+      const dl = new Date(t0.dates[t0.dates.length - 1]); dl.setMonth(dl.getMonth() - 3);
+      const cut = dl.toISOString().slice(0, 10), k0 = Math.max(0, t0.dates.findIndex(d => d >= cut));
+      const t = { ...t0, values: t0.values.slice(k0), dates: t0.dates.slice(k0) };
+      const v = t.values, n = v.length, last = v[n - 1];
+      const dDay = t.abs ? last - v[n - 2] : chg(last, v[n - 2]), dPer = t.abs ? last - v[0] : chg(last, v[0]);
+      const days = (new Date(t.dates[n - 1]) - new Date(t.dates[0])) / 864e5, mo = Math.max(1, Math.round(days / 30.4));
+      const col = dPer >= 0 ? "var(--q-up)" : "var(--q-down)";
+      const div = document.createElement("div"); div.className = "tile";
+      div.innerHTML = `<div class="th"><span class="tn">${t.label}</span><span class="td">${fmtDay(t.dates[n - 1])}</span></div>
+        <div class="tv">${fmtNum(last, t.dec)}${t.unit ? (t.unit === "%" ? " %" : " " + t.unit) : ""}</div>
+        <div class="tcs">${pill("Päivä", dDay, t.abs)}${pill(mo + " kk", dPer, t.abs)}</div>`;
+      // kipina: vari ja katkoviiva jakson alun tasosta kertovat jakson muutoksen
+      const Wt = 240, Ht = 64, lo = Math.min(...v), hi = Math.max(...v), pad = (hi - lo) * 0.08 || 1;
+      const xs = i => i * Wt / (n - 1), ys = y => Ht - (y - lo + pad) / (hi - lo + 2 * pad) * Ht;
+      const svg = el("svg", { viewBox: `0 0 ${Wt} ${Ht}`, preserveAspectRatio: "none", role: "img",
+        "aria-label": `${t.label}, ${mo} kuukauden kehitys` }, div);
+      const d = v.map((y, i) => `${i ? "L" : "M"}${xs(i).toFixed(1)} ${ys(y).toFixed(1)}`).join("");
+      el("path", { d: d + `L${Wt} ${Ht}L0 ${Ht}Z`, fill: col, "fill-opacity": 0.08 }, svg);
+      el("line", { x1: 0, x2: Wt, y1: ys(v[0]), y2: ys(v[0]), stroke: "var(--muted)", "stroke-width": 1, "stroke-dasharray": "3 3", "vector-effect": "non-scaling-stroke", opacity: 0.6 }, svg);
+      el("path", { d, fill: "none", stroke: col, "stroke-width": 1.6, "stroke-linejoin": "round", "vector-effect": "non-scaling-stroke" }, svg);
+      box.appendChild(div);
+    });
+  }
+
+  /* ---------- kuvionakyma: rahoitusmarkkinat ---------- */
+  const LINE_COLS = ["var(--accent)", "var(--g2)", "var(--fg)", "var(--q-turn)"];
+  const STACK_COLS = ["var(--g1)", "var(--g2)", "var(--g3)", "#c9a56b", "var(--g5)", "#b9c0c8", "#8fb0a6"];
+  const fmtV = (v, dec) => { if (v == null) return "–"; const r = +v.toFixed(dec), a = Math.abs(r);
+    return (r < 0 ? "−" : "") + (a >= 10000 ? a.toLocaleString("fi-FI", { minimumFractionDigits: dec, maximumFractionDigits: dec }) : a.toFixed(dec).replace(".", ",")); };
+  const withU = (v, c) => fmtV(v, c.dec) + (c.unit ? (c.unit === "%" ? " %" : " " + c.unit) : "");
+  const niceStep = r => { if (!(r > 0)) return 1;                   // 1, 2, 2,5 tai 5 kertaa 10^k, enintaan noin 5 valia
+    const m = Math.pow(10, Math.floor(Math.log10(r / 5)));
+    return [1, 2, 2.5, 5, 10].map(f => f * m).find(st => r / st <= 5); };
+  const lastNN = a => { for (let k = a.length - 1; k >= 0; k--) if (a[k] != null) return k; return -1; };
+  const pctile = (a, v) => { const xs = a.filter(x => x != null); return Math.round(100 * xs.filter(x => x < v).length / xs.length); };
+  let chartHooks = [];
+
+  /* ---------- CSV-lataus: puolipiste ja desimaalipilkku (Excel fi), UTF-8 BOM ---------- */
+  let dlP = null;
+  const csvCell = v => v == null ? "" : typeof v === "number" ? String(+v.toFixed(4)).replace(".", ",") : /[;"\n]/.test(v) ? `"${String(v).replace(/"/g, '""')}"` : v;
+  const toCSV = rows => rows.map(r => r.map(csvCell).join(";")).join("\r\n");
+  async function saveFile(filename, text) {
+    const data = "\ufeff" + text;
+    try {                                   // claude.ai-esikatselussa tallennus kulkee downloads-kyvyn kautta
+      if (window.claude && typeof window.claude.use === "function") {
+        if (!dlP) dlP = window.claude.use("downloads");
+        const dl = await dlP;
+        if (dl) { try { await dl.save({ filename, data }); } catch (e) { /* katsoja perui tai ei saatavilla */ } return; }
+      }
+    } catch (e) { /* jatketaan tavallisella latauksella */ }
+    const a = document.createElement("a"); a.href = URL.createObjectURL(new Blob([data], { type: "text/csv;charset=utf-8" }));
+    a.download = filename; document.body.appendChild(a); a.click(); setTimeout(() => { URL.revokeObjectURL(a.href); a.remove(); }, 1500);
+  }
+  const slug = s => s.toLowerCase().replace(/[åä]/g, "a").replace(/ö/g, "o").replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "").slice(0, 60);
+  function chartCSV(c) {
+    const ser = id => set.series.find(x => x.id === id), lbl = id => (c.labels && c.labels[id]) || ser(id).label;
+    const ids = [...c.lines, ...(c.bars ? [c.bars] : []), ...(c.stack || [])].filter(id => ser(id));
+    const i0 = c.from ? Math.max(0, set.periods.indexOf(c.from + "-01")) : 0, rows = [["Jakso", ...ids.map(lbl)]];
+    for (let i = i0; i < set.periods.length; i++) { const r = ids.map(id => ser(id).values[i]); if (r.some(v => v != null)) rows.push([set.periods[i], ...r]); }
+    saveFile(`suhdannekartta-${slug(c.title)}.csv`, toCSV(rows));
+  }
+  $("hm-dl").onclick = () => {
+    const key = hmMode === "raw" ? "raw" : hmMode === "lvl" ? "level" : "change", items = [comp(), ...set.indicators];
+    const rows = [["Jakso", ...items.map(s => s.label + (hmMode === "raw" && s.unit ? ` (${s.unit})` : ""))]];
+    set.periods.forEach((p, i) => { const r = items.map(s => s[key] ? s[key][i] : null); if (r.some(v => v != null)) rows.push([p, ...r]); });
+    saveFile(`suhdannekartta-${slug(set.label)}-${{ raw: "arvo", level: "taso", change: "muutos" }[key]}.csv`, toCSV(rows));
+  };
+  $("gr-dl").onclick = () => {
+    const ser = id => set.series.find(x => x.id === id), rws = set.growth.filter(r => ser(r.id + "_" + grMode));
+    const rows = [["Jakso", ...rws.map(r => `${r.label} ${grMode === "yy" ? "v/v" : "q/q"} %`)]];
+    set.periods.forEach((p, i) => { const r = rws.map(x => ser(x.id + "_" + grMode).values[i]); if (r.some(v => v != null)) rows.push([p, ...r]); });
+    saveFile(`suhdannekartta-kasvu-${grMode}.csv`, toCSV(rows));
+  };
+
+  /* ---------- toisto ajassa ---------- */
+  let playT = null;
+  function stopPlay() { if (!playT) return; clearInterval(playT); playT = null; $("play").innerHTML = "&#9654;"; $("play").setAttribute("aria-label", "Toista ajassa"); }
+  $("play").onclick = () => {
+    if (playT) return stopPlay();
+    const end = set.periods.length - 1;
+    if (end - idx < 6) { const f = set.composite.level.findIndex(v => v != null); idx = Math.max(0, f); update(); }   // lopussa: alusta
+    $("play").innerHTML = "&#10074;&#10074;"; $("play").setAttribute("aria-label", "Pysäytä");
+    playT = setInterval(() => { if (idx >= end) return stopPlay(); idx++; update(); }, set.freq === "M" ? 160 : 450);
+  };
+
+  // rahoitusolot yhdella silmayksella: viimeisin arvo, muutos 3 ja 12 kk, sijoitus historiaan
+  function renderSummary() {
+    const ser = id => set.series.find(x => x.id === id), y0 = set.periods[0].slice(0, 4);
+    const sg = (v, dec) => v == null ? "–" : (+v.toFixed(dec) > 0 ? "+" : "") + fmtV(v, dec);
+    let h = `<div class="phead"><h2>Rahoitusolot nyt</h2><span class="meta">Muutos samassa yksikössä; sijoitus = osuus kuukausista vuodesta ${y0}, jolloin arvo oli matalampi</span></div>
+      <table><thead><tr><th class="l"></th><th>Viimeisin</th><th>3 kk</th><th>12 kk</th><th class="hide-s">Sijoitus</th></tr></thead><tbody>`;
+    set.summary.forEach(r => { const s = ser(r.id); if (!s) return;
+      const a = s.values, i = lastNN(a); if (i < 0) return;
+      const at = k => (k >= 0 && a[k] != null ? a[k] : null), v = a[i], u = r.unit ? (r.unit === "%" ? " %" : " " + r.unit) : "";
+      const d3 = at(i - 3) == null ? null : v - at(i - 3), d12 = at(i - 12) == null ? null : v - at(i - 12), pc = pctile(a, v);
+      h += `<tr><th class="l">${r.label || s.label} <span class="d" style="color:var(--muted);font-size:.78rem">${fmtP(set.periods[i])}</span></th>
+        <td class="v">${fmtV(v, r.dec)}${u}</td><td class="d">${sg(d3, r.dec)}</td><td class="d">${sg(d12, r.dec)}</td>
+        <td class="d hide-s">${pc} %<span class="pb"><i style="width:${pc}%"></i></span></td></tr>`; });
+    $("finSum").innerHTML = h + "</tbody></table>";
+  }
+
+  function renderCharts(box = $("charts"), only = null) {
+    box.innerHTML = ""; chartHooks = [];
+    const ser = id => set.series.find(x => x.id === id);
+    const narrow = box.clientWidth < 640, colOf = {};
+    const gRow = set.growth && set.growth.find(r => r.id === grSel);
+    // valitulla rivilla voi olla kontribuutiokuvio (BKT: c.contrib, muut: c.contribs[rivi])
+    const charts = only ? only : !gRow ? set.charts : set.charts.map(c => { if (c.id !== "bktkasvu") return c;
+      const vw = c.views && c.views[gRow.id];               // rivikohtainen viivakuvio (esim. nimellis- ja reaalipalkat)
+      if (vw) return { ...c, ...vw, bars: undefined, stack: undefined };
+      const cb = (c.contribs && c.contribs[gRow.id]) || (gRow.id === "bkt" ? c.contrib : null);
+      return cb && ser(cb.line)
+        ? { ...c, title: cb.title, note: cb.note, lines: [cb.line], bars: undefined, stack: cb.stack.filter(id => ser(id)),
+            unit: cb.unit || "%", dec: cb.dec != null ? cb.dec : c.dec, stackUnit: cb.stackUnit }
+        : { ...c, title: `${gRow.label}: kasvu`, lines: [grSel + "_yy"], bars: grSel + "_qq" }; });
+    Object.assign(colOf, set.colors || {});
+    charts.forEach(c => { if (c.lineColor) colOf[c.lines[0]] = c.lineColor; });
+    charts.forEach(c => c.lines.forEach((id, k) => { if (!(id in colOf)) colOf[id] = LINE_COLS[k % LINE_COLS.length]; }));
+    let lastSec = null;
+    charts.forEach(c0 => {
+      const c = { ...c0, lines: c0.lines.filter(id => ser(id)) };       // puuttuvat sarjat ohitetaan
+      if (c.section && c.section !== lastSec) {                          // valiotsikko osioiden valiin
+        const h = document.createElement("h3"); h.className = "fsec"; h.textContent = c.section; box.appendChild(h); lastSec = c.section; }
+      const lbl = id => (c.labels && c.labels[id]) || ser(id).label;
+      if (c.bars && !ser(c.bars)) delete c.bars;
+      if (!c.lines.length) return;
+      const card = document.createElement("div"); card.className = "card fcard" + (c.size === "tt" && !narrow ? " tt" : c.wide ? " wide" : c.size === "half" ? " half" : "");
+      card.innerHTML = `<div class="fhead"><h2>${c.title}</h2><span class="fval"></span></div><p class="fsub"></p>`;
+      const big = c.wide && !narrow && !c.w, half = c.size === "half" && !narrow;
+      if (c.size === "tt" && !narrow) { c.w = c.w || 760; c.height = c.height || 300; }   // kaksi kolmasosaa leveydesta
+      const W2 = c.w || (big ? 960 : half ? 560 : 420), H2 = c.height || (big ? 300 : half ? 270 : (c.wide ? 270 : 230)), fs = c.w ? 11 : big ? 11 : half ? 12 : 13;
+      const Y2 = c.y2 || [], isY2 = k => Y2.includes(c.lines[k]);   // toissijainen (oikea) akseli eri tason sarjoille
+      const ml = big ? 44 : 52, mr = 10 + (c.bars || c.stack ? W2 / set.periods.length / 2 : 0) + (Y2.length ? 34 : 0), mt = 10, mb = big ? 28 : 34;
+      const svg = el("svg", { class: "fc", viewBox: `0 0 ${W2} ${H2}`, role: "img", "aria-label": c.title }, card);
+      if (c.note) { const p = document.createElement("p"); p.className = "fnote"; p.textContent = c.note; card.appendChild(p); }
+      if (c.lines.length > 1 || c.bars || c.stack) {
+        const lg = document.createElement("div"); lg.className = "legend";
+        lg.innerHTML = c.lines.map(id => `<span style="--qc:${colOf[id]}">${lbl(id)}${(c.y2 || []).includes(id) ? " (oikea akseli)" : ""}</span>`).join("") +
+          (c.stack || []).map((id, k) => `<span class="sq" style="--qc:${STACK_COLS[k % STACK_COLS.length]}">${ser(id).label}</span>`).join("") +
+          (!c.bars ? "" : c.barsNeutral ? `<span style="--qc:var(--g3)">${ser(c.bars).label} (palkit)</span>`
+            : `<span style="--qc:var(--q-up)">${(c.barsLegend || [])[0] || "Normaali käyrä"}</span><span style="--qc:var(--q-down)">${(c.barsLegend || [])[1] || "Käänteinen käyrä"}</span>`);
+        card.appendChild(lg);
+      }
+      const fd = document.createElement("div"); fd.className = "fdl";
+      const db = document.createElement("button"); db.type = "button"; db.className = "dl"; db.textContent = "CSV"; db.title = "Lataa kuvan data";
+      db.onclick = () => chartCSV(c); fd.appendChild(db); card.appendChild(fd);
+      box.appendChild(card);
+
+      // kuviokohtainen alkuvuosi: indeksit paikallisia (i), jaettu hover globaali (i + i0)
+      const i0 = c.from ? Math.max(0, set.periods.indexOf(c.from + "-01")) : 0, P = set.periods.slice(i0), n = P.length;
+      const L = c.lines.map(id => ser(id).values.slice(i0)), B = c.bars ? ser(c.bars).values.slice(i0) : null;
+      const S = (c.stack || []).map(id => ser(id).values.slice(i0));
+      const sums = S.length ? P.map((_, i) => [S.reduce((a, s) => a + Math.min(0, s[i] || 0), 0), S.reduce((a, s) => a + Math.max(0, s[i] || 0), 0)]) : [];
+      const all = [...L.filter((_, k) => !isY2(k)).flat(), ...(B || []), ...sums.flat()].filter(v => v != null);
+      let lo = Math.min(...all, B || S.length ? 0 : Infinity), hi = Math.max(...all);
+      const step = niceStep(hi - lo); lo = Math.floor(lo / step) * step; hi = Math.ceil(hi / step) * step;
+      const xs = i => ml + i * (W2 - ml - mr) / (n - 1), ys = v => mt + (hi - v) / (hi - lo) * (H2 - mt - mb);
+      let ys2 = ys;
+      if (Y2.length) { const a2 = L.filter((_, k) => isY2(k)).flat().filter(v => v != null);
+        let lo2 = Math.min(...a2), hi2 = Math.max(...a2); const st2 = niceStep(hi2 - lo2);
+        lo2 = Math.floor(lo2 / st2) * st2; hi2 = Math.ceil(hi2 / st2) * st2;
+        ys2 = v => mt + (hi2 - v) / (hi2 - lo2) * (H2 - mt - mb);
+        for (let v = lo2; v <= hi2 + st2 / 2; v += st2) { const vv = Math.round(v / st2) * st2;
+          el("text", { x: W2 - mr + 6, y: ys2(vv) + 4, "text-anchor": "start", "font-size": fs, fill: "var(--muted)" }, svg).textContent = fmtV(vv, st2 < 1 ? 1 : 0); } }
+      for (let v = lo; v <= hi + step / 2; v += step) {
+        const vv = Math.round(v / step) * step;
+        el("line", { x1: ml, x2: W2 - mr, y1: ys(vv), y2: ys(vv), stroke: Math.abs(vv) < 1e-9 && (B || S.length || lo < 0) ? "var(--muted)" : "var(--grid)", "stroke-width": 1 }, svg);
+        el("text", { x: ml - 6, y: ys(vv) + 4, "text-anchor": "end", "font-size": fs, fill: "var(--muted)" }, svg).textContent = fmtV(vv, step < 1 ? (step < 0.1 ? 2 : 1) : 0);
+      }
+      const ystep = big || c.size === "tt" ? 2 : 5;
+      P.forEach((per, i) => { const yr = +per.slice(0, 4);
+        if ((per.endsWith("-01") || per.endsWith("-Q1")) && yr % ystep === 0) {
+          el("line", { x1: xs(i), x2: xs(i), y1: H2 - mb, y2: H2 - mb + 4, stroke: "var(--muted)" }, svg);
+          el("text", { x: xs(i), y: H2 - mb + 8 + fs, "text-anchor": "middle", "font-size": fs, fill: "var(--muted)" }, svg).textContent = yr; } });
+      if (B) { const bw = (W2 - ml - mr) / n;
+        B.forEach((v, i) => { if (v == null) return;
+          el("rect", { x: xs(i) - bw / 2, y: Math.min(ys(0), ys(v)), width: bw + 0.3, height: Math.abs(ys(v) - ys(0)),
+            fill: c.barsNeutral ? "var(--g3)" : v >= 0 ? "var(--q-up)" : "var(--q-down)", "fill-opacity": c.barsNeutral ? 0.22 : 0.26 }, svg); }); }
+      if (S.length) { const bw = (W2 - ml - mr) / n * 0.78;   // pinotut kontribuutiot: positiiviset ylos, negatiiviset alas
+        P.forEach((_, i) => { let up = 0, dn = 0;
+          S.forEach((s, k) => { const v = s[i]; if (v == null || v === 0) return;
+            const y0 = v > 0 ? up : dn, y1 = y0 + v; if (v > 0) up = y1; else dn = y1;
+            el("rect", { x: xs(i) - bw / 2, y: ys(Math.max(y0, y1)), width: bw, height: Math.abs(ys(y1) - ys(y0)),
+              fill: STACK_COLS[k % STACK_COLS.length], "fill-opacity": 0.82 }, svg); }); }); }
+      const path = (a, step, yf = ys) => { let d = "", pen = false;
+        a.forEach((v, i) => { if (v == null) { if (!c.connect) pen = false; return; }   // connect: harva sarja (nelj.) yhtenaisena
+          d += pen ? (step ? `H${xs(i).toFixed(1)}V${yf(v).toFixed(1)}` : `L${xs(i).toFixed(1)} ${yf(v).toFixed(1)}`) : `M${xs(i).toFixed(1)} ${yf(v).toFixed(1)}`; pen = true; }); return d; };
+      if (L.length === 1 && !B && !S.length) {   // yksi sarja: pinta ja mediaaniviiva vertailuksi
+        const a = L[0], f = a.findIndex(v => v != null), l = lastNN(a);
+        el("path", { d: path(a) + `L${xs(l)} ${ys(lo)}L${xs(f)} ${ys(lo)}Z`, fill: "var(--accent)", "fill-opacity": 0.08 }, svg);
+        const srt = a.filter(v => v != null).sort((p, q) => p - q), med = srt[Math.floor(srt.length / 2)];
+        el("line", { x1: ml, x2: W2 - mr, y1: ys(med), y2: ys(med), stroke: "var(--muted)", "stroke-dasharray": "4 4", "stroke-width": 1 }, svg);
+        el("text", { x: ml + 4, y: ys(med) - 5, "font-size": fs - 1, fill: "var(--muted)", stroke: "var(--surface)", "stroke-width": 3, "paint-order": "stroke" }, svg).textContent = "mediaani";
+      }
+      L.forEach((a, k) => { const id = c.lines[k], st = (c.step || []).includes(id);
+        el("path", { d: path(a, st, isY2(k) ? ys2 : ys), fill: "none", stroke: colOf[id], "stroke-width": k === 0 ? 2.2 : 1.6,
+          "stroke-dasharray": (c.dot || []).includes(id) ? "1.5 3" : (c.dash || []).includes(id) ? "5 3" : "none",
+          "stroke-linecap": (c.dot || []).includes(id) ? "round" : "butt", "stroke-linejoin": "round" }, svg); });
+      const cur = el("line", { y1: mt, y2: H2 - mb, stroke: "var(--fg)", "stroke-opacity": 0.35, "stroke-width": 1 }, svg);
+      const dots = L.map((a, k) => el("circle", { r: big ? 3.5 : 4, fill: colOf[c.lines[k]], stroke: "var(--surface)", "stroke-width": 1.5 }, svg));
+
+      const valEl = card.querySelector(".fval"), subEl = card.querySelector(".fsub");
+      const show = h => {
+        const iDef = c.defIdx != null && c.defIdx - i0 >= 0 && L[0][Math.min(c.defIdx - i0, lastNN(L[0]))] != null ? Math.min(c.defIdx - i0, lastNN(L[0])) : null;
+        const i = h == null ? (iDef != null ? iDef : L.length > 1 && !B && !S.length ? Math.min(...L.map(lastNN)) : lastNN(B || L[0]))   // oletus: valittu tai viimeisin yhteinen jakso
+                         : Math.max(0, Math.min(n - 1, h - i0));
+        cur.setAttribute("x1", xs(i)); cur.setAttribute("x2", xs(i));
+        L.forEach((a, k) => { const ok = a[i] != null; dots[k].setAttribute("visibility", ok ? "visible" : "hidden");
+          if (ok) { dots[k].setAttribute("cx", xs(i)); dots[k].setAttribute("cy", (isY2(k) ? ys2 : ys)(a[i])); } });
+        if (S.length) {
+          const g = L[0][i], u = c.unit === "%" ? " %" : c.unit ? " " + c.unit : "";
+          valEl.innerHTML = `${fmtP(P[i])} · ${ser(c.lines[0]).label} <b>${g > 0 ? "+" : ""}${fmtV(g, c.dec)}${u}</b>`;
+          const su = c.stackUnit != null ? c.stackUnit : "%-yks.";
+          subEl.textContent = c.stack.map((id, k) => `${ser(id).label} ${+(S[k][i] || 0).toFixed(c.dec) > 0 ? "+" : ""}${fmtV(S[k][i], c.dec)}`).join(" · ") + (su ? " " + su : "");
+        } else if (c.bars) {
+          const d = B[i]; valEl.innerHTML = `${fmtP(P[i])} · ${c.barsName || "ero"} <b style="color:${c.barsNeutral ? "var(--fg)" : d >= 0 ? "var(--q-up)" : "var(--q-down)"}">${d > 0 ? "+" : ""}${fmtV(d, c.dec)} ${c.barsUnit || "%-yks."}</b>`;
+          subEl.textContent = c.lines.map(id => `${ser(id).label} ${withU(L[c.lines.indexOf(id)][i], c)}`).join(" · ");
+        } else if (L.length > 1) {
+          let j = i; while (j > 0 && L.every(a => a[j] == null)) j--;
+          valEl.innerHTML = `${fmtP(P[j])}`;
+          subEl.textContent = c.lines.map(id => `${lbl(id)} ${fmtV(L[c.lines.indexOf(id)][j], c.dec)}${c.unit === "%" ? " %" : ""}`).join(" · ");
+        } else {
+          const a = L[0]; let j = i; while (j > 0 && a[j] == null) j--;
+          valEl.innerHTML = `${fmtP(P[j])} · <b>${withU(a[j], c)}</b>`;
+          const y0 = P[a.findIndex(v => v != null)].slice(0, 4);
+          subEl.textContent = c.sub || "";
+        }
+      };
+      show(null); chartHooks.push(show);
+      const hit = el("rect", { x: ml, y: mt, width: W2 - ml - mr, height: H2 - mt - mb, fill: "transparent" }, svg);
+      hit.addEventListener("pointermove", e => { const r = svg.getBoundingClientRect();
+        const i = Math.max(0, Math.min(n - 1, Math.round(((e.clientX - r.left) / r.width * W2 - ml) / (W2 - ml - mr) * (n - 1))));
+        chartHooks.forEach(fn => fn(i + i0)); });
+      hit.addEventListener("pointerleave", () => chartHooks.forEach(fn => fn(null)));
+    });
+  }
+
+  let lastNarrow = null;
+  addEventListener("resize", () => { if (set.view !== "charts") return;
+    const nw = $("charts").clientWidth < 640; if (nw !== lastNarrow) { lastNarrow = nw; renderCharts(); } });
+  function renderAll() { renderHeader(); update(); }
+  renderFoot(); renderAll();
+})();
+</script>

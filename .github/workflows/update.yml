@@ -1,0 +1,55 @@
+name: Paivitys
+
+on:
+  schedule:
+    - cron: "17 7 * * 1-5"   # arkisin 07:17 UTC (9:17 talviaikaan)
+  workflow_dispatch:
+
+concurrency: { group: paivitys, cancel-in-progress: false }
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: r-lib/actions/setup-r@v2
+        with: { use-public-rspm: true }
+
+      - name: R-paketit
+        run: Rscript -e 'install.packages(c("httr", "jsonlite"))'
+
+      - name: Valimuisti (edelliset onnistuneet haut)
+        uses: actions/cache@v4
+        with:
+          path: cache
+          key: sarjat-${{ github.run_id }}
+          restore-keys: sarjat-
+
+      - name: Aja putki
+        id: run
+        continue-on-error: true
+        env: { LANG: C.UTF-8, STRICT: "1" }
+        run: Rscript pipeline.R
+
+      - name: Kokoa julkaisu
+        if: hashFiles('suhdannekartta.html') != ''
+        run: |
+          mkdir -p public
+          cp suhdannekartta.html public/index.html
+          cp clock.json favicon.svg public/
+
+      - name: Julkaise Cloudflareen
+        if: hashFiles('public/index.html') != ''
+        uses: cloudflare/wrangler-action@v3
+        with:
+          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          command: deploy
+
+      - name: Ilmoita tarkistushuomioista
+        if: steps.run.outcome == 'failure'
+        run: |
+          echo "Putki paattyi virheeseen tai tarkistushuomioihin, katso Aja putki -vaiheen loki."
+          exit 1
