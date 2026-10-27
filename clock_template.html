@@ -1,6 +1,6 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Suhdannekartta</title>
+<title>Suhdannetilanne</title>
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20viewBox%3D%220%200%2032%2032%22%3E%3Crect%20x%3D%22.5%22%20y%3D%22.5%22%20width%3D%2231%22%20height%3D%2231%22%20rx%3D%227%22%20fill%3D%22%23fff%22%20stroke%3D%22%23dfe3e8%22/%3E%3Cline%20x1%3D%223%22%20x2%3D%2229%22%20y1%3D%2216%22%20y2%3D%2216%22%20stroke%3D%22%236b7380%22%20stroke-width%3D%221%22%20stroke-dasharray%3D%222%201.6%22/%3E%3Cline%20y1%3D%223%22%20y2%3D%2229%22%20x1%3D%2216%22%20x2%3D%2216%22%20stroke%3D%22%236b7380%22%20stroke-width%3D%221%22%20stroke-dasharray%3D%222%201.6%22/%3E%3Cpath%20d%3D%22M4.0%208.0L5.0%208.3L6.0%209.1L7.0%2010.3L8.0%2012.0L9.0%2013.9L10.0%2016.0L11.0%2018.1L12.0%2020.0L13.0%2021.7L14.0%2022.9L15.0%2023.7L16.0%2024.0L17.0%2023.7L18.0%2022.9L19.0%2021.7L20.0%2020.0L21.0%2018.1L22.0%2016.0L23.0%2013.9L24.0%2012.0L25.0%2010.3L26.0%209.1L27.0%208.3L28.0%208.0%22%20fill%3D%22none%22%20stroke%3D%22%23b9bec6%22%20stroke-width%3D%221.6%22/%3E%3Cpath%20d%3D%22M10.0%2016.0L10.2%2016.5L10.5%2017.0L10.8%2017.6L11.0%2018.1L11.2%2018.6L11.5%2019.1L11.8%2019.5L12.0%2020.0L12.2%2020.4L12.5%2020.9L12.8%2021.3L13.0%2021.7L13.2%2022.0L13.5%2022.3L13.8%2022.7L14.0%2022.9L14.2%2023.2L14.5%2023.4L14.8%2023.6L15.0%2023.7L15.2%2023.8L15.5%2023.9L15.8%2024.0L16.0%2024.0%22%20fill%3D%22none%22%20stroke%3D%22%23d6716a%22%20stroke-width%3D%223.2%22%20stroke-linecap%3D%22round%22/%3E%3Cpath%20d%3D%22M22.0%2016.0L22.2%2015.5L22.5%2015.0L22.8%2014.4L23.0%2013.9L23.2%2013.4L23.5%2012.9L23.8%2012.5L24.0%2012.0L24.2%2011.6L24.5%2011.1L24.8%2010.7L25.0%2010.3L25.2%2010.0L25.5%209.7L25.8%209.3L26.0%209.1L26.2%208.8L26.5%208.6L26.8%208.4L27.0%208.3L27.2%208.2L27.5%208.1L27.8%208.0L28.0%208.0%22%20fill%3D%22none%22%20stroke%3D%22%235aa77a%22%20stroke-width%3D%223.2%22%20stroke-linecap%3D%22round%22/%3E%3Ccircle%20cx%3D%2228.0%22%20cy%3D%228.0%22%20r%3D%222.8%22%20fill%3D%22%235aa77a%22/%3E%3C/svg%3E">
 <meta name="claude:viewport-fit-sides" content="cover">
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -294,13 +294,13 @@ footer b { color: var(--fg); font-weight: 600; }
 <script id="data" type="application/json">__DATA__</script>
 <script>
 (async function () {
-  // Data upotettuna (pipeline.R:n tuottama suhdannekartta.html) tai haettuna viereisesta clock.json:sta (julkaisu)
+  // Data upotettuna (pipeline.R:n tuottama suhdannetilanne.html) tai haettuna viereisesta clock.json:sta (julkaisu)
   const embedded = document.getElementById("data").textContent.trim();
   let D;
   try {
     D = embedded.startsWith("__") ? await (await fetch("clock.json", { cache: "no-cache" })).json() : JSON.parse(embedded);
   } catch (e) {
-    document.querySelector(".wrap").innerHTML = "<p>Dataa ei saatu ladattua. Aja pipeline.R ja avaa suhdannekartta.html, tai tarjoile sivu palvelimelta clock.json:n vierestä.</p>";
+    document.querySelector(".wrap").innerHTML = "<p>Dataa ei saatu ladattua. Aja pipeline.R ja avaa suhdannetilanne.html, tai tarjoile sivu palvelimelta clock.json:n vierestä.</p>";
     return;
   }
   const NS = "http://www.w3.org/2000/svg";
@@ -787,19 +787,19 @@ footer b { color: var(--fg); font-weight: 600; }
     const ids = [...c.lines, ...(c.bars ? [c.bars] : []), ...(c.stack || [])].filter(id => ser(id));
     const i0 = c.from ? Math.max(0, set.periods.indexOf(c.from + "-01")) : 0, rows = [["Jakso", ...ids.map(lbl)]];
     for (let i = i0; i < set.periods.length; i++) { const r = ids.map(id => ser(id).values[i]); if (r.some(v => v != null)) rows.push([set.periods[i], ...r]); }
-    saveFile(`suhdannekartta-${slug(c.title)}.csv`, toCSV(rows));
+    saveFile(`suhdannetilanne-${slug(c.title)}.csv`, toCSV(rows));
   }
   $("hm-dl").onclick = () => {
     const key = hmMode === "raw" ? "raw" : hmMode === "lvl" ? "level" : "change", items = [comp(), ...set.indicators];
     const rows = [["Jakso", ...items.map(s => s.label + (hmMode === "raw" && s.unit ? ` (${s.unit})` : ""))]];
     set.periods.forEach((p, i) => { const r = items.map(s => s[key] ? s[key][i] : null); if (r.some(v => v != null)) rows.push([p, ...r]); });
-    saveFile(`suhdannekartta-${slug(set.label)}-${{ raw: "arvo", level: "taso", change: "muutos" }[key]}.csv`, toCSV(rows));
+    saveFile(`suhdannetilanne-${slug(set.label)}-${{ raw: "arvo", level: "taso", change: "muutos" }[key]}.csv`, toCSV(rows));
   };
   $("gr-dl").onclick = () => {
     const ser = id => set.series.find(x => x.id === id), rws = set.growth.filter(r => ser(r.id + "_" + grMode));
     const rows = [["Jakso", ...rws.map(r => `${r.label} ${grMode === "yy" ? "v/v" : "q/q"} %`)]];
     set.periods.forEach((p, i) => { const r = rws.map(x => ser(x.id + "_" + grMode).values[i]); if (r.some(v => v != null)) rows.push([p, ...r]); });
-    saveFile(`suhdannekartta-kasvu-${grMode}.csv`, toCSV(rows));
+    saveFile(`suhdannetilanne-kasvu-${grMode}.csv`, toCSV(rows));
   };
 
   /* ---------- toisto ajassa ---------- */

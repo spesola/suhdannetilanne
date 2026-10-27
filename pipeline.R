@@ -1,5 +1,5 @@
 # =====================================================================
-# Suhdannekartta - koko putki
+# Suhdannetilanne - koko putki
 # Lukee series.json, hakee sarjat (StatFin, Eurostat, EKP, FRED),
 # laskee jokaiselle trendipoikkeaman (taso) ja sen muutoksen,
 # kokonaisindikaattorin setin sisalla ja kirjoittaa clock.json.
@@ -522,8 +522,8 @@ TEMPLATE <- "clock_template.html"
 if (file.exists(TEMPLATE)) {
   json <- gsub("</", "<\\/", paste(readLines(OUT_PATH, encoding = "UTF-8"), collapse = "\n"), fixed = TRUE)
   tpl  <- paste(readLines(TEMPLATE, encoding = "UTF-8"), collapse = "\n")
-  writeLines(sub("__DATA__", json, tpl, fixed = TRUE), "suhdannekartta.html", useBytes = TRUE)
-  message("Kirjoitettu suhdannekartta.html (avaa selaimessa)")
+  writeLines(sub("__DATA__", json, tpl, fixed = TRUE), "suhdannetilanne.html", useBytes = TRUE)
+  message("Kirjoitettu suhdannetilanne.html (avaa selaimessa)")
 }
 if (length(CHECKS) && identical(Sys.getenv("STRICT"), "1")) {
   message("STRICT: lopetetaan virhekoodilla tarkistushuomioiden vuoksi"); quit(status = 1)

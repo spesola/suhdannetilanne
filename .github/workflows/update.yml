@@ -34,10 +34,10 @@ jobs:
         run: Rscript pipeline.R
 
       - name: Kokoa julkaisu
-        if: hashFiles('suhdannekartta.html') != ''
+        if: hashFiles('suhdannetilanne.html') != ''
         run: |
           mkdir -p public
-          cp suhdannekartta.html public/index.html
+          cp suhdannetilanne.html public/index.html
           cp clock.json favicon.svg public/
 
       - name: Julkaise Cloudflareen

@@ -1,7 +1,7 @@
 cache/
 public/
 clock.json
-suhdannekartta.html
+suhdannetilanne.html
 .wrangler/
 .Rhistory
 .RData

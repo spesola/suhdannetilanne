@@ -1,5 +1,5 @@
 {
-  "name": "suhdannekartta",
+  "name": "suhdannetilanne",
   "compatibility_date": "2026-10-01",
   "assets": { "directory": "./public" }
 }
