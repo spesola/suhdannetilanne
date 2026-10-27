@@ -1,6 +1,15 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Suhdannetilanne</title>
+<meta name="description" content="Suomen talouden suhdannetilanne avoimista tilastoista: suhdannekartta, reaalitalous ja rahoitusmarkkinat. Päivittyy arkisin.">
+<link rel="canonical" href="https://suhdannetilanne.fi/">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="suhdannetilanne.fi">
+<meta property="og:title" content="Suhdannetilanne">
+<meta property="og:description" content="Suomen talouden suhdannetilanne avoimista tilastoista. Päivittyy arkisin.">
+<meta property="og:url" content="https://suhdannetilanne.fi/">
+<meta property="og:locale" content="fi_FI">
+<meta name="twitter:card" content="summary">
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20viewBox%3D%220%200%2032%2032%22%3E%3Crect%20x%3D%22.5%22%20y%3D%22.5%22%20width%3D%2231%22%20height%3D%2231%22%20rx%3D%227%22%20fill%3D%22%23fff%22%20stroke%3D%22%23dfe3e8%22/%3E%3Cline%20x1%3D%223%22%20x2%3D%2229%22%20y1%3D%2216%22%20y2%3D%2216%22%20stroke%3D%22%236b7380%22%20stroke-width%3D%221%22%20stroke-dasharray%3D%222%201.6%22/%3E%3Cline%20y1%3D%223%22%20y2%3D%2229%22%20x1%3D%2216%22%20x2%3D%2216%22%20stroke%3D%22%236b7380%22%20stroke-width%3D%221%22%20stroke-dasharray%3D%222%201.6%22/%3E%3Cpath%20d%3D%22M4.0%208.0L5.0%208.3L6.0%209.1L7.0%2010.3L8.0%2012.0L9.0%2013.9L10.0%2016.0L11.0%2018.1L12.0%2020.0L13.0%2021.7L14.0%2022.9L15.0%2023.7L16.0%2024.0L17.0%2023.7L18.0%2022.9L19.0%2021.7L20.0%2020.0L21.0%2018.1L22.0%2016.0L23.0%2013.9L24.0%2012.0L25.0%2010.3L26.0%209.1L27.0%208.3L28.0%208.0%22%20fill%3D%22none%22%20stroke%3D%22%23b9bec6%22%20stroke-width%3D%221.6%22/%3E%3Cpath%20d%3D%22M10.0%2016.0L10.2%2016.5L10.5%2017.0L10.8%2017.6L11.0%2018.1L11.2%2018.6L11.5%2019.1L11.8%2019.5L12.0%2020.0L12.2%2020.4L12.5%2020.9L12.8%2021.3L13.0%2021.7L13.2%2022.0L13.5%2022.3L13.8%2022.7L14.0%2022.9L14.2%2023.2L14.5%2023.4L14.8%2023.6L15.0%2023.7L15.2%2023.8L15.5%2023.9L15.8%2024.0L16.0%2024.0%22%20fill%3D%22none%22%20stroke%3D%22%23d6716a%22%20stroke-width%3D%223.2%22%20stroke-linecap%3D%22round%22/%3E%3Cpath%20d%3D%22M22.0%2016.0L22.2%2015.5L22.5%2015.0L22.8%2014.4L23.0%2013.9L23.2%2013.4L23.5%2012.9L23.8%2012.5L24.0%2012.0L24.2%2011.6L24.5%2011.1L24.8%2010.7L25.0%2010.3L25.2%2010.0L25.5%209.7L25.8%209.3L26.0%209.1L26.2%208.8L26.5%208.6L26.8%208.4L27.0%208.3L27.2%208.2L27.5%208.1L27.8%208.0L28.0%208.0%22%20fill%3D%22none%22%20stroke%3D%22%235aa77a%22%20stroke-width%3D%223.2%22%20stroke-linecap%3D%22round%22/%3E%3Ccircle%20cx%3D%2228.0%22%20cy%3D%228.0%22%20r%3D%222.8%22%20fill%3D%22%235aa77a%22/%3E%3C/svg%3E">
 <meta name="claude:viewport-fit-sides" content="cover">
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -27,8 +36,13 @@ body { font-variant-numeric: tabular-nums; background: var(--bg); min-height: 10
   padding-block: 22px 56px; }
 .wrap { max-width: 1180px; margin: 0 auto; display: flex; flex-direction: column; gap: 40px; }
 
-.topbar { display: flex; justify-content: flex-end; }
+.topbar { display: flex; justify-content: space-between; align-items: center; gap: 10px 24px; flex-wrap: wrap; }
+.brand { display: inline-flex; align-items: center; gap: 9px; color: var(--fg); text-decoration: none; font-weight: 500; font-size: 0.95rem; letter-spacing: -0.01em; }
+.brand svg { width: 22px; height: 22px; flex: none; }
+.brand .tld { color: var(--muted); font-weight: 400; }
+.brand:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; }
 .sets { display: flex; flex-wrap: wrap; gap: 4px 22px; }
+.sets .sh { display: none; }
 .sets button { font: inherit; font-size: 0.95rem; color: var(--muted); background: none; border: 0; padding: 4px 0; cursor: pointer;
   border-bottom: 1.5px solid transparent; }
 .sets button:hover { color: var(--fg); }
@@ -140,8 +154,11 @@ h1 { font-family: var(--font-display); font-weight: 300; font-size: clamp(2.1rem
   .tile { padding: 14px 12px 12px; }
   .tile:nth-child(4n + 1) { padding-left: 12px; }
   .tile:nth-child(2n + 1) { padding-left: 0; }
-  .tile .tn { font-size: 0.88rem; white-space: nowrap; }
-  .tile .tc { font-size: 0.74rem; }
+  .tile .th { flex-wrap: wrap; gap: 0 8px; }
+  .tile .tn { font-size: 0.88rem; }
+  .tile .tcs { gap: 2px 8px; }
+  .tile .tcx { font-size: 0.72rem; }
+  .tile .tcx b { margin-right: 3px; }
   .tile .tv { font-size: 1.2rem; }
   .tile .tfn { display: none; }
 }
@@ -212,7 +229,9 @@ footer summary { cursor: pointer; color: var(--fg); font-weight: 500; font-size:
 footer .fbody { display: grid; gap: 6px; margin-top: 10px; }
 footer b { color: var(--fg); font-weight: 600; }
 @media (max-width: 560px) {
-  .sets { gap: 4px 16px; }
+  .sets { gap: 4px 18px; flex-wrap: nowrap; }
+  .sets .lg { display: none; }
+  .sets .sh { display: inline; }
   .summary { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .timebar > label { display: none; }
   .timebar input[type=range] { flex-basis: 120px; }
@@ -224,6 +243,7 @@ footer b { color: var(--fg); font-weight: 600; }
 
 <div class="wrap">
   <header class="topbar">
+    <a class="brand" href="./"><svg viewBox="0 0 32 32" aria-hidden="true"><rect x=".5" y=".5" width="31" height="31" rx="7" fill="#fff" stroke="#dfe3e8"/><line x1="3" x2="29" y1="16" y2="16" stroke="#6b7380" stroke-width="1" stroke-dasharray="2 1.6"/><line y1="3" y2="29" x1="16" x2="16" stroke="#6b7380" stroke-width="1" stroke-dasharray="2 1.6"/><path d="M4.0 8.0L5.0 8.3L6.0 9.1L7.0 10.3L8.0 12.0L9.0 13.9L10.0 16.0L11.0 18.1L12.0 20.0L13.0 21.7L14.0 22.9L15.0 23.7L16.0 24.0L17.0 23.7L18.0 22.9L19.0 21.7L20.0 20.0L21.0 18.1L22.0 16.0L23.0 13.9L24.0 12.0L25.0 10.3L26.0 9.1L27.0 8.3L28.0 8.0" fill="none" stroke="#b9bec6" stroke-width="1.6"/><path d="M10.0 16.0L10.2 16.5L10.5 17.0L10.8 17.6L11.0 18.1L11.2 18.6L11.5 19.1L11.8 19.5L12.0 20.0L12.2 20.4L12.5 20.9L12.8 21.3L13.0 21.7L13.2 22.0L13.5 22.3L13.8 22.7L14.0 22.9L14.2 23.2L14.5 23.4L14.8 23.6L15.0 23.7L15.2 23.8L15.5 23.9L15.8 24.0L16.0 24.0" fill="none" stroke="#d6716a" stroke-width="3.2" stroke-linecap="round"/><path d="M22.0 16.0L22.2 15.5L22.5 15.0L22.8 14.4L23.0 13.9L23.2 13.4L23.5 12.9L23.8 12.5L24.0 12.0L24.2 11.6L24.5 11.1L24.8 10.7L25.0 10.3L25.2 10.0L25.5 9.7L25.8 9.3L26.0 9.1L26.2 8.8L26.5 8.6L26.8 8.4L27.0 8.3L27.2 8.2L27.5 8.1L27.8 8.0L28.0 8.0" fill="none" stroke="#5aa77a" stroke-width="3.2" stroke-linecap="round"/><circle cx="28.0" cy="8.0" r="2.8" fill="#5aa77a"/></svg><span>suhdannetilanne<span class="tld">.fi</span></span></a>
     <nav class="sets" id="sets" aria-label="Näkymä"></nav>
   </header>
 
@@ -359,13 +379,14 @@ footer b { color: var(--fg); font-weight: 600; }
   }
 
   /* ---------- otsikko ja settivalitsin ---------- */
+  const SHORT = { suhdanne: "Suhdanne", bkt: "Reaalitalous", rahoitus: "Rahoitus" };
   function renderHeader() {
     const gen = new Date(D.meta.generated.replace(/(\+\d{2})(\d{2})$/, "$1:$2"));
     const lastAll = set.view === "charts" ? set.periods[lastNN(set.series.find(x => x.id === (set.charts[0].bars || set.charts[0].lines[0])).values)] : set.periods[set.periods.length - 1];
     $("headline").textContent = set.label;
     $("sub").textContent = `Päivitetty ${gen.toLocaleDateString("fi-FI")} · viimeisin havainto ${fmtP(lastAll)}`;
     const box = $("sets"); box.innerHTML = "";
-    D.sets.forEach(s => { const b = document.createElement("button"); b.type = "button"; b.textContent = s.label;
+    D.sets.forEach(s => { const b = document.createElement("button"); b.type = "button"; b.innerHTML = `<span class="lg">${s.label}</span><span class="sh">${SHORT[s.id] || s.label}</span>`;
       b.setAttribute("aria-pressed", s.id === set.id); b.onclick = () => { if (s.id === set.id) return;
         stopPlay(); set = s; idx = defIdx(s); sel = null; qf = null; renderAll(); }; box.appendChild(b); });
   }

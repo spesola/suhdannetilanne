@@ -37,7 +37,8 @@ jobs:
         if: hashFiles('suhdannetilanne.html') != ''
         run: |
           mkdir -p public
-          cp suhdannetilanne.html public/index.html
+          # doctype ja kieli: ilman doctypea selain kayttaa quirks-tilaa
+          { echo '<!doctype html><html lang="fi">'; cat suhdannetilanne.html; } > public/index.html
           cp clock.json favicon.svg public/
 
       - name: Julkaise Cloudflareen
