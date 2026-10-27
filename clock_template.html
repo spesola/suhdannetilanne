@@ -210,6 +210,7 @@ footer .fbody { max-width: 78ch; }
 footer p { margin: 0; }
 footer summary { cursor: pointer; color: var(--fg); font-weight: 500; font-size: 0.88rem; }
 footer .fbody { display: grid; gap: 6px; margin-top: 10px; }
+footer .disc { font-size: 0.8rem; margin-top: 2px; }
 footer b { color: var(--fg); font-weight: 600; }
 @media (max-width: 560px) {
   .sets { gap: 4px 16px; }
@@ -669,7 +670,9 @@ footer b { color: var(--fg); font-weight: 600; }
   function renderFoot() {
     $("foot").innerHTML = `<details><summary>Menetelmä ja lähteet</summary><div class="fbody"><p><b>Menetelmä.</b> ${D.meta.method}</p><p>${D.meta.composite}</p><p>${D.meta.charts || ""}</p>
       <p><b>Huomio.</b> ${D.meta.caveat} Ontot pisteet kartassa: sarjan viimeisin havainto on valittua ajankohtaa vanhempi.</p>
-      <p><b>Lähteet.</b> Tilastokeskus (StatFin: kansantalouden tilinpito, työvoimatutkimus, hinnat ja ansiot, rakentaminen, konkurssit, kuluttajabarometri), Eurostat (Euroopan komission yritysten luottamuskyselyt, HICP-painot, kaupan ja palvelujen liikevaihto), Suomen Pankki (luotonanto ja lainojen korot), EKP (korot, €STR, tuottokäyrä, valuuttakurssit, rahoitusstressi), FRED (epävarmuusindeksi, Yhdysvaltain ja Japanin korot © OECD, Brent © EIA).</p></div></details>`;
+      <p><b>Lähteet.</b> Tilastokeskus (StatFin: kansantalouden tilinpito, työvoimatutkimus, hinnat ja ansiot, rakentaminen, konkurssit, kuluttajabarometri), Eurostat (Euroopan komission yritysten luottamuskyselyt, HICP-painot, kaupan ja palvelujen liikevaihto), Suomen Pankki (luotonanto ja lainojen korot), EKP (korot, €STR, tuottokäyrä, valuuttakurssit, rahoitusstressi), FRED (epävarmuusindeksi, Yhdysvaltain ja Japanin korot © OECD, Brent © EIA).</p>
+      <p><b>Käyttöehdot.</b> Tilastokeskuksen aineistot CC BY 4.0. Muut aineistot lähteiden käyttöehtojen mukaisesti, lähde mainiten. Epävarmuusindeksi: Baker, Bloom ja Davis, policyuncertainty.com. Laskelmat ja esitystapa ovat omia.</p></div></details>
+      <p class="disc">Henkilökohtainen kokeiluprojekti. Ei sijoitusneuvontaa, eikä edusta minkään organisaation näkemystä.</p>`;
   }
 
   function renderMeta() {
