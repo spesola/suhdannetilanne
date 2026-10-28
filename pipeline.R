@@ -401,7 +401,7 @@ for (set in cfg$sets) {
     comp_lvl <- rowMeans(L); dlc <- c(NA, diff(comp_lvl)); comp_chg <- dlc / sd(dlc, na.rm = TRUE)
     sets_out[[length(sets_out) + 1]] <- list(
       id = set$id, label = set$label, freq = freq, default = isTRUE(set$default), view = "charts",
-      from = from_y, periods = periods, charts = set$charts, colors = set$colors, groups = set$groups,
+      from = from_y, periods = periods, charts = set$charts, colors = set$colors, groups = set$groups, lead = set$lead,
       tail = TAIL_N[[freq]], indicators = unname(inds),
       composite = list(last = periods[max(which(!is.na(comp_lvl)))], level = r3(comp_lvl), change = r3(comp_chg)),
       growth = unname(rows),
@@ -495,7 +495,7 @@ for (set in cfg$sets) {
 
   sets_out[[length(sets_out) + 1]] <- list(
     id = set$id, label = set$label, freq = freq, default = isTRUE(set$default),
-    tail = TAIL_N[[freq]], groups = set$groups, periods = periods,
+    tail = TAIL_N[[freq]], groups = set$groups, lead = set$lead, periods = periods,
     composite = list(last = comp_last, level = r3(comp_lvl), change = r3(comp_chg)),
     indicators = unname(inds), series = unname(cser), contribs = contribs)
 }

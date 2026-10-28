@@ -149,8 +149,11 @@ h1 { font-family: var(--font-display); font-weight: 600; font-size: clamp(2.1rem
 .ind .per { font-size: 0.72rem; color: var(--muted); margin-left: 6px; }
 .chip { font-size: 0.78rem; font-weight: 500; white-space: nowrap; color: var(--qc); }
 .gh .chip { font-size: 0.72rem; color: var(--muted); font-weight: 400; }
-.ind.comp { font-weight: 600; border-bottom: 1.5px solid var(--fg); padding-block: 9px; }
+.ind.comp { font-weight: 600; padding-block: 9px; }
 .ind.comp .nm, .ind.comp .ph { font-weight: 600; }
+.ind.lead { font-weight: 600; padding-block: 9px; }
+.ind.lead .nm, .ind.lead .ph { font-weight: 600; }
+.grp.gtop .ind:last-child { border-bottom: 1.5px solid var(--fg); }
 
 .tabs { display: flex; gap: 22px; margin: 0 0 22px; flex-wrap: wrap; border-bottom: 1px solid var(--line); }
 #detail { border-top: 0; padding-top: 0; }
@@ -580,9 +583,14 @@ footer b { color: var(--fg); font-weight: 600; }
       b.onmouseenter = () => hlPoints([s.id]); b.onmouseleave = () => hlPoints([]);
       return b;
     };
-    if (pass(comp())) { const top = document.createElement("div"); top.className = "grp"; top.appendChild(mk(comp(), " comp")); list.appendChild(top); }
+    // lead: tarkeimmat sarjat (esim. BKT) heti kokonaisindikaattorin alle, ei ryhmansa alla
+    const lead = (set.lead || []).map(id => set.indicators.find(x => x.id === id)).filter(Boolean), isLead = s => lead.includes(s);
+    const top = document.createElement("div"); top.className = "grp gtop";
+    if (pass(comp())) top.appendChild(mk(comp(), " comp"));
+    lead.filter(pass).forEach(s => top.appendChild(mk(s, " lead")));
+    if (top.children.length) list.appendChild(top);
     set.groups.forEach((g, gi) => {
-      const all = set.indicators.filter(s => s.group === g), mem = all.filter(pass); if (!mem.length) return;
+      const all = set.indicators.filter(s => s.group === g && !isLead(s)), mem = all.filter(pass); if (!mem.length) return;
       const box = document.createElement("div"); box.className = "grp";
       const h = document.createElement("button"); h.type = "button"; h.className = "gh";
       h.style.setProperty("--gc", `var(${GVARS[gi % GVARS.length]})`);

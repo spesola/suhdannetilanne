@@ -259,6 +259,9 @@
         "Hinnat ja palkat",
         "Kokonaistuotanto"
       ],
+      "lead": [
+        "bkt"
+      ],
       "view": "growth",
       "from": 2015,
       "charts": [
