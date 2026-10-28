@@ -517,8 +517,10 @@ footer b { color: var(--fg); font-weight: 600; }
       el("title", {}, g).textContent = `${s.label}, ${fmtP(set.periods[p.i])}: taso ${fmtN(p.l)}, muutos ${fmtN(p.c)}`;
       if (hi(s)) placed.push(lbl);
       g.addEventListener("click", () => select(s.id));
-      g.addEventListener("mouseenter", () => hlRow(s.id)); g.addEventListener("mouseleave", () => hlRow(null));
+      g.addEventListener("mouseenter", () => { if (svg.lastChild !== g) svg.appendChild(g); hlRow(s.id); });   // paalle, ettei nimi jaa muiden pisteiden alle
+      g.addEventListener("mouseleave", () => hlRow(null));
     });
+    placed.forEach(t => svg.appendChild(t.parentNode));   // valittujen nimet muiden pisteiden paalle
     // nimien tormaysten esto: ylhaalta alas, paallekkainen nimi siirtyy rivin alemmas
     const boxes = [];
     placed.map(t => ({ t, x: +t.getAttribute("x"), y: +t.getAttribute("y"), w: t.textContent.length * 7.4,
