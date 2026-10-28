@@ -393,6 +393,95 @@
       "from": 2000,
       "charts": [
         {
+          "id": "t_korot",
+          "type": "table",
+          "section": "Korot ja rahapolitiikka",
+          "size": "half",
+          "title": "Korot ja riskit",
+          "rows": [
+            {
+              "id": "dfr_d",
+              "group": "Rahapolitiikka"
+            },
+            {
+              "id": "estr"
+            },
+            {
+              "id": "fwd1y_d"
+            },
+            {
+              "id": "fwd2y_d"
+            },
+            {
+              "id": "aaa2",
+              "group": "Euroalueen valtionlainat (AAA)"
+            },
+            {
+              "id": "aaa5"
+            },
+            {
+              "id": "y10_ea"
+            },
+            {
+              "id": "aaa30"
+            },
+            {
+              "id": "aaa_2s10"
+            },
+            {
+              "id": "fi10y",
+              "group": "Suomi"
+            },
+            {
+              "id": "riskilisa"
+            },
+            {
+              "id": "asuntokorko"
+            },
+            {
+              "id": "ciss",
+              "group": "Rahoitusolot"
+            }
+          ],
+          "note": "Korkojen muutokset korkopisteinä. Kuukausisarjoista vain muutos vuoden alusta. Lähteet: EKP, Suomen Pankki."
+        },
+        {
+          "id": "kayra",
+          "type": "curve",
+          "section": "Korot ja rahapolitiikka",
+          "size": "half",
+          "title": "Euroalueen tuottokäyrä",
+          "flow": "YC",
+          "key": "B.U2.EUR.4F.G_N_A.SV_C_YM.SR_%s",
+          "maturities": [
+            "3M",
+            "6M",
+            "1Y",
+            "2Y",
+            "3Y",
+            "5Y",
+            "7Y",
+            "10Y",
+            "15Y",
+            "20Y",
+            "30Y"
+          ],
+          "labels": [
+            "3 kk",
+            "6 kk",
+            "1 v",
+            "2 v",
+            "3 v",
+            "5 v",
+            "7 v",
+            "10 v",
+            "15 v",
+            "20 v",
+            "30 v"
+          ],
+          "note": "AAA-luokiteltujen valtionlainojen spot-korot. Lähde: EKP."
+        },
+        {
           "id": "lyhyt",
           "title": "Ohjauskorko ja Euribor",
           "size": "half",
@@ -504,6 +593,57 @@
             "jp_short": "Japani"
           },
           "note": "Yhdysvallat: Fed funds. Japani: lyhyt markkinakorko (OECD)."
+        },
+        {
+          "id": "t_fx",
+          "type": "table",
+          "section": "Valuutat ja öljy",
+          "size": "half",
+          "title": "Valuuttakurssit ja öljyn hinta",
+          "rows": [
+            {
+              "id": "eer_d",
+              "group": "Valuutat"
+            },
+            {
+              "id": "eurusd"
+            },
+            {
+              "id": "eursek"
+            },
+            {
+              "id": "eurnok"
+            },
+            {
+              "id": "eurgbp"
+            },
+            {
+              "id": "eurjpy"
+            },
+            {
+              "id": "eurcny"
+            },
+            {
+              "id": "brent",
+              "group": "Öljy"
+            },
+            {
+              "id": "wti"
+            }
+          ],
+          "note": "Valuuttakurssit vierasta valuuttaa euroa kohden, nousu = euro vahvistuu. Lähteet: EKP, EIA."
+        },
+        {
+          "id": "eer",
+          "section": "Valuutat ja öljy",
+          "size": "half",
+          "title": "Euron efektiivinen kurssi",
+          "lines": [
+            "eer"
+          ],
+          "unit": "",
+          "dec": 1,
+          "note": "Nimellinen, 40 kauppakumppania, 1999 Q1 = 100. Lähde: EKP."
         },
         {
           "id": "lainakorot",
@@ -2222,7 +2362,11 @@
       "flow": "IRS",
       "key": "M.FI.L.L40.CI.0000.EUR.N.Z",
       "handling": "none",
-      "kind": "level"
+      "kind": "level",
+      "chg": "kp",
+      "dec": 2,
+      "unit": "%",
+      "short": "10 v korko"
     },
     {
       "set": "rahoitus",
@@ -2308,7 +2452,11 @@
       "key": "M.A.1.C.A20.A.A.U2.2250.ZZ.EUR.H.A.0.A.0.A.0",
       "set": "rahoitus",
       "handling": "none",
-      "kind": "level"
+      "kind": "level",
+      "chg": "kp",
+      "dec": 2,
+      "unit": "%",
+      "short": "Uusien asuntolainojen korko"
     },
     {
       "id": "asuntomarginaali",
@@ -2358,7 +2506,11 @@
       "a": "fi10y",
       "b": "de10y",
       "handling": "none",
-      "kind": "level"
+      "kind": "level",
+      "chg": "kp",
+      "dec": 2,
+      "unit": "%-yks.",
+      "short": "Riskilisä Saksaan"
     },
     {
       "set": "rahoitus",
@@ -2487,13 +2639,13 @@
       "flow": "EST",
       "key": "B.EU000A2X2A25.WT",
       "unit": "%",
-      "dec": 3,
-      "abs": true,
+      "dec": 2,
       "set": "rahoitus",
-      "tile": true,
       "daily": true,
       "handling": "none",
-      "kind": "level"
+      "kind": "level",
+      "table_only": true,
+      "chg": "kp"
     },
     {
       "id": "y10_ea",
@@ -2503,12 +2655,13 @@
       "key": "B.U2.EUR.4F.G_N_A.SV_C_YM.SR_10Y",
       "unit": "%",
       "dec": 2,
-      "abs": true,
       "set": "rahoitus",
-      "tile": true,
       "daily": true,
       "handling": "none",
-      "kind": "level"
+      "kind": "level",
+      "table_only": true,
+      "chg": "kp",
+      "short": "10 v"
     },
     {
       "id": "eurusd",
@@ -2519,10 +2672,12 @@
       "unit": "",
       "dec": 4,
       "set": "rahoitus",
-      "tile": true,
       "daily": true,
       "handling": "none",
-      "kind": "level"
+      "kind": "level",
+      "table_only": true,
+      "chg": "pct",
+      "short": "EUR/USD"
     },
     {
       "id": "brent",
@@ -2532,8 +2687,255 @@
       "unit": "$",
       "dec": 2,
       "set": "rahoitus",
-      "tile": true,
       "daily": true,
+      "handling": "none",
+      "kind": "level",
+      "table_only": true,
+      "chg": "pct",
+      "short": "Brent ($/tynnyri)"
+    },
+    {
+      "id": "dfr_d",
+      "label": "EKP:n talletuskorko",
+      "set": "rahoitus",
+      "table_only": true,
+      "daily": true,
+      "source": "ecb",
+      "flow": "FM",
+      "key": "D.U2.EUR.4F.KR.DFR.LEV",
+      "chg": "kp",
+      "dec": 2,
+      "unit": "%",
+      "handling": "none",
+      "kind": "level"
+    },
+    {
+      "id": "fwd1y_d",
+      "label": "Markkinakorko 1 v päästä",
+      "set": "rahoitus",
+      "table_only": true,
+      "daily": true,
+      "source": "ecb",
+      "flow": "YC",
+      "key": "B.U2.EUR.4F.G_N_A.SV_C_YM.IF_1Y",
+      "chg": "kp",
+      "dec": 2,
+      "unit": "%",
+      "handling": "none",
+      "kind": "level"
+    },
+    {
+      "id": "fwd2y_d",
+      "label": "Markkinakorko 2 v päästä",
+      "set": "rahoitus",
+      "table_only": true,
+      "daily": true,
+      "source": "ecb",
+      "flow": "YC",
+      "key": "B.U2.EUR.4F.G_N_A.SV_C_YM.IF_2Y",
+      "chg": "kp",
+      "dec": 2,
+      "unit": "%",
+      "handling": "none",
+      "kind": "level"
+    },
+    {
+      "id": "aaa2",
+      "label": "Euroalueen 2 v korko",
+      "set": "rahoitus",
+      "table_only": true,
+      "daily": true,
+      "source": "ecb",
+      "flow": "YC",
+      "key": "B.U2.EUR.4F.G_N_A.SV_C_YM.SR_2Y",
+      "chg": "kp",
+      "dec": 2,
+      "unit": "%",
+      "handling": "none",
+      "kind": "level",
+      "short": "2 v"
+    },
+    {
+      "id": "aaa5",
+      "label": "Euroalueen 5 v korko",
+      "set": "rahoitus",
+      "table_only": true,
+      "daily": true,
+      "source": "ecb",
+      "flow": "YC",
+      "key": "B.U2.EUR.4F.G_N_A.SV_C_YM.SR_5Y",
+      "chg": "kp",
+      "dec": 2,
+      "unit": "%",
+      "handling": "none",
+      "kind": "level",
+      "short": "5 v"
+    },
+    {
+      "id": "aaa30",
+      "label": "Euroalueen 30 v korko",
+      "set": "rahoitus",
+      "table_only": true,
+      "daily": true,
+      "source": "ecb",
+      "flow": "YC",
+      "key": "B.U2.EUR.4F.G_N_A.SV_C_YM.SR_30Y",
+      "chg": "kp",
+      "dec": 2,
+      "unit": "%",
+      "handling": "none",
+      "kind": "level",
+      "short": "30 v"
+    },
+    {
+      "id": "aaa_2s10",
+      "label": "Korkokäyrän jyrkkyys (10 v – 2 v)",
+      "short": "Ero 10 v – 2 v",
+      "set": "rahoitus",
+      "table_only": true,
+      "source": "spread",
+      "a": "y10_ea",
+      "b": "aaa2",
+      "chg": "kp",
+      "dec": 2,
+      "unit": "%-yks.",
+      "handling": "none",
+      "kind": "level"
+    },
+    {
+      "id": "ciss",
+      "label": "Rahoitusstressi (CISS, euroalue)",
+      "set": "rahoitus",
+      "table_only": true,
+      "daily": true,
+      "source": "ecb",
+      "flow": "CISS",
+      "key": "D.U2.Z0Z.4F.EC.SS_CIN.IDX",
+      "chg": "abs",
+      "dec": 3,
+      "unit": "",
+      "handling": "none",
+      "kind": "level",
+      "short": "Rahoitusstressi (CISS)"
+    },
+    {
+      "id": "eer_d",
+      "label": "Euron efektiivinen kurssi (EER-40)",
+      "set": "rahoitus",
+      "table_only": true,
+      "daily": true,
+      "source": "ecb",
+      "flow": "EXR",
+      "key": "D.E03.EUR.EN00.A",
+      "chg": "pct",
+      "dec": 1,
+      "unit": "",
+      "handling": "none",
+      "kind": "level",
+      "short": "Efektiivinen kurssi (EER-40)"
+    },
+    {
+      "id": "eursek",
+      "label": "EUR/SEK",
+      "set": "rahoitus",
+      "table_only": true,
+      "daily": true,
+      "source": "ecb",
+      "flow": "EXR",
+      "key": "D.SEK.EUR.SP00.A",
+      "chg": "pct",
+      "dec": 4,
+      "unit": "",
+      "handling": "none",
+      "kind": "level",
+      "short": "EUR/SEK"
+    },
+    {
+      "id": "eurnok",
+      "label": "EUR/NOK",
+      "set": "rahoitus",
+      "table_only": true,
+      "daily": true,
+      "source": "ecb",
+      "flow": "EXR",
+      "key": "D.NOK.EUR.SP00.A",
+      "chg": "pct",
+      "dec": 4,
+      "unit": "",
+      "handling": "none",
+      "kind": "level",
+      "short": "EUR/NOK"
+    },
+    {
+      "id": "eurgbp",
+      "label": "EUR/GBP",
+      "set": "rahoitus",
+      "table_only": true,
+      "daily": true,
+      "source": "ecb",
+      "flow": "EXR",
+      "key": "D.GBP.EUR.SP00.A",
+      "chg": "pct",
+      "dec": 4,
+      "unit": "",
+      "handling": "none",
+      "kind": "level",
+      "short": "EUR/GBP"
+    },
+    {
+      "id": "eurjpy",
+      "label": "EUR/JPY",
+      "set": "rahoitus",
+      "table_only": true,
+      "daily": true,
+      "source": "ecb",
+      "flow": "EXR",
+      "key": "D.JPY.EUR.SP00.A",
+      "chg": "pct",
+      "dec": 2,
+      "unit": "",
+      "handling": "none",
+      "kind": "level",
+      "short": "EUR/JPY"
+    },
+    {
+      "id": "eurcny",
+      "label": "EUR/CNY",
+      "set": "rahoitus",
+      "table_only": true,
+      "daily": true,
+      "source": "ecb",
+      "flow": "EXR",
+      "key": "D.CNY.EUR.SP00.A",
+      "chg": "pct",
+      "dec": 4,
+      "unit": "",
+      "handling": "none",
+      "kind": "level",
+      "short": "EUR/CNY"
+    },
+    {
+      "id": "wti",
+      "label": "WTI-öljy",
+      "short": "WTI ($/tynnyri)",
+      "set": "rahoitus",
+      "table_only": true,
+      "daily": true,
+      "source": "fred",
+      "fred_id": "DCOILWTICO",
+      "chg": "pct",
+      "dec": 2,
+      "unit": "$",
+      "handling": "none",
+      "kind": "level"
+    },
+    {
+      "id": "eer",
+      "label": "Euron efektiivinen kurssi",
+      "set": "rahoitus",
+      "source": "ecb",
+      "flow": "EXR",
+      "key": "M.E03.EUR.EN00.A",
       "handling": "none",
       "kind": "level"
     },

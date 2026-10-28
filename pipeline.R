@@ -112,7 +112,8 @@ fetch_eurostat <- function(s, geo = "FI") {
 }
 
 fetch_ecb <- function(s) {
-  d <- read.csv(text = get_text(sprintf("%s%s/%s?format=csvdata", ECB, s$flow, s$key)))
+  d <- read.csv(text = get_text(sprintf("%s%s/%s?format=csvdata%s", ECB, s$flow, s$key,
+                                        if (is.null(s$start)) "" else paste0("&startPeriod=", s$start))))
   d <- data.frame(date = d$TIME_PERIOD, value = as.numeric(d$OBS_VALUE))
   if (!isTRUE(s$daily) && all(nchar(d$date) == 10)) {   # paivadata -> kuukauden viimeinen havainto
     d <- d[order(d$date), ]; m <- substr(d$date, 1, 7)
@@ -297,9 +298,57 @@ cfg  <- fromJSON(CFG_PATH, simplifyVector = FALSE)
 r3   <- function(x) ifelse(is.na(x), NA, round(x, 3))
 
 sets_out <- list()
+# ---------------------------------------------------------------------
+# Tilannetaulukko: viimeisin arvo ja muutos 1 pv, 1 vk ja vuoden alusta
+# chg: "kp" (korot, korkopisteina), "pct" (kurssit ja hinnat, %), "abs" (indeksit)
+# kuukausisarjoille vain muutos vuoden alusta (edellisen vuoden joulukuusta)
+# ---------------------------------------------------------------------
+TABLE_START <- format(Sys.Date() - 430, "%Y-%m-%d")    # paivasarjoista haetaan vain runsas vuosi
+ser_cfg <- function(id) { x <- Filter(function(s) identical(s$id, id), cfg$series); if (!length(x)) stop("Sarjaa ei loydy: ", id); x[[1]] }
+.tbl_memo <- new.env()
+get_any <- function(id, raws) {
+  if (!is.null(raws[[id]])) return(raws[[id]])
+  if (!is.null(.tbl_memo[[id]])) return(.tbl_memo[[id]])
+  .tbl_memo[[id]] <- get_any_(id, raws); .tbl_memo[[id]]
+}
+get_any_ <- function(id, raws) {
+  s <- ser_cfg(id)
+  if (identical(s$source, "spread")) { a <- get_any(s$a, raws); b <- get_any(s$b, raws); m <- merge(a, b, by = "date")
+    return(data.frame(date = m$date, value = m$value.x - m$value.y)) }
+  if (isTRUE(s$daily) && identical(s$source, "ecb") && is.null(s$start)) s$start <- TABLE_START
+  message("  taulukko ", id); fetch_series(s)
+}
+snap_row <- function(id, raws) {
+  s <- ser_cfg(id); d <- get_any(id, raws); d <- d[!is.na(d$value), ]; d <- d[order(d$date), ]
+  n <- nrow(d); last <- d$value[n]; ld <- d$date[n]; daily <- nchar(ld) == 10
+  chg <- if (is.null(s$chg)) "abs" else s$chg
+  dif <- function(ref) if (!length(ref) || is.na(ref)) NULL else switch(chg, kp = 100 * (last - ref), pct = 100 * (last / ref - 1), last - ref)
+  at_or_before <- function(k) if (length(k)) d$value[max(k)] else NA
+  ytd_ref <- at_or_before(which(substr(d$date, 1, 4) < substr(ld, 1, 4)))
+  d1 <- if (daily && n > 1) dif(d$value[n - 1]) else NULL
+  w1 <- if (daily) dif(at_or_before(which(as.Date(d$date) <= as.Date(ld) - 7))) else NULL
+  if (daily && as.Date(ld) < Sys.Date() - 10) CHECKS <<- c(CHECKS, sprintf("%s: taulukon viimeisin havainto %s", id, ld))
+  list(label = if (is.null(s$short)) s$label else s$short, date = ld, last = round(last, 4), chg = chg,
+       unit = s$unit, dec = s$dec, d1 = d1, w1 = w1, ytd = dif(ytd_ref))
+}
+# tuottokayra: viimeisin, kuukausi sitten ja edellisen vuoden lopussa
+curve_data <- function(c) {
+  m <- lapply(c$maturities, function(k) { s <- list(id = paste0("kayra_", k), source = "ecb", flow = c$flow, key = sprintf(c$key, k),
+    daily = TRUE, start = TABLE_START); message("  kayra ", k); x <- fetch_series(s); setNames(x, c("date", k)) })
+  w <- Reduce(function(a, b) merge(a, b, by = "date"), m); w <- w[order(w$date), ]; w <- w[complete.cases(w), ]
+  ld <- w$date[nrow(w)]
+  pick <- function(k) if (length(k)) w[max(k), ] else NULL
+  ref <- list(list(label = "Viimeisin", row = w[nrow(w), ]),
+              list(label = "Kuukausi sitten", row = pick(which(as.Date(w$date) <= seq(as.Date(ld), by = "-1 month", length.out = 2)[2]))),
+              list(label = "Vuoden lopussa", row = pick(which(substr(w$date, 1, 4) < substr(ld, 1, 4)))))
+  list(maturities = unlist(c$maturities), labels = unlist(c$labels),
+       lines = lapply(Filter(function(r) !is.null(r$row), ref), function(r)
+         list(label = r$label, date = r$row$date, values = round(unname(unlist(r$row[unlist(c$maturities)])), 4))))
+}
+
 for (set in cfg$sets) {
   freq <- set$freq
-  members <- Filter(function(s) identical(s$set, set$id) && !isFALSE(s$enabled) && !isTRUE(s$tile) && !isTRUE(s$contrib) && is.null(s$decomp) && !isTRUE(s$validation) && !isTRUE(s$chart_only), cfg$series)
+  members <- Filter(function(s) identical(s$set, set$id) && !isFALSE(s$enabled) && !isTRUE(s$tile) && !isTRUE(s$contrib) && is.null(s$decomp) && !isTRUE(s$validation) && !isTRUE(s$chart_only) && !isTRUE(s$table_only), cfg$series)
   # markkinaruudut: paivittaiset sarjat, viimeiset TILE_N havaintoa
   tiles <- lapply(Filter(function(s) identical(s$set, set$id) && isTRUE(s$tile) && !isFALSE(s$enabled), cfg$series), function(s) {
     message("  ruutu ", s$id); d <- tail(fetch_series(s), TILE_N + 1)
@@ -320,9 +369,14 @@ for (set in cfg$sets) {
     last_i  <- max(vapply(raws, function(r) max(per_idx(r$date, freq)), numeric(1)))
     start_i <- per_idx(if (freq == "M") sprintf("%d-01", from_y) else sprintf("%d-Q1", from_y), freq)
     periods <- idx_per(start_i:last_i, freq)
+    # tilannetaulukot (type = "table") ja tuottokayra (type = "curve") lasketaan valmiiksi
+    charts_out <- lapply(set$charts, function(c) {
+      if (identical(c$type, "table")) c$rows <- lapply(c$rows, function(r) c(r, snap_row(r$id, raws)))
+      if (identical(c$type, "curve")) c$curve <- curve_data(c)
+      c })
     sets_out[[length(sets_out) + 1]] <- list(
       id = set$id, label = set$label, freq = freq, default = isTRUE(set$default), view = "charts",
-      from = from_y, periods = periods, charts = set$charts, colors = set$colors, tiles = unname(tiles), summary = set$summary,
+      from = from_y, periods = periods, charts = charts_out, colors = set$colors, tiles = unname(tiles), summary = set$summary,
       series = unname(lapply(members, function(s) { r <- raws[[s$id]]
         list(id = s$id, label = s$label, last = r$date[nrow(r)], values = r3(r$value[match(periods, r$date)])) })))
     next
