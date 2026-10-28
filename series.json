@@ -321,7 +321,7 @@
               "unit": "%",
               "stackUnit": "%-yks.",
               "dec": 1,
-              "note": "Neljänneksen keskiarvo. Viivat: Tilastokeskus. Kontribuutiot: Eurostat (YKHI).",
+              "note": "Lähteet: Tilastokeskus, Eurostat.",
               "lines": [
                 "ki_ykhi",
                 "ki_khi"
