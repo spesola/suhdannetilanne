@@ -157,7 +157,7 @@ body { font-variant-numeric: tabular-nums; background: var(--bg); min-height: 10
 .ind.comp .nm, .ind.comp .ph { font-weight: 600; }
 .ind.lead { font-weight: 600; padding-block: 9px; }
 .ind.lead .nm, .ind.lead .ph { font-weight: 600; }
-.grp.gtop .ind:last-child { border-bottom: 1.5px solid var(--fg); }
+.grp.gtop .ind:last-child { border-bottom: 1px solid color-mix(in srgb, var(--fg) 35%, transparent); }
 
 .tabs { display: flex; gap: 22px; margin: 0 0 22px; flex-wrap: wrap; border-bottom: 1px solid var(--line); }
 #detail { border-top: 0; padding-top: 0; }
@@ -529,11 +529,11 @@ footer b { color: var(--fg); font-weight: 600; }
         if (s.level[k] != null && s.change[k] != null) pts.push([X(s.change[k]), Y(s.level[k])]);
       if (pts.length > 1) {
         el("polyline", { points: pts.map(q => q.join(",")).join(" "), fill: "none", stroke: col,
-          "stroke-width": s.comp || s.isGroup ? 1.8 : 1.3, "stroke-opacity": s.comp ? 0.9 : 0.5, "stroke-linejoin": "round" }, g);
-        pts.slice(0, -1).forEach((q, k) => el("circle", { cx: q[0], cy: q[1], r: (s.comp ? 2.4 : 2) * K, fill: col, "fill-opacity": s.comp ? 1 : 0.25 + 0.5 * k / pts.length }, g));
+          "stroke-width": s.comp || s.isGroup ? 1.2 : 1.1, "stroke-opacity": s.comp ? 0.45 : 0.4, "stroke-linejoin": "round", "stroke-linecap": "round" }, g);
+        pts.slice(0, -1).forEach((q, k) => el("circle", { cx: q[0], cy: q[1], r: (s.comp ? 1.7 : 1.6) * K, fill: col, "fill-opacity": 0.2 + 0.4 * k / pts.length }, g));
       }
       const [hx, hy] = pts[pts.length - 1];
-      const r = ((s.comp ? 7.5 : s.isGroup ? 7 : 5) + (hi(s) ? 2 : 0)) * K;
+      const r = ((s.comp ? 6.5 : s.isGroup ? 7 : 5) + (hi(s) ? 2 : 0)) * K;
       const hollow = !s.comp && !s.isGroup && !s.in_composite;           // ei kokonaisindikaattorissa: ontto piste
       el("circle", { cx: hx, cy: hy, r, fill: hollow ? "var(--plot)" : s.comp ? "var(--fg)" : col, stroke: hollow ? col : "var(--plot)", "stroke-width": hollow ? 1.6 : 1.5 }, g);
       const right = hx + r + 8 + s.label.length * 6.6 < W - M;   // nimi oikealle, jos mahtuu kehyksen sisaan
@@ -787,7 +787,7 @@ footer b { color: var(--fg); font-weight: 600; }
     $("clockDesc").textContent = growthClock
       ? `Kasvun ero omaan keskiarvoonsa ja sen muutos edellisestä ${M_ ? "kuukaudesta" : "neljänneksestä"}, keskihajontoina.`
       : `Sarjan poikkeama trendistä ja sen muutos edellisestä ${M_ ? "kuukaudesta" : "neljänneksestä"}, keskihajontoina.`;
-    const pathIc = `<svg width="22" height="10" viewBox="0 0 22 10" aria-hidden="true"><polyline points="1,8 6,7 11,5 17,3" fill="none" stroke="var(--fg)" stroke-width="1.4"/><circle cx="6" cy="7" r="1.5" fill="var(--fg)"/><circle cx="11" cy="5" r="1.5" fill="var(--fg)"/><circle cx="17.5" cy="3.5" r="3.2" fill="var(--fg)"/></svg>`;
+    const pathIc = `<svg width="22" height="10" viewBox="0 0 22 10" aria-hidden="true"><polyline points="1,8 6,7 11,5 17,3" fill="none" stroke="var(--fg)" stroke-opacity="0.45" stroke-width="1.2"/><circle cx="6" cy="7" r="1.2" fill="var(--fg)" fill-opacity="0.4"/><circle cx="11" cy="5" r="1.2" fill="var(--fg)" fill-opacity="0.5"/><circle cx="17.5" cy="3.5" r="3.2" fill="var(--fg)"/></svg>`;
     $("clockLegend").innerHTML = `<span>${pathIc}Kokonaisindikaattori ja sen ${set.tail} ${M_ ? "kk" : "neljänneksen"} polku</span><span><i></i>Sarja</span>` +
       (nComp < nAll ? `<span><i class="o"></i>Ei kokonaisindikaattorissa</span>` : "");
     $("listMeta").textContent = `Tilanne ${fmtP(set.periods[idx])}`;
