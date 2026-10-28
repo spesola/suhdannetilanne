@@ -1166,7 +1166,7 @@ footer b { color: var(--fg); font-weight: 600; }
           if (valEl) valEl.innerHTML = `${fmtP(P[i])}: ${ser(c.lines[0]).label} <b>${g > 0 ? "+" : ""}${fmtV(g, c.dec)}${u}</b>`;
           const su = c.stackUnit != null ? c.stackUnit : "%-yks.";
           subEl.textContent = (c.ts ? `${fmtP(P[i])}: ${ser(c.lines[0]).label} ${g > 0 ? "+" : ""}${fmtV(g, c.dec)}${u}. ` : "") +
-            c.stack.map((id, k) => `${ser(id).label} ${+(S[k][i] || 0).toFixed(c.dec) > 0 ? "+" : ""}${fmtV(S[k][i], c.dec)}`).join(", ") + (su ? " " + su : "") + ".";
+            c.stack.map((id, k) => `${ser(id).label} ${+(S[k][i] || 0).toFixed(c.dec) > 0 ? "+" : ""}${fmtV(S[k][i], c.dec)}`).join(", ") + (su ? " " + su : "") + (su && su.endsWith(".") ? "" : ".");
         } else if (c.bars) {
           const d = B[i]; if (valEl) valEl.innerHTML = `${fmtP(P[i])}: ${c.barsName || "ero"} <b style="color:${c.barsNeutral ? "var(--fg)" : d >= 0 ? "var(--q-up)" : "var(--q-down)"}">${d > 0 ? "+" : ""}${fmtV(d, c.dec)} ${c.barsUnit || "%-yks."}</b>`;
           subEl.textContent = c.lines.map(id => `${ser(id).label} ${withU(L[c.lines.indexOf(id)][i], c)}`).join(", ") + ".";

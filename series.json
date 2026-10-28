@@ -322,6 +322,66 @@
               "stackUnit": "%-yks.",
               "dec": 1,
               "note": "Neljänneksen keskiarvo. Lähde: Eurostat."
+            },
+            "bkt_kulutus": {
+              "title": "Yksityinen kulutus ja kontribuutiot",
+              "line": "kd_bkt_kulutus",
+              "stack": [
+                "kd_bkt_kulutus_1",
+                "kd_bkt_kulutus_2",
+                "kd_bkt_kulutus_3",
+                "kd_bkt_kulutus_4",
+                "kd_bkt_kulutus_5",
+                "kd_bkt_kulutus_6",
+                "k_muu_bkt_kulutus"
+              ],
+              "unit": "%",
+              "note": "Edellisen vuoden hinnoin, %-yks. Lähde: Tilastokeskus.",
+              "stackUnit": "%-yks.",
+              "dec": 1
+            },
+            "bkt_inv": {
+              "title": "Investoinnit ja kontribuutiot",
+              "line": "kd_bkt_inv",
+              "stack": [
+                "kd_bkt_inv_1",
+                "kd_bkt_inv_2",
+                "kd_bkt_inv_3",
+                "kd_bkt_inv_4",
+                "kd_bkt_inv_5",
+                "kd_bkt_inv_6",
+                "k_muu_bkt_inv"
+              ],
+              "unit": "%",
+              "note": "Edellisen vuoden hinnoin, %-yks. Lähde: Tilastokeskus.",
+              "stackUnit": "%-yks.",
+              "dec": 1
+            },
+            "bkt_vienti": {
+              "title": "Vienti ja kontribuutiot",
+              "line": "kd_bkt_vienti",
+              "stack": [
+                "kd_bkt_vienti_1",
+                "kd_bkt_vienti_2",
+                "k_muu_bkt_vienti"
+              ],
+              "unit": "%",
+              "note": "Edellisen vuoden hinnoin, %-yks. Lähde: Tilastokeskus.",
+              "stackUnit": "%-yks.",
+              "dec": 1
+            },
+            "bkt_tuonti": {
+              "title": "Tuonti ja kontribuutiot",
+              "line": "kd_bkt_tuonti",
+              "stack": [
+                "kd_bkt_tuonti_1",
+                "kd_bkt_tuonti_2",
+                "k_muu_bkt_tuonti"
+              ],
+              "unit": "%",
+              "note": "Edellisen vuoden hinnoin, %-yks. Lähde: Tilastokeskus.",
+              "stackUnit": "%-yks.",
+              "dec": 1
             }
           },
           "views": {
@@ -3331,6 +3391,303 @@
       "source": "hicp_ctrb",
       "coicop18": "SERV",
       "to_quarter": true,
+      "handling": "none",
+      "kind": "level"
+    },
+    {
+      "id": "kd_bkt_kulutus",
+      "label": "Yksityinen kulutus v/v",
+      "set": "bkt",
+      "contrib": true,
+      "contrib_group": "bkt_kulutus",
+      "contrib_total": true,
+      "total": "P3KS14_S15",
+      "residual": "Ketjutusero",
+      "source": "ntp_ctrb",
+      "handling": "none",
+      "kind": "level"
+    },
+    {
+      "id": "kd_bkt_kulutus_1",
+      "label": "Kestävät kulutustavarat",
+      "set": "bkt",
+      "contrib": true,
+      "contrib_group": "bkt_kulutus",
+      "contrib_total": false,
+      "total": "P3KS14_S15",
+      "items": [
+        "P31KCD"
+      ],
+      "source": "ntp_ctrb",
+      "handling": "none",
+      "kind": "level"
+    },
+    {
+      "id": "kd_bkt_kulutus_2",
+      "label": "Puolikestävät tavarat",
+      "set": "bkt",
+      "contrib": true,
+      "contrib_group": "bkt_kulutus",
+      "contrib_total": false,
+      "total": "P3KS14_S15",
+      "items": [
+        "P31KCSD"
+      ],
+      "source": "ntp_ctrb",
+      "handling": "none",
+      "kind": "level"
+    },
+    {
+      "id": "kd_bkt_kulutus_3",
+      "label": "Lyhytikäiset tavarat",
+      "set": "bkt",
+      "contrib": true,
+      "contrib_group": "bkt_kulutus",
+      "contrib_total": false,
+      "total": "P3KS14_S15",
+      "items": [
+        "P31KCND"
+      ],
+      "source": "ntp_ctrb",
+      "handling": "none",
+      "kind": "level"
+    },
+    {
+      "id": "kd_bkt_kulutus_4",
+      "label": "Palvelut",
+      "set": "bkt",
+      "contrib": true,
+      "contrib_group": "bkt_kulutus",
+      "contrib_total": false,
+      "total": "P3KS14_S15",
+      "items": [
+        "P31KCS"
+      ],
+      "source": "ntp_ctrb",
+      "handling": "none",
+      "kind": "level"
+    },
+    {
+      "id": "kd_bkt_kulutus_5",
+      "label": "Matkailu (netto)",
+      "set": "bkt",
+      "contrib": true,
+      "contrib_group": "bkt_kulutus",
+      "contrib_total": false,
+      "total": "P3KS14_S15",
+      "items": [
+        "P31KNC",
+        "P31KDC"
+      ],
+      "signs": [
+        1,
+        -1
+      ],
+      "source": "ntp_ctrb",
+      "handling": "none",
+      "kind": "level"
+    },
+    {
+      "id": "kd_bkt_kulutus_6",
+      "label": "Kotitalouksia palvelevat yhteisöt",
+      "set": "bkt",
+      "contrib": true,
+      "contrib_group": "bkt_kulutus",
+      "contrib_total": false,
+      "total": "P3KS14_S15",
+      "items": [
+        "P3KS15"
+      ],
+      "source": "ntp_ctrb",
+      "handling": "none",
+      "kind": "level"
+    },
+    {
+      "id": "kd_bkt_inv",
+      "label": "Investoinnit v/v",
+      "set": "bkt",
+      "contrib": true,
+      "contrib_group": "bkt_inv",
+      "contrib_total": true,
+      "total": "P51K",
+      "residual": "Ketjutusero",
+      "source": "ntp_ctrb",
+      "handling": "none",
+      "kind": "level"
+    },
+    {
+      "id": "kd_bkt_inv_1",
+      "label": "Asuinrakennukset",
+      "set": "bkt",
+      "contrib": true,
+      "contrib_group": "bkt_inv",
+      "contrib_total": false,
+      "total": "P51K",
+      "items": [
+        "P51KN111"
+      ],
+      "source": "ntp_ctrb",
+      "handling": "none",
+      "kind": "level"
+    },
+    {
+      "id": "kd_bkt_inv_2",
+      "label": "Muut talorakennukset",
+      "set": "bkt",
+      "contrib": true,
+      "contrib_group": "bkt_inv",
+      "contrib_total": false,
+      "total": "P51K",
+      "items": [
+        "P51KN1121"
+      ],
+      "source": "ntp_ctrb",
+      "handling": "none",
+      "kind": "level"
+    },
+    {
+      "id": "kd_bkt_inv_3",
+      "label": "Maa- ja vesirakennukset",
+      "set": "bkt",
+      "contrib": true,
+      "contrib_group": "bkt_inv",
+      "contrib_total": false,
+      "total": "P51K",
+      "items": [
+        "P51KN1122_N1123"
+      ],
+      "source": "ntp_ctrb",
+      "handling": "none",
+      "kind": "level"
+    },
+    {
+      "id": "kd_bkt_inv_4",
+      "label": "Kuljetusvälineet",
+      "set": "bkt",
+      "contrib": true,
+      "contrib_group": "bkt_inv",
+      "contrib_total": false,
+      "total": "P51K",
+      "items": [
+        "P51KN1131"
+      ],
+      "source": "ntp_ctrb",
+      "handling": "none",
+      "kind": "level"
+    },
+    {
+      "id": "kd_bkt_inv_5",
+      "label": "Koneet ja laitteet",
+      "set": "bkt",
+      "contrib": true,
+      "contrib_group": "bkt_inv",
+      "contrib_total": false,
+      "total": "P51K",
+      "items": [
+        "P51KN1132_N114"
+      ],
+      "source": "ntp_ctrb",
+      "handling": "none",
+      "kind": "level"
+    },
+    {
+      "id": "kd_bkt_inv_6",
+      "label": "Henkiset omaisuustuotteet",
+      "set": "bkt",
+      "contrib": true,
+      "contrib_group": "bkt_inv",
+      "contrib_total": false,
+      "total": "P51K",
+      "items": [
+        "P51KN115_N117"
+      ],
+      "source": "ntp_ctrb",
+      "handling": "none",
+      "kind": "level"
+    },
+    {
+      "id": "kd_bkt_vienti",
+      "label": "Vienti v/v",
+      "set": "bkt",
+      "contrib": true,
+      "contrib_group": "bkt_vienti",
+      "contrib_total": true,
+      "total": "P6K",
+      "residual": "Ketjutusero",
+      "source": "ntp_ctrb",
+      "handling": "none",
+      "kind": "level"
+    },
+    {
+      "id": "kd_bkt_vienti_1",
+      "label": "Tavarat",
+      "set": "bkt",
+      "contrib": true,
+      "contrib_group": "bkt_vienti",
+      "contrib_total": false,
+      "total": "P6K",
+      "items": [
+        "P61K"
+      ],
+      "source": "ntp_ctrb",
+      "handling": "none",
+      "kind": "level"
+    },
+    {
+      "id": "kd_bkt_vienti_2",
+      "label": "Palvelut",
+      "set": "bkt",
+      "contrib": true,
+      "contrib_group": "bkt_vienti",
+      "contrib_total": false,
+      "total": "P6K",
+      "items": [
+        "P62K"
+      ],
+      "source": "ntp_ctrb",
+      "handling": "none",
+      "kind": "level"
+    },
+    {
+      "id": "kd_bkt_tuonti",
+      "label": "Tuonti v/v",
+      "set": "bkt",
+      "contrib": true,
+      "contrib_group": "bkt_tuonti",
+      "contrib_total": true,
+      "total": "P7R",
+      "residual": "Ketjutusero",
+      "source": "ntp_ctrb",
+      "handling": "none",
+      "kind": "level"
+    },
+    {
+      "id": "kd_bkt_tuonti_1",
+      "label": "Tavarat",
+      "set": "bkt",
+      "contrib": true,
+      "contrib_group": "bkt_tuonti",
+      "contrib_total": false,
+      "total": "P7R",
+      "items": [
+        "P71R"
+      ],
+      "source": "ntp_ctrb",
+      "handling": "none",
+      "kind": "level"
+    },
+    {
+      "id": "kd_bkt_tuonti_2",
+      "label": "Palvelut",
+      "set": "bkt",
+      "contrib": true,
+      "contrib_group": "bkt_tuonti",
+      "contrib_total": false,
+      "total": "P7R",
+      "items": [
+        "P72R"
+      ],
+      "source": "ntp_ctrb",
       "handling": "none",
       "kind": "level"
     }

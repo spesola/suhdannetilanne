@@ -197,10 +197,11 @@ fetch_ntp_ctrb <- function(s) {
     d <- .ntp_memo[[key]]; setNames(d$value, d$date) }
   pbar <- function(i) { c1 <- get(i, "tyopcp"); v1 <- get(i, "tyopvv2015")[names(c1)]; yy <- substr(names(c1), 1, 4)
     p <- tapply(c1, yy, sum) / tapply(v1, yy, sum); p[tapply(!is.na(c1), yy, sum) < 4] <- NA; p }
-  Y <- get("B1GMH", "tyopvv2015"); dates <- names(Y); y <- as.integer(substr(dates, 1, 4))
+  tot <- if (is.null(s$total)) "B1GMH" else s$total   # kokonaiserä: BKT tai kysyntäerä (esim. vienti), jonka kasvua osat selittävät
+  Y <- get(tot, "tyopvv2015"); dates <- names(Y); y <- as.integer(substr(dates, 1, 4))
   t0 <- sprintf("%d%s", y - 1, substr(dates, 5, 7)); py <- as.character(y - 1)
   if (isTRUE(s$contrib_total)) return(data.frame(date = dates, value = unname(100 * (Y[dates] / Y[t0] - 1))))
-  PY <- pbar("B1GMH"); v <- 0
+  PY <- pbar(tot); v <- 0
   for (k in seq_along(s$items)) {
     X <- get(s$items[[k]], "tyopvv2015"); P <- pbar(s$items[[k]]); sg <- if (is.null(s$signs)) 1 else s$signs[[k]]
     v <- v + sg * 100 * (X[dates] - X[t0]) * P[py] / (Y[t0] * PY[py])
