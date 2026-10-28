@@ -332,8 +332,7 @@
                 "kd_bkt_kulutus_3",
                 "kd_bkt_kulutus_4",
                 "kd_bkt_kulutus_5",
-                "kd_bkt_kulutus_6",
-                "k_muu_bkt_kulutus"
+                "kd_bkt_kulutus_6"
               ],
               "unit": "%",
               "note": "Edellisen vuoden hinnoin, %-yks. Lähde: Tilastokeskus.",
@@ -349,8 +348,7 @@
                 "kd_bkt_inv_3",
                 "kd_bkt_inv_4",
                 "kd_bkt_inv_5",
-                "kd_bkt_inv_6",
-                "k_muu_bkt_inv"
+                "kd_bkt_inv_6"
               ],
               "unit": "%",
               "note": "Edellisen vuoden hinnoin, %-yks. Lähde: Tilastokeskus.",
@@ -362,8 +360,7 @@
               "line": "kd_bkt_vienti",
               "stack": [
                 "kd_bkt_vienti_1",
-                "kd_bkt_vienti_2",
-                "k_muu_bkt_vienti"
+                "kd_bkt_vienti_2"
               ],
               "unit": "%",
               "note": "Edellisen vuoden hinnoin, %-yks. Lähde: Tilastokeskus.",
@@ -375,8 +372,7 @@
               "line": "kd_bkt_tuonti",
               "stack": [
                 "kd_bkt_tuonti_1",
-                "kd_bkt_tuonti_2",
-                "k_muu_bkt_tuonti"
+                "kd_bkt_tuonti_2"
               ],
               "unit": "%",
               "note": "Edellisen vuoden hinnoin, %-yks. Lähde: Tilastokeskus.",
