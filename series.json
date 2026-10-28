@@ -1103,6 +1103,25 @@
       "raw_desc": "Trendisarja"
     },
     {
+      "id": "kapasiteetti",
+      "label": "Teollisuuden kapasiteetin käyttöaste",
+      "set": "suhdanne",
+      "group": "Tuotanto",
+      "source": "eurostat",
+      "ds": "ei_bsin_q_r2",
+      "pick": {
+        "indic": "BS-ICU-PC",
+        "s_adj": "SA"
+      },
+      "q_interp": true,
+      "handling": "none",
+      "kind": "balance",
+      "invert": false,
+      "in_composite": false,
+      "unit": "%",
+      "raw_desc": "Kausitasoitettu, neljännesvuosikysely, kuukaudet interpoloitu"
+    },
+    {
       "id": "tsk",
       "label": "Tuotannon suhdannekuvaaja",
       "set": "suhdanne",

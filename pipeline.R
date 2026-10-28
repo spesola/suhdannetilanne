@@ -241,6 +241,13 @@ fetch_series <- function(s) {
     a <- tapply(d$value, q, function(v) if (sum(!is.na(v)) == 3) agg(v) else NA)
     d <- data.frame(date = names(a), value = as.numeric(a))
   }
+  if (isTRUE(s$q_interp)) {                       # neljannesvuosikysely kuukausittaiseksi: arvo kyselykuukaudelle
+    d <- d[!is.na(d$value), ]                       # (neljanneksen 1. kk), valikuukaudet lineaarisesti
+    q <- as.integer(substr(d$date, nchar(d$date), nchar(d$date)))
+    mi <- as.integer(substr(d$date, 1, 4)) * 12 + 3 * (q - 1)
+    full <- min(mi):max(mi)
+    d <- data.frame(date = sprintf("%d-%02d", full %/% 12, full %% 12 + 1), value = approx(mi, d$value, full)$y)
+  }
   if (isTRUE(s$q_to_m)) {                         # neljannesvuosisarja kuukausinakymaan: neljanneksen viimeinen kuukausi
     d$date <- sprintf("%s-%02d", substr(d$date, 1, 4), 3 * as.integer(substr(d$date, 7, 7)))
   }
