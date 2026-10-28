@@ -18,7 +18,7 @@
 <style>
 /* Layout: tasainen vaalea pohja, osiot erotettu ohuella ylaviivalla (ei kortteja). Ylapalkki, iso otsikko, kello + luettelo, yksityiskohdat alla. */
 :root {
-  --bg: #f6f7f9; --surface: #f6f7f9; --plot: #ffffff; --fg: #161b22; --muted: #6b7380; --line: #dfe3e8; --grid: #e7eaee; --rule: #1f2933;
+  --bg: #fbfbfc; --surface: #fbfbfc; --plot: #ffffff; --fg: #161b22; --muted: #6b7380; --line: #e3e6ea; --grid: #eceef1; --rule: #1f2933; --pt: #3d4450;
   --accent: #1d4f7f;
   --q-up: #0f5532; --q-turn: #a14f00; --q-down: #c4382e; --q-rec: #2456a3;
   --g1: #1d4f7f; --g2: #7d7aa8; --g3: #2c8077; --g4: #5c6670; --g5: #a0785a;
@@ -36,50 +36,82 @@ body { font-variant-numeric: tabular-nums; background: var(--bg); min-height: 10
   padding-block: 22px 56px; }
 .wrap { max-width: 1180px; margin: 0 auto; display: flex; flex-direction: column; gap: 40px; }
 
-.topbar { display: flex; justify-content: space-between; align-items: center; gap: 10px 24px; flex-wrap: wrap; }
+.topbar { display: flex; justify-content: space-between; align-items: stretch; gap: 10px 24px; flex-wrap: wrap; border-bottom: 1px solid var(--line); }
+.topbar .brand { padding: 6px 0 14px; }
 .brand { display: inline-flex; align-items: center; gap: 9px; color: var(--fg); text-decoration: none; font-weight: 500; font-size: 0.95rem; letter-spacing: -0.01em; }
 .brand svg { width: 22px; height: 22px; flex: none; }
 .brand .tld { color: var(--muted); font-weight: 400; }
 .brand:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; }
 .sets { display: flex; flex-wrap: wrap; gap: 4px 22px; }
 .sets .sh { display: none; }
-.sets button { font: inherit; font-size: 0.95rem; color: var(--muted); background: none; border: 0; padding: 4px 0; cursor: pointer;
-  border-bottom: 1.5px solid transparent; }
+.sets button { font: inherit; font-size: 0.9rem; color: var(--muted); background: none; border: 0; padding: 6px 0 14px; margin-bottom: -1px; cursor: pointer;
+  border-bottom: 2px solid transparent; }
 .sets button:hover { color: var(--fg); }
-.sets button[aria-pressed="true"] { color: var(--fg); border-bottom-color: var(--fg); }
+.sets button[aria-pressed="true"] { color: var(--fg); border-bottom-color: var(--fg); font-weight: 600; }
 .sets button:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; }
-.hero { display: flex; flex-direction: column; gap: 14px; padding-top: 12px; }
-.eyebrow { font-family: var(--font-data); font-size: 0.78rem; letter-spacing: 0.12em; text-transform: uppercase; color: var(--muted); margin: 0; }
-h1 { font-family: var(--font-display); font-weight: 300; font-size: clamp(2.1rem, 5vw, 3.6rem); line-height: 1.08; letter-spacing: -0.03em; margin: 0; text-wrap: balance; }
+.hero { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 300px); gap: 24px 56px; align-items: end; padding-top: 28px; }
+h1 { font-family: var(--font-display); font-weight: 600; font-size: clamp(2.1rem, 5vw, 3.4rem); line-height: 1.05; letter-spacing: -0.035em; margin: 0; text-wrap: balance; }
+.hsum { display: flex; flex-direction: column; gap: 12px; }
+#summary { display: flex; flex-direction: column; gap: 8px; }
+#summary:empty { display: none; }
+.upd { font-size: 0.76rem; color: var(--muted); margin: 0; }
+.shead { display: flex; justify-content: space-between; gap: 8px; font-size: 0.76rem; color: var(--muted); }
+.sbar { display: flex; gap: 2px; height: 8px; }
+.sbar button { flex-basis: 0; min-width: 4px; border: 0; padding: 0; border-radius: 1px; background: var(--qc); cursor: pointer; }
+.sbar.f button:not(.on) { opacity: .25; }
+.slegend { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 4px 18px; }
+.sl { display: flex; align-items: center; gap: 7px; font: inherit; font-size: 0.82rem; color: var(--fg); background: none; border: 0; padding: 2px 0; cursor: pointer; text-align: left; }
+.sl i { width: 8px; height: 8px; border-radius: 50%; background: var(--qc); flex: none; }
+.sl span { flex: 1; }
+.sl b { font-weight: 600; font-variant-numeric: tabular-nums; }
+.sl.dim { opacity: .4; }
+.sl:hover { opacity: 1; }
+.sl:focus-visible, .sbar button:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+@media (max-width: 720px) { .hero { grid-template-columns: minmax(0, 1fr); } }
 
 .top { display: grid; grid-template-columns: minmax(0, 1.3fr) minmax(0, 1fr); gap: 56px; align-items: start; }
 .top > .card:first-child { position: sticky; top: 16px; }
+#topSec > .card { border-top: 0; padding-top: 0; }
 @media (max-width: 860px) { .top { grid-template-columns: minmax(0, 1fr); gap: 40px; } .top > .card:first-child { position: static; } }
 .card { border-top: 1px solid var(--rule); padding-top: 14px; min-width: 0; }
 .phead { display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: 4px 12px; margin-bottom: 14px; }
-.phead h2 { font-family: var(--font-body); font-weight: 500; font-size: 1rem; margin: 0; }
+.phead h2 { font-family: var(--font-body); font-weight: 600; font-size: 1rem; margin: 0; }
+.cdesc { font-size: 0.82rem; color: var(--muted); margin: -8px 0 8px; max-width: 52ch; }
+.clegend { display: flex; flex-wrap: wrap; gap: 6px 18px; font-size: 0.76rem; color: var(--muted); margin-bottom: 6px; align-items: center; }
+.clegend span { display: inline-flex; align-items: center; gap: 6px; }
+.clegend i { width: 8px; height: 8px; border-radius: 50%; background: var(--pt); display: inline-block; }
+.clegend i.o { background: transparent; box-shadow: inset 0 0 0 1.5px var(--pt); }
 .phead .meta { font-size: 0.85rem; color: var(--muted); }
 #clock { width: 100%; height: auto; display: block; max-width: 640px; margin: 0 auto; }
 #clock text { font-family: var(--font-body); }
 .pt { cursor: pointer; }
 .pt .lbl { opacity: 0; transition: opacity .12s; pointer-events: none; }
 .pt:hover .lbl, .pt.sel .lbl { opacity: 1; }
-.clockbar { display: flex; justify-content: flex-end; margin: -4px 0 -6px; }
 .tg { display: inline-flex; align-items: center; gap: 6px; font-size: 0.82rem; color: var(--muted); cursor: pointer; }
-.tg input { accent-color: var(--accent); margin: 0; }
-.gh { display: flex; align-items: center; gap: 8px; width: 100%; font: inherit; background: none; border: 0; padding: 2px 4px; margin: 0; border-radius: 3px; cursor: pointer; color: var(--muted); text-align: left; }
+.tg input { appearance: none; -webkit-appearance: none; width: 28px; height: 16px; border-radius: 8px; background: var(--line); position: relative; margin: 0; cursor: pointer; transition: background .15s; flex: none; }
+.tg input::after { content: ""; position: absolute; top: 2px; left: 2px; width: 12px; height: 12px; border-radius: 50%; background: #fff; box-shadow: 0 1px 2px rgba(0,0,0,.2); transition: transform .15s; }
+.tg input:checked { background: var(--fg); }
+.tg input:checked::after { transform: translateX(12px); }
+.tg input:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.gh { display: flex; align-items: center; gap: 8px; width: 100%; font: inherit; background: none; border: 0; border-bottom: 1px solid var(--line); padding: 16px 6px 6px; margin: 0; border-radius: 0; cursor: pointer; color: var(--fg); text-align: left; }
 .gh:hover { background: var(--grid); }
 .gh:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
-.gh i { width: 9px; height: 9px; border-radius: 50%; background: var(--gc); display: inline-block; flex: none; }
-.gh .gn { flex: 1; font-family: var(--font-data); font-size: 0.72rem; text-transform: uppercase; letter-spacing: .14em; font-weight: 500; }
+.gh .gn { flex: 1; font-size: 0.78rem; font-weight: 600; }
 .gh[aria-pressed="true"] { background: color-mix(in srgb, var(--accent) 14%, var(--surface)); }
 
-.timebar { display: flex; align-items: center; gap: 10px; margin-top: 12px; flex-wrap: wrap; }
-.timebar > label { font-family: var(--font-data); font-size: 0.74rem; text-transform: uppercase; letter-spacing: .14em; color: var(--muted); }
-.timebar input[type=range] { flex: 1 1 200px; min-width: 0; accent-color: var(--accent); }
-.timebar output { font-family: var(--font-data); font-size: 0.95rem; min-width: 6.5ch; text-align: right; }
-.step { font: inherit; border: 1px solid var(--line); background: transparent; color: var(--fg); border-radius: 3px;
-  width: 30px; height: 28px; cursor: pointer; }
+.timebar { display: flex; align-items: center; gap: 10px; margin-top: 14px; flex-wrap: wrap; }
+.timebar > label { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); }
+.timebar input[type=range] { flex: 1 1 200px; min-width: 0; -webkit-appearance: none; appearance: none; background: transparent; height: 20px; cursor: pointer; }
+.timebar input[type=range]::-webkit-slider-runnable-track { height: 2px; background: var(--fg); border-radius: 1px; }
+.timebar input[type=range]::-moz-range-track { height: 2px; background: var(--fg); border-radius: 1px; }
+.timebar input[type=range]::-webkit-slider-thumb { -webkit-appearance: none; width: 14px; height: 14px; margin-top: -6px; border-radius: 50%; background: var(--accent); border: 2px solid var(--plot); box-shadow: 0 0 0 1px var(--accent); }
+.timebar input[type=range]::-moz-range-thumb { width: 12px; height: 12px; border-radius: 50%; background: var(--accent); border: 2px solid var(--plot); box-shadow: 0 0 0 1px var(--accent); }
+.timebar input[type=range]:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.timebar output { font-family: var(--font-data); font-size: 0.92rem; font-weight: 600; min-width: 6.5ch; text-align: right; }
+.step { font: inherit; border: 1px solid var(--line); background: var(--plot); color: var(--fg); border-radius: 50%;
+  width: 32px; height: 32px; cursor: pointer; display: inline-grid; place-items: center; padding: 0; }
+.step:hover { border-color: var(--muted); }
+.step:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
 
 .summary { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 6px; margin-bottom: 8px; }
 .qbox { border-radius: 3px; padding: 4px 6px; display: flex; align-items: center; justify-content: center; gap: 10px; background: color-mix(in srgb, var(--qc) 9%, var(--bg));
@@ -101,35 +133,42 @@ h1 { font-family: var(--font-display); font-weight: 300; font-size: clamp(2.1rem
 .qbox .n span { font-size: 0.72rem; color: var(--muted); }
 .qbox .t { font-size: 0.74rem; color: var(--muted); }
 
-.list { display: flex; flex-direction: column; gap: 10px; }
+.list { display: flex; flex-direction: column; }
+.lhead { display: grid; grid-template-columns: minmax(0, 1fr) 3.4rem 3.8rem 7.4rem; gap: 10px; font-size: 0.72rem; color: var(--muted); padding: 0 6px 6px; border-bottom: 1px solid var(--line); }
+.lhead span:nth-child(2), .lhead span:nth-child(3) { text-align: right; }
 .grp h3 { font-size: 0.72rem; text-transform: uppercase; letter-spacing: .07em; color: var(--muted); font-weight: 600; margin: 0 0 4px; display: flex; align-items: center; gap: 7px; }
 .grp h3 i { width: 9px; height: 9px; border-radius: 50%; background: var(--gc); display: inline-block; }
-.ind { display: grid; grid-template-columns: minmax(0, 1fr) auto auto; gap: 10px; align-items: center; width: 100%;
-  font: inherit; color: inherit; text-align: left; background: none; border: 0; border-bottom: 1px solid var(--line); border-radius: 0; padding: 3px 4px; cursor: pointer; }
-.grp .ind:last-child { border-bottom: 0; }
+.ind { display: grid; grid-template-columns: minmax(0, 1fr) 3.4rem 3.8rem 7.4rem; gap: 10px; align-items: center; width: 100%;
+  font: inherit; color: inherit; text-align: left; background: none; border: 0; border-bottom: 1px solid var(--line); border-radius: 0; padding: 6px 6px; cursor: pointer; }
+.ind .v { font-size: 0.84rem; text-align: right; font-variant-numeric: tabular-nums; }
+.ind .ph { display: flex; align-items: center; gap: 7px; font-size: 0.8rem; color: var(--fg); white-space: nowrap; }
+.ind .ph i { width: 7px; height: 7px; border-radius: 50%; background: var(--qc); flex: none; }
 .ind:hover { background: var(--grid); }
 .ind[aria-pressed="true"] { background: color-mix(in srgb, var(--accent) 14%, var(--surface)); }
-.ind .nm { font-size: 0.88rem; overflow-wrap: anywhere; }
-.ind .per { font-family: var(--font-data); font-size: 0.76rem; color: var(--muted); }
+.ind .nm { font-size: 0.86rem; overflow-wrap: break-word; min-width: 0; }
+.ind .per { font-size: 0.72rem; color: var(--muted); margin-left: 6px; }
 .chip { font-size: 0.78rem; font-weight: 500; white-space: nowrap; color: var(--qc); }
 .gh .chip { font-size: 0.72rem; color: var(--muted); font-weight: 400; }
-.ind.comp .nm { font-weight: 500; }
-.ind.comp .nm::before { content: "\25C6"; margin-right: 8px; font-size: 0.85em; }
-.grp:first-child .ind.comp { border-bottom: 1px solid var(--line); }
+.ind.comp { font-weight: 600; border-bottom: 1.5px solid var(--fg); padding-block: 9px; }
+.ind.comp .nm, .ind.comp .ph { font-weight: 600; }
 
-.tabs { display: flex; gap: 22px; margin: 0 0 14px; flex-wrap: wrap; }
-.tabs button { font: inherit; font-size: 0.92rem; font-weight: 500; color: var(--muted); background: none; border: 0;
-  border-bottom: 1.5px solid transparent; padding: 2px 0; cursor: pointer; }
-.tabs button[aria-selected="true"] { color: var(--fg); border-bottom-color: var(--fg); }
+.tabs { display: flex; gap: 22px; margin: 0 0 22px; flex-wrap: wrap; border-bottom: 1px solid var(--line); }
+#detail { border-top: 0; padding-top: 0; }
+.tabs button { font: inherit; font-size: 0.9rem; font-weight: 500; color: var(--muted); background: none; border: 0;
+  border-bottom: 2px solid transparent; padding: 4px 0 10px; margin-bottom: -1px; cursor: pointer; }
+.tabs button[aria-selected="true"] { color: var(--fg); border-bottom-color: var(--fg); font-weight: 600; }
 .tabs button:disabled { opacity: .4; cursor: default; }
 .viewhead { display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: 8px; margin-bottom: 6px; }
-.viewhead h2 { font-family: var(--font-body); font-weight: 500; font-size: 1rem; margin: 0; text-wrap: balance; }
+.viewhead h2 { font-family: var(--font-body); font-weight: 600; font-size: 1rem; margin: 0; text-wrap: balance; }
+.tsnow { display: flex; align-items: center; gap: 7px; font-size: 0.82rem; color: var(--fg); margin: 0 0 4px; }
+.tsnow i { width: 7px; height: 7px; border-radius: 50%; background: var(--qc); flex: none; }
 .viewhead .now { font-size: 0.85rem; color: var(--muted); }
 #ts { width: 100%; height: auto; display: block; }
 #ts text { font-family: var(--font-body); }
 .legend { display: flex; flex-wrap: wrap; gap: 14px; font-size: 0.8rem; color: var(--muted); margin-top: 8px; }
 .legend span.sq::before { height: 10px; width: 10px; border-radius: 2px; vertical-align: -1px; }
 .legend span::before { content: ""; display: inline-block; width: 14px; height: 3px; border-radius: 2px; background: var(--qc); vertical-align: middle; margin-right: 6px; }
+.legend.dots span::before { width: 7px; height: 7px; border-radius: 50%; vertical-align: 0; }
 
 .tiles { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); border-top: 1px solid var(--rule); }
 .tile { padding: 16px 22px 14px; border-left: 1px solid var(--line); min-width: 0; display: flex; flex-direction: column; gap: 4px; }
@@ -174,11 +213,11 @@ h1 { font-family: var(--font-display); font-weight: 300; font-size: clamp(2.1rem
 .fcard.tt { grid-column: 1 / span 4; }
 @media (max-width: 980px) { .fgrid { grid-template-columns: repeat(2, minmax(0, 1fr)); } .fcard, .fcard.half { grid-column: auto; } .fcard.wide, .fcard.tt { grid-column: 1 / -1; } }
 @media (max-width: 640px) { .fgrid { grid-template-columns: minmax(0, 1fr); } }
-button.dl { font: inherit; font-size: 0.74rem; color: var(--muted); background: none; border: 1px solid var(--line); border-radius: 3px; padding: 2px 8px; cursor: pointer; margin-left: 10px; }
-button.dl:hover { color: var(--fg); border-color: var(--muted); }
+button.dl { font: inherit; font-size: 0.76rem; color: var(--fg); background: none; border: 0; padding: 0; cursor: pointer; margin-left: 10px; text-decoration: underline; text-underline-offset: 3px; text-decoration-color: var(--line); }
+button.dl:hover { text-decoration-color: var(--fg); }
 .fdl { display: flex; justify-content: flex-end; margin-top: 6px; }
 .step.play { font-size: 0.7rem; }
-.fsec { grid-column: 1 / -1; font-size: 0.74rem; text-transform: uppercase; letter-spacing: .14em; color: var(--muted); font-weight: 600; margin: 8px 0 -28px; }
+.fsec { grid-column: 1 / -1; font-size: 1.05rem; color: var(--fg); font-weight: 600; margin: 8px 0 -28px; }
 .fsec:first-child { margin-top: 0; }
 #finSum table { width: 100%; border-collapse: collapse; font-variant-numeric: tabular-nums; font-size: 0.88rem; }
 #finSum th, #finSum td { padding: 7px 6px; border-bottom: 1px solid var(--line); text-align: right; white-space: nowrap; }
@@ -190,7 +229,7 @@ button.dl:hover { color: var(--fg); border-color: var(--muted); }
 #finSum .pb i { position: absolute; left: 0; top: 0; bottom: 0; background: var(--accent); opacity: .55; }
 @media (max-width: 640px) { #finSum .pb { display: none; } #finSum .hide-s { display: none; } }
 .fhead { display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: 4px 12px; }
-.fhead h2 { font-family: var(--font-body); font-weight: 500; font-size: 1rem; margin: 0; text-wrap: balance; }
+.fhead h2 { font-family: var(--font-body); font-weight: 600; font-size: 1rem; margin: 0; text-wrap: balance; }
 .fval { font-family: var(--font-data); font-size: 0.82rem; color: var(--muted); font-variant-numeric: tabular-nums; }
 .fval b { font-weight: 500; font-size: 0.95rem; color: var(--fg); }
 .fsub { color: var(--muted); font-size: 0.8rem; margin: 2px 0 0; min-height: 1.2em; }
@@ -222,20 +261,28 @@ table.hm { border-collapse: separate; border-spacing: 2px; font-variant-numeric:
 .tip { position: fixed; pointer-events: none; background: var(--fg); color: var(--bg); font-size: 0.8rem; padding: 6px 9px;
   border-radius: 3px; font-family: var(--font-data); white-space: nowrap; z-index: 20; }
 
-footer { color: var(--muted); font-size: 0.82rem; display: grid; gap: 6px; border-top: 1px solid var(--line); padding-top: 14px; }
+footer { color: var(--muted); font-size: 0.8rem; display: flex; flex-wrap: wrap; justify-content: space-between; align-items: baseline; gap: 10px 24px; border-top: 1px solid var(--line); padding-top: 20px; margin-top: 24px; }
+footer { position: relative; }
+footer > p { max-width: calc(70ch + 180px); padding-right: 180px; }
+footer details { flex-basis: 100%; }
+footer summary { list-style: none; position: absolute; right: 0; top: 20px; }
+footer summary::-webkit-details-marker { display: none; }
+footer summary::after { content: ""; display: inline-block; width: 6px; height: 6px; border-right: 1.5px solid currentColor; border-bottom: 1.5px solid currentColor; transform: translateY(-3px) rotate(45deg); margin-left: 9px; }
+footer details[open] summary::after { transform: translateY(1px) rotate(-135deg); }
 footer .fbody { max-width: 78ch; }
 footer p { margin: 0; }
-footer summary { cursor: pointer; color: var(--fg); font-weight: 500; font-size: 0.88rem; }
+footer summary { cursor: pointer; color: var(--fg); font-weight: 600; font-size: 0.84rem; }
 footer .fbody { display: grid; gap: 6px; margin-top: 10px; }
 footer b { color: var(--fg); font-weight: 600; }
 @media (max-width: 560px) {
   .sets { gap: 4px 18px; flex-wrap: nowrap; }
   .sets .lg { display: none; }
   .sets .sh { display: inline; }
-  .summary { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-  .timebar > label { display: none; }
+  .lhead, .ind { grid-template-columns: minmax(0, 1fr) 2.8rem 3.1rem 0.9rem; gap: 6px; }
+  .ind .ph .pt-t, .lhead span:nth-child(4) { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); }
   .timebar input[type=range] { flex-basis: 120px; }
   #clock text { font-size: 17px; }
+  #clock .axl.top, #clock .axl.bot { display: none; }
   #ts text { font-size: 18px; }
 }
 @media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
@@ -248,27 +295,27 @@ footer b { color: var(--fg); font-weight: 600; }
   </header>
 
   <section class="hero">
-    <p class="eyebrow" id="sub"></p>
     <h1 id="headline"></h1>
+    <div class="hsum"><div id="summary"></div><p class="upd" id="sub"></p></div>
   </section>
 
   <section class="top" id="topSec">
     <div class="card">
-      <div class="phead"><h2>Kartta</h2><span class="meta" id="clockMeta"></span></div>
-      <div class="clockbar"><label class="tg" id="tailsTg"><input type="checkbox" id="tails"> <span id="tailsLbl">Trendi</span></label></div>
+      <div class="phead"><h2 id="clockTitle">Suhdannekartta</h2><label class="tg" id="tailsTg"><input type="checkbox" id="tails"> <span id="tailsLbl">Kaikkien sarjojen polut</span></label></div>
+      <p class="cdesc" id="clockDesc"></p>
+      <div class="clegend" id="clockLegend"></div>
       <svg id="clock" viewBox="0 22 561 578" role="img" aria-label="Suhdannekartta"></svg>
       <div class="timebar">
         <label for="per">Ajankohta</label>
         <button class="step play" id="play" type="button" aria-label="Toista ajassa" title="Toista ajassa">&#9654;</button>
-        <button class="step" id="prev" type="button" aria-label="Edellinen jakso">&#8249;</button>
+        <button class="step" id="prev" type="button" aria-label="Edellinen jakso"><svg width="12" height="12" viewBox="0 0 12 12" aria-hidden="true"><path d="M7.5 2.5L4 6l3.5 3.5" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
         <input type="range" id="per" min="0" max="0" value="0">
-        <button class="step" id="next" type="button" aria-label="Seuraava jakso">&#8250;</button>
+        <button class="step" id="next" type="button" aria-label="Seuraava jakso"><svg width="12" height="12" viewBox="0 0 12 12" aria-hidden="true"><path d="M4.5 2.5L8 6l-3.5 3.5" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
         <output id="perOut" for="per"></output>
       </div>
     </div>
     <div class="card">
       <div class="phead"><h2>Indikaattorit</h2><span class="meta" id="listMeta"></span></div>
-      <div class="summary" id="summary"></div>
       <div class="list" id="list"></div>
     </div>
   </section>
@@ -277,7 +324,7 @@ footer b { color: var(--fg); font-weight: 600; }
   <section class="card" id="growthSec" hidden>
     <div class="phead"><h2 id="grTitle">Kasvu</h2>
       <div class="hmctl"><span class="meta">Muutos, %. Hinnoissa ja palkoissa sininen väri.</span>
-        <div class="mini" role="group" aria-label="Kasvuvauhti"><button type="button" id="gr-yy" aria-pressed="true">v/v</button><button type="button" id="gr-qq" aria-pressed="false">q/q</button></div><button type="button" class="dl" id="gr-dl">CSV</button></div></div>
+        <div class="mini" role="group" aria-label="Kasvuvauhti"><button type="button" id="gr-yy" aria-pressed="true">v/v</button><button type="button" id="gr-qq" aria-pressed="false">q/q</button></div><button type="button" class="dl" id="gr-dl">Lataa CSV</button></div></div>
     <div class="hmwrap"><table class="hm" id="grTable"></table></div>
   </section>
   <section class="card" id="finSum" hidden></section>
@@ -291,10 +338,11 @@ footer b { color: var(--fg); font-weight: 600; }
     <div id="view-ts">
       <div class="tsgrid" id="tsGrid">
         <div class="tsmain">
-          <div class="viewhead"><h2 id="tsTitle"></h2><span class="now" id="tsNow"></span></div>
-          <p class="fsub" id="tsSub">Standardoitu poikkeama sarjan omasta pitkän aikavälin trendistä. 0 = trendi, ±1 = tavanomainen vaihtelu.</p>
+          <div class="viewhead"><h2 id="tsTitle"></h2></div>
+          <p class="tsnow" id="tsNow"></p>
           <svg id="ts" viewBox="0 0 560 300" role="img" aria-label="Poikkeama trendistä ajassa"></svg>
-          <div class="legend" id="tsLegend"></div>
+          <div class="legend dots" id="tsLegend"></div>
+          <p class="fnote" id="tsSub"></p>
         </div>
         <div class="fgrid" id="tsContrib"></div>
       </div>
@@ -302,7 +350,7 @@ footer b { color: var(--fg); font-weight: 600; }
     <div id="view-hm" hidden>
       <div class="viewhead"><h2 id="hmTitle">Poikkeama trendistä</h2>
         <div class="hmctl"><span class="now" id="hmNote"></span>
-          <div class="mini" role="group" aria-label="Taulukon arvo"><button type="button" id="hm-lvl" aria-pressed="true">Taso</button><button type="button" id="hm-chg" aria-pressed="false">Muutos</button><button type="button" id="hm-raw" aria-pressed="false">Arvo</button></div><button type="button" class="dl" id="hm-dl">CSV</button></div></div>
+          <div class="mini" role="group" aria-label="Taulukon arvo"><button type="button" id="hm-lvl" aria-pressed="true">Taso</button><button type="button" id="hm-chg" aria-pressed="false">Muutos</button><button type="button" id="hm-raw" aria-pressed="false">Arvo</button></div><button type="button" class="dl" id="hm-dl">Lataa CSV</button></div></div>
       <div class="hmwrap"><table class="hm" id="hm"></table></div>
     </div>
   </section>
@@ -384,7 +432,7 @@ footer b { color: var(--fg); font-weight: 600; }
     const gen = new Date(D.meta.generated.replace(/(\+\d{2})(\d{2})$/, "$1:$2"));
     const lastAll = set.view === "charts" ? set.periods[lastNN(set.series.find(x => x.id === (set.charts[0].bars || set.charts[0].lines[0])).values)] : set.periods[set.periods.length - 1];
     $("headline").textContent = set.label;
-    $("sub").textContent = `Päivitetty ${gen.toLocaleDateString("fi-FI")} · viimeisin havainto ${fmtP(lastAll)}`;
+    $("sub").textContent = `Päivitetty ${gen.toLocaleDateString("fi-FI")}. Viimeisin havainto ${fmtP(lastAll)}.`;
     const box = $("sets"); box.innerHTML = "";
     D.sets.forEach(s => { const b = document.createElement("button"); b.type = "button"; b.innerHTML = `<span class="lg">${s.label}</span><span class="sh">${SHORT[s.id] || s.label}</span>`;
       b.setAttribute("aria-pressed", s.id === set.id); b.onclick = () => { if (s.id === set.id) return;
@@ -415,30 +463,33 @@ footer b { color: var(--fg); font-weight: 600; }
   function renderClock() {
     const svg = $("clock"); svg.innerHTML = "";
     const mid = W / 2, inner = W - 2 * M;
-    // tausta: lapinakyva; vaiheet kertovat kulmien kuvakkeet
+    // tausta: vaiheiden neljannekset vaalealla savylla, valkoinen ruudukko
+    [["turn", M, M], ["up", mid, M], ["down", M, mid], ["rec", mid, mid]].forEach(([q, x, y]) =>
+      el("rect", { x, y, width: inner / 2, height: inner / 2, fill: `color-mix(in srgb, ${qcol(q)} 6%, var(--plot))` }, svg));
     for (let v = -2; v <= 2; v++) { if (!v) continue;
+      el("line", { x1: X(v), x2: X(v), y1: M, y2: W - M, stroke: "var(--plot)", "stroke-width": 1.5 }, svg);
+      el("line", { y1: Y(v), y2: Y(v), x1: M, x2: W - M, stroke: "var(--plot)", "stroke-width": 1.5 }, svg);
       el("text", { x: X(v), y: W - M + 16, "text-anchor": "middle", "font-size": 11, fill: "var(--muted)" }, svg).textContent = tick(v);
       el("text", { x: M - 8, y: Y(v) + 4, "text-anchor": "end", "font-size": 11, fill: "var(--muted)" }, svg).textContent = tick(v);
     }
-    el("rect", { x: M, y: M, width: inner, height: inner, fill: "none", stroke: "var(--line)" }, svg);
-    el("line", { x1: mid, x2: mid, y1: M, y2: W - M, stroke: "var(--muted)", "stroke-width": 1, "stroke-dasharray": "6 4", "stroke-opacity": 0.7 }, svg);
-    el("line", { y1: mid, y2: mid, x1: M, x2: W - M, stroke: "var(--muted)", "stroke-width": 1, "stroke-dasharray": "6 4", "stroke-opacity": 0.7 }, svg);
-    // akselitekstit CBS:n kellon tapaan akselien paihin
-    const IS = 1.3, IW = 32 * IS;
-    [["turn", M + 8, M + 8], ["up", W - M - 8 - IW, M + 8], ["down", M + 8, W - M - 8 - IW], ["rec", W - M - 8 - IW, W - M - 8 - IW]].forEach(([q, x, y]) => {
-      const g = el("g", { transform: `translate(${x} ${y}) scale(${IS})`, class: "pic" }, svg); g.innerHTML = phaseIcon(q);
-      el("title", {}, g).textContent = Q[q].name; });
+    el("line", { x1: mid, x2: mid, y1: M, y2: W - M, stroke: "var(--muted)", "stroke-width": 1, "stroke-opacity": 0.55 }, svg);
+    el("line", { y1: mid, y2: mid, x1: M, x2: W - M, stroke: "var(--muted)", "stroke-width": 1, "stroke-opacity": 0.55 }, svg);
+    // vaiheiden nimet kulmiin
+    [["turn", M + 12, M + 22, "start"], ["up", W - M - 12, M + 22, "end"], ["down", M + 12, W - M - 14, "start"], ["rec", W - M - 12, W - M - 14, "end"]].forEach(([q, x, y, a]) => {
+      const t = el("text", { x, y, "text-anchor": a, "font-size": 12, "font-weight": 600, fill: "var(--fg)" }, svg);
+      el("tspan", { fill: qcol(q), "font-size": "1.05em" }, t).textContent = "\u25CF ";
+      el("tspan", {}, t).textContent = Q[q].short; });
     const growthClock = set.indicators.every(x => x.kind === "growth");
     const T = growthClock ? ["Keskimääräistä nopeampi kasvu", "Keskimääräistä hitaampi kasvu", "Kasvu hidastuu", "Kasvu kiihtyy"]
                           : ["Trendin yläpuolella", "Trendin alapuolella", "Heikentynyt", "Vahvistunut"];
-    const axl = (t, x, y, a, cls = "") => { el("text", { class: "axl " + cls, x, y, "text-anchor": a, "font-size": 11.5, fill: "var(--fg)", "fill-opacity": 0.75 }, svg).textContent = t; };
+    const axl = (t, x, y, a, cls = "") => { el("text", { class: "axl " + cls, x, y, "text-anchor": a, "font-size": 11, fill: "var(--muted)" }, svg).textContent = t; };
     axl(T[0], mid + 8, M + 20, "start", "top"); axl(T[1], mid + 8, W - M - 12, "start", "bot");
     axl(T[2], M + 10, mid + 18, "start"); axl(T[3], W - M - 10, mid + 18, "end");
 
     const items = [];
     set.groups.forEach(g => {
       const mem = set.indicators.filter(s => s.group === g); if (!mem.length) return;
-      mem.forEach(s => items.push({ s, col: gcol(g) }));
+      mem.forEach(s => items.push({ s, col: "var(--pt)" }));
     });
     items.push({ s: comp(), col: "var(--fg)" });
     const placed = [];
@@ -446,24 +497,19 @@ footer b { color: var(--fg); font-weight: 600; }
     items.forEach(({ s, col }) => {
       const p = at(s, idx); if (!p) return;
       const off = qf && (quad(p.l, p.c) !== qf || (!s.comp && !s.isGroup && !s.in_composite)) && !hi(s);
-      const g = el("g", { class: "pt" + (hi(s) ? " sel" : "") + (off ? " off" : ""), tabindex: -1, "data-id": s.id }, svg);
-      const pts = [], from = (showTails || hi(s)) ? Math.max(0, p.i - set.tail) : p.i;
+      const g = el("g", { class: "pt" + (hi(s) ? " sel" : "") + (off ? " off" : ""), tabindex: -1, "data-id": s.id, opacity: p.stale && !s.comp ? 0.45 : 1 }, svg);
+      const pts = [], from = (showTails || hi(s) || s.comp) ? Math.max(0, p.i - set.tail) : p.i;   // kokonaisindikaattorin polku aina
       for (let k = from; k <= p.i; k++)
         if (s.level[k] != null && s.change[k] != null) pts.push([X(s.change[k]), Y(s.level[k])]);
       if (pts.length > 1) {
         el("polyline", { points: pts.map(q => q.join(",")).join(" "), fill: "none", stroke: col,
-          "stroke-width": s.comp || s.isGroup ? 2 : 1.5, "stroke-opacity": 0.5, "stroke-linejoin": "round" }, g);
-        pts.slice(0, -1).forEach((q, k) => el("circle", { cx: q[0], cy: q[1], r: 2.2, fill: col, "fill-opacity": 0.25 + 0.5 * k / pts.length }, g));
+          "stroke-width": s.comp || s.isGroup ? 1.8 : 1.3, "stroke-opacity": s.comp ? 0.9 : 0.5, "stroke-linejoin": "round" }, g);
+        pts.slice(0, -1).forEach((q, k) => el("circle", { cx: q[0], cy: q[1], r: s.comp ? 2.4 : 2, fill: col, "fill-opacity": s.comp ? 1 : 0.25 + 0.5 * k / pts.length }, g));
       }
       const [hx, hy] = pts[pts.length - 1];
-      const r = (s.isGroup ? 9 : 6.5) + (hi(s) ? 2 : 0);
-      if (s.comp) {
-        const d = r + 2;
-        el("path", { d: `M${hx} ${hy - d}L${hx + d} ${hy}L${hx} ${hy + d}L${hx - d} ${hy}Z`,
-          fill: p.stale ? "var(--surface)" : "var(--fg)", stroke: p.stale ? "var(--fg)" : "var(--surface)", "stroke-width": 2 }, g);
-      } else {
-        el("circle", { cx: hx, cy: hy, r, fill: p.stale ? "var(--surface)" : col, stroke: p.stale ? col : "var(--surface)", "stroke-width": 2 }, g);
-      }
+      const r = (s.comp ? 7.5 : s.isGroup ? 7 : 5) + (hi(s) ? 2 : 0);
+      const hollow = !s.comp && !s.isGroup && !s.in_composite;           // ei kokonaisindikaattorissa: ontto piste
+      el("circle", { cx: hx, cy: hy, r, fill: hollow ? "var(--plot)" : s.comp ? "var(--fg)" : col, stroke: hollow ? col : "var(--plot)", "stroke-width": hollow ? 1.6 : 1.5 }, g);
       const right = hx + r + 8 + s.label.length * 6.6 < W - M;   // nimi oikealle, jos mahtuu kehyksen sisaan
       const lbl = el("text", { class: "lbl", x: hx + (right ? r + 6 : -r - 6), y: hy - 10, "text-anchor": right ? "start" : "end",
         "font-size": s.isGroup ? 12.5 : 12, "font-weight": s.isGroup ? 600 : 500, fill: "var(--fg)", stroke: "var(--surface)", "stroke-width": 4, "paint-order": "stroke" }, g);
@@ -503,19 +549,23 @@ footer b { color: var(--fg); font-weight: 600; }
   function renderPanel() {
     const counts = { up: 0, turn: 0, down: 0, rec: 0 }; let n = 0;
     set.indicators.forEach(s => { if (!s.in_composite) return; const p = at(s, idx); if (p) { counts[quad(p.l, p.c)]++; n++; } });
-    $("summary").innerHTML = QORDER.map(q => `<button type="button" class="qbox${qf === q ? " on" : qf ? " dim" : ""}" data-q="${q}" aria-pressed="${qf === q}" style="--qc:${qcol(q)}" title="${Q[q].name}">${iconHTML(q, 24)}<div class="n">${counts[q]}<span>/${n}</span></div></button>`).join("");
-    $("summary").querySelectorAll(".qbox").forEach(b => b.onclick = () => { qf = qf === b.dataset.q ? null : b.dataset.q; update(); });
+    // yhteenveto: vaiheiden osuudet palkkina ja lukuina; klikkaus suodattaa kartan ja luettelon
+    $("summary").innerHTML = `<div class="shead"><span>Kokonaisindikaattorin ${n} sarjaa</span><span>${fmtP(set.periods[idx])}</span></div>` +
+      `<div class="sbar${qf ? " f" : ""}">${QORDER.filter(q => counts[q]).map(q => `<button type="button" data-q="${q}" class="${qf === q ? "on" : ""}" style="--qc:${qcol(q)};flex-grow:${counts[q]}" title="${Q[q].name}: ${counts[q]}" aria-label="${Q[q].name}: ${counts[q]}"></button>`).join("")}</div>` +
+      `<div class="slegend">${QORDER.map(q => `<button type="button" class="sl${qf && qf !== q ? " dim" : ""}" data-q="${q}" aria-pressed="${qf === q}" style="--qc:${qcol(q)}" title="Näytä vain: ${Q[q].name.toLowerCase()}"><i></i><span>${Q[q].short}</span><b>${counts[q]}</b></button>`).join("")}</div>`;
+    $("summary").querySelectorAll("[data-q]").forEach(b => b.onclick = () => { qf = qf === b.dataset.q ? null : b.dataset.q; update(); });
     const pass = s => { if (!qf) return true; if (!s.comp && !s.in_composite) return false; const p = at(s, idx); return !!p && quad(p.l, p.c) === qf; };
 
-    const list = $("list"); list.innerHTML = "";
+    const list = $("list"); list.innerHTML = `<div class="lhead"><span>Sarja</span><span>Taso</span><span>Muutos</span><span>Vaihe</span></div>`;
     const mk = (s, extraCls) => {
       const p = at(s, idx); const b = document.createElement("button"); b.type = "button";
       b.className = "ind" + (extraCls || ""); b.setAttribute("aria-pressed", sel === s.id);
       const q = p ? quad(p.l, p.c) : null;
       const out = !s.comp && !s.in_composite;
       b.dataset.id = s.id;
-      b.innerHTML = `<span class="nm">${s.label}${out ? `<sup title="Ei mukana kokonaisindikaattorissa">*</sup>` : ""}</span><span class="per">${!p ? "–" : p.stale ? fmtP(set.periods[p.i]) : ""}</span>` +
-        (q ? `<span class="chip" style="--qc:${qcol(q)}">${Q[q].short}</span>` : `<span></span>`);
+      b.innerHTML = `<span class="nm">${s.label}${out ? `<sup title="Ei mukana kokonaisindikaattorissa">*</sup>` : ""}${p && p.stale ? `<span class="per">${fmtP(set.periods[p.i])}</span>` : ""}</span>` +
+        `<span class="v">${p ? fmtN(p.l) : "–"}</span><span class="v">${p ? fmtN(p.c) : "–"}</span>` +
+        (q ? `<span class="ph" style="--qc:${qcol(q)}" title="${Q[q].name}"><i></i><span class="pt-t">${Q[q].short}</span></span>` : `<span></span>`);
       b.onclick = () => select(s.id);
       b.onmouseenter = () => hlPoints([s.id]); b.onmouseleave = () => hlPoints([]);
       return b;
@@ -533,7 +583,7 @@ footer b { color: var(--fg); font-weight: 600; }
       h.onmouseenter = () => hlPoints(all.map(x => x.id)); h.onmouseleave = () => hlPoints([]);
       box.appendChild(h); mem.forEach(s => box.appendChild(mk(s))); list.appendChild(box);
     });
-    if (!list.children.length) list.innerHTML = `<div class="empty">Ei indikaattoreita vaiheessa ${Q[qf].name.toLowerCase()}.</div>`;
+    if (list.children.length === 1) list.insertAdjacentHTML("beforeend", `<div class="empty">Ei indikaattoreita vaiheessa ${Q[qf].name.toLowerCase()}.</div>`);
     if (set.indicators.some(s => !s.in_composite)) list.insertAdjacentHTML("beforeend", `<p class="lnote">* Ei mukana kokonaisindikaattorissa.</p>`);
   }
 
@@ -559,9 +609,11 @@ footer b { color: var(--fg); font-weight: 600; }
   function renderTS() {
     const s = (sel && findItem(sel)) || comp();
     const lvlKind = s.kind === "level";   // esim. konkurssit: taso suhteessa omaan historiaan, ei trendia
-    $("tsTitle").textContent = `${s.label}: ${lvlKind ? "suhteessa historiaan" : "poikkeama trendistä"}`;
-    $("tsSub").textContent = lvlKind ? `Standardoitu taso suhteessa omaan historiaan vuodesta 2010. 0 = keskiarvo.`
-      : "Standardoitu poikkeama sarjan omasta pitkän aikavälin trendistä. 0 = trendi, ±1 = tavanomainen vaihtelu.";
+    const growthTS = s.kind === "growth" || (s.comp && set.indicators.every(x => x.kind === "growth"));
+    $("tsTitle").textContent = s.label;
+    $("tsSub").textContent = (lvlKind ? "Taso suhteessa omaan historiaan vuodesta 2010 keskihajontoina."
+      : growthTS ? "Kasvun ero omaan keskiarvoonsa keskihajontoina." : "Poikkeama pitkän aikavälin trendistä keskihajontoina.") +
+      " Harmaa vyöhyke on tavanomainen vaihtelu, −1…+1. Klikkaa kuvaa vaihtaaksesi ajankohtaa.";
     // oikea puoli: osatekijat (luottamus ym.), BKT-vertailu (kokonaisindikaattori) tai lahteen julkaisema arvo
     let cc = set.contribs && set.contribs[sel || "comp"];
     if (!cc && s.isGroup) {               // ryhma = sarjojen poikkeamien keskiarvo, joten osuus = poikkeama / n (tasmalleen)
@@ -593,7 +645,7 @@ footer b { color: var(--fg); font-weight: 600; }
     $("tsGrid").classList.toggle("solo", !cc);
     if (cc) renderCharts($("tsContrib"), [{ ...cc, wide: true, w: 560, height: 300, defIdx: idx }]); else $("tsContrib").innerHTML = "";
     const p = at(s, idx);
-    $("tsNow").innerHTML = p ? `${fmtP(set.periods[p.i])}: <b style="color:${qcol(quad(p.l, p.c))}">${Q[quad(p.l, p.c)].name}</b>, taso ${fmtN(p.l)}, muutos ${fmtN(p.c)}` : "";
+    $("tsNow").innerHTML = p ? `<i style="--qc:${qcol(quad(p.l, p.c))}"></i>${Q[quad(p.l, p.c)].name} ${fmtP(set.periods[p.i])}. Taso ${fmtN(p.l)}, muutos ${fmtN(p.c)}.` : "";
     const svg = $("ts"); svg.innerHTML = "";
     const solo = !cc, W2 = solo ? 960 : 560, H2 = solo ? 230 : 300, ml = 40, mr = 14, mt = 12, mb = 28;
     svg.setAttribute("viewBox", `0 0 ${W2} ${H2}`);
@@ -601,6 +653,7 @@ footer b { color: var(--fg); font-weight: 600; }
     const vals = s.level.filter(v => v != null);
     const lim = Math.max(2.5, Math.ceil(Math.max(...vals.map(Math.abs)) * 2) / 2);
     const ys = v => mt + (lim - v) / (2 * lim) * (H2 - mt - mb);
+    el("rect", { x: ml, y: ys(1), width: W2 - ml - mr, height: ys(-1) - ys(1), fill: "var(--grid)", "fill-opacity": 0.75 }, svg);   // tavanomainen vaihtelu
     for (let v = -Math.floor(lim); v <= Math.floor(lim); v++) {
       el("line", { x1: ml, x2: W2 - mr, y1: ys(v), y2: ys(v), stroke: v ? "var(--grid)" : "var(--muted)", "stroke-width": 1 }, svg);
       el("text", { x: ml - 6, y: ys(v) + 4, "text-anchor": "end", "font-size": 11, fill: "var(--muted)" }, svg).textContent = tick(v);
@@ -612,7 +665,7 @@ footer b { color: var(--fg); font-weight: 600; }
         el("text", { x: xs(i), y: H2 - 8, "text-anchor": "middle", "font-size": 11, fill: "var(--muted)" }, svg).textContent = yr;
       }
     });
-    el("rect", { x: xs(idx) - 0.5, y: mt, width: 1, height: H2 - mt - mb, fill: "var(--accent)", "fill-opacity": 0.6 }, svg);
+    el("line", { x1: xs(idx), x2: xs(idx), y1: mt, y2: H2 - mb, stroke: "var(--muted)", "stroke-width": 1, "stroke-dasharray": "2 3" }, svg);
     for (let i = 1; i < n; i++) {
       const a = s.level[i - 1], b = s.level[i], c = s.change[i];
       if (a == null || b == null || c == null) continue;
@@ -642,8 +695,7 @@ footer b { color: var(--fg); font-weight: 600; }
     hit.addEventListener("click", e => { const box = svg.getBoundingClientRect();
       const i = Math.round(((e.clientX - box.left) / box.width * W2 - ml) / (W2 - ml - mr) * (n - 1));
       if (i >= 0 && i < n) { idx = i; update(); } });
-    $("tsLegend").innerHTML = QORDER.map(q => `<span style="--qc:${qcol(q)}">${Q[q].name}</span>`).join("") +
-      `<span style="--qc:var(--accent)">Valittu ajankohta (klikkaa kuvaa vaihtaaksesi)</span>`;
+    $("tsLegend").innerHTML = QORDER.map(q => `<span style="--qc:${qcol(q)}">${Q[q].name}</span>`).join("");
   }
 
   /* ---------- heatmap ---------- */
@@ -687,8 +739,8 @@ footer b { color: var(--fg); font-weight: 600; }
   $("tab-hm").onclick = () => { setTab("hm"); update(); };
 
   function renderFoot() {
-    $("foot").innerHTML = `<details><summary>Menetelmä ja lähteet</summary><div class="fbody"><p><b>Menetelmä.</b> ${D.meta.method}</p><p>${D.meta.composite}</p><p>${D.meta.charts || ""}</p>
-      <p><b>Huomio.</b> ${D.meta.caveat} Ontot pisteet kartassa: sarjan viimeisin havainto on valittua ajankohtaa vanhempi.</p>
+    $("foot").innerHTML = `<p>Suomen talouden suhdannetilanne avoimista tilastoista. Päivittyy arkisin.</p><details><summary>Menetelmä ja lähteet</summary><div class="fbody"><p><b>Menetelmä.</b> ${D.meta.method}</p><p>${D.meta.composite}</p><p>${D.meta.charts || ""}</p>
+      <p><b>Huomio.</b> ${D.meta.caveat} Haaleat pisteet kartassa: sarjan viimeisin havainto on valittua ajankohtaa vanhempi. Ontot pisteet eivät ole mukana kokonaisindikaattorissa.</p>
       <p><b>Lähteet.</b> Tilastokeskus (StatFin: kansantalouden tilinpito, työvoimatutkimus, hinnat ja ansiot, rakentaminen, konkurssit, kuluttajabarometri), Eurostat (Euroopan komission yritysten luottamuskyselyt, HICP-painot, kaupan ja palvelujen liikevaihto), Suomen Pankki (luotonanto ja lainojen korot), EKP (korot, €STR, tuottokäyrä, valuuttakurssit, rahoitusstressi), FRED (epävarmuusindeksi, Yhdysvaltain ja Japanin korot © OECD, Brent © EIA).</p>
       <p><b>Käyttöehdot.</b> Tilastokeskuksen aineistot CC BY 4.0. Muut aineistot lähteiden käyttöehtojen mukaisesti, lähde mainiten. Epävarmuusindeksi: Baker, Bloom ja Davis, policyuncertainty.com. Laskelmat ja esitystapa ovat omia.</p>
       <p><b>Vastuuvapaus.</b> Sivuston tiedot perustuvat avoimiin lähteisiin, eivätkä ole tarkoitettu sijoitusneuvoiksi.</p></div></details>`;
@@ -696,14 +748,21 @@ footer b { color: var(--fg); font-weight: 600; }
 
   function renderMeta() {
     const nAll = set.indicators.length, nComp = set.indicators.filter(s => s.in_composite).length;
-    $("clockMeta").textContent = `${nAll} sarjaa${nComp < nAll ? `, ${nComp} kokonaisindikaattorissa` : ""}, ${set.freq === "M" ? "kuukausittain" : "neljännesvuosittain"}`;
-    $("listMeta").textContent = `Tila ${fmtP(set.periods[idx])}`;
+    const growthClock = set.indicators.every(x => x.kind === "growth"), M_ = set.freq === "M";
+    $("clockTitle").textContent = growthClock ? "Kasvukartta" : "Suhdannekartta";
+    $("clockDesc").textContent = growthClock
+      ? `Kasvun ero omaan keskiarvoonsa ja sen muutos edellisestä ${M_ ? "kuukaudesta" : "neljänneksestä"}, keskihajontoina.`
+      : `Sarjan poikkeama trendistä ja sen muutos edellisestä ${M_ ? "kuukaudesta" : "neljänneksestä"}, keskihajontoina.`;
+    const pathIc = `<svg width="22" height="10" viewBox="0 0 22 10" aria-hidden="true"><polyline points="1,8 6,7 11,5 17,3" fill="none" stroke="var(--fg)" stroke-width="1.4"/><circle cx="6" cy="7" r="1.5" fill="var(--fg)"/><circle cx="11" cy="5" r="1.5" fill="var(--fg)"/><circle cx="17.5" cy="3.5" r="3.2" fill="var(--fg)"/></svg>`;
+    $("clockLegend").innerHTML = `<span>${pathIc}Kokonaisindikaattori ja sen ${set.tail} ${M_ ? "kk" : "neljänneksen"} polku</span><span><i></i>Sarja</span>` +
+      (nComp < nAll ? `<span><i class="o"></i>Ei kokonaisindikaattorissa</span>` : "");
+    $("listMeta").textContent = `Tilanne ${fmtP(set.periods[idx])}`;
   }
 
   function update() {
     const charts = set.view === "charts", clock = !!(set.indicators && set.indicators.length);
     $("topSec").hidden = !clock; $("detail").hidden = charts; $("charts").hidden = !charts;
-    if (clock) { renderMeta(); renderTime(); renderClock(); renderPanel(); }
+    if (clock) { renderMeta(); renderTime(); renderClock(); renderPanel(); } else $("summary").innerHTML = "";
     $("tiles").hidden = !(charts && set.tiles && set.tiles.length);
     $("growthSec").hidden = !(charts && set.growth);
     $("finSum").hidden = !(charts && set.summary && set.summary.length);
@@ -896,7 +955,7 @@ footer b { color: var(--fg); font-weight: 600; }
         card.appendChild(lg);
       }
       const fd = document.createElement("div"); fd.className = "fdl";
-      const db = document.createElement("button"); db.type = "button"; db.className = "dl"; db.textContent = "CSV"; db.title = "Lataa kuvan data";
+      const db = document.createElement("button"); db.type = "button"; db.className = "dl"; db.textContent = "Lataa CSV"; db.title = "Lataa kuvan data";
       db.onclick = () => chartCSV(c); fd.appendChild(db); card.appendChild(fd);
       box.appendChild(card);
 
