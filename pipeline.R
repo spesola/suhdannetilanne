@@ -57,8 +57,9 @@ is_time_px <- function(vals) any(grepl("^\\d{4}(M\\d{2}|Q\\d)$", vals))   # kk t
 # StatFin rajoittaa kyselyja (noin 30 / 10 s): taulujen metatiedot muistiin ja pieni tauko kyselyjen valiin
 .px_meta <- new.env()
 fetch_statfin <- function(s) {
+  base <- if (is.null(s$db)) STATFIN else sub("StatFin/$", paste0(s$db, "/"), STATFIN)   # db: esim. StatFin_Passiivi (arkistotaulut)
   if (is.null(.px_meta[[s$table]])) {
-    Sys.sleep(0.8); .px_meta[[s$table]] <- fromJSON(get_text(paste0(STATFIN, s$table)), simplifyVector = FALSE)$variables }
+    Sys.sleep(0.8); .px_meta[[s$table]] <- fromJSON(get_text(paste0(base, s$table)), simplifyVector = FALSE)$variables }
   vars <- .px_meta[[s$table]]
   Sys.sleep(0.8)
   # muuttujakoodeissa on luokituksen paivays (esim. alue_23_20260101), joka vaihtuu luokituksen paivittyessa:
@@ -81,7 +82,7 @@ fetch_statfin <- function(s) {
     list(code = v$code, selection = list(filter = "item", values = list(chosen)))
   })
   body <- toJSON(list(query = q, response = list(format = "json-stat2")), auto_unbox = TRUE)
-  r <- RETRY("POST", paste0(STATFIN, s$table), body = body, content_type_json(),
+  r <- RETRY("POST", paste0(base, s$table), body = body, content_type_json(),
              timeout(40), times = 5, pause_base = 5, pause_min = 11, quiet = TRUE)   # 429: odota rajoitusikkuna yli
   stop_for_status(r)
   js <- fromJSON(content(r, "text", encoding = "UTF-8"), simplifyVector = FALSE)
@@ -181,8 +182,20 @@ fetch_ntp_ctrb <- function(s) {
   data.frame(date = dates, value = unname(v))
 }
 
+# saumaus: sama sarja useasta taulusta (esim. perusvuoden vaihtuessa), osat jarjestyksessa, myohempi osa voittaa
+# osan from/to rajaa jakson ("YYYY-MM"); tarkoitettu tasosarjoille kuten lukumaarille, ei indekseille
+fetch_splice <- function(s) {
+  parts <- lapply(seq_along(s$parts), function(k) { p <- modifyList(s$parts[[k]], list(id = paste0(s$id, "_osa", k)))
+    x <- fetch_statfin(p)
+    if (!is.null(p$from)) x <- x[x$date >= p$from, ]
+    if (!is.null(p$to)) x <- x[x$date <= p$to, ]
+    x[!is.na(x$value), ] })
+  d <- Reduce(function(a, b) rbind(a[!(a$date %in% b$date), ], b), parts)
+  d[order(d$date), ]
+}
+
 fetch_series <- function(s) {
-  f <- switch(s$source, statfin = fetch_statfin, eurostat = fetch_eurostat, hicp_ctrb = fetch_hicp_ctrb, ntp_ctrb = fetch_ntp_ctrb,
+  f <- switch(s$source, statfin = fetch_statfin, splice = fetch_splice, eurostat = fetch_eurostat, hicp_ctrb = fetch_hicp_ctrb, ntp_ctrb = fetch_ntp_ctrb,
               ecb = fetch_ecb, fred = fetch_fred, bof = fetch_bof, stop("Tuntematon lahde ", s$source))
   # valimuisti: onnistunut haku tallennetaan, epaonnistuessa kaytetaan edellista hakua
   cache <- file.path(CACHE_DIR, paste0(s$id, ".csv"))
@@ -195,9 +208,10 @@ fetch_series <- function(s) {
     STALE <<- c(STALE, s$id)
     read.csv(cache, colClasses = c("character", "numeric"))
   })
-  if (isTRUE(s$to_quarter)) {                      # kuukausisarja -> neljannesvuosikeskiarvo (vain taydet neljannekset)
+  if (isTRUE(s$to_quarter) || identical(s$to_quarter, "sum")) {   # kuukausisarja -> neljannes (keskiarvo tai "sum"), vain taydet neljannekset
     q <- sprintf("%s-Q%d", substr(d$date, 1, 4), (as.integer(substr(d$date, 6, 7)) - 1) %/% 3 + 1)
-    a <- tapply(d$value, q, function(v) if (sum(!is.na(v)) == 3) mean(v) else NA)
+    agg <- if (identical(s$to_quarter, "sum")) sum else mean
+    a <- tapply(d$value, q, function(v) if (sum(!is.na(v)) == 3) agg(v) else NA)
     d <- data.frame(date = names(a), value = as.numeric(a))
   }
   if (isTRUE(s$q_to_m)) {                         # neljannesvuosisarja kuukausinakymaan: neljanneksen viimeinen kuukausi
@@ -207,6 +221,13 @@ fetch_series <- function(s) {
     d <- d[order(d$date), ]; d$value <- as.numeric(stats::filter(d$value, rep(1, s$roll), sides = 1))
   }
   if (!is.null(s$mult)) d$value <- d$value * s$mult  # yksikonmuunnos (esim. milj. -> mrd. euroa)
+  if (!is.null(s$pct_lag)) {                        # muutos %, edellisesta vuodesta (lag 4 nelj. / 12 kk)
+    d <- d[order(d$date), ]; n <- nrow(d); L <- s$pct_lag
+    d$value <- c(rep(NA, L), 100 * (d$value[(L + 1):n] / d$value[1:(n - L)] - 1)) }
+  if (!is.null(s$rebase)) {                         # perusvuosi = 100 (vuoden havaintojen keskiarvo)
+    b <- mean(d$value[substr(d$date, 1, 4) == as.character(s$rebase)], na.rm = TRUE)
+    if (!is.finite(b)) stop(s$id, ": perusvuodelta ", s$rebase, " ei havaintoja")
+    d$value <- 100 * d$value / b }
   if (!is.null(s$deflate)) {                       # nimellinen sarja -> reaalinen (hintaindeksilla)
     p <- fetch_series(c(s$deflate, list(id = paste0(s$id, "_defl"))))
     m <- merge(d, p, by = "date")
@@ -278,7 +299,7 @@ r3   <- function(x) ifelse(is.na(x), NA, round(x, 3))
 sets_out <- list()
 for (set in cfg$sets) {
   freq <- set$freq
-  members <- Filter(function(s) identical(s$set, set$id) && !isFALSE(s$enabled) && !isTRUE(s$tile) && !isTRUE(s$contrib) && is.null(s$decomp) && !isTRUE(s$validation), cfg$series)
+  members <- Filter(function(s) identical(s$set, set$id) && !isFALSE(s$enabled) && !isTRUE(s$tile) && !isTRUE(s$contrib) && is.null(s$decomp) && !isTRUE(s$validation) && !isTRUE(s$chart_only), cfg$series)
   # markkinaruudut: paivittaiset sarjat, viimeiset TILE_N havaintoa
   tiles <- lapply(Filter(function(s) identical(s$set, set$id) && isTRUE(s$tile) && !isFALSE(s$enabled), cfg$series), function(s) {
     message("  ruutu ", s$id); d <- tail(fetch_series(s), TILE_N + 1)
@@ -330,6 +351,9 @@ for (set in cfg$sets) {
     cmem <- Filter(function(s) identical(s$set, set$id) && isTRUE(s$contrib) && !isFALSE(s$enabled), cfg$series)
     grp_of <- function(s) if (is.null(s$contrib_group)) "bkt" else s$contrib_group
     for (s in cmem) { message("  ", s$id); raws[[s$id]] <- fetch_series(s); ser[[length(ser) + 1]] <- list(id = s$id, label = s$label) }
+    # chart_only: tasosarjat rivikohtaisiin kuvioihin (esim. asuntojen hinnat ja kaupat alueittain), ei taulukkoon eika kelloon
+    xmem <- Filter(function(s) identical(s$set, set$id) && isTRUE(s$chart_only) && !isFALSE(s$enabled), cfg$series)
+    for (s in xmem) { message("  ", s$id); raws[[s$id]] <- fetch_series(s); ser[[length(ser) + 1]] <- list(id = s$id, label = s$label) }
     for (g in unique(vapply(cmem, grp_of, ""))) {
       gm <- Filter(function(s) grp_of(s) == g, cmem)
       totS <- Filter(function(s) isTRUE(s$contrib_total), gm)[[1]]

@@ -857,8 +857,10 @@ footer b { color: var(--fg); font-weight: 600; }
     const narrow = box.clientWidth < 640, colOf = {};
     const gRow = set.growth && set.growth.find(r => r.id === grSel);
     // valitulla rivilla voi olla kontribuutiokuvio (BKT: c.contrib, muut: c.contribs[rivi])
-    const charts = only ? only : !gRow ? set.charts : set.charts.map(c => { if (c.id !== "bktkasvu") return c;
+    const charts = only ? only : !gRow ? set.charts : set.charts.flatMap(c => { if (c.id !== "bktkasvu") return c;
       const vw = c.views && c.views[gRow.id];               // rivikohtainen viivakuvio (esim. nimellis- ja reaalipalkat)
+      if (Array.isArray(vw))                                // useampi kuvio rinnakkain (esim. asuntojen hinnat ja kaupat)
+        return vw.map((v, k) => ({ ...c, ...v, id: `${c.id}_${k}`, bars: undefined, stack: undefined, size: "half", wide: false, w: undefined, height: undefined }));
       if (vw) return { ...c, ...vw, bars: undefined, stack: undefined };
       const cb = (c.contribs && c.contribs[gRow.id]) || (gRow.id === "bkt" ? c.contrib : null);
       return cb && ser(cb.line)
@@ -866,7 +868,7 @@ footer b { color: var(--fg); font-weight: 600; }
             unit: cb.unit || "%", dec: cb.dec != null ? cb.dec : c.dec, stackUnit: cb.stackUnit }
         : { ...c, title: `${gRow.label}: kasvu`, lines: [grSel + "_yy"], bars: grSel + "_qq" }; });
     Object.assign(colOf, set.colors || {});
-    charts.forEach(c => { if (c.lineColor) colOf[c.lines[0]] = c.lineColor; });
+    charts.forEach(c => { if (c.colors) Object.assign(colOf, c.colors); else if (c.lineColor) colOf[c.lines[0]] = c.lineColor; });
     charts.forEach(c => c.lines.forEach((id, k) => { if (!(id in colOf)) colOf[id] = LINE_COLS[k % LINE_COLS.length]; }));
     let lastSec = null;
     charts.forEach(c0 => {
@@ -901,23 +903,39 @@ footer b { color: var(--fg); font-weight: 600; }
       // kuviokohtainen alkuvuosi: indeksit paikallisia (i), jaettu hover globaali (i + i0)
       const i0 = c.from ? Math.max(0, set.periods.indexOf(c.from + "-01")) : 0, P = set.periods.slice(i0), n = P.length;
       const L = c.lines.map(id => ser(id).values.slice(i0)), B = c.bars ? ser(c.bars).values.slice(i0) : null;
+      const LW = c.lower && ser(c.lower.bars) ? ser(c.lower.bars).values.slice(i0) : null;
+      const pb = LW ? mt + (H2 - mt - mb) * 0.66 : H2 - mb;               // paakuvion alareuna; alle jaa alapaneeli
       const S = (c.stack || []).map(id => ser(id).values.slice(i0));
       const sums = S.length ? P.map((_, i) => [S.reduce((a, s) => a + Math.min(0, s[i] || 0), 0), S.reduce((a, s) => a + Math.max(0, s[i] || 0), 0)]) : [];
       const all = [...L.filter((_, k) => !isY2(k)).flat(), ...(B || []), ...sums.flat()].filter(v => v != null);
       let lo = Math.min(...all, B || S.length ? 0 : Infinity), hi = Math.max(...all);
       const step = niceStep(hi - lo); lo = Math.floor(lo / step) * step; hi = Math.ceil(hi / step) * step;
-      const xs = i => ml + i * (W2 - ml - mr) / (n - 1), ys = v => mt + (hi - v) / (hi - lo) * (H2 - mt - mb);
+      const xs = i => ml + i * (W2 - ml - mr) / (n - 1), ys = v => mt + (hi - v) / (hi - lo) * (pb - mt);
       let ys2 = ys;
       if (Y2.length) { const a2 = L.filter((_, k) => isY2(k)).flat().filter(v => v != null);
         let lo2 = Math.min(...a2), hi2 = Math.max(...a2); const st2 = niceStep(hi2 - lo2);
         lo2 = Math.floor(lo2 / st2) * st2; hi2 = Math.ceil(hi2 / st2) * st2;
-        ys2 = v => mt + (hi2 - v) / (hi2 - lo2) * (H2 - mt - mb);
+        ys2 = v => mt + (hi2 - v) / (hi2 - lo2) * (pb - mt);
         for (let v = lo2; v <= hi2 + st2 / 2; v += st2) { const vv = Math.round(v / st2) * st2;
           el("text", { x: W2 - mr + 6, y: ys2(vv) + 4, "text-anchor": "start", "font-size": fs, fill: "var(--muted)" }, svg).textContent = fmtV(vv, st2 < 1 ? 1 : 0); } }
       for (let v = lo; v <= hi + step / 2; v += step) {
         const vv = Math.round(v / step) * step;
         el("line", { x1: ml, x2: W2 - mr, y1: ys(vv), y2: ys(vv), stroke: Math.abs(vv) < 1e-9 && (B || S.length || lo < 0) ? "var(--muted)" : "var(--grid)", "stroke-width": 1 }, svg);
         el("text", { x: ml - 6, y: ys(vv) + 4, "text-anchor": "end", "font-size": fs, fill: "var(--muted)" }, svg).textContent = fmtV(vv, step < 1 ? (step < 0.1 ? 2 : 1) : 0);
+      }
+      let yl = null;
+      if (LW) {                                                           // alapaneeli: palkit omalla asteikolla
+        const a3 = LW.filter(v => v != null); let lo3 = Math.min(0, ...a3), hi3 = Math.max(0, ...a3);
+        const st3 = niceStep(hi3 - lo3) * 2; lo3 = Math.floor(lo3 / st3) * st3; hi3 = Math.ceil(hi3 / st3) * st3;
+        const t3 = pb + 22, b3 = H2 - mb; yl = v => t3 + (hi3 - v) / (hi3 - lo3) * (b3 - t3);
+        el("text", { x: ml, y: pb + 14, "font-size": fs - 1, fill: "var(--muted)" }, svg).textContent = c.lower.label;
+        for (let v = lo3; v <= hi3 + st3 / 2; v += st3) { const vv = Math.round(v / st3) * st3;
+          el("line", { x1: ml, x2: W2 - mr, y1: yl(vv), y2: yl(vv), stroke: Math.abs(vv) < 1e-9 ? "var(--muted)" : "var(--grid)", "stroke-width": 1 }, svg);
+          el("text", { x: ml - 6, y: yl(vv) + 4, "text-anchor": "end", "font-size": fs, fill: "var(--muted)" }, svg).textContent = fmtV(vv, st3 < 1 ? 1 : 0); }
+        const bw = (W2 - ml - mr) / n * 0.7;
+        LW.forEach((v, i) => { if (v == null) return;
+          el("rect", { x: xs(i) - bw / 2, y: Math.min(yl(0), yl(v)), width: bw, height: Math.abs(yl(v) - yl(0)),
+            fill: v >= 0 ? "var(--q-up)" : "var(--q-down)", "fill-opacity": 0.55 }, svg); });
       }
       const ystep = big || c.size === "tt" ? 2 : 5;
       P.forEach((per, i) => { const yr = +per.slice(0, 4);
@@ -970,7 +988,8 @@ footer b { color: var(--fg); font-weight: 600; }
         } else if (L.length > 1) {
           let j = i; while (j > 0 && L.every(a => a[j] == null)) j--;
           valEl.innerHTML = `${fmtP(P[j])}`;
-          subEl.textContent = c.lines.map(id => `${lbl(id)} ${fmtV(L[c.lines.indexOf(id)][j], c.dec)}${c.unit === "%" ? " %" : ""}`).join(" · ");
+          subEl.textContent = c.lines.map(id => `${lbl(id)} ${fmtV(L[c.lines.indexOf(id)][j], c.dec)}${c.unit === "%" ? " %" : ""}`).join(" · ") +
+            (LW && LW[j] != null ? ` · ${c.lower.label} ${LW[j] > 0 ? "+" : ""}${fmtV(LW[j], c.lower.dec != null ? c.lower.dec : 1)}` : "");
         } else {
           const a = L[0]; let j = i; while (j > 0 && a[j] == null) j--;
           valEl.innerHTML = `${fmtP(P[j])} · <b>${withU(a[j], c)}</b>`;
