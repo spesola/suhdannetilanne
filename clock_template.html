@@ -176,6 +176,7 @@ body { font-variant-numeric: tabular-nums; background: var(--bg); min-height: 10
 .legend { display: flex; flex-wrap: wrap; gap: 14px; font-size: 0.8rem; color: var(--muted); margin-top: 8px; }
 .legend span.sq::before { height: 10px; width: 10px; border-radius: 2px; vertical-align: -1px; }
 .legend span::before { content: ""; display: inline-block; width: 14px; height: 3px; border-radius: 2px; background: var(--qc); vertical-align: middle; margin-right: 6px; }
+.legend span.ds::before { background: repeating-linear-gradient(90deg, var(--qc) 0 4px, transparent 4px 7px); }
 .legend.dots span::before { width: 7px; height: 7px; border-radius: 50%; vertical-align: 0; }
 
 .tiles { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); border-top: 1px solid var(--rule); }
@@ -1027,6 +1028,7 @@ footer b { color: var(--fg); font-weight: 600; }
     return { id: base.id, section: base.section, size: "half", title: r.label, lines: ["h_" + rowId], unit, dec: r.dec != null ? Math.min(r.dec, 2) : 1,
       from: 2000, note: (r.date.length === 10 ? "Kuukauden viimeinen havainto." : "Kuukausiarvo.") + " Klikkaa riviä uudelleen palataksesi.", fromTable: tb.id };
   }
+  const stepDec = st => Number.isInteger(+st.toFixed(6)) ? 0 : Number.isInteger(+(st * 10).toFixed(6)) ? 1 : 2;   // tikkien desimaalit (2,5 -> 1)
   function renderCharts(box = $("charts"), only = null) {
     box.innerHTML = ""; chartHooks = [];
     const ser = id => set.series.find(x => x.id === id);
@@ -1040,8 +1042,8 @@ footer b { color: var(--fg); font-weight: 600; }
       if (vw) return { ...c, ...vw, bars: undefined, stack: undefined };
       const cb = (c.contribs && c.contribs[gRow.id]) || (gRow.id === "bkt" ? c.contrib : null);
       return cb && ser(cb.line)
-        ? { ...c, title: cb.title, note: cb.note, lines: [cb.line], bars: undefined, stack: cb.stack.filter(id => ser(id)),
-            unit: cb.unit || "%", dec: cb.dec != null ? cb.dec : c.dec, stackUnit: cb.stackUnit }
+        ? { ...c, title: cb.title, note: cb.note, lines: (cb.lines || [cb.line]).filter(id => ser(id)), bars: undefined, stack: cb.stack.filter(id => ser(id)),
+            unit: cb.unit || "%", dec: cb.dec != null ? cb.dec : c.dec, stackUnit: cb.stackUnit, dash: cb.dash, labels: cb.labels, colors: cb.colors }
         : { ...c, title: `${gRow.label}: kasvu`, lines: [grSel + "_yy"], bars: grSel + "_qq" }; });
     if (!only) charts = charts.map(c => {                 // taulukosta valittu rivi korvaa parikuvion
       const tb = set.charts.find(t => t.type === "table" && t.pair === c.id && tblSel[t.id]);
@@ -1070,7 +1072,7 @@ footer b { color: var(--fg); font-weight: 600; }
       const fm = document.createElement("div"); fm.className = "fmeta";
       if (c.lines.length > 1 || c.bars || c.stack) {
         const lg = document.createElement("div"); lg.className = "legend";
-        lg.innerHTML = c.lines.map(id => `<span style="--qc:${colOf[id]}">${lbl(id)}${(c.y2 || []).includes(id) ? " (oikea akseli)" : ""}</span>`).join("") +
+        lg.innerHTML = c.lines.map(id => `<span${(c.dash || []).includes(id) ? ' class="ds"' : ""} style="--qc:${colOf[id]}">${lbl(id)}${(c.y2 || []).includes(id) ? " (oikea akseli)" : ""}</span>`).join("") +
           (c.stack || []).map((id, k) => `<span class="sq" style="--qc:${STACK_COLS[k % STACK_COLS.length]}">${ser(id).label}</span>`).join("") +
           (!c.bars ? "" : c.barsNeutral ? `<span style="--qc:var(--g3)">${ser(c.bars).label} (palkit)</span>`
             : `<span style="--qc:var(--q-up)">${(c.barsLegend || [])[0] || "Normaali käyrä"}</span><span style="--qc:var(--q-down)">${(c.barsLegend || [])[1] || "Käänteinen käyrä"}</span>`);
@@ -1100,12 +1102,12 @@ footer b { color: var(--fg); font-weight: 600; }
         lo2 = Math.floor(lo2 / st2) * st2; hi2 = Math.ceil(hi2 / st2) * st2;
         ys2 = v => mt + (hi2 - v) / (hi2 - lo2) * (pb - mt);
         for (let v = lo2; v <= hi2 + st2 / 2; v += st2) { const vv = Math.round(v / st2) * st2;
-          el("text", { x: W2 - mr + 6, y: ys2(vv) + 4, "text-anchor": "start", "font-size": fs, fill: "var(--muted)" }, svg).textContent = fmtV(vv, st2 < 1 ? 1 : 0); } }
+          el("text", { x: W2 - mr + 6, y: ys2(vv) + 4, "text-anchor": "start", "font-size": fs, fill: "var(--muted)" }, svg).textContent = fmtV(vv, stepDec(st2)); } }
       for (let v = lo; v <= hi + step / 2; v += step) {
         const vv = Math.round(v / step) * step;
         el("line", { x1: ml, x2: W2 - mr, y1: ys(vv), y2: ys(vv), stroke: Math.abs(vv) < 1e-9 && (B || S.length || lo < 0) ? "var(--muted)" : "var(--grid)", "stroke-width": 1 }, svg);
         el("text", { x: ml - 6, y: ys(vv) + 4, "text-anchor": "end", "font-size": fs, fill: "var(--muted)" }, svg).textContent =
-          c.ts && Number.isInteger(vv) ? tick(vv) : fmtV(vv, step < 1 ? (step < 0.1 ? 2 : 1) : 0);
+          c.ts && Number.isInteger(vv) ? tick(vv) : fmtV(vv, stepDec(step));
       }
       let yl = null;
       if (LW) {                                                           // alapaneeli: palkit omalla asteikolla
@@ -1163,7 +1165,8 @@ footer b { color: var(--fg); font-weight: 600; }
           if (ok) { dots[k].setAttribute("cx", xs(i)); dots[k].setAttribute("cy", (isY2(k) ? ys2 : ys)(a[i])); } });
         if (S.length) {
           const g = L[0][i], u = c.unit === "%" ? " %" : c.unit ? " " + c.unit : "";
-          if (valEl) valEl.innerHTML = `${fmtP(P[i])}: ${ser(c.lines[0]).label} <b>${g > 0 ? "+" : ""}${fmtV(g, c.dec)}${u}</b>`;
+          if (valEl) valEl.innerHTML = `${fmtP(P[i])}: ` + c.lines.map((id, k) => { const v = L[k][i];   // useampi viiva: esim. YKHI ja KHI
+            return `${lbl(id)} <b>${v > 0 ? "+" : ""}${fmtV(v, c.dec)}${u}</b>`; }).join(", ");
           const su = c.stackUnit != null ? c.stackUnit : "%-yks.";
           subEl.textContent = (c.ts ? `${fmtP(P[i])}: ${ser(c.lines[0]).label} ${g > 0 ? "+" : ""}${fmtV(g, c.dec)}${u}. ` : "") +
             c.stack.map((id, k) => `${ser(id).label} ${+(S[k][i] || 0).toFixed(c.dec) > 0 ? "+" : ""}${fmtV(S[k][i], c.dec)}`).join(", ") + (su ? " " + su : "") + (su && su.endsWith(".") ? "" : ".");

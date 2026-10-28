@@ -321,7 +321,22 @@
               "unit": "%",
               "stackUnit": "%-yks.",
               "dec": 1,
-              "note": "Neljänneksen keskiarvo. Lähde: Eurostat."
+              "note": "Neljänneksen keskiarvo. Viivat: Tilastokeskus. Kontribuutiot: Eurostat (YKHI).",
+              "lines": [
+                "ki_ykhi",
+                "ki_khi"
+              ],
+              "dash": [
+                "ki_khi"
+              ],
+              "labels": {
+                "ki_ykhi": "YKHI",
+                "ki_khi": "KHI"
+              },
+              "colors": {
+                "ki_ykhi": "var(--fg)",
+                "ki_khi": "var(--fg)"
+              }
             },
             "bkt_kulutus": {
               "title": "Yksityinen kulutus ja kontribuutiot",
@@ -3386,6 +3401,39 @@
       "contrib_total": false,
       "source": "hicp_ctrb",
       "coicop18": "SERV",
+      "to_quarter": true,
+      "handling": "none",
+      "kind": "level"
+    },
+    {
+      "id": "ki_ykhi",
+      "label": "Yhdenmukaistettu kuluttajahintaindeksi (YKHI) v/v",
+      "set": "bkt",
+      "contrib": true,
+      "contrib_group": "inflaatio",
+      "contrib_total": false,
+      "source": "statfin",
+      "table": "khi/15b7.px",
+      "pick": {
+        "coicop_46_20231201": "SSS",
+        "contentscode": "vm_ykhi"
+      },
+      "to_quarter": true,
+      "handling": "none",
+      "kind": "level"
+    },
+    {
+      "id": "ki_khi",
+      "label": "Kuluttajahintaindeksi (KHI) v/v",
+      "set": "bkt",
+      "contrib": true,
+      "contrib_group": "inflaatio",
+      "contrib_total": false,
+      "source": "statfin",
+      "table": "khi/122p.px",
+      "pick": {
+        "contentscode": "Vuosimuutos"
+      },
       "to_quarter": true,
       "handling": "none",
       "kind": "level"
