@@ -528,8 +528,7 @@ footer b { color: var(--fg); font-weight: 600; }
       h.style.setProperty("--gc", `var(${GVARS[gi % GVARS.length]})`);
       const gp = all.length > 1 ? at(grp(g), idx) : null, gq = gp ? quad(gp.l, gp.c) : null;
       h.setAttribute("aria-pressed", sel === "g:" + g);
-      h.innerHTML = `<i></i><span class="gn">${g}</span>` + (gq ? `<span class="chip" style="--qc:${qcol(gq)}">${Q[gq].short}</span>` : "") +
-        "";
+      h.innerHTML = `<i></i><span class="gn">${g}</span>`;   // ryhman vaihe nakyy valittaessa, ei listassa
       h.onclick = () => select("g:" + g); h.dataset.g = g;
       h.onmouseenter = () => hlPoints(all.map(x => x.id)); h.onmouseleave = () => hlPoints([]);
       box.appendChild(h); mem.forEach(s => box.appendChild(mk(s))); list.appendChild(box);
