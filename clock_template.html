@@ -215,7 +215,10 @@ h1 { font-family: var(--font-display); font-weight: 600; font-size: clamp(2.1rem
 @media (max-width: 640px) { .fgrid { grid-template-columns: minmax(0, 1fr); } }
 button.dl { font: inherit; font-size: 0.76rem; color: var(--fg); background: none; border: 0; padding: 0; cursor: pointer; margin-left: 10px; text-decoration: underline; text-underline-offset: 3px; text-decoration-color: var(--line); }
 button.dl:hover { text-decoration-color: var(--fg); }
-.fdl { display: flex; justify-content: flex-end; margin-top: 6px; }
+.fmeta { display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: 6px 16px; margin-top: 8px; }
+.fmeta .legend { margin-top: 0; }
+.fmeta > .dl { margin-left: auto; }
+.fhead > .dl { margin-left: auto; }
 .step.play { font-size: 0.7rem; }
 .fsec { grid-column: 1 / -1; font-size: 1.05rem; color: var(--fg); font-weight: 600; margin: 8px 0 -28px; }
 .fsec:first-child { margin-top: 0; }
@@ -282,9 +285,13 @@ footer b { color: var(--fg); font-weight: 600; }
   .ind .ph .pt-t, .lhead span:nth-child(4) { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); }
   .timebar input[type=range] { flex-basis: 120px; }
   #clock text { font-size: 17px; }
+  #tsContrib .fc text { font-size: 17px; }
+  footer > p { padding-right: 0; }
+  footer summary { position: static; }
   #clock .axl.top, #clock .axl.bot { display: none; }
   #ts text { font-size: 18px; }
 }
+@media (max-width: 560px), (pointer: coarse) { .ind, .gh { min-height: 44px; } }
 @media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
 </style>
 
@@ -462,6 +469,7 @@ footer b { color: var(--fg); font-weight: 600; }
 
   function renderClock() {
     const svg = $("clock"); svg.innerHTML = "";
+    const K = svg.clientWidth && svg.clientWidth < 420 ? 1.6 : 1;   // kapealla naytolla pisteet suuremmiksi
     const mid = W / 2, inner = W - 2 * M;
     // tausta: vaiheiden neljannekset vaalealla savylla, valkoinen ruudukko
     [["turn", M, M], ["up", mid, M], ["down", M, mid], ["rec", mid, mid]].forEach(([q, x, y]) =>
@@ -504,10 +512,10 @@ footer b { color: var(--fg); font-weight: 600; }
       if (pts.length > 1) {
         el("polyline", { points: pts.map(q => q.join(",")).join(" "), fill: "none", stroke: col,
           "stroke-width": s.comp || s.isGroup ? 1.8 : 1.3, "stroke-opacity": s.comp ? 0.9 : 0.5, "stroke-linejoin": "round" }, g);
-        pts.slice(0, -1).forEach((q, k) => el("circle", { cx: q[0], cy: q[1], r: s.comp ? 2.4 : 2, fill: col, "fill-opacity": s.comp ? 1 : 0.25 + 0.5 * k / pts.length }, g));
+        pts.slice(0, -1).forEach((q, k) => el("circle", { cx: q[0], cy: q[1], r: (s.comp ? 2.4 : 2) * K, fill: col, "fill-opacity": s.comp ? 1 : 0.25 + 0.5 * k / pts.length }, g));
       }
       const [hx, hy] = pts[pts.length - 1];
-      const r = (s.comp ? 7.5 : s.isGroup ? 7 : 5) + (hi(s) ? 2 : 0);
+      const r = ((s.comp ? 7.5 : s.isGroup ? 7 : 5) + (hi(s) ? 2 : 0)) * K;
       const hollow = !s.comp && !s.isGroup && !s.in_composite;           // ei kokonaisindikaattorissa: ontto piste
       el("circle", { cx: hx, cy: hy, r, fill: hollow ? "var(--plot)" : s.comp ? "var(--fg)" : col, stroke: hollow ? col : "var(--plot)", "stroke-width": hollow ? 1.6 : 1.5 }, g);
       const right = hx + r + 8 + s.label.length * 6.6 < W - M;   // nimi oikealle, jos mahtuu kehyksen sisaan
@@ -645,7 +653,7 @@ footer b { color: var(--fg); font-weight: 600; }
       const ind = set.indicators.find(x => x.id === id.slice(4)); if (!ind) return;
       set.series = (set.series || []).filter(x => x.id !== id).concat([{ id, label: ind.label, values: ind.raw }]); });
     $("tsGrid").classList.toggle("solo", !cc);
-    if (cc) renderCharts($("tsContrib"), [{ ...cc, wide: true, w: 560, height: 300, defIdx: idx }]); else $("tsContrib").innerHTML = "";
+    if (cc) renderCharts($("tsContrib"), [{ ...cc, wide: true, w: 560, height: 300, defIdx: idx, ts: true }]); else $("tsContrib").innerHTML = "";
     const p = at(s, idx);
     $("tsNow").innerHTML = p ? `<i style="--qc:${qcol(quad(p.l, p.c))}"></i>${Q[quad(p.l, p.c)].name} ${fmtP(set.periods[p.i])}. Taso ${fmtN(p.l)}, muutos ${fmtN(p.c)}.` : "";
     const svg = $("ts"); svg.innerHTML = "";
@@ -940,25 +948,27 @@ footer b { color: var(--fg); font-weight: 600; }
       if (c.bars && !ser(c.bars)) delete c.bars;
       if (!c.lines.length) return;
       const card = document.createElement("div"); card.className = "card fcard" + (c.size === "tt" && !narrow ? " tt" : c.wide ? " wide" : c.size === "half" ? " half" : "");
-      card.innerHTML = `<div class="fhead"><h2>${c.title}</h2><span class="fval"></span></div><p class="fsub"></p>`;
+      card.innerHTML = `<div class="fhead"><h2>${c.title}</h2>${c.ts ? "" : `<span class="fval"></span>`}</div><p class="fsub"></p>`;
       const big = c.wide && !narrow && !c.w, half = c.size === "half" && !narrow;
       if (c.size === "tt" && !narrow) { c.w = c.w || 760; c.height = c.height || 300; }   // kaksi kolmasosaa leveydesta
       const W2 = c.w || (big ? 960 : half ? 560 : 420), H2 = c.height || (big ? 300 : half ? 270 : (c.wide ? 270 : 230)), fs = c.w ? 11 : big ? 11 : half ? 12 : 13;
       const Y2 = c.y2 || [], isY2 = k => Y2.includes(c.lines[k]);   // toissijainen (oikea) akseli eri tason sarjoille
       const ml = big ? 44 : 52, mr = 10 + (c.bars || c.stack ? W2 / set.periods.length / 2 : 0) + (Y2.length ? 34 : 0), mt = 10, mb = big ? 28 : 34;
       const svg = el("svg", { class: "fc", viewBox: `0 0 ${W2} ${H2}`, role: "img", "aria-label": c.title }, card);
-      if (c.note) { const p = document.createElement("p"); p.className = "fnote"; p.textContent = c.note; card.appendChild(p); }
+      const fm = document.createElement("div"); fm.className = "fmeta";
       if (c.lines.length > 1 || c.bars || c.stack) {
         const lg = document.createElement("div"); lg.className = "legend";
         lg.innerHTML = c.lines.map(id => `<span style="--qc:${colOf[id]}">${lbl(id)}${(c.y2 || []).includes(id) ? " (oikea akseli)" : ""}</span>`).join("") +
           (c.stack || []).map((id, k) => `<span class="sq" style="--qc:${STACK_COLS[k % STACK_COLS.length]}">${ser(id).label}</span>`).join("") +
           (!c.bars ? "" : c.barsNeutral ? `<span style="--qc:var(--g3)">${ser(c.bars).label} (palkit)</span>`
             : `<span style="--qc:var(--q-up)">${(c.barsLegend || [])[0] || "Normaali käyrä"}</span><span style="--qc:var(--q-down)">${(c.barsLegend || [])[1] || "Käänteinen käyrä"}</span>`);
-        card.appendChild(lg);
+        fm.appendChild(lg);
       }
-      const fd = document.createElement("div"); fd.className = "fdl";
       const db = document.createElement("button"); db.type = "button"; db.className = "dl"; db.textContent = "Lataa CSV"; db.title = "Lataa kuvan data";
-      db.onclick = () => chartCSV(c); fd.appendChild(db); card.appendChild(fd);
+      db.onclick = () => chartCSV(c);
+      if (c.ts) card.querySelector(".fhead").appendChild(db); else fm.appendChild(db);   // aikasarjanakymassa kuten vasen kuvio: otsikkoriville
+      if (fm.children.length) card.appendChild(fm);
+      if (c.note) { const p = document.createElement("p"); p.className = "fnote"; p.textContent = c.note; card.appendChild(p); }
       box.appendChild(card);
 
       // kuviokohtainen alkuvuosi: indeksit paikallisia (i), jaettu hover globaali (i + i0)
@@ -982,7 +992,8 @@ footer b { color: var(--fg); font-weight: 600; }
       for (let v = lo; v <= hi + step / 2; v += step) {
         const vv = Math.round(v / step) * step;
         el("line", { x1: ml, x2: W2 - mr, y1: ys(vv), y2: ys(vv), stroke: Math.abs(vv) < 1e-9 && (B || S.length || lo < 0) ? "var(--muted)" : "var(--grid)", "stroke-width": 1 }, svg);
-        el("text", { x: ml - 6, y: ys(vv) + 4, "text-anchor": "end", "font-size": fs, fill: "var(--muted)" }, svg).textContent = fmtV(vv, step < 1 ? (step < 0.1 ? 2 : 1) : 0);
+        el("text", { x: ml - 6, y: ys(vv) + 4, "text-anchor": "end", "font-size": fs, fill: "var(--muted)" }, svg).textContent =
+          c.ts && Number.isInteger(vv) ? tick(vv) : fmtV(vv, step < 1 ? (step < 0.1 ? 2 : 1) : 0);
       }
       let yl = null;
       if (LW) {                                                           // alapaneeli: palkit omalla asteikolla
@@ -1018,7 +1029,6 @@ footer b { color: var(--fg); font-weight: 600; }
           d += pen ? (step ? `H${xs(i).toFixed(1)}V${yf(v).toFixed(1)}` : `L${xs(i).toFixed(1)} ${yf(v).toFixed(1)}`) : `M${xs(i).toFixed(1)} ${yf(v).toFixed(1)}`; pen = true; }); return d; };
       if (L.length === 1 && !B && !S.length) {   // yksi sarja: pinta ja mediaaniviiva vertailuksi
         const a = L[0], f = a.findIndex(v => v != null), l = lastNN(a);
-        el("path", { d: path(a) + `L${xs(l)} ${ys(lo)}L${xs(f)} ${ys(lo)}Z`, fill: "var(--accent)", "fill-opacity": 0.08 }, svg);
         const srt = a.filter(v => v != null).sort((p, q) => p - q), med = srt[Math.floor(srt.length / 2)];
         el("line", { x1: ml, x2: W2 - mr, y1: ys(med), y2: ys(med), stroke: "var(--muted)", "stroke-dasharray": "4 4", "stroke-width": 1 }, svg);
         el("text", { x: ml + 4, y: ys(med) - 5, "font-size": fs - 1, fill: "var(--muted)", stroke: "var(--surface)", "stroke-width": 3, "paint-order": "stroke" }, svg).textContent = "mediaani";
@@ -1027,7 +1037,7 @@ footer b { color: var(--fg); font-weight: 600; }
         el("path", { d: path(a, st, isY2(k) ? ys2 : ys), fill: "none", stroke: colOf[id], "stroke-width": k === 0 ? 2.2 : 1.6,
           "stroke-dasharray": (c.dot || []).includes(id) ? "1.5 3" : (c.dash || []).includes(id) ? "5 3" : "none",
           "stroke-linecap": (c.dot || []).includes(id) ? "round" : "butt", "stroke-linejoin": "round" }, svg); });
-      const cur = el("line", { y1: mt, y2: H2 - mb, stroke: "var(--fg)", "stroke-opacity": 0.35, "stroke-width": 1 }, svg);
+      const cur = el("line", { y1: mt, y2: H2 - mb, stroke: "var(--muted)", "stroke-width": 1, "stroke-dasharray": "2 3" }, svg);
       const dots = L.map((a, k) => el("circle", { r: big ? 3.5 : 4, fill: colOf[c.lines[k]], stroke: "var(--surface)", "stroke-width": 1.5 }, svg));
 
       const valEl = card.querySelector(".fval"), subEl = card.querySelector(".fsub");
@@ -1036,24 +1046,28 @@ footer b { color: var(--fg); font-weight: 600; }
         const i = h == null ? (iDef != null ? iDef : L.length > 1 && !B && !S.length ? Math.min(...L.map(lastNN)) : lastNN(B || L[0]))   // oletus: valittu tai viimeisin yhteinen jakso
                          : Math.max(0, Math.min(n - 1, h - i0));
         cur.setAttribute("x1", xs(i)); cur.setAttribute("x2", xs(i));
+        cur.setAttribute("stroke-dasharray", h == null ? "2 3" : "none"); cur.setAttribute("stroke", h == null ? "var(--muted)" : "var(--fg)"); cur.setAttribute("stroke-opacity", h == null ? 1 : 0.35);
         L.forEach((a, k) => { const ok = a[i] != null; dots[k].setAttribute("visibility", ok ? "visible" : "hidden");
           if (ok) { dots[k].setAttribute("cx", xs(i)); dots[k].setAttribute("cy", (isY2(k) ? ys2 : ys)(a[i])); } });
         if (S.length) {
           const g = L[0][i], u = c.unit === "%" ? " %" : c.unit ? " " + c.unit : "";
-          valEl.innerHTML = `${fmtP(P[i])} · ${ser(c.lines[0]).label} <b>${g > 0 ? "+" : ""}${fmtV(g, c.dec)}${u}</b>`;
+          if (valEl) valEl.innerHTML = `${fmtP(P[i])}: ${ser(c.lines[0]).label} <b>${g > 0 ? "+" : ""}${fmtV(g, c.dec)}${u}</b>`;
           const su = c.stackUnit != null ? c.stackUnit : "%-yks.";
-          subEl.textContent = c.stack.map((id, k) => `${ser(id).label} ${+(S[k][i] || 0).toFixed(c.dec) > 0 ? "+" : ""}${fmtV(S[k][i], c.dec)}`).join(" · ") + (su ? " " + su : "");
+          subEl.textContent = (c.ts ? `${fmtP(P[i])}: ${ser(c.lines[0]).label} ${g > 0 ? "+" : ""}${fmtV(g, c.dec)}${u}. ` : "") +
+            c.stack.map((id, k) => `${ser(id).label} ${+(S[k][i] || 0).toFixed(c.dec) > 0 ? "+" : ""}${fmtV(S[k][i], c.dec)}`).join(", ") + (su ? " " + su : "") + ".";
         } else if (c.bars) {
-          const d = B[i]; valEl.innerHTML = `${fmtP(P[i])} · ${c.barsName || "ero"} <b style="color:${c.barsNeutral ? "var(--fg)" : d >= 0 ? "var(--q-up)" : "var(--q-down)"}">${d > 0 ? "+" : ""}${fmtV(d, c.dec)} ${c.barsUnit || "%-yks."}</b>`;
-          subEl.textContent = c.lines.map(id => `${ser(id).label} ${withU(L[c.lines.indexOf(id)][i], c)}`).join(" · ");
+          const d = B[i]; if (valEl) valEl.innerHTML = `${fmtP(P[i])}: ${c.barsName || "ero"} <b style="color:${c.barsNeutral ? "var(--fg)" : d >= 0 ? "var(--q-up)" : "var(--q-down)"}">${d > 0 ? "+" : ""}${fmtV(d, c.dec)} ${c.barsUnit || "%-yks."}</b>`;
+          subEl.textContent = c.lines.map(id => `${ser(id).label} ${withU(L[c.lines.indexOf(id)][i], c)}`).join(", ") + ".";
         } else if (L.length > 1) {
           let j = i; while (j > 0 && L.every(a => a[j] == null)) j--;
-          valEl.innerHTML = `${fmtP(P[j])}`;
-          subEl.textContent = c.lines.map(id => `${lbl(id)} ${fmtV(L[c.lines.indexOf(id)][j], c.dec)}${c.unit === "%" ? " %" : ""}`).join(" · ") +
-            (LW && LW[j] != null ? ` · ${c.lower.label} ${LW[j] > 0 ? "+" : ""}${fmtV(LW[j], c.lower.dec != null ? c.lower.dec : 1)}` : "");
+          if (valEl) valEl.innerHTML = `${fmtP(P[j])}`;
+          const sg = v => c.ts && v > 0 ? "+" : "";
+          subEl.textContent = (c.ts ? `${fmtP(P[j])}: ` : "") +
+            c.lines.map(id => { const v = L[c.lines.indexOf(id)][j]; return `${lbl(id)} ${sg(v)}${fmtV(v, c.dec)}${c.unit === "%" ? " %" : ""}`; }).join(", ") +
+            (LW && LW[j] != null ? `, ${c.lower.label} ${LW[j] > 0 ? "+" : ""}${fmtV(LW[j], c.lower.dec != null ? c.lower.dec : 1)}` : "") + ".";
         } else {
           const a = L[0]; let j = i; while (j > 0 && a[j] == null) j--;
-          valEl.innerHTML = `${fmtP(P[j])} · <b>${withU(a[j], c)}</b>`;
+          if (valEl) valEl.innerHTML = `${fmtP(P[j])}: <b>${withU(a[j], c)}</b>`;
           const y0 = P[a.findIndex(v => v != null)].slice(0, 4);
           subEl.textContent = c.sub || "";
         }
@@ -1067,7 +1081,9 @@ footer b { color: var(--fg); font-weight: 600; }
     });
   }
 
-  let lastNarrow = null;
+  let lastNarrow = null, lastK = null;
+  addEventListener("resize", () => { const c = $("clock"); if (!c || $("topSec").hidden) return;   // kartan pistekoko kapealla
+    const k = c.clientWidth < 420; if (k !== lastK) { lastK = k; renderClock(); } });
   addEventListener("resize", () => { if (set.view !== "charts") return;
     const nw = $("charts").clientWidth < 640; if (nw !== lastNarrow) { lastNarrow = nw; renderCharts(); } });
   function renderAll() { renderHeader(); update(); }

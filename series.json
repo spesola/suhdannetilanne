@@ -929,7 +929,7 @@
     },
     {
       "id": "avoimet",
-      "label": "Avoimet työpaikat (TE-palvelut)",
+      "label": "Avoimet työpaikat (TE‑palvelut)",
       "set": "suhdanne",
       "group": "Työmarkkinat",
       "source": "statfin",
