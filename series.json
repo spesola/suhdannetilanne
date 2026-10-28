@@ -597,9 +597,9 @@
         {
           "id": "t_fx",
           "type": "table",
-          "section": "Valuutat ja öljy",
+          "section": "Valuutat ja raaka-aineet",
           "size": "half",
-          "title": "Valuuttakurssit ja öljyn hinta",
+          "title": "Valuuttakurssit ja öljy",
           "rows": [
             {
               "id": "eer_d",
@@ -635,7 +635,7 @@
         },
         {
           "id": "eer",
-          "section": "Valuutat ja öljy",
+          "section": "Valuutat ja raaka-aineet",
           "size": "half",
           "title": "Euron efektiivinen kurssi",
           "lines": [
@@ -644,6 +644,79 @@
           "unit": "",
           "dec": 1,
           "note": "Nimellinen, 40 kauppakumppania, 1999 Q1 = 100. Lähde: EKP."
+        },
+        {
+          "id": "t_raaka",
+          "type": "table",
+          "section": "Valuutat ja raaka-aineet",
+          "size": "half",
+          "title": "Raaka-aineiden hinnat",
+          "cols": [
+            "m1",
+            "y1",
+            "ytd"
+          ],
+          "rows": [
+            {
+              "id": "wb_gas",
+              "group": "Energia"
+            },
+            {
+              "id": "wb_coal"
+            },
+            {
+              "id": "wb_copper",
+              "group": "Metallit"
+            },
+            {
+              "id": "wb_alu"
+            },
+            {
+              "id": "wb_nickel"
+            },
+            {
+              "id": "wb_iron"
+            },
+            {
+              "id": "wb_gold",
+              "group": "Jalometallit"
+            },
+            {
+              "id": "wb_silver"
+            },
+            {
+              "id": "wb_wheat",
+              "group": "Maataloustuotteet"
+            },
+            {
+              "id": "wb_maize"
+            },
+            {
+              "id": "wb_coffee"
+            }
+          ],
+          "note": "Kuukausikeskiarvot Yhdysvaltain dollareina. Lähde: Maailmanpankki (Pink Sheet), CC BY 4.0."
+        },
+        {
+          "id": "wbi",
+          "section": "Valuutat ja raaka-aineet",
+          "size": "half",
+          "title": "Raaka-aineiden hintaindeksit (2010=100)",
+          "lines": [
+            "wbi_energy",
+            "wbi_metals",
+            "wbi_agri",
+            "wbi_prec"
+          ],
+          "unit": "",
+          "dec": 0,
+          "labels": {
+            "wbi_energy": "Energia",
+            "wbi_metals": "Metallit ja mineraalit",
+            "wbi_agri": "Maataloustuotteet",
+            "wbi_prec": "Jalometallit"
+          },
+          "note": "Dollarimääräiset hinnat. Lähde: Maailmanpankki (Pink Sheet), CC BY 4.0."
         },
         {
           "id": "lainakorot",
@@ -2928,6 +3001,186 @@
       "unit": "$",
       "handling": "none",
       "kind": "level"
+    },
+    {
+      "id": "wb_gas",
+      "label": "Maakaasu, Eurooppa ($/MMBtu)",
+      "set": "rahoitus",
+      "source": "wb",
+      "series": "Natural gas, Europe",
+      "chg": "pct",
+      "dec": 2,
+      "handling": "none",
+      "kind": "level",
+      "table_only": true
+    },
+    {
+      "id": "wb_coal",
+      "label": "Kivihiili, Australia ($/t)",
+      "set": "rahoitus",
+      "source": "wb",
+      "series": "Coal, Australian",
+      "chg": "pct",
+      "dec": 1,
+      "handling": "none",
+      "kind": "level",
+      "table_only": true
+    },
+    {
+      "id": "wb_copper",
+      "label": "Kupari ($/t)",
+      "set": "rahoitus",
+      "source": "wb",
+      "series": "Copper",
+      "chg": "pct",
+      "dec": 0,
+      "handling": "none",
+      "kind": "level",
+      "table_only": true
+    },
+    {
+      "id": "wb_alu",
+      "label": "Alumiini ($/t)",
+      "set": "rahoitus",
+      "source": "wb",
+      "series": "Aluminum",
+      "chg": "pct",
+      "dec": 0,
+      "handling": "none",
+      "kind": "level",
+      "table_only": true
+    },
+    {
+      "id": "wb_nickel",
+      "label": "Nikkeli ($/t)",
+      "set": "rahoitus",
+      "source": "wb",
+      "series": "Nickel",
+      "chg": "pct",
+      "dec": 0,
+      "handling": "none",
+      "kind": "level",
+      "table_only": true
+    },
+    {
+      "id": "wb_iron",
+      "label": "Rautamalmi ($/t)",
+      "set": "rahoitus",
+      "source": "wb",
+      "series": "Iron ore, cfr spot",
+      "chg": "pct",
+      "dec": 1,
+      "handling": "none",
+      "kind": "level",
+      "table_only": true
+    },
+    {
+      "id": "wb_gold",
+      "label": "Kulta ($/unssi)",
+      "set": "rahoitus",
+      "source": "wb",
+      "series": "Gold",
+      "chg": "pct",
+      "dec": 0,
+      "handling": "none",
+      "kind": "level",
+      "table_only": true
+    },
+    {
+      "id": "wb_silver",
+      "label": "Hopea ($/unssi)",
+      "set": "rahoitus",
+      "source": "wb",
+      "series": "Silver",
+      "chg": "pct",
+      "dec": 2,
+      "handling": "none",
+      "kind": "level",
+      "table_only": true
+    },
+    {
+      "id": "wb_wheat",
+      "label": "Vehnä ($/t)",
+      "set": "rahoitus",
+      "source": "wb",
+      "series": "Wheat, US HRW",
+      "chg": "pct",
+      "dec": 1,
+      "handling": "none",
+      "kind": "level",
+      "table_only": true
+    },
+    {
+      "id": "wb_maize",
+      "label": "Maissi ($/t)",
+      "set": "rahoitus",
+      "source": "wb",
+      "series": "Maize",
+      "chg": "pct",
+      "dec": 1,
+      "handling": "none",
+      "kind": "level",
+      "table_only": true
+    },
+    {
+      "id": "wb_coffee",
+      "label": "Kahvi, arabica ($/kg)",
+      "set": "rahoitus",
+      "source": "wb",
+      "series": "Coffee, Arabica",
+      "chg": "pct",
+      "dec": 2,
+      "handling": "none",
+      "kind": "level",
+      "table_only": true
+    },
+    {
+      "id": "wbi_energy",
+      "label": "Energia",
+      "set": "rahoitus",
+      "source": "wb",
+      "series": "Energy",
+      "chg": "pct",
+      "dec": 1,
+      "handling": "none",
+      "kind": "level",
+      "sheet": "Monthly Indices"
+    },
+    {
+      "id": "wbi_metals",
+      "label": "Metallit ja mineraalit",
+      "set": "rahoitus",
+      "source": "wb",
+      "series": "Metals & Minerals",
+      "chg": "pct",
+      "dec": 1,
+      "handling": "none",
+      "kind": "level",
+      "sheet": "Monthly Indices"
+    },
+    {
+      "id": "wbi_agri",
+      "label": "Maataloustuotteet",
+      "set": "rahoitus",
+      "source": "wb",
+      "series": "Agriculture",
+      "chg": "pct",
+      "dec": 1,
+      "handling": "none",
+      "kind": "level",
+      "sheet": "Monthly Indices"
+    },
+    {
+      "id": "wbi_prec",
+      "label": "Jalometallit",
+      "set": "rahoitus",
+      "source": "wb",
+      "series": "Precious Metals",
+      "chg": "pct",
+      "dec": 1,
+      "handling": "none",
+      "kind": "level",
+      "sheet": "Monthly Indices"
     },
     {
       "id": "eer",

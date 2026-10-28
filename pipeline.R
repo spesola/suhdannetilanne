@@ -122,6 +122,31 @@ fetch_ecb <- function(s) {
   d
 }
 
+# Maailmanpankin raaka-ainehinnat (Pink Sheet, CC BY 4.0): kuukausitiedosto, jonka osoite vaihtuu kuukausittain,
+# joten linkki haetaan Commodity Markets -sivulta. Tiedosto ladataan kerran ajoa kohden.
+WB_PAGE <- "https://www.worldbank.org/en/research/commodity-markets"
+.wb <- new.env()
+wb_sheet <- function(sheet) {
+  if (is.null(.wb$file)) {
+    html <- get_text(WB_PAGE)
+    url <- regmatches(html, regexpr("https://thedocs\\.worldbank\\.org[^\"']*CMO-Historical-Data-Monthly\\.xlsx", html))
+    if (!length(url)) stop("Maailmanpankki: kuukausitiedoston linkkia ei loydy sivulta")
+    f <- tempfile(fileext = ".xlsx"); r <- RETRY("GET", url, write_disk(f, overwrite = TRUE), timeout(120), times = 3, quiet = TRUE)
+    stop_for_status(r); .wb$file <- f; message("  Maailmanpankki: ", basename(dirname(dirname(url))))
+  }
+  if (is.null(.wb[[sheet]])) .wb[[sheet]] <- as.data.frame(readxl::read_excel(.wb$file, sheet = sheet, col_names = FALSE, col_types = "text", .name_repair = "minimal"))
+  .wb[[sheet]]
+}
+fetch_wb <- function(s) {
+  x <- wb_sheet(if (is.null(s$sheet)) "Monthly Prices" else s$sheet)
+  clean <- function(v) gsub("\\s+", " ", trimws(gsub("\\*", "", v)))
+  hdr <- x[1:12, , drop = FALSE]
+  col <- which(vapply(seq_along(hdr), function(j) any(clean(hdr[[j]]) == clean(s$series), na.rm = TRUE), logical(1)))
+  if (length(col) != 1) stop("Maailmanpankki: sarakkeita '", s$series, "' loytyi ", length(col))
+  rows <- grepl("^\\d{4}M\\d{2}$", x[[1]])
+  data.frame(date = sub("M", "-", x[[1]][rows]), value = suppressWarnings(as.numeric(x[[col]][rows])))
+}
+
 fetch_fred <- function(s) {
   d <- read.csv(text = get_text(paste0(FRED, s$fred_id)))
   data.frame(date = substr(d[[1]], 1, if (isTRUE(s$daily)) 10 else 7), value = suppressWarnings(as.numeric(d[[2]])))
@@ -197,7 +222,7 @@ fetch_splice <- function(s) {
 
 fetch_series <- function(s) {
   f <- switch(s$source, statfin = fetch_statfin, splice = fetch_splice, eurostat = fetch_eurostat, hicp_ctrb = fetch_hicp_ctrb, ntp_ctrb = fetch_ntp_ctrb,
-              ecb = fetch_ecb, fred = fetch_fred, bof = fetch_bof, stop("Tuntematon lahde ", s$source))
+              ecb = fetch_ecb, fred = fetch_fred, bof = fetch_bof, wb = fetch_wb, stop("Tuntematon lahde ", s$source))
   # valimuisti: onnistunut haku tallennetaan, epaonnistuessa kaytetaan edellista hakua
   cache <- file.path(CACHE_DIR, paste0(s$id, ".csv"))
   d <- tryCatch({
@@ -327,9 +352,11 @@ snap_row <- function(id, raws) {
   ytd_ref <- at_or_before(which(substr(d$date, 1, 4) < substr(ld, 1, 4)))
   d1 <- if (daily && n > 1) dif(d$value[n - 1]) else NULL
   w1 <- if (daily) dif(at_or_before(which(as.Date(d$date) <= as.Date(ld) - 7))) else NULL
+  m1 <- if (!daily && n > 1) dif(d$value[n - 1]) else NULL                       # kuukausisarjat: edellinen kuukausi
+  y1 <- if (!daily) dif(d$value[match(sprintf("%d-%s", as.integer(substr(ld, 1, 4)) - 1, substr(ld, 6, 7)), d$date)]) else NULL
   if (daily && as.Date(ld) < Sys.Date() - 10) CHECKS <<- c(CHECKS, sprintf("%s: taulukon viimeisin havainto %s", id, ld))
   list(label = if (is.null(s$short)) s$label else s$short, date = ld, last = round(last, 4), chg = chg,
-       unit = s$unit, dec = s$dec, d1 = d1, w1 = w1, ytd = dif(ytd_ref))
+       unit = s$unit, dec = s$dec, d1 = d1, w1 = w1, m1 = m1, y1 = y1, ytd = dif(ytd_ref))
 }
 # tuottokayra: viimeisin, kuukausi sitten ja edellisen vuoden lopussa
 curve_data <- function(c) {

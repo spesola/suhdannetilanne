@@ -18,7 +18,7 @@ jobs:
         with: { use-public-rspm: true }
 
       - name: R-paketit
-        run: Rscript -e 'install.packages(c("httr", "jsonlite"))'
+        run: Rscript -e 'install.packages(c("httr", "jsonlite", "readxl"))'
 
       - name: Valimuisti (edelliset onnistuneet haut)
         uses: actions/cache@v4

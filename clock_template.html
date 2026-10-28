@@ -950,22 +950,24 @@ footer b { color: var(--fg); font-weight: 600; }
     const dec = r.chg === "kp" ? 0 : r.chg === "pct" ? 1 : r.dec, x = +v.toFixed(dec);
     return (x > 0 ? "+" : x < 0 ? "−" : "") + Math.abs(x).toFixed(dec).replace(".", ",") + (r.chg === "kp" ? " kp" : r.chg === "pct" ? " %" : ""); };
   const fmtLast = r => fmtV(r.last, r.dec) + (r.unit ? " " + r.unit : "");
+  const COLH = { d1: "1 pv", w1: "1 vk", m1: "1 kk", y1: "1 v", ytd: "Vuoden alusta" };
   function tableCard(c, narrow) {
     const card = document.createElement("div"); card.className = "card fcard tcard" + (narrow ? "" : " half");
-    const cnt = {}; c.rows.forEach(r => { if (r.date.length === 10) cnt[r.date] = (cnt[r.date] || 0) + 1; });   // taulukon paiva = yleisin havaintopaiva
+    const cols = c.cols || ["d1", "w1", "ytd"];   // kuukausitaulukoissa esim. m1, y1, ytd
+    const cnt = {}; c.rows.forEach(r => { cnt[r.date] = (cnt[r.date] || 0) + 1; });   // taulukon paiva = yleisin havaintopaiva
     const maxD = Object.keys(cnt).sort((a, b) => cnt[b] - cnt[a] || (a < b ? 1 : -1))[0] || "";
     let h = `<div class="fhead"><h2>${c.title}</h2><span class="fval">${maxD ? fmtD(maxD) : ""}</span></div>
-      <table class="snap"><thead><tr><th></th><th>Viimeisin</th><th>1 pv</th><th>1 vk</th><th>Vuoden alusta</th></tr></thead><tbody>`;
+      <table class="snap${cols[0] === "d1" ? " daily" : ""}"><thead><tr><th></th><th>Viimeisin</th>${cols.map(k => `<th>${COLH[k]}</th>`).join("")}</tr></thead><tbody>`;
     c.rows.forEach(r => {
-      if (r.group) h += `<tr class="g"><th colspan="5">${r.group}</th></tr>`;
+      if (r.group) h += `<tr class="g"><th colspan="${cols.length + 2}">${r.group}</th></tr>`;
       const old = r.date !== maxD;                     // eri havaintopaiva kuin taulukon uusin: paiva nakyviin
-      h += `<tr><th>${r.label}${old ? `<span class="dt">${fmtD(r.date)}</span>` : ""}</th><td class="v">${fmtLast(r)}</td><td>${fmtChg(r.d1, r)}</td><td>${fmtChg(r.w1, r)}</td><td>${fmtChg(r.ytd, r)}</td></tr>`; });
+      h += `<tr><th>${r.label}${old ? `<span class="dt">${fmtD(r.date)}</span>` : ""}</th><td class="v">${fmtLast(r)}</td>${cols.map(k => `<td>${fmtChg(r[k], r)}</td>`).join("")}</tr>`; });
     h += `</tbody></table>`;
     card.innerHTML = h;
     const fm = document.createElement("div"); fm.className = "fmeta";
     const db = document.createElement("button"); db.type = "button"; db.className = "dl"; db.textContent = "Lataa CSV";
-    db.onclick = () => saveFile(`suhdannetilanne-${slug(c.title)}.csv`, toCSV([["Sarja", "Päivä", "Viimeisin", "1 pv", "1 vk", "Vuoden alusta", "Muutoksen yksikkö"],
-      ...c.rows.map(r => [r.label, r.date, r.last, r.d1, r.w1, r.ytd, r.chg === "kp" ? "korkopistettä" : r.chg === "pct" ? "%" : "indeksi"])]));
+    db.onclick = () => saveFile(`suhdannetilanne-${slug(c.title)}.csv`, toCSV([["Sarja", "Päivä", "Viimeisin", ...cols.map(k => COLH[k]), "Muutoksen yksikkö"],
+      ...c.rows.map(r => [r.label, r.date, r.last, ...cols.map(k => r[k]), r.chg === "kp" ? "korkopistettä" : r.chg === "pct" ? "%" : "indeksi"])]));
     fm.appendChild(db); card.appendChild(fm);
     if (c.note) { const p = document.createElement("p"); p.className = "fnote"; p.textContent = c.note; card.appendChild(p); }
     return card;
