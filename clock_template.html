@@ -670,20 +670,23 @@ footer b { color: var(--fg); font-weight: 600; }
       // keskiarvo vuodesta 2010: tasovertailu trendin rinnalle (kartta vertaa trendiin, ei keskiarvoon)
       const k10 = Math.max(0, set.periods.indexOf("2010-01")), r10 = s.raw.slice(k10).filter(v => v != null);
       const avg = r10.reduce((a, b) => a + b, 0) / r10.length, avgVals = s.raw.map((v, k) => k >= k10 ? avg : null);
-      set.series = (set.series || []).filter(x => !["__raw", "__trend", "__avg"].includes(x.id))
-        .concat([{ id: "__raw", label: "Julkaistu arvo", values: s.raw }], hasTr ? [{ id: "__trend", label: "Pitkän aikavälin trendi", values: s.trend }] : [],
+      const hasSa = s.sa && s.sa.some(v => v != null);   // kausitasoittamaton lahde: oma STL-kausitasoitus paaviivaksi
+      set.series = (set.series || []).filter(x => !["__raw", "__sa", "__trend", "__avg"].includes(x.id))
+        .concat(hasSa ? [{ id: "__sa", label: "Kausitasoitettu", values: s.sa }] : [],
+                [{ id: "__raw", label: hasSa ? "Alkuperäinen" : "Julkaistu arvo", values: s.raw }], hasTr ? [{ id: "__trend", label: "Pitkän aikavälin trendi", values: s.trend }] : [],
                 [{ id: "__avg", label: "Keskiarvo 2010–", values: avgVals }]);
       const big = Math.max(...s.raw.filter(v => v != null).map(Math.abs)) >= 1000;
-      cc = { id: "raw_" + s.id, title: `${s.label}: julkaistu arvo`, lines: hasTr ? ["__raw", "__trend", "__avg"] : ["__raw", "__avg"], dash: ["__trend"], dot: ["__avg"],
+      cc = { id: "raw_" + s.id, title: `${s.label}: ${hasSa ? "kausitasoitettu" : "julkaistu arvo"}`,
+             lines: ["__raw", ...(hasSa ? ["__sa"] : []), ...(hasTr ? ["__trend"] : []), "__avg"], dash: ["__trend"], dot: ["__avg"], thin: hasSa ? ["__raw"] : [],
              unit: "", dec: big ? 0 : 1, from: 2010,
-             note: [s.raw_desc, s.unit].filter(Boolean).join(", ") + (hasTr ? ". Kartta vertaa trendiin, ei keskiarvoon." : ".") };
-      set.colors = { ...(set.colors || {}), __raw: "var(--accent)", __trend: "var(--muted)", __avg: "var(--q-turn)" };
+             note: [hasSa ? "Kausitasoitus oma laskelma" : s.raw_desc, s.unit].filter(Boolean).join(", ") + (hasTr ? ". Kartta vertaa trendiin, ei keskiarvoon." : ".") };
+      set.colors = { ...(set.colors || {}), __sa: "var(--accent)", __raw: hasSa ? "var(--line)" : "var(--accent)", __trend: "var(--muted)", __avg: "var(--q-turn)" };
     }
     if (cc) [...cc.lines, ...(cc.stack || [])].filter(id => id.startsWith("raw:")).forEach(id => {   // raw:<sarja> = julkaistu arvo
       const ind = set.indicators.find(x => x.id === id.slice(4)); if (!ind) return;
       set.series = (set.series || []).filter(x => x.id !== id).concat([{ id, label: ind.label, values: ind.raw }]); });
     $("tsGrid").classList.toggle("solo", !cc);
-    if (cc) renderCharts($("tsContrib"), [{ ...cc, wide: true, w: 560, height: 300, defIdx: idx, ts: true }]); else $("tsContrib").innerHTML = "";
+    if (cc) renderCharts($("tsContrib"), [{ ...cc, wide: true, w: 560, height: 300, defIdx: idx, ts: true, rawv: cc.id.startsWith("raw_") }]); else $("tsContrib").innerHTML = "";
     const p = at(s, idx);
     $("tsNow").innerHTML = p ? `<i style="--qc:${qcol(quad(p.l, p.c))}"></i>${Q[quad(p.l, p.c)].name} ${fmtP(set.periods[p.i])}. Taso ${fmtN(p.l)}, muutos ${fmtN(p.c)}.` : "";
     const svg = $("ts"); svg.innerHTML = "";
@@ -1107,7 +1110,7 @@ footer b { color: var(--fg); font-weight: 600; }
         const vv = Math.round(v / step) * step;
         el("line", { x1: ml, x2: W2 - mr, y1: ys(vv), y2: ys(vv), stroke: Math.abs(vv) < 1e-9 && (B || S.length || lo < 0) ? "var(--muted)" : "var(--grid)", "stroke-width": 1 }, svg);
         el("text", { x: ml - 6, y: ys(vv) + 4, "text-anchor": "end", "font-size": fs, fill: "var(--muted)" }, svg).textContent =
-          c.ts && Number.isInteger(vv) ? tick(vv) : fmtV(vv, stepDec(step));
+          c.ts && !c.rawv && Number.isInteger(vv) ? tick(vv) : fmtV(vv, stepDec(step));
       }
       let yl = null;
       if (LW) {                                                           // alapaneeli: palkit omalla asteikolla
@@ -1148,7 +1151,7 @@ footer b { color: var(--fg); font-weight: 600; }
         el("text", { x: ml + 4, y: ys(med) - 5, "font-size": fs - 1, fill: "var(--muted)", stroke: "var(--surface)", "stroke-width": 3, "paint-order": "stroke" }, svg).textContent = "mediaani";
       }
       L.forEach((a, k) => { const id = c.lines[k], st = (c.step || []).includes(id);
-        el("path", { d: path(a, st, isY2(k) ? ys2 : ys), fill: "none", stroke: colOf[id], "stroke-width": k === 0 ? 2.2 : 1.6,
+        el("path", { d: path(a, st, isY2(k) ? ys2 : ys), fill: "none", stroke: colOf[id], "stroke-width": (c.thin || []).includes(id) ? 1.2 : k === 0 ? 2.2 : 1.6,
           "stroke-dasharray": (c.dot || []).includes(id) ? "1.5 3" : (c.dash || []).includes(id) ? "5 3" : "none",
           "stroke-linecap": (c.dot || []).includes(id) ? "round" : "butt", "stroke-linejoin": "round" }, svg); });
       const cur = el("line", { y1: mt, y2: H2 - mb, stroke: "var(--muted)", "stroke-width": 1, "stroke-dasharray": "2 3" }, svg);
@@ -1176,7 +1179,7 @@ footer b { color: var(--fg); font-weight: 600; }
         } else if (L.length > 1) {
           let j = i; while (j > 0 && L.every(a => a[j] == null)) j--;
           if (valEl) valEl.innerHTML = `${fmtP(P[j])}`;
-          const sg = v => c.ts && v > 0 ? "+" : "";
+          const sg = v => c.ts && !c.rawv && v > 0 ? "+" : "";
           subEl.textContent = (c.ts ? `${fmtP(P[j])}: ` : "") +
             c.lines.map(id => { const v = L[c.lines.indexOf(id)][j]; return `${lbl(id)} ${sg(v)}${fmtV(v, c.dec)}${c.unit === "%" ? " %" : ""}`; }).join(", ") +
             (LW && LW[j] != null ? `, ${c.lower.label} ${LW[j] > 0 ? "+" : ""}${fmtV(LW[j], c.lower.dec != null ? c.lower.dec : 1)}` : "") + ".";

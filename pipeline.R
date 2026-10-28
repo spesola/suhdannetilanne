@@ -514,7 +514,10 @@ for (set in cfg$sets) {
          invert = isTRUE(s$invert), in_composite = !isFALSE(s$in_composite),
          last = lp, last_raw = round(r$raw[nrow(r)], 2),
          level = align(r, "level"), change = align(r, "change"), raw = r3((if (is.null(s$raw_scale)) 1 else s$raw_scale) * rw$value[match(periods, rw$date)]),
-         trend = r3((if (is.null(s$raw_scale)) 1 else s$raw_scale) * r$trend[match(periods, r$date)]))
+         trend = r3((if (is.null(s$raw_scale)) 1 else s$raw_scale) * r$trend[match(periods, r$date)]),
+         # kausitasoitettu taso omassa yksikossa (STL), jos lahde on kausitasoittamaton
+         sa = if (s$handling %in% c("sa", "sa_trend")) { a <- preprocess(rw, "sa", freq)
+           r3((if (is.null(s$raw_scale)) 1 else s$raw_scale) * a$value[match(periods, a$date)]) } else NULL)
   }, clock_members, res)
 
   # kokonaisindikaattori: keskiarvo, vain jaksot joissa kaikki mukana olevat sarjat
