@@ -526,35 +526,6 @@
           "note": "Korko miinus inflaatio (YKHI)."
         },
         {
-          "id": "korot",
-          "title": "Pitkät korot ja korkokäyrä",
-          "size": "half",
-          "unit": "%",
-          "dec": 2,
-          "lines": [
-            "fi10y",
-            "de10y"
-          ],
-          "dash": [
-            "de10y"
-          ],
-          "bars": "korkokayra",
-          "note": "Palkit: 10 v korko miinus 3 kk Euribor. Punainen = käänteinen käyrä.",
-          "section": "Korot ja rahapolitiikka"
-        },
-        {
-          "id": "riski",
-          "title": "Riskilisä Saksaan",
-          "unit": "%-yks.",
-          "dec": 2,
-          "lines": [
-            "riskilisa"
-          ],
-          "note": "",
-          "section": "Korot ja rahapolitiikka",
-          "size": "half"
-        },
-        {
           "id": "maat",
           "title": "10 vuoden valtionlainojen korot",
           "unit": "%",
@@ -2461,16 +2432,6 @@
       "source": "ecb",
       "flow": "FM",
       "key": "M.U2.EUR.RT.MM.EURIBOR3MD_.HSTA",
-      "handling": "none",
-      "kind": "level"
-    },
-    {
-      "set": "rahoitus",
-      "id": "korkokayra",
-      "label": "Korkokäyrä (10 v – 3 kk)",
-      "source": "spread",
-      "a": "fi10y",
-      "b": "euribor3m",
       "handling": "none",
       "kind": "level"
     },
