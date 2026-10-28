@@ -76,7 +76,8 @@ body { font-variant-numeric: tabular-nums; background: var(--bg); min-height: 10
 .card { border-top: 1px solid var(--rule); padding-top: 14px; min-width: 0; }
 .phead { display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: 4px 12px; margin-bottom: 14px; }
 .phead h2 { font-family: var(--font-body); font-weight: 600; font-size: 1rem; margin: 0; }
-.cdesc { font-size: 0.82rem; color: var(--muted); margin: -8px 0 8px; max-width: 52ch; }
+.cdesc { font-size: 0.82rem; color: var(--muted); margin: -8px 0 8px; }
+.clegend:empty { display: none; }
 .clegend { display: flex; flex-wrap: wrap; gap: 6px 18px; font-size: 0.76rem; color: var(--muted); margin-bottom: 6px; align-items: center; }
 .clegend span { display: inline-flex; align-items: center; gap: 6px; }
 .clegend i { width: 8px; height: 8px; border-radius: 50%; background: var(--pt); display: inline-block; }
@@ -774,7 +775,7 @@ footer b { color: var(--fg); font-weight: 600; }
 
   function renderFoot() {
     $("foot").innerHTML = `<p>Suomen talouden suhdannetilanne avoimista tilastoista. Päivittyy arkisin.</p><details><summary>Menetelmä ja lähteet</summary><div class="fbody"><p><b>Menetelmä.</b> ${D.meta.method}</p><p>${D.meta.composite}</p><p>${D.meta.charts || ""}</p>
-      <p><b>Huomio.</b> ${D.meta.caveat} Haaleat pisteet kartassa: sarjan viimeisin havainto on valittua ajankohtaa vanhempi. Ontot pisteet eivät ole mukana kokonaisindikaattorissa.</p>
+      <p><b>Huomio.</b> ${D.meta.caveat} Kartan suurin piste on kokonaisindikaattori, ja viiva näyttää sen kulun kuuden kuukauden ajalta. Haaleat pisteet: sarjan viimeisin havainto on valittua ajankohtaa vanhempi. Ontot pisteet eivät ole mukana kokonaisindikaattorissa.</p>
       <p><b>Lähteet.</b> Tilastokeskus (StatFin: kansantalouden tilinpito, työvoimatutkimus, hinnat ja ansiot, rakentaminen, konkurssit, kuluttajabarometri), Eurostat (Euroopan komission yritysten luottamuskyselyt, HICP-painot, kaupan ja palvelujen liikevaihto), Suomen Pankki (luotonanto ja lainojen korot), EKP (korot, €STR, tuottokäyrä, valuuttakurssit, rahoitusstressi), FRED (epävarmuusindeksi, Yhdysvaltain ja Japanin korot © OECD, Brent © EIA).</p>
       <p><b>Käyttöehdot.</b> Tilastokeskuksen aineistot CC BY 4.0. Muut aineistot lähteiden käyttöehtojen mukaisesti, lähde mainiten. Epävarmuusindeksi: Baker, Bloom ja Davis, policyuncertainty.com. Laskelmat ja esitystapa ovat omia.</p>
       <p><b>Vastuuvapaus.</b> Sivuston tiedot perustuvat avoimiin lähteisiin, eivätkä ole tarkoitettu sijoitusneuvoiksi.</p></div></details>`;
@@ -785,11 +786,10 @@ footer b { color: var(--fg); font-weight: 600; }
     const growthClock = set.indicators.every(x => x.kind === "growth"), M_ = set.freq === "M";
     $("clockTitle").textContent = growthClock ? "Kasvukartta" : "Suhdannekartta";
     $("clockDesc").textContent = growthClock
-      ? `Kasvun ero omaan keskiarvoonsa ja sen muutos edellisestä ${M_ ? "kuukaudesta" : "neljänneksestä"}, keskihajontoina.`
-      : `Sarjan poikkeama trendistä ja sen muutos edellisestä ${M_ ? "kuukaudesta" : "neljänneksestä"}, keskihajontoina.`;
+      ? `Kasvun ero keskiarvoon ja muutos edellisestä ${M_ ? "kuukaudesta" : "neljänneksestä"}`
+      : `Sarjan poikkeama trendistä ja muutos edellisestä ${M_ ? "kuukaudesta" : "neljänneksestä"}`;
     const pathIc = `<svg width="22" height="10" viewBox="0 0 22 10" aria-hidden="true"><polyline points="1,8 6,7 11,5 17,3" fill="none" stroke="var(--fg)" stroke-opacity="0.45" stroke-width="1.2"/><circle cx="6" cy="7" r="1.2" fill="var(--fg)" fill-opacity="0.4"/><circle cx="11" cy="5" r="1.2" fill="var(--fg)" fill-opacity="0.5"/><circle cx="17.5" cy="3.5" r="3.2" fill="var(--fg)"/></svg>`;
-    $("clockLegend").innerHTML = `<span>${pathIc}Kokonaisindikaattori ja sen ${set.tail} ${M_ ? "kk" : "neljänneksen"} polku</span><span><i></i>Sarja</span>` +
-      (nComp < nAll ? `<span><i class="o"></i>Ei kokonaisindikaattorissa</span>` : "");
+    $("clockLegend").innerHTML = "";   // selitteet pois: polku ja ontot pisteet selitetty menetelmissa
     $("listMeta").textContent = `Tilanne ${fmtP(set.periods[idx])}`;
   }
 
