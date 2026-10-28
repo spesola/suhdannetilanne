@@ -133,12 +133,10 @@ h1 { font-family: var(--font-display); font-weight: 600; font-size: clamp(2.1rem
 .qbox .n span { font-size: 0.72rem; color: var(--muted); }
 .qbox .t { font-size: 0.74rem; color: var(--muted); }
 
-.list { display: flex; flex-direction: column; }
-/* sarakkeet: havaintokausi (vain jos jokin sarja on valittua ajankohtaa vanhempi) | nimi | taso | muutos | vaihe */
+.list { display: flex; flex-direction: column; margin-inline: -6px; }   /* tekstit linjaan otsikon kanssa, rivin korostus ulottuu reunan yli */
+/* sarakkeet: havaintokausi | nimi | taso | muutos | vaihe */
 .list { --cols: 3rem minmax(0, 1fr) 3rem 3.4rem 6.2rem; }
-.list.nodate { --cols: minmax(0, 1fr) 3rem 3.4rem 6.2rem; }
 .lhead { display: grid; grid-template-columns: var(--cols); column-gap: 10px; font-size: 0.72rem; color: var(--muted); padding: 0 6px 6px; border-bottom: 1px solid var(--line); }
-.list.nodate .per, .list.nodate .lhead span:nth-child(1) { display: none; }
 .lhead span:nth-child(3), .lhead span:nth-child(4) { text-align: right; }
 .lhead span:nth-child(1) { font-size: 0.66rem; }
 .lhead span:nth-child(5) { padding-left: 4px; }
@@ -291,7 +289,6 @@ footer b { color: var(--fg); font-weight: 600; }
   .sets .lg { display: none; }
   .sets .sh { display: inline; }
   .list { --cols: 2.7rem minmax(0, 1fr) 2.7rem 2.9rem 0.9rem; }
-  .list.nodate { --cols: minmax(0, 1fr) 2.8rem 3rem 0.9rem; }
   .lhead, .ind { column-gap: 6px; }
   .ind .per, .lhead span:nth-child(1) { font-size: 0.62rem; }
   .ind .ph .pt-t, .lhead span:nth-child(5) { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); }
@@ -579,15 +576,13 @@ footer b { color: var(--fg); font-weight: 600; }
     const pass = s => { if (!qf) return true; if (!s.comp && !s.in_composite) return false; const p = at(s, idx); return !!p && quad(p.l, p.c) === qf; };
 
     const list = $("list"); list.innerHTML = `<div class="lhead"><span>Havainto</span><span>Sarja</span><span>Taso</span><span>Muutos</span><span>Vaihe</span></div>`;
-    const anyStale = [comp(), ...set.indicators].some(s => { const p = at(s, idx); return p && p.stale; });
-    list.classList.toggle("nodate", !anyStale);
     const mk = (s, extraCls) => {
       const p = at(s, idx); const b = document.createElement("button"); b.type = "button";
       b.className = "ind" + (extraCls || ""); b.setAttribute("aria-pressed", sel === s.id);
       const q = p ? quad(p.l, p.c) : null;
       const out = !s.comp && !s.in_composite;
       b.dataset.id = s.id;
-      b.innerHTML = `<span class="per" title="Viimeisin havainto">${p && p.stale ? fmtP(set.periods[p.i]) : ""}</span>` +
+      b.innerHTML = `<span class="per" title="Havaintokausi">${p ? fmtP(set.periods[p.i]) : "–"}</span>` +
         `<span class="nm">${s.label}${out ? `<sup title="Ei mukana kokonaisindikaattorissa">*</sup>` : ""}</span>` +
         `<span class="v">${p ? fmtN(p.l) : "–"}</span><span class="v">${p ? fmtN(p.c) : "–"}</span>` +
         (q ? `<span class="ph" style="--qc:${qcol(q)}" title="${Q[q].name}"><i></i><span class="pt-t">${Q[q].short}</span></span>` : `<span></span>`);
@@ -608,7 +603,7 @@ footer b { color: var(--fg); font-weight: 600; }
       h.style.setProperty("--gc", `var(${GVARS[gi % GVARS.length]})`);
       const gp = all.length > 1 ? at(grp(g), idx) : null, gq = gp ? quad(gp.l, gp.c) : null;
       h.setAttribute("aria-pressed", sel === "g:" + g);
-      h.innerHTML = `<i></i><span class="gn">${g}</span>`;   // ryhman vaihe nakyy valittaessa, ei listassa
+      h.innerHTML = `<span class="gn">${g}</span>`;   // ryhman vaihe nakyy valittaessa, ei listassa
       h.onclick = () => select("g:" + g); h.dataset.g = g;
       h.onmouseenter = () => hlPoints(all.map(x => x.id)); h.onmouseleave = () => hlPoints([]);
       box.appendChild(h); mem.forEach(s => box.appendChild(mk(s))); list.appendChild(box);
