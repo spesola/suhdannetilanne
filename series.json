@@ -443,7 +443,8 @@
               "group": "Rahoitusolot"
             }
           ],
-          "note": "Korkojen muutokset korkopisteinä. Kuukausisarjoista vain muutos vuoden alusta. Lähteet: EKP, Suomen Pankki."
+          "note": "Korkojen muutokset korkopisteinä. Kuukausisarjoista vain muutos vuoden alusta. Lähteet: EKP, Suomen Pankki. Klikkaa riviä nähdäksesi historian.",
+          "pair": "kayra"
         },
         {
           "id": "kayra",
@@ -631,7 +632,8 @@
               "id": "wti"
             }
           ],
-          "note": "Valuuttakurssit vierasta valuuttaa euroa kohden, nousu = euro vahvistuu. Lähteet: EKP, EIA."
+          "note": "Valuuttakurssit vierasta valuuttaa euroa kohden, nousu = euro vahvistuu. Lähteet: EKP, EIA. Klikkaa riviä nähdäksesi historian.",
+          "pair": "eer"
         },
         {
           "id": "eer",
@@ -695,7 +697,8 @@
               "id": "wb_coffee"
             }
           ],
-          "note": "Kuukausikeskiarvot Yhdysvaltain dollareina. Lähde: Maailmanpankki (Pink Sheet), CC BY 4.0."
+          "note": "Kuukausikeskiarvot Yhdysvaltain dollareina. Lähde: Maailmanpankki (Pink Sheet), CC BY 4.0. Klikkaa riviä nähdäksesi historian.",
+          "pair": "wbi"
         },
         {
           "id": "wbi",

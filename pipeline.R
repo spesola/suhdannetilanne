@@ -340,7 +340,6 @@ get_any_ <- function(id, raws) {
   s <- ser_cfg(id)
   if (identical(s$source, "spread")) { a <- get_any(s$a, raws); b <- get_any(s$b, raws); m <- merge(a, b, by = "date")
     return(data.frame(date = m$date, value = m$value.x - m$value.y)) }
-  if (isTRUE(s$daily) && identical(s$source, "ecb") && is.null(s$start)) s$start <- TABLE_START
   message("  taulukko ", id); fetch_series(s)
 }
 snap_row <- function(id, raws) {
@@ -401,11 +400,18 @@ for (set in cfg$sets) {
       if (identical(c$type, "table")) c$rows <- lapply(c$rows, function(r) c(r, snap_row(r$id, raws)))
       if (identical(c$type, "curve")) c$curve <- curve_data(c)
       c })
+    # taulukkorivien historia kuukausisarjoina (paivadata: kuukauden viimeinen havainto) rivin valintaa varten
+    tbl_ids <- unique(unlist(lapply(Filter(function(c) identical(c$type, "table"), set$charts), function(c) vapply(c$rows, function(r) r$id, ""))))
+    hist <- lapply(tbl_ids, function(id) {
+      d <- get_any(id, raws); d <- d[!is.na(d$value), ]
+      if (all(nchar(d$date) == 10)) { d <- d[order(d$date), ]; m <- substr(d$date, 1, 7)
+        d <- data.frame(date = unique(m), value = tapply(d$value, m, function(v) tail(v, 1))[unique(m)]) }
+      list(id = paste0("h_", id), label = ser_cfg(id)$label, last = d$date[nrow(d)], values = r3(d$value[match(periods, d$date)])) })
     sets_out[[length(sets_out) + 1]] <- list(
       id = set$id, label = set$label, freq = freq, default = isTRUE(set$default), view = "charts",
       from = from_y, periods = periods, charts = charts_out, colors = set$colors, tiles = unname(tiles), summary = set$summary,
-      series = unname(lapply(members, function(s) { r <- raws[[s$id]]
-        list(id = s$id, label = s$label, last = r$date[nrow(r)], values = r3(r$value[match(periods, r$date)])) })))
+      series = c(unname(lapply(members, function(s) { r <- raws[[s$id]]
+        list(id = s$id, label = s$label, last = r$date[nrow(r)], values = r3(r$value[match(periods, r$date)])) })), hist))
     next
   }
   # kasvunakyma (kansantalous): q/q- ja v/v-muutokset prosentteina, ei kelloa

@@ -248,6 +248,10 @@ table.snap { width: 100%; border-collapse: collapse; font-size: 0.84rem; font-va
 .snap tr.g th { font-size: 0.78rem; font-weight: 600; padding-top: 14px; text-align: left; }
 .snap .dt { font-size: 0.7rem; color: var(--muted); margin-left: 6px; white-space: nowrap; }
 .snap th:first-child { padding-left: 0; }
+.tcard .snap tr.pick { cursor: pointer; }
+.tcard .snap tr.pick:hover th, .tcard .snap tr.pick:focus-visible th { color: var(--accent); }
+.tcard .snap tr.pick:focus-visible { outline: 2px solid var(--accent); outline-offset: -2px; }
+.tcard .snap tr.on th { color: var(--accent); font-weight: 600; box-shadow: inset 2px 0 0 var(--accent); padding-left: 8px; }
 @media (max-width: 560px) { .snap { font-size: 0.78rem; } .snap th, .snap td { padding: 6px 3px; } .snap thead th:nth-child(3), .snap tbody td:nth-child(3) { display: none; } }
 .fhead h2 { font-family: var(--font-body); font-weight: 600; font-size: 1rem; margin: 0; text-wrap: balance; }
 .fval { font-family: var(--font-data); font-size: 0.82rem; color: var(--muted); font-variant-numeric: tabular-nums; }
@@ -961,9 +965,13 @@ footer b { color: var(--fg); font-weight: 600; }
     c.rows.forEach(r => {
       if (r.group) h += `<tr class="g"><th colspan="${cols.length + 2}">${r.group}</th></tr>`;
       const old = r.date !== maxD;                     // eri havaintopaiva kuin taulukon uusin: paiva nakyviin
-      h += `<tr><th>${r.label}${old ? `<span class="dt">${fmtD(r.date)}</span>` : ""}</th><td class="v">${fmtLast(r)}</td>${cols.map(k => `<td>${fmtChg(r[k], r)}</td>`).join("")}</tr>`; });
+      h += `<tr class="pick${tblSel[c.id] === r.id ? " on" : ""}" data-id="${r.id}" title="Näytä kuvassa"><th>${r.label}${old ? `<span class="dt">${fmtD(r.date)}</span>` : ""}</th><td class="v">${fmtLast(r)}</td>${cols.map(k => `<td>${fmtChg(r[k], r)}</td>`).join("")}</tr>`; });
     h += `</tbody></table>`;
     card.innerHTML = h;
+    if (c.pair) card.querySelectorAll("tr.pick").forEach(tr => {
+      tr.tabIndex = 0;
+      const go = () => { tblSel[c.id] = tblSel[c.id] === tr.dataset.id ? null : tr.dataset.id; const y = scrollY; renderCharts(); scrollTo(0, y); };
+      tr.onclick = go; tr.onkeydown = e => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); go(); } }; });
     const fm = document.createElement("div"); fm.className = "fmeta";
     const db = document.createElement("button"); db.type = "button"; db.className = "dl"; db.textContent = "Lataa CSV";
     db.onclick = () => saveFile(`suhdannetilanne-${slug(c.title)}.csv`, toCSV([["Sarja", "Päivä", "Viimeisin", ...cols.map(k => COLH[k]), "Muutoksen yksikkö"],
@@ -1012,13 +1020,20 @@ footer b { color: var(--fg); font-weight: 600; }
     return card;
   }
 
+  const tblSel = {};   // taulukon id -> valitun rivin id; valinta vaihtaa viereisen (pair) kuvion rivin historiaksi
+  function rowChart(tb, rowId, base) {
+    const r = tb.rows.find(x => x.id === rowId);
+    const unit = r.unit === "%" || r.unit === "%-yks." ? "%" : "";
+    return { id: base.id, section: base.section, size: "half", title: r.label, lines: ["h_" + rowId], unit, dec: r.dec != null ? Math.min(r.dec, 2) : 1,
+      from: 2000, note: (r.date.length === 10 ? "Kuukauden viimeinen havainto." : "Kuukausiarvo.") + " Klikkaa riviä uudelleen palataksesi.", fromTable: tb.id };
+  }
   function renderCharts(box = $("charts"), only = null) {
     box.innerHTML = ""; chartHooks = [];
     const ser = id => set.series.find(x => x.id === id);
     const narrow = box.clientWidth < 640, colOf = {};
     const gRow = set.growth && set.growth.find(r => r.id === grSel);
     // valitulla rivilla voi olla kontribuutiokuvio (BKT: c.contrib, muut: c.contribs[rivi])
-    const charts = only ? only : !gRow ? set.charts : set.charts.flatMap(c => { if (c.id !== "bktkasvu") return c;
+    let charts = only ? only : !gRow ? set.charts : set.charts.flatMap(c => { if (c.id !== "bktkasvu") return c;
       const vw = c.views && c.views[gRow.id];               // rivikohtainen viivakuvio (esim. nimellis- ja reaalipalkat)
       if (Array.isArray(vw))                                // useampi kuvio rinnakkain (esim. asuntojen hinnat ja kaupat)
         return vw.map((v, k) => ({ ...c, ...v, id: `${c.id}_${k}`, bars: undefined, stack: undefined, size: "half", wide: false, w: undefined, height: undefined }));
@@ -1028,6 +1043,9 @@ footer b { color: var(--fg); font-weight: 600; }
         ? { ...c, title: cb.title, note: cb.note, lines: [cb.line], bars: undefined, stack: cb.stack.filter(id => ser(id)),
             unit: cb.unit || "%", dec: cb.dec != null ? cb.dec : c.dec, stackUnit: cb.stackUnit }
         : { ...c, title: `${gRow.label}: kasvu`, lines: [grSel + "_yy"], bars: grSel + "_qq" }; });
+    if (!only) charts = charts.map(c => {                 // taulukosta valittu rivi korvaa parikuvion
+      const tb = set.charts.find(t => t.type === "table" && t.pair === c.id && tblSel[t.id]);
+      return tb ? rowChart(tb, tblSel[tb.id], c) : c; });
     Object.assign(colOf, set.colors || {});
     charts.forEach(c => { if (!c.lines) return; if (c.colors) Object.assign(colOf, c.colors); else if (c.lineColor) colOf[c.lines[0]] = c.lineColor; });
     charts.forEach(c => (c.lines || []).forEach((id, k) => { if (!(id in colOf)) colOf[id] = LINE_COLS[k % LINE_COLS.length]; }));
