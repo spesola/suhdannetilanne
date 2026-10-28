@@ -134,12 +134,13 @@ h1 { font-family: var(--font-display); font-weight: 600; font-size: clamp(2.1rem
 .qbox .t { font-size: 0.74rem; color: var(--muted); }
 
 .list { display: flex; flex-direction: column; }
-/* sarakkeet: nimi | havaintokausi (vain jos jokin sarja on valittua ajankohtaa vanhempi) | taso | muutos | vaihe */
-.list { --cols: minmax(0, 1fr) 3.4rem 3rem 3.4rem 6.2rem; }
+/* sarakkeet: havaintokausi (vain jos jokin sarja on valittua ajankohtaa vanhempi) | nimi | taso | muutos | vaihe */
+.list { --cols: 3rem minmax(0, 1fr) 3rem 3.4rem 6.2rem; }
 .list.nodate { --cols: minmax(0, 1fr) 3rem 3.4rem 6.2rem; }
 .lhead { display: grid; grid-template-columns: var(--cols); column-gap: 10px; font-size: 0.72rem; color: var(--muted); padding: 0 6px 6px; border-bottom: 1px solid var(--line); }
-.list.nodate .per, .list.nodate .lhead span:nth-child(2) { display: none; }
-.lhead span:nth-child(2), .lhead span:nth-child(3), .lhead span:nth-child(4) { text-align: right; }
+.list.nodate .per, .list.nodate .lhead span:nth-child(1) { display: none; }
+.lhead span:nth-child(3), .lhead span:nth-child(4) { text-align: right; }
+.lhead span:nth-child(1) { font-size: 0.66rem; }
 .lhead span:nth-child(5) { padding-left: 4px; }
 .grp h3 { font-size: 0.72rem; text-transform: uppercase; letter-spacing: .07em; color: var(--muted); font-weight: 600; margin: 0 0 4px; display: flex; align-items: center; gap: 7px; }
 .grp h3 i { width: 9px; height: 9px; border-radius: 50%; background: var(--gc); display: inline-block; }
@@ -151,7 +152,7 @@ h1 { font-family: var(--font-display); font-weight: 600; font-size: clamp(2.1rem
 .ind:hover { background: var(--grid); }
 .ind[aria-pressed="true"] { background: color-mix(in srgb, var(--accent) 14%, var(--surface)); }
 .ind .nm { font-size: 0.86rem; overflow-wrap: break-word; hyphens: auto; min-width: 0; }
-.ind .per { font-size: 0.72rem; color: var(--muted); text-align: right; white-space: nowrap; overflow: hidden; }
+.ind .per { font-size: 0.68rem; color: var(--muted); white-space: nowrap; overflow: hidden; }
 .chip { font-size: 0.78rem; font-weight: 500; white-space: nowrap; color: var(--qc); }
 .gh .chip { font-size: 0.72rem; color: var(--muted); font-weight: 400; }
 .ind.comp { font-weight: 600; padding-block: 9px; }
@@ -289,10 +290,10 @@ footer b { color: var(--fg); font-weight: 600; }
   .sets { gap: 4px 18px; flex-wrap: nowrap; }
   .sets .lg { display: none; }
   .sets .sh { display: inline; }
-  .list { --cols: minmax(0, 1fr) 3rem 2.7rem 2.9rem 0.9rem; }
+  .list { --cols: 2.7rem minmax(0, 1fr) 2.7rem 2.9rem 0.9rem; }
   .list.nodate { --cols: minmax(0, 1fr) 2.8rem 3rem 0.9rem; }
   .lhead, .ind { column-gap: 6px; }
-  .ind .per { font-size: 0.66rem; }
+  .ind .per, .lhead span:nth-child(1) { font-size: 0.62rem; }
   .ind .ph .pt-t, .lhead span:nth-child(5) { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); }
   .timebar input[type=range] { flex-basis: 120px; }
   #clock text { font-size: 17px; }
@@ -577,7 +578,7 @@ footer b { color: var(--fg); font-weight: 600; }
     $("summary").querySelectorAll("[data-q]").forEach(b => b.onclick = () => { qf = qf === b.dataset.q ? null : b.dataset.q; update(); });
     const pass = s => { if (!qf) return true; if (!s.comp && !s.in_composite) return false; const p = at(s, idx); return !!p && quad(p.l, p.c) === qf; };
 
-    const list = $("list"); list.innerHTML = `<div class="lhead"><span>Sarja</span><span>Havainto</span><span>Taso</span><span>Muutos</span><span>Vaihe</span></div>`;
+    const list = $("list"); list.innerHTML = `<div class="lhead"><span>Havainto</span><span>Sarja</span><span>Taso</span><span>Muutos</span><span>Vaihe</span></div>`;
     const anyStale = [comp(), ...set.indicators].some(s => { const p = at(s, idx); return p && p.stale; });
     list.classList.toggle("nodate", !anyStale);
     const mk = (s, extraCls) => {
@@ -586,8 +587,8 @@ footer b { color: var(--fg); font-weight: 600; }
       const q = p ? quad(p.l, p.c) : null;
       const out = !s.comp && !s.in_composite;
       b.dataset.id = s.id;
-      b.innerHTML = `<span class="nm">${s.label}${out ? `<sup title="Ei mukana kokonaisindikaattorissa">*</sup>` : ""}</span>` +
-        `<span class="per" title="Viimeisin havainto">${p && p.stale ? fmtP(set.periods[p.i]) : ""}</span>` +
+      b.innerHTML = `<span class="per" title="Viimeisin havainto">${p && p.stale ? fmtP(set.periods[p.i]) : ""}</span>` +
+        `<span class="nm">${s.label}${out ? `<sup title="Ei mukana kokonaisindikaattorissa">*</sup>` : ""}</span>` +
         `<span class="v">${p ? fmtN(p.l) : "–"}</span><span class="v">${p ? fmtN(p.c) : "–"}</span>` +
         (q ? `<span class="ph" style="--qc:${qcol(q)}" title="${Q[q].name}"><i></i><span class="pt-t">${Q[q].short}</span></span>` : `<span></span>`);
       b.onclick = () => select(s.id);
