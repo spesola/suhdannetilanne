@@ -396,6 +396,21 @@
               "note": "Kontribuutiot laskettu edellisen vuoden hinnoin, jotta osat summautuvat kasvuun. Lähde: Tilastokeskus.",
               "stackUnit": "%-yks.",
               "dec": 1
+            },
+            "__jb": {
+              "title": "Julkisyhteisöjen rahoitusjäämä, % BKT:stä",
+              "line": "x_jb_s13",
+              "stack": [
+                "x_jb_s1311",
+                "x_jb_s13131",
+                "x_jb_s13132",
+                "x_jb_s13141",
+                "x_jb_s13149"
+              ],
+              "unit": "%",
+              "stackUnit": "% BKT:stä",
+              "dec": 1,
+              "note": "Nettoluotonanto alasektoreittain, neljän neljänneksen summa. Kunnat ja hyvinvointialueet erikseen. Lähde: Tilastokeskus."
             }
           },
           "views": {
@@ -501,6 +516,186 @@
                 "ylab": "Avoimien työpaikkojen aste, %",
                 "dec": 1,
                 "note": "Avoimien työpaikkojen aste = avoimet / (avoimet + työlliset). Kausitasoitettu. Lähde: Tilastokeskus."
+              }
+            ],
+            "bkt": [
+              {
+                "contrib": "bkt"
+              },
+              {
+                "title": "BKT:n volyymi, 2019 = 100",
+                "lines": [
+                  "x_gdp_fi",
+                  "x_gdp_se",
+                  "x_gdp_de",
+                  "x_gdp_ea"
+                ],
+                "colors": {
+                  "x_gdp_fi": "var(--fg)",
+                  "x_gdp_se": "var(--accent)",
+                  "x_gdp_de": "var(--g3)",
+                  "x_gdp_ea": "var(--g2)"
+                },
+                "unit": "",
+                "dec": 1,
+                "note": "Kausitasoitettu. Lähde: Eurostat."
+              },
+              {
+                "title": "Sektorien rahoitusjäämät, % BKT:stä",
+                "lines": [
+                  "x_nl_s11",
+                  "x_nl_s13",
+                  "x_nl_s14",
+                  "x_nl_s2"
+                ],
+                "colors": {
+                  "x_nl_s11": "var(--accent)",
+                  "x_nl_s13": "var(--q-down)",
+                  "x_nl_s14": "var(--g3)",
+                  "x_nl_s2": "var(--fg)"
+                },
+                "unit": "%",
+                "dec": 1,
+                "note": "Nettoluotonanto, neljän neljänneksen summa. Ulkomaat: positiivinen = Suomi ottaa velkaa ulkomailta. Lähde: Tilastokeskus."
+              }
+            ],
+            "bkt_kulutus": [
+              {
+                "contrib": "bkt_kulutus"
+              },
+              {
+                "title": "Kotitalouksien säästämisaste, %",
+                "lines": [
+                  "x_saast"
+                ],
+                "colors": {
+                  "x_saast": "var(--accent)"
+                },
+                "unit": "%",
+                "dec": 1,
+                "note": "Säästö suhteessa käytettävissä oleviin tuloihin, kausitasoitettu. Lähde: Tilastokeskus."
+              }
+            ],
+            "bkt_julk": [
+              {
+                "growth": true
+              },
+              {
+                "contrib": "__jb"
+              }
+            ],
+            "bkt_inv": [
+              {
+                "contrib": "bkt_inv"
+              },
+              {
+                "title": "Investointiaste, % BKT:stä",
+                "lines": [
+                  "x_inv_tot",
+                  "x_inv_yks",
+                  "x_inv_julk"
+                ],
+                "colors": {
+                  "x_inv_tot": "var(--fg)",
+                  "x_inv_yks": "var(--accent)",
+                  "x_inv_julk": "var(--g3)"
+                },
+                "unit": "%",
+                "dec": 1,
+                "note": "Kiinteän pääoman bruttomuodostus käyvin hinnoin, kausitasoitettu. Lähde: Tilastokeskus."
+              }
+            ],
+            "bkt_vienti": [
+              {
+                "contrib": "bkt_vienti"
+              },
+              {
+                "title": "Vienti- ja tuontihinnat, 2015 = 100",
+                "lines": [
+                  "x_px",
+                  "x_pm",
+                  "x_tot"
+                ],
+                "colors": {
+                  "x_px": "var(--accent)",
+                  "x_pm": "var(--q-down)",
+                  "x_tot": "var(--fg)"
+                },
+                "dash": [
+                  "x_tot"
+                ],
+                "unit": "",
+                "dec": 1,
+                "note": "Implisiittiset hintaindeksit. Vaihtosuhde = vientihinnat / tuontihinnat. Lähde: Tilastokeskus."
+              }
+            ],
+            "bkt_tuonti": [
+              {
+                "contrib": "bkt_tuonti"
+              },
+              {
+                "title": "Vienti- ja tuontihinnat, 2015 = 100",
+                "lines": [
+                  "x_px",
+                  "x_pm",
+                  "x_tot"
+                ],
+                "colors": {
+                  "x_px": "var(--accent)",
+                  "x_pm": "var(--q-down)",
+                  "x_tot": "var(--fg)"
+                },
+                "dash": [
+                  "x_tot"
+                ],
+                "unit": "",
+                "dec": 1,
+                "note": "Implisiittiset hintaindeksit. Vaihtosuhde = vientihinnat / tuontihinnat. Lähde: Tilastokeskus."
+              }
+            ],
+            "tyotunnit": [
+              {
+                "growth": true
+              },
+              {
+                "title": "Työlliset, työtunnit ja tuottavuus, 2019 = 100",
+                "lines": [
+                  "x_e1",
+                  "x_e2",
+                  "x_prod"
+                ],
+                "colors": {
+                  "x_e1": "var(--accent)",
+                  "x_e2": "var(--g3)",
+                  "x_prod": "var(--fg)"
+                },
+                "unit": "",
+                "dec": 1,
+                "note": "Kansantalouden tilinpito, kausitasoitettu. Tuottavuus = BKT:n volyymi / tehdyt työtunnit. Lähde: Tilastokeskus."
+              }
+            ],
+            "inflaatio": [
+              {
+                "contrib": "inflaatio"
+              },
+              {
+                "title": "Inflaatio: Suomi ja euroalue, %",
+                "lines": [
+                  "x_hicp_fi",
+                  "x_hicp_ea",
+                  "x_core_fi"
+                ],
+                "colors": {
+                  "x_hicp_fi": "var(--fg)",
+                  "x_hicp_ea": "var(--g2)",
+                  "x_core_fi": "var(--accent)"
+                },
+                "dash": [
+                  "x_core_fi"
+                ],
+                "unit": "%",
+                "dec": 1,
+                "note": "YKHI, vuosimuutos, neljänneksen keskiarvo. Lähde: Eurostat."
               }
             ]
           },
@@ -3879,6 +4074,540 @@
         "to_quarter": true,
         "mult": 1000
       }
+    },
+    {
+      "id": "x_gdp_fi",
+      "label": "Suomi",
+      "set": "bkt",
+      "chart_only": true,
+      "source": "eurostat",
+      "ds": "namq_10_gdp",
+      "geo": "FI",
+      "pick": {
+        "unit": "CLV10_MEUR",
+        "s_adj": "SCA",
+        "na_item": "B1GQ"
+      },
+      "rebase": 2019
+    },
+    {
+      "id": "x_gdp_se",
+      "label": "Ruotsi",
+      "set": "bkt",
+      "chart_only": true,
+      "source": "eurostat",
+      "ds": "namq_10_gdp",
+      "geo": "SE",
+      "pick": {
+        "unit": "CLV10_MEUR",
+        "s_adj": "SCA",
+        "na_item": "B1GQ"
+      },
+      "rebase": 2019
+    },
+    {
+      "id": "x_gdp_de",
+      "label": "Saksa",
+      "set": "bkt",
+      "chart_only": true,
+      "source": "eurostat",
+      "ds": "namq_10_gdp",
+      "geo": "DE",
+      "pick": {
+        "unit": "CLV10_MEUR",
+        "s_adj": "SCA",
+        "na_item": "B1GQ"
+      },
+      "rebase": 2019
+    },
+    {
+      "id": "x_gdp_ea",
+      "label": "Euroalue",
+      "set": "bkt",
+      "chart_only": true,
+      "source": "eurostat",
+      "ds": "namq_10_gdp",
+      "geo": "EA",
+      "pick": {
+        "unit": "CLV10_MEUR",
+        "s_adj": "SCA",
+        "na_item": "B1GQ"
+      },
+      "rebase": 2019
+    },
+    {
+      "id": "x_nl_s11",
+      "label": "Yritykset",
+      "set": "bkt",
+      "chart_only": true,
+      "source": "statfin",
+      "table": "ntp/15i1.px",
+      "pick": {
+        "sektoriluokitus_7_20230101": "S11",
+        "taloustoimi_1_20180101": "B9",
+        "contentscode": "ntp-LS_4Q"
+      },
+      "div": {
+        "source": "statfin",
+        "table": "ntp/132h.px",
+        "pick": {
+          "taloustoimi_1_20180101": "B1GMH",
+          "contentscode": "tasmcp"
+        },
+        "roll": 4
+      }
+    },
+    {
+      "id": "x_nl_s13",
+      "label": "Julkisyhteisöt",
+      "set": "bkt",
+      "chart_only": true,
+      "source": "statfin",
+      "table": "ntp/15i1.px",
+      "pick": {
+        "sektoriluokitus_7_20230101": "S13",
+        "taloustoimi_1_20180101": "B9",
+        "contentscode": "ntp-LS_4Q"
+      },
+      "div": {
+        "source": "statfin",
+        "table": "ntp/132h.px",
+        "pick": {
+          "taloustoimi_1_20180101": "B1GMH",
+          "contentscode": "tasmcp"
+        },
+        "roll": 4
+      }
+    },
+    {
+      "id": "x_nl_s14",
+      "label": "Kotitaloudet",
+      "set": "bkt",
+      "chart_only": true,
+      "source": "statfin",
+      "table": "ntp/15i1.px",
+      "pick": {
+        "sektoriluokitus_7_20230101": "S14",
+        "taloustoimi_1_20180101": "B9",
+        "contentscode": "ntp-LS_4Q"
+      },
+      "div": {
+        "source": "statfin",
+        "table": "ntp/132h.px",
+        "pick": {
+          "taloustoimi_1_20180101": "B1GMH",
+          "contentscode": "tasmcp"
+        },
+        "roll": 4
+      }
+    },
+    {
+      "id": "x_nl_s2",
+      "label": "Ulkomaat",
+      "set": "bkt",
+      "chart_only": true,
+      "source": "statfin",
+      "table": "ntp/15i1.px",
+      "pick": {
+        "sektoriluokitus_7_20230101": "S2",
+        "taloustoimi_1_20180101": "B9",
+        "contentscode": "ntp-LS_4Q"
+      },
+      "div": {
+        "source": "statfin",
+        "table": "ntp/132h.px",
+        "pick": {
+          "taloustoimi_1_20180101": "B1GMH",
+          "contentscode": "tasmcp"
+        },
+        "roll": 4
+      }
+    },
+    {
+      "id": "x_saast",
+      "label": "Säästämisaste",
+      "set": "bkt",
+      "chart_only": true,
+      "source": "statfin",
+      "table": "ntp/15a8.px",
+      "pick": {
+        "sektoriluokitus_7_20230101": "S14",
+        "contentscode": "ntp-kausit_b8n"
+      }
+    },
+    {
+      "id": "x_jb_s13",
+      "label": "Julkisyhteisöt yhteensä",
+      "set": "bkt",
+      "chart_only": true,
+      "source": "statfin",
+      "table": "jtume/11zf.px",
+      "pick": {
+        "sektoriluokitus_7_20230101": "S13",
+        "taloustoimi_1_20180101": "B9",
+        "contentscode": "jtume-TASM"
+      },
+      "roll": 4,
+      "div": {
+        "source": "statfin",
+        "table": "ntp/132h.px",
+        "pick": {
+          "taloustoimi_1_20180101": "B1GMH",
+          "contentscode": "tasmcp"
+        },
+        "roll": 4
+      }
+    },
+    {
+      "id": "x_jb_s1311",
+      "label": "Valtionhallinto",
+      "set": "bkt",
+      "chart_only": true,
+      "source": "statfin",
+      "table": "jtume/11zf.px",
+      "pick": {
+        "sektoriluokitus_7_20230101": "S1311",
+        "taloustoimi_1_20180101": "B9",
+        "contentscode": "jtume-TASM"
+      },
+      "roll": 4,
+      "div": {
+        "source": "statfin",
+        "table": "ntp/132h.px",
+        "pick": {
+          "taloustoimi_1_20180101": "B1GMH",
+          "contentscode": "tasmcp"
+        },
+        "roll": 4
+      }
+    },
+    {
+      "id": "x_jb_s13131",
+      "label": "Kunnat ja kuntayhtymät",
+      "set": "bkt",
+      "chart_only": true,
+      "source": "statfin",
+      "table": "jtume/11zf.px",
+      "pick": {
+        "sektoriluokitus_7_20230101": "S13131",
+        "taloustoimi_1_20180101": "B9",
+        "contentscode": "jtume-TASM"
+      },
+      "roll": 4,
+      "div": {
+        "source": "statfin",
+        "table": "ntp/132h.px",
+        "pick": {
+          "taloustoimi_1_20180101": "B1GMH",
+          "contentscode": "tasmcp"
+        },
+        "roll": 4
+      }
+    },
+    {
+      "id": "x_jb_s13132",
+      "label": "Hyvinvointialueet",
+      "set": "bkt",
+      "chart_only": true,
+      "source": "statfin",
+      "table": "jtume/11zf.px",
+      "pick": {
+        "sektoriluokitus_7_20230101": "S13132",
+        "taloustoimi_1_20180101": "B9",
+        "contentscode": "jtume-TASM"
+      },
+      "roll": 4,
+      "div": {
+        "source": "statfin",
+        "table": "ntp/132h.px",
+        "pick": {
+          "taloustoimi_1_20180101": "B1GMH",
+          "contentscode": "tasmcp"
+        },
+        "roll": 4
+      }
+    },
+    {
+      "id": "x_jb_s13141",
+      "label": "Työeläkelaitokset",
+      "set": "bkt",
+      "chart_only": true,
+      "source": "statfin",
+      "table": "jtume/11zf.px",
+      "pick": {
+        "sektoriluokitus_7_20230101": "S13141",
+        "taloustoimi_1_20180101": "B9",
+        "contentscode": "jtume-TASM"
+      },
+      "roll": 4,
+      "div": {
+        "source": "statfin",
+        "table": "ntp/132h.px",
+        "pick": {
+          "taloustoimi_1_20180101": "B1GMH",
+          "contentscode": "tasmcp"
+        },
+        "roll": 4
+      }
+    },
+    {
+      "id": "x_jb_s13149",
+      "label": "Muut sosiaaliturvarahastot",
+      "set": "bkt",
+      "chart_only": true,
+      "source": "statfin",
+      "table": "jtume/11zf.px",
+      "pick": {
+        "sektoriluokitus_7_20230101": "S13149",
+        "taloustoimi_1_20180101": "B9",
+        "contentscode": "jtume-TASM"
+      },
+      "roll": 4,
+      "div": {
+        "source": "statfin",
+        "table": "ntp/132h.px",
+        "pick": {
+          "taloustoimi_1_20180101": "B1GMH",
+          "contentscode": "tasmcp"
+        },
+        "roll": 4
+      }
+    },
+    {
+      "id": "x_inv_tot",
+      "label": "Yhteensä",
+      "set": "bkt",
+      "chart_only": true,
+      "div": {
+        "source": "statfin",
+        "table": "ntp/132h.px",
+        "pick": {
+          "taloustoimi_1_20180101": "B1GMH",
+          "contentscode": "kausitcp"
+        }
+      },
+      "source": "statfin",
+      "table": "ntp/132h.px",
+      "pick": {
+        "taloustoimi_1_20180101": "P51K",
+        "contentscode": "kausitcp"
+      }
+    },
+    {
+      "id": "x_inv_yks",
+      "label": "Yksityiset",
+      "set": "bkt",
+      "chart_only": true,
+      "div": {
+        "source": "statfin",
+        "table": "ntp/132h.px",
+        "pick": {
+          "taloustoimi_1_20180101": "B1GMH",
+          "contentscode": "kausitcp"
+        }
+      },
+      "source": "statfin",
+      "table": "ntp/132h.px",
+      "pick": {
+        "taloustoimi_1_20180101": "P51KXS13",
+        "contentscode": "kausitcp"
+      }
+    },
+    {
+      "id": "x_inv_julk",
+      "label": "Julkiset",
+      "set": "bkt",
+      "chart_only": true,
+      "div": {
+        "source": "statfin",
+        "table": "ntp/132h.px",
+        "pick": {
+          "taloustoimi_1_20180101": "B1GMH",
+          "contentscode": "kausitcp"
+        }
+      },
+      "source": "statfin",
+      "table": "ntp/132h.px",
+      "pick": {
+        "taloustoimi_1_20180101": "P51KS13",
+        "contentscode": "kausitcp"
+      }
+    },
+    {
+      "id": "x_px",
+      "label": "Vientihinnat",
+      "set": "bkt",
+      "chart_only": true,
+      "rebase": 2015,
+      "div": {
+        "source": "statfin",
+        "table": "ntp/132h.px",
+        "pick": {
+          "taloustoimi_1_20180101": "P6K",
+          "contentscode": "kausitvv2015"
+        }
+      },
+      "source": "statfin",
+      "table": "ntp/132h.px",
+      "pick": {
+        "taloustoimi_1_20180101": "P6K",
+        "contentscode": "kausitcp"
+      },
+      "div_mult": 1
+    },
+    {
+      "id": "x_pm",
+      "label": "Tuontihinnat",
+      "set": "bkt",
+      "chart_only": true,
+      "rebase": 2015,
+      "div": {
+        "source": "statfin",
+        "table": "ntp/132h.px",
+        "pick": {
+          "taloustoimi_1_20180101": "P7R",
+          "contentscode": "kausitvv2015"
+        }
+      },
+      "source": "statfin",
+      "table": "ntp/132h.px",
+      "pick": {
+        "taloustoimi_1_20180101": "P7R",
+        "contentscode": "kausitcp"
+      },
+      "div_mult": 1
+    },
+    {
+      "id": "x_tot",
+      "label": "Vaihtosuhde",
+      "set": "bkt",
+      "chart_only": true,
+      "source": "statfin",
+      "table": "ntp/132h.px",
+      "pick": {
+        "taloustoimi_1_20180101": "P6K",
+        "contentscode": "kausitcp"
+      },
+      "div": [
+        {
+          "source": "statfin",
+          "table": "ntp/132h.px",
+          "pick": {
+            "taloustoimi_1_20180101": "P6K",
+            "contentscode": "kausitvv2015"
+          }
+        },
+        {
+          "source": "statfin",
+          "table": "ntp/132h.px",
+          "pick": {
+            "taloustoimi_1_20180101": "P7R",
+            "contentscode": "kausitcp"
+          },
+          "div": {
+            "source": "statfin",
+            "table": "ntp/132h.px",
+            "pick": {
+              "taloustoimi_1_20180101": "P7R",
+              "contentscode": "kausitvv2015"
+            }
+          }
+        }
+      ],
+      "div_mult": 1,
+      "rebase": 2015
+    },
+    {
+      "id": "x_e1",
+      "label": "Työlliset",
+      "set": "bkt",
+      "chart_only": true,
+      "source": "statfin",
+      "table": "ntp/11tj.px",
+      "pick": {
+        "taloustoimi_1_20180101": "E1",
+        "toimiala_79_20180101": "SSS",
+        "contentscode": "ntp-KAUSIT"
+      },
+      "rebase": 2019
+    },
+    {
+      "id": "x_e2",
+      "label": "Tehdyt työtunnit",
+      "set": "bkt",
+      "chart_only": true,
+      "source": "statfin",
+      "table": "ntp/11tj.px",
+      "pick": {
+        "taloustoimi_1_20180101": "E2",
+        "toimiala_79_20180101": "SSS",
+        "contentscode": "ntp-KAUSIT"
+      },
+      "rebase": 2019
+    },
+    {
+      "id": "x_prod",
+      "label": "Työn tuottavuus (BKT / työtunnit)",
+      "set": "bkt",
+      "chart_only": true,
+      "rebase": 2019,
+      "div": {
+        "source": "statfin",
+        "table": "ntp/11tj.px",
+        "pick": {
+          "taloustoimi_1_20180101": "E2",
+          "toimiala_79_20180101": "SSS",
+          "contentscode": "ntp-KAUSIT"
+        }
+      },
+      "source": "statfin",
+      "table": "ntp/132h.px",
+      "pick": {
+        "taloustoimi_1_20180101": "B1GMH",
+        "contentscode": "kausitvv2015"
+      }
+    },
+    {
+      "id": "x_hicp_fi",
+      "label": "Suomi",
+      "set": "bkt",
+      "chart_only": true,
+      "source": "eurostat",
+      "ds": "prc_hicp_minr",
+      "geo": "FI",
+      "pick": {
+        "unit": "RCH_A",
+        "coicop18": "TOTAL"
+      },
+      "to_quarter": true
+    },
+    {
+      "id": "x_hicp_ea",
+      "label": "Euroalue",
+      "set": "bkt",
+      "chart_only": true,
+      "source": "eurostat",
+      "ds": "prc_hicp_minr",
+      "geo": "EA",
+      "pick": {
+        "unit": "RCH_A",
+        "coicop18": "TOTAL"
+      },
+      "to_quarter": true
+    },
+    {
+      "id": "x_core_fi",
+      "label": "Suomi, pl. energia ja ruoka",
+      "set": "bkt",
+      "chart_only": true,
+      "source": "eurostat",
+      "ds": "prc_hicp_minr",
+      "geo": "FI",
+      "pick": {
+        "unit": "RCH_A",
+        "coicop18": "TOT_X_NRG_FOOD"
+      },
+      "to_quarter": true
     }
   ]
 }

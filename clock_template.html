@@ -832,7 +832,7 @@ footer b { color: var(--fg); font-weight: 600; }
   function renderFoot() {
     $("foot").innerHTML = `<p>Suomen talouden suhdannetilanne avoimista tilastoista. Päivittyy arkisin.</p><details><summary>Menetelmä ja lähteet</summary><div class="fbody"><p><b>Menetelmä.</b> ${D.meta.method}</p><p>${D.meta.composite}</p><p>${D.meta.charts || ""}</p>
       <p><b>Huomio.</b> ${D.meta.caveat} Kartan suurin piste on kokonaisindikaattori, ja viiva näyttää sen kulun kuuden kuukauden ajalta. Haaleat pisteet: sarjan viimeisin havainto on valittua ajankohtaa vanhempi. Ontot pisteet eivät ole mukana kokonaisindikaattorissa.</p>
-      <p><b>Lähteet.</b> Tilastokeskus (StatFin: kansantalouden tilinpito, työvoimatutkimus, avoimet työpaikat, työnvälitystilasto, hinnat ja ansiot, rakentaminen, asuntojen hinnat ja kaupat, konkurssit, kuluttajabarometri), Eurostat (Euroopan komission yritysten luottamuskyselyt ja kapasiteetin käyttöaste, HICP-painot, kaupan ja palvelujen liikevaihto), Suomen Pankki (luotonanto ja lainojen korot), EKP (korot, €STR, tuottokäyrä, valuuttakurssit, rahoitusstressi), Maailmanpankki (raaka-aineiden hinnat, Pink Sheet), FRED (epävarmuusindeksi, Yhdysvaltain ja Japanin korot © OECD, Brent ja WTI © EIA).</p>
+      <p><b>Lähteet.</b> Tilastokeskus (StatFin: kansantalouden tilinpito ja sektoritilit, julkisyhteisöjen tulot ja menot, työvoimatutkimus, avoimet työpaikat, työnvälitystilasto, hinnat ja ansiot, rakentaminen, asuntojen hinnat ja kaupat, konkurssit, kuluttajabarometri), Eurostat (Euroopan komission yritysten luottamuskyselyt ja kapasiteetin käyttöaste, HICP-painot, kaupan ja palvelujen liikevaihto, BKT ja YKHI vertailumaissa), Suomen Pankki (luotonanto ja lainojen korot), EKP (korot, €STR, tuottokäyrä, valuuttakurssit, rahoitusstressi), Maailmanpankki (raaka-aineiden hinnat, Pink Sheet), FRED (epävarmuusindeksi, Yhdysvaltain ja Japanin korot © OECD, Brent ja WTI © EIA).</p>
       <p><b>Käyttöehdot.</b> Tilastokeskuksen ja Maailmanpankin aineistot CC BY 4.0. Muut aineistot lähteiden käyttöehtojen mukaisesti, lähde mainiten. Epävarmuusindeksi: Baker, Bloom ja Davis, policyuncertainty.com. Laskelmat ja esitystapa ovat omia.</p>
       <p><b>Vastuuvapaus.</b> Sivuston tiedot perustuvat avoimiin lähteisiin, eivätkä ole tarkoitettu sijoitusneuvoiksi.</p></div></details>`;
   }
@@ -1180,9 +1180,11 @@ footer b { color: var(--fg); font-weight: 600; }
             unit: cb.unit || "%", dec: cb.dec != null ? cb.dec : c.dec, stackUnit: cb.stackUnit, dash: cb.dash, labels: cb.labels, colors: cb.colors, resid: cb.resid });
       const vw = c.views && c.views[gRow.id];               // rivikohtainen viivakuvio (esim. nimellis- ja reaalipalkat)
       if (Array.isArray(vw))                                // useampi kuvio: ensimmainen ylapariin, muut alle
-        return vw.map((v, k) => v.type === "scatter" ? { ...v, id: `${c.id}_${k}` }
-          : v.contrib ? (c.contribs[v.contrib] && ser(c.contribs[v.contrib].line) ? fromCb(c.contribs[v.contrib], `${c.id}_${k}`) : null)
-          : ({ ...c, ...v, id: `${c.id}_${k}`, bars: undefined, stack: undefined, size: "half", wide: false, w: undefined, height: undefined })).filter(Boolean);
+        return vw.map((v, k) => { const cbv = v.contrib && ((c.contribs || {})[v.contrib] || (v.contrib === "bkt" ? c.contrib : null));
+          return v.type === "scatter" ? { ...v, id: `${c.id}_${k}` }
+          : v.growth ? { ...c, id: `${c.id}_${k}`, title: `${gRow.label}: kasvu`, lines: [grSel + "_yy"], bars: grSel + "_qq" }   // rivin kasvukuvio
+          : v.contrib ? (cbv && ser(cbv.line) ? fromCb(cbv, `${c.id}_${k}`) : null)
+          : ({ ...c, ...v, id: `${c.id}_${k}`, bars: undefined, stack: undefined, size: "half", wide: false, w: undefined, height: undefined }); }).filter(Boolean);
       if (vw) return { ...c, ...vw, bars: undefined, stack: undefined };
       const cb = (c.contribs && c.contribs[gRow.id]) || (gRow.id === "bkt" ? c.contrib : null);
       return cb && ser(cb.line) ? fromCb(cb)

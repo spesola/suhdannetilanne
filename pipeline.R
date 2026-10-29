@@ -95,6 +95,7 @@ fetch_statfin <- function(s) {
 }
 
 fetch_eurostat <- function(s, geo = "FI") {
+  if (!is.null(s$geo)) geo <- s$geo                  # vertailumaat (esim. SE, DE, EA)
   pick <- c(s$pick, geo = geo)
   qs <- paste(sprintf("%s=%s", names(pick), unlist(pick)), collapse = "&")
   js <- fromJSON(get_text(paste0(EUROSTAT, s$ds, "?format=JSON&lang=EN&", qs)),
@@ -261,6 +262,12 @@ fetch_series <- function(s) {
     x <- approx(seq_along(d$value), d$value, seq_along(d$value))$y
     fit <- stl(ts(x, start = st, frequency = f), s.window = "periodic", robust = TRUE)
     d$value <- x - as.numeric(fit$time.series[, "seasonal"]) }
+  if (!is.null(s$div)) {                           # suhde toiseen sarjaan: div_mult * x / y (esim. % BKT:stä, deflaattori, tuottavuus)
+    dv <- if (!is.null(s$div$source)) list(s$div) else s$div   # useampi jakaja peräkkäin (esim. vaihtosuhde)
+    for (j in seq_along(dv)) {
+      e <- fetch_series(c(dv[[j]], list(id = paste0(s$id, "_div", j))))
+      m <- merge(d, e, by = "date"); d <- data.frame(date = m$date, value = m$value.x / m$value.y) }
+    d$value <- d$value * (if (is.null(s$div_mult)) 100 else s$div_mult) }
   if (!is.null(s$vac_emp)) {                       # avoimien tyopaikkojen aste: V / (V + tyolliset) * 100
     e <- fetch_series(c(s$vac_emp, list(id = paste0(s$id, "_emp"))))
     m <- merge(d, e, by = "date")
