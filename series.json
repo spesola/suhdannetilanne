@@ -452,6 +452,56 @@
                 "dec": 1,
                 "note": "Kiinteistönvälittäjien kautta tehdyt kaupat. Lähde: Tilastokeskus."
               }
+            ],
+            "tyottomat": [
+              {
+                "title": "Työllisyys- ja työttömyysaste",
+                "lines": [
+                  "tm_tyoll",
+                  "tm_tyottom"
+                ],
+                "y2": [
+                  "tm_tyottom"
+                ],
+                "colors": {
+                  "tm_tyoll": "var(--accent)",
+                  "tm_tyottom": "var(--q-down)"
+                },
+                "labels": {
+                  "tm_tyoll": "Työllisyysaste, 15–64-v.",
+                  "tm_tyottom": "Työttömyysaste"
+                },
+                "unit": "%",
+                "dec": 1,
+                "note": "Kausitasoitetut kuukausiluvut, neljänneksen keskiarvo. Lähde: Tilastokeskus, työvoimatutkimus."
+              },
+              {
+                "contrib": "tyottomat"
+              },
+              {
+                "title": "Avoimet työpaikat, tuhatta",
+                "lines": [
+                  "tm_atp",
+                  "tm_te"
+                ],
+                "colors": {
+                  "tm_atp": "var(--fg)",
+                  "tm_te": "var(--g2)"
+                },
+                "unit": "",
+                "dec": 1,
+                "note": "Kausitasoitettu (STL). TE-palvelut: kuukauden lopussa avoinna, neljänneksen keskiarvo. Lähde: Tilastokeskus."
+              },
+              {
+                "type": "scatter",
+                "title": "Beveridgen käyrä",
+                "x": "tm_tyottom",
+                "y": "tm_vr",
+                "xlab": "Työttömyysaste, %",
+                "ylab": "Avoimien työpaikkojen aste, %",
+                "dec": 1,
+                "note": "Avoimien työpaikkojen aste = avoimet / (avoimet + työlliset). Kausitasoitettu. Lähde: Tilastokeskus."
+              }
             ]
           },
           "size": "tt"
@@ -3756,6 +3806,79 @@
       "source": "ntp_ctrb",
       "handling": "none",
       "kind": "level"
+    },
+    {
+      "id": "tm_tyoll",
+      "label": "Työllisyysaste, 15–64-v.",
+      "set": "bkt",
+      "chart_only": true,
+      "source": "statfin",
+      "table": "tyti/135z.px",
+      "pick": {
+        "contentscode": "Tyollaste_15_64_kausi"
+      },
+      "to_quarter": true
+    },
+    {
+      "id": "tm_tyottom",
+      "label": "Työttömyysaste",
+      "set": "bkt",
+      "chart_only": true,
+      "source": "statfin",
+      "table": "tyti/135z.px",
+      "pick": {
+        "contentscode": "Tyottaste_kausi"
+      },
+      "to_quarter": true
+    },
+    {
+      "id": "tm_atp",
+      "label": "Tilastokeskus (työpaikkatutkimus)",
+      "set": "bkt",
+      "chart_only": true,
+      "source": "statfin",
+      "table": "atp/11l1.px",
+      "pick": {
+        "contentscode": "atp_lkm"
+      },
+      "stl": true,
+      "mult": 0.001
+    },
+    {
+      "id": "tm_te",
+      "label": "TE-palvelut (ilmoitetut)",
+      "set": "bkt",
+      "chart_only": true,
+      "source": "statfin",
+      "table": "tyonv/12r5.px",
+      "pick": {
+        "Alue": "SSS",
+        "contentscode": "AVPAIKATLOPUSSA"
+      },
+      "to_quarter": true,
+      "stl": true,
+      "mult": 0.001
+    },
+    {
+      "id": "tm_vr",
+      "label": "Avoimien työpaikkojen aste",
+      "set": "bkt",
+      "chart_only": true,
+      "source": "statfin",
+      "table": "atp/11l1.px",
+      "pick": {
+        "contentscode": "atp_lkm"
+      },
+      "stl": true,
+      "vac_emp": {
+        "source": "statfin",
+        "table": "tyti/135z.px",
+        "pick": {
+          "contentscode": "Tyolliset_kausi"
+        },
+        "to_quarter": true,
+        "mult": 1000
+      }
     }
   ]
 }

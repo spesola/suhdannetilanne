@@ -254,6 +254,17 @@ fetch_series <- function(s) {
   if (!is.null(s$roll)) {                          # liukuva summa (esim. 12 kk konkurssit), vain taydet ikkunat
     d <- d[order(d$date), ]; d$value <- as.numeric(stats::filter(d$value, rep(1, s$roll), sides = 1))
   }
+  if (isTRUE(s$stl)) {                             # kausitasoitus stl:lla (alkuperainen sarja, ei julkaistua kausitasoitettua)
+    d <- d[order(d$date), ]; ok <- which(!is.na(d$value)); d <- d[min(ok):max(ok), ]
+    f <- if (grepl("-Q", d$date[1])) 4 else 12
+    st <- c(as.integer(substr(d$date[1], 1, 4)), if (f == 4) as.integer(substr(d$date[1], 7, 7)) else as.integer(substr(d$date[1], 6, 7)))
+    x <- approx(seq_along(d$value), d$value, seq_along(d$value))$y
+    fit <- stl(ts(x, start = st, frequency = f), s.window = "periodic", robust = TRUE)
+    d$value <- x - as.numeric(fit$time.series[, "seasonal"]) }
+  if (!is.null(s$vac_emp)) {                       # avoimien tyopaikkojen aste: V / (V + tyolliset) * 100
+    e <- fetch_series(c(s$vac_emp, list(id = paste0(s$id, "_emp"))))
+    m <- merge(d, e, by = "date")
+    d <- data.frame(date = m$date, value = 100 * m$value.x / (m$value.x + m$value.y)) }
   if (!is.null(s$mult)) d$value <- d$value * s$mult  # yksikonmuunnos (esim. milj. -> mrd. euroa)
   if (!is.null(s$pct_lag)) {                        # muutos %, edellisesta vuodesta (lag 4 nelj. / 12 kk)
     d <- d[order(d$date), ]; n <- nrow(d); L <- s$pct_lag

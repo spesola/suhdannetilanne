@@ -832,7 +832,7 @@ footer b { color: var(--fg); font-weight: 600; }
   function renderFoot() {
     $("foot").innerHTML = `<p>Suomen talouden suhdannetilanne avoimista tilastoista. Päivittyy arkisin.</p><details><summary>Menetelmä ja lähteet</summary><div class="fbody"><p><b>Menetelmä.</b> ${D.meta.method}</p><p>${D.meta.composite}</p><p>${D.meta.charts || ""}</p>
       <p><b>Huomio.</b> ${D.meta.caveat} Kartan suurin piste on kokonaisindikaattori, ja viiva näyttää sen kulun kuuden kuukauden ajalta. Haaleat pisteet: sarjan viimeisin havainto on valittua ajankohtaa vanhempi. Ontot pisteet eivät ole mukana kokonaisindikaattorissa.</p>
-      <p><b>Lähteet.</b> Tilastokeskus (StatFin: kansantalouden tilinpito, työvoimatutkimus, hinnat ja ansiot, rakentaminen, asuntojen hinnat ja kaupat, konkurssit, kuluttajabarometri), Eurostat (Euroopan komission yritysten luottamuskyselyt ja kapasiteetin käyttöaste, HICP-painot, kaupan ja palvelujen liikevaihto), Suomen Pankki (luotonanto ja lainojen korot), EKP (korot, €STR, tuottokäyrä, valuuttakurssit, rahoitusstressi), Maailmanpankki (raaka-aineiden hinnat, Pink Sheet), FRED (epävarmuusindeksi, Yhdysvaltain ja Japanin korot © OECD, Brent ja WTI © EIA).</p>
+      <p><b>Lähteet.</b> Tilastokeskus (StatFin: kansantalouden tilinpito, työvoimatutkimus, avoimet työpaikat, työnvälitystilasto, hinnat ja ansiot, rakentaminen, asuntojen hinnat ja kaupat, konkurssit, kuluttajabarometri), Eurostat (Euroopan komission yritysten luottamuskyselyt ja kapasiteetin käyttöaste, HICP-painot, kaupan ja palvelujen liikevaihto), Suomen Pankki (luotonanto ja lainojen korot), EKP (korot, €STR, tuottokäyrä, valuuttakurssit, rahoitusstressi), Maailmanpankki (raaka-aineiden hinnat, Pink Sheet), FRED (epävarmuusindeksi, Yhdysvaltain ja Japanin korot © OECD, Brent ja WTI © EIA).</p>
       <p><b>Käyttöehdot.</b> Tilastokeskuksen ja Maailmanpankin aineistot CC BY 4.0. Muut aineistot lähteiden käyttöehtojen mukaisesti, lähde mainiten. Epävarmuusindeksi: Baker, Bloom ja Davis, policyuncertainty.com. Laskelmat ja esitystapa ovat omia.</p>
       <p><b>Vastuuvapaus.</b> Sivuston tiedot perustuvat avoimiin lähteisiin, eivätkä ole tarkoitettu sijoitusneuvoiksi.</p></div></details>`;
   }
@@ -1061,6 +1061,54 @@ footer b { color: var(--fg); font-weight: 600; }
     if (c.note) { const p = document.createElement("p"); p.className = "fnote"; p.textContent = c.note; card.appendChild(p); }
     return card;
   }
+  // hajontakuvio ajassa (esim. Beveridgen kayra): pisteet yhdistetty, uusimmat tummimpina
+  function scatterCard(c, narrow) {
+    const ser = id => set.series.find(x => x.id === id), X = ser(c.x).values, Y = ser(c.y).values;
+    const card = document.createElement("div"); card.className = "card fcard" + (narrow ? "" : " half");
+    card.innerHTML = `<div class="fhead"><h2>${c.title}</h2><span class="fval"></span></div><p class="fsub"></p>`;
+    const W2 = narrow ? 420 : 560, H2 = narrow ? 300 : 260, fs = narrow ? 13 : 12, ml = 44, mr = 14, mt = 10, mb = 40;
+    const i0 = c.from ? Math.max(0, set.periods.findIndex(p => p >= String(c.from))) : 0;
+    const pts = []; for (let i = i0; i < set.periods.length; i++) if (X[i] != null && Y[i] != null) pts.push(i);
+    const svg = el("svg", { class: "fc", viewBox: `0 0 ${W2} ${H2}`, role: "img", "aria-label": c.title }, card);
+    const ax = (vals, a, b) => { let lo = Math.min(...vals), hi = Math.max(...vals); const st = niceStep(hi - lo) || 0.5;
+      lo = Math.floor(lo / st) * st; hi = Math.ceil(hi / st) * st; return { lo, hi, st, f: v => a + (v - lo) / (hi - lo) * (b - a) }; };
+    const AX = ax(pts.map(i => X[i]), ml, W2 - mr), AY = ax(pts.map(i => Y[i]), H2 - mb, mt);
+    for (let v = AY.lo; v <= AY.hi + AY.st / 2; v += AY.st) { const vv = Math.round(v / AY.st) * AY.st;
+      el("line", { x1: ml, x2: W2 - mr, y1: AY.f(vv), y2: AY.f(vv), stroke: "var(--grid)" }, svg);
+      el("text", { x: ml - 6, y: AY.f(vv) + 4, "text-anchor": "end", "font-size": fs, fill: "var(--muted)" }, svg).textContent = fmtV(vv, stepDec(AY.st)); }
+    for (let v = AX.lo; v <= AX.hi + AX.st / 2; v += AX.st) { const vv = Math.round(v / AX.st) * AX.st;
+      el("line", { x1: AX.f(vv), x2: AX.f(vv), y1: mt, y2: H2 - mb, stroke: "var(--grid)" }, svg);
+      el("text", { x: AX.f(vv), y: H2 - mb + 4 + fs, "text-anchor": "middle", "font-size": fs, fill: "var(--muted)" }, svg).textContent = fmtV(vv, stepDec(AX.st)); }
+    el("text", { x: W2 - mr, y: H2 - 4, "text-anchor": "end", "font-size": fs - 1, fill: "var(--muted)" }, svg).textContent = c.xlab + " →";
+    el("text", { x: ml + 4, y: mt + fs, "font-size": fs - 1, fill: "var(--muted)" }, svg).textContent = "↑ " + c.ylab;
+    el("path", { d: pts.map((i, k) => `${k ? "L" : "M"}${AX.f(X[i]).toFixed(1)} ${AY.f(Y[i]).toFixed(1)}`).join(""), fill: "none", stroke: "var(--muted)", "stroke-opacity": 0.45, "stroke-width": 1.2 }, svg);
+    const n = pts.length;
+    pts.forEach((i, k) => el("circle", { cx: AX.f(X[i]), cy: AY.f(Y[i]), r: 3, fill: "var(--accent)", "fill-opacity": 0.15 + 0.75 * (k / (n - 1)) ** 2 }, svg));
+    const yrLab = new Set([pts[0], ...pts.filter(i => /-Q1$/.test(set.periods[i]) && +set.periods[i].slice(0, 4) % 5 === 0)]);   // vuosimerkit harvakseltaan
+    yrLab.forEach(i => { if (i === pts[n - 1]) return;
+      el("text", { x: AX.f(X[i]) + 6, y: AY.f(Y[i]) - 5, "font-size": fs - 1, fill: "var(--muted)", stroke: "var(--surface)", "stroke-width": 3, "paint-order": "stroke" }, svg).textContent = set.periods[i].slice(0, 4); });
+    const last = pts[n - 1];
+    const lr = AX.f(X[last]) > W2 - 80;                                 // oikeassa reunassa nimi pisteen vasemmalle
+    el("text", { x: AX.f(X[last]) + (lr ? -8 : 8), y: AY.f(Y[last]) + (lr ? -8 : 4), "text-anchor": lr ? "end" : "start", "font-size": fs, "font-weight": 600, fill: "var(--fg)", stroke: "var(--surface)", "stroke-width": 3, "paint-order": "stroke" }, svg).textContent = fmtP(set.periods[last]);
+    const dot = el("circle", { r: 5, fill: "var(--fg)", stroke: "var(--surface)", "stroke-width": 1.5 }, svg);
+    const valEl = card.querySelector(".fval"), subEl = card.querySelector(".fsub");
+    const show = h => { let i = h == null ? last : h; if (!pts.includes(i)) i = pts.filter(j => j <= i).pop() ?? last;
+      dot.setAttribute("cx", AX.f(X[i])); dot.setAttribute("cy", AY.f(Y[i]));
+      valEl.textContent = fmtP(set.periods[i]);
+      subEl.textContent = `${c.xlab.replace(/, %$/, "")} ${fmtV(X[i], c.dec)} %, ${c.ylab.replace(/, %$/, "").toLowerCase()} ${fmtV(Y[i], c.dec)} %.`; };
+    show(null); chartHooks.push(show);
+    const hit = el("rect", { x: ml, y: mt, width: W2 - ml - mr, height: H2 - mt - mb, fill: "transparent" }, svg);
+    hit.addEventListener("pointermove", e => { const r = svg.getBoundingClientRect(), sx = (e.clientX - r.left) / r.width * W2, sy = (e.clientY - r.top) / r.height * H2;
+      let best = last, bd = Infinity; pts.forEach(i => { const d = (AX.f(X[i]) - sx) ** 2 + (AY.f(Y[i]) - sy) ** 2; if (d < bd) { bd = d; best = i; } });
+      chartHooks.forEach(fn => fn(best)); });
+    hit.addEventListener("pointerleave", () => chartHooks.forEach(fn => fn(null)));
+    const fm = document.createElement("div"); fm.className = "fmeta";
+    const db = document.createElement("button"); db.type = "button"; db.className = "dl"; db.textContent = "Lataa CSV";
+    db.onclick = () => saveFile(`suhdannetilanne-${slug(c.title)}.csv`, toCSV([["Jakso", c.xlab, c.ylab], ...pts.map(i => [set.periods[i], X[i], Y[i]])]));
+    fm.appendChild(db); card.appendChild(fm);
+    if (c.note) { const p = document.createElement("p"); p.className = "fnote"; p.textContent = c.note; card.appendChild(p); }
+    return card;
+  }
   function curveCard(c, narrow) {
     const K = c.curve, card = document.createElement("div"); card.className = "card fcard" + (narrow ? "" : " half");
     card.innerHTML = `<div class="fhead"><h2>${c.title}</h2><span class="fval"></span></div><p class="fsub"></p>`;
@@ -1128,14 +1176,16 @@ footer b { color: var(--fg); font-weight: 600; }
     const gRow = set.growth && set.growth.find(r => r.id === grSel);
     // valitulla rivilla voi olla kontribuutiokuvio (BKT: c.contrib, muut: c.contribs[rivi])
     let charts = only ? only : !gRow ? set.charts : set.charts.flatMap(c => { if (c.id !== "bktkasvu") return c;
+      const fromCb = (cb, id) => ({ ...c, id: id || c.id, title: cb.title, note: cb.note, lines: (cb.lines || [cb.line]).filter(x => ser(x)), bars: undefined, stack: cb.stack.filter(x => ser(x)),
+            unit: cb.unit || "%", dec: cb.dec != null ? cb.dec : c.dec, stackUnit: cb.stackUnit, dash: cb.dash, labels: cb.labels, colors: cb.colors, resid: cb.resid });
       const vw = c.views && c.views[gRow.id];               // rivikohtainen viivakuvio (esim. nimellis- ja reaalipalkat)
-      if (Array.isArray(vw))                                // useampi kuvio rinnakkain (esim. asuntojen hinnat ja kaupat)
-        return vw.map((v, k) => ({ ...c, ...v, id: `${c.id}_${k}`, bars: undefined, stack: undefined, size: "half", wide: false, w: undefined, height: undefined }));
+      if (Array.isArray(vw))                                // useampi kuvio: ensimmainen ylapariin, muut alle
+        return vw.map((v, k) => v.type === "scatter" ? { ...v, id: `${c.id}_${k}` }
+          : v.contrib ? (c.contribs[v.contrib] && ser(c.contribs[v.contrib].line) ? fromCb(c.contribs[v.contrib], `${c.id}_${k}`) : null)
+          : ({ ...c, ...v, id: `${c.id}_${k}`, bars: undefined, stack: undefined, size: "half", wide: false, w: undefined, height: undefined })).filter(Boolean);
       if (vw) return { ...c, ...vw, bars: undefined, stack: undefined };
       const cb = (c.contribs && c.contribs[gRow.id]) || (gRow.id === "bkt" ? c.contrib : null);
-      return cb && ser(cb.line)
-        ? { ...c, title: cb.title, note: cb.note, lines: (cb.lines || [cb.line]).filter(id => ser(id)), bars: undefined, stack: cb.stack.filter(id => ser(id)),
-            unit: cb.unit || "%", dec: cb.dec != null ? cb.dec : c.dec, stackUnit: cb.stackUnit, dash: cb.dash, labels: cb.labels, colors: cb.colors, resid: cb.resid }
+      return cb && ser(cb.line) ? fromCb(cb)
         : { ...c, title: `${gRow.label}: kasvu`, lines: [grSel + "_yy"], bars: grSel + "_qq" }; });
     if (!only) charts = charts.map(c => {                 // taulukosta valittu rivi korvaa parikuvion
       const tb = set.charts.find(t => t.type === "table" && t.pair === c.id && tblSel[t.id]);
@@ -1160,6 +1210,7 @@ footer b { color: var(--fg); font-weight: 600; }
         const h = document.createElement("h3"); h.className = "fsec"; h.textContent = c0.section; box.appendChild(h); lastSec = c0.section; }
       if (c0.type === "table") { tgt.appendChild(tableCard(c0, narrow)); return; }
       if (c0.type === "curve") { tgt.appendChild(curveCard(c0, narrow)); return; }
+      if (c0.type === "scatter") { if (col && nth++ === 0) tgt = box; tgt.appendChild(scatterCard(c0, narrow)); return; }
       const c = { ...c0, lines: c0.lines.filter(id => ser(id)) };       // puuttuvat sarjat ohitetaan
       const isRes = id => (c.resid || []).includes(id) || /_muu$/.test(id);   // jaannoserat viivoitettuina
       if (col && nth++ === 0 && grSel) c.hdr = grSel;                   // ensimmainen kuvio: otsakkeeseen rivin v/v ja q/q
@@ -1280,7 +1331,7 @@ footer b { color: var(--fg); font-weight: 600; }
         if (S.length) {
           const g = L[0][i], u = c.unit === "%" ? " %" : c.unit ? " " + c.unit : "";
           if (valEl) valEl.innerHTML = `${fmtP(P[i])}: ` + c.lines.map((id, k) => { const v = L[k][i];   // useampi viiva: esim. YKHI ja KHI
-            return `${lbl(id)} <b>${v > 0 ? "+" : ""}${fmtV(v, c.dec)}${u}</b>`; }).join(", ");
+            return `${c.lines.length > 1 ? lbl(id) + " " : ""}<b>${v > 0 ? "+" : ""}${fmtV(v, c.dec)}${u}</b>`; }).join(", ");
           const su = c.stackUnit != null ? c.stackUnit : "%-yks.";
           subEl.hidden = erit; if (!erit) subEl.textContent = (c.ts ? `${fmtP(P[i])}: ${ser(c.lines[0]).label} ${g > 0 ? "+" : ""}${fmtV(g, c.dec)}${u}. ` : "") +
             c.stack.map((id, k) => `${ser(id).label} ${+(S[k][i] || 0).toFixed(c.dec) > 0 ? "+" : ""}${fmtV(S[k][i], c.dec)}`).join(", ") + (su ? " " + su : "") + (su && su.endsWith(".") ? "" : ".");
