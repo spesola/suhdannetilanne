@@ -568,7 +568,7 @@
           "step": [
             "dfr"
           ],
-          "note": "Katkoviivat: forward-korot EKP:n tuottokäyrästä, sisältävät termipreemion.",
+          "note": "Euribor kuukausikeskiarvo, forward-korot kuun viimeinen havainto. Katkoviivat: forward-korot EKP:n tuottokäyrästä, sisältävät termipreemion.",
           "section": "Korot ja rahapolitiikka",
           "dash": [
             "fwd1y",
@@ -687,7 +687,7 @@
           ],
           "unit": "",
           "dec": 1,
-          "note": "Nimellinen, 40 kauppakumppania, 1999 Q1 = 100. Lähde: EKP."
+          "note": "Kuukausikeskiarvo. Nimellinen, 40 kauppakumppania, 1999 Q1 = 100. Lähde: EKP."
         },
         {
           "id": "t_raaka",
@@ -827,13 +827,13 @@
         },
         {
           "id": "clifs",
-          "title": "Rahoitusstressi",
+          "title": "Rahoitusstressi, Suomi (CLIFS)",
           "unit": "",
           "dec": 2,
           "lines": [
             "clifs"
           ],
-          "note": "0 = ei stressiä, 1 = äärimmäinen. Lähde: EKP.",
+          "note": "Kuukausiarvot. 0 = ei stressiä, 1 = äärimmäinen. Lähde: EKP.",
           "section": "Riskit ja epävarmuus",
           "size": "half"
         },
@@ -2943,7 +2943,7 @@
       "unit": "",
       "handling": "none",
       "kind": "level",
-      "short": "Rahoitusstressi (CISS)"
+      "short": "Rahoitusstressi, euroalue (CISS)"
     },
     {
       "id": "eer_d",

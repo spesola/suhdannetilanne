@@ -128,6 +128,7 @@ body { font-variant-numeric: tabular-nums; background: var(--bg); min-height: 10
 .pt.hl > circle:last-of-type, .pt.hl > path:last-of-type { stroke: var(--fg); stroke-width: 2.5; }
 .ind.hl, .gh.hl { background: var(--grid); }
 .ind .nm sup { color: var(--muted); font-size: 0.7em; margin-left: 2px; }
+.ind .nm .inv { color: var(--muted); font-size: 0.72em; font-weight: 400; }
 .lnote { font-size: 0.74rem; color: var(--muted); margin-top: 10px; }
 .qbox .picon { flex: none; display: block; }
 .qbox .n { font-family: var(--font-data); font-size: 1.05rem; font-weight: 400; color: var(--qc); line-height: 1.2; }
@@ -571,6 +572,7 @@ footer b { color: var(--fg); font-weight: 600; }
   /* ---------- aikavalitsin ---------- */
   function renderTime() {
     $("tailsTg").title = `Näytä pisteiden kulku ${set.tail} ${set.freq === "M" ? "kuukauden" : "neljänneksen"} ajalta`;
+    $("tailsLbl").textContent = `Kulku ${set.tail} ${set.freq === "M" ? "kk" : "nelj."}`;
     const r = $("per"); r.max = set.periods.length - 1; r.value = idx;
     $("perOut").textContent = fmtP(set.periods[idx]);
   }
@@ -598,7 +600,7 @@ footer b { color: var(--fg); font-weight: 600; }
       const out = !s.comp && !s.in_composite;
       b.dataset.id = s.id;
       b.innerHTML = `<span class="per" title="Havaintokausi">${p ? fmtP(set.periods[p.i]) : "–"}</span>` +
-        `<span class="nm">${s.label}${out ? `<sup title="Ei mukana kokonaisindikaattorissa">*</sup>` : ""}</span>` +
+        `<span class="nm">${s.label}${s.invert ? ` <span class="inv" title="Käännetty sarja: nousu näkyy negatiivisena">käänt.</span>` : ""}${out ? `<sup title="Ei mukana kokonaisindikaattorissa">*</sup>` : ""}</span>` +
         `<span class="v">${p ? fmtN(p.l) : "–"}</span><span class="v">${p ? fmtN(p.c) : "–"}</span>` +
         (q ? `<span class="ph" style="--qc:${qcol(q)}" title="${Q[q].name}"><i></i><span class="pt-t">${Q[q].short}</span></span>` : `<span></span>`);
       b.onclick = () => select(s.id);
@@ -624,7 +626,9 @@ footer b { color: var(--fg); font-weight: 600; }
       box.appendChild(h); mem.forEach(s => box.appendChild(mk(s))); list.appendChild(box);
     });
     if (list.children.length === 1) list.insertAdjacentHTML("beforeend", `<div class="empty">Ei indikaattoreita vaiheessa ${Q[qf].name.toLowerCase()}.</div>`);
-    if (set.indicators.some(s => !s.in_composite)) list.insertAdjacentHTML("beforeend", `<p class="lnote">* Ei mukana kokonaisindikaattorissa.</p>`);
+    const notes = [set.indicators.some(s => !s.in_composite) ? "* Ei mukana kokonaisindikaattorissa." : "",
+                   set.indicators.some(s => s.invert) ? "Käänt. = käännetty sarja, nousu näkyy negatiivisena." : ""].filter(Boolean);
+    if (notes.length) list.insertAdjacentHTML("beforeend", `<p class="lnote">${notes.join(" ")}</p>`);
   }
 
   // kartan ja luettelon kytkentä: rivin hover korostaa pisteen ja nayttaa nimen, pisteen hover korostaa rivin
@@ -784,8 +788,8 @@ footer b { color: var(--fg); font-weight: 600; }
   function renderFoot() {
     $("foot").innerHTML = `<p>Suomen talouden suhdannetilanne avoimista tilastoista. Päivittyy arkisin.</p><details><summary>Menetelmä ja lähteet</summary><div class="fbody"><p><b>Menetelmä.</b> ${D.meta.method}</p><p>${D.meta.composite}</p><p>${D.meta.charts || ""}</p>
       <p><b>Huomio.</b> ${D.meta.caveat} Kartan suurin piste on kokonaisindikaattori, ja viiva näyttää sen kulun kuuden kuukauden ajalta. Haaleat pisteet: sarjan viimeisin havainto on valittua ajankohtaa vanhempi. Ontot pisteet eivät ole mukana kokonaisindikaattorissa.</p>
-      <p><b>Lähteet.</b> Tilastokeskus (StatFin: kansantalouden tilinpito, työvoimatutkimus, hinnat ja ansiot, rakentaminen, konkurssit, kuluttajabarometri), Eurostat (Euroopan komission yritysten luottamuskyselyt, HICP-painot, kaupan ja palvelujen liikevaihto), Suomen Pankki (luotonanto ja lainojen korot), EKP (korot, €STR, tuottokäyrä, valuuttakurssit, rahoitusstressi), FRED (epävarmuusindeksi, Yhdysvaltain ja Japanin korot © OECD, Brent © EIA).</p>
-      <p><b>Käyttöehdot.</b> Tilastokeskuksen aineistot CC BY 4.0. Muut aineistot lähteiden käyttöehtojen mukaisesti, lähde mainiten. Epävarmuusindeksi: Baker, Bloom ja Davis, policyuncertainty.com. Laskelmat ja esitystapa ovat omia.</p>
+      <p><b>Lähteet.</b> Tilastokeskus (StatFin: kansantalouden tilinpito, työvoimatutkimus, hinnat ja ansiot, rakentaminen, asuntojen hinnat ja kaupat, konkurssit, kuluttajabarometri), Eurostat (Euroopan komission yritysten luottamuskyselyt ja kapasiteetin käyttöaste, HICP-painot, kaupan ja palvelujen liikevaihto), Suomen Pankki (luotonanto ja lainojen korot), EKP (korot, €STR, tuottokäyrä, valuuttakurssit, rahoitusstressi), Maailmanpankki (raaka-aineiden hinnat, Pink Sheet), FRED (epävarmuusindeksi, Yhdysvaltain ja Japanin korot © OECD, Brent ja WTI © EIA).</p>
+      <p><b>Käyttöehdot.</b> Tilastokeskuksen ja Maailmanpankin aineistot CC BY 4.0. Muut aineistot lähteiden käyttöehtojen mukaisesti, lähde mainiten. Epävarmuusindeksi: Baker, Bloom ja Davis, policyuncertainty.com. Laskelmat ja esitystapa ovat omia.</p>
       <p><b>Vastuuvapaus.</b> Sivuston tiedot perustuvat avoimiin lähteisiin, eivätkä ole tarkoitettu sijoitusneuvoiksi.</p></div></details>`;
   }
 
