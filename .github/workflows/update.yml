@@ -42,7 +42,23 @@ jobs:
           cp clock.json favicon.svg public/
 
       - name: Julkaise Cloudflareen
+        id: deploy
         if: hashFiles('public/index.html') != ''
+        continue-on-error: true
+        uses: cloudflare/wrangler-action@v3
+        with:
+          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          wranglerVersion: "4.154.0"
+          command: deploy
+
+      - name: Odota ennen uutta yritystä
+        if: steps.deploy.outcome == 'failure'
+        run: sleep 60
+
+      - name: Julkaise Cloudflareen (uusi yritys)
+        # Cloudflaren API palauttaa toisinaan tilapaisen virheen (esim. code 10013)
+        if: steps.deploy.outcome == 'failure'
         uses: cloudflare/wrangler-action@v3
         with:
           apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
