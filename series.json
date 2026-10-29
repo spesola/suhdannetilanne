@@ -466,6 +466,20 @@
                 "unit": "",
                 "dec": 1,
                 "note": "Kiinteistönvälittäjien kautta tehdyt kaupat. Lähde: Tilastokeskus."
+              },
+              {
+                "title": "Asuntojen hinnat suhteessa tuloihin ja vuokriin, 2015 = 100",
+                "lines": [
+                  "x_as_pti",
+                  "x_as_ptr"
+                ],
+                "colors": {
+                  "x_as_pti": "var(--fg)",
+                  "x_as_ptr": "var(--accent)"
+                },
+                "unit": "",
+                "dec": 1,
+                "note": "Vanhojen osakeasuntojen hinnat suhteessa kotitalouksien käytettävissä oleviin tuloihin asukasta kohden ja vapaarahoitteisiin vuokriin. Lähde: Tilastokeskus."
               }
             ],
             "tyottomat": [
@@ -4608,6 +4622,109 @@
         "coicop18": "TOT_X_NRG_FOOD"
       },
       "to_quarter": true
+    },
+    {
+      "id": "x_as_vuokra",
+      "label": "Vuokrat (vapaarahoitteiset)",
+      "set": "bkt",
+      "chart_only": true,
+      "rebase": 2015,
+      "source": "splice",
+      "chain": true,
+      "parts": [
+        {
+          "db": "StatFin_Passiivi",
+          "table": "asvu/statfinpas_asvu_pxt_11x4_2025q4.px",
+          "pick": {
+            "Alue": "ksu",
+            "Huoneluku": "00",
+            "Rahoitusmuoto": "1",
+            "Tiedot": "ketj_Tor"
+          }
+        },
+        {
+          "table": "asvu/15fa.px",
+          "pick": {
+            "alue_44_20260101": "SSS",
+            "rahoitus_2_20260101": "1",
+            "huoneluku_5_20260101": "SSS",
+            "contentscode": "asvu2025"
+          }
+        }
+      ]
+    },
+    {
+      "id": "x_as_pti",
+      "label": "Hinnat / tulot",
+      "set": "bkt",
+      "chart_only": true,
+      "rebase": 2015,
+      "div": {
+        "source": "statfin",
+        "table": "ntp/15a6.px",
+        "pick": {
+          "sektoriluokitus_7_20230101": "S14",
+          "taloustoimi_1_20180101": "B6N",
+          "contentscode": "ntp-KAUSIT"
+        },
+        "div": {
+          "source": "statfin",
+          "table": "ntp/11tj.px",
+          "pick": {
+            "taloustoimi_1_20180101": "EP",
+            "toimiala_79_20180101": "SSS",
+            "contentscode": "ntp-TASM"
+          }
+        }
+      },
+      "source": "statfin",
+      "table": "ashi/15it.px",
+      "pick": {
+        "alue_43_20260625": "SSS",
+        "talotyyppi_5_20111209": "0",
+        "huoneluku_1_20111212": "00",
+        "contentscode": "ashivq_indeksi_2015"
+      }
+    },
+    {
+      "id": "x_as_ptr",
+      "label": "Hinnat / vuokrat",
+      "set": "bkt",
+      "chart_only": true,
+      "rebase": 2015,
+      "div": {
+        "source": "splice",
+        "chain": true,
+        "parts": [
+          {
+            "db": "StatFin_Passiivi",
+            "table": "asvu/statfinpas_asvu_pxt_11x4_2025q4.px",
+            "pick": {
+              "Alue": "ksu",
+              "Huoneluku": "00",
+              "Rahoitusmuoto": "1",
+              "Tiedot": "ketj_Tor"
+            }
+          },
+          {
+            "table": "asvu/15fa.px",
+            "pick": {
+              "alue_44_20260101": "SSS",
+              "rahoitus_2_20260101": "1",
+              "huoneluku_5_20260101": "SSS",
+              "contentscode": "asvu2025"
+            }
+          }
+        ]
+      },
+      "source": "statfin",
+      "table": "ashi/15it.px",
+      "pick": {
+        "alue_43_20260625": "SSS",
+        "talotyyppi_5_20111209": "0",
+        "huoneluku_1_20111212": "00",
+        "contentscode": "ashivq_indeksi_2015"
+      }
     }
   ]
 }

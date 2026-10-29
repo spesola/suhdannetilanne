@@ -218,7 +218,11 @@ fetch_splice <- function(s) {
     if (!is.null(p$from)) x <- x[x$date >= p$from, ]
     if (!is.null(p$to)) x <- x[x$date <= p$to, ]
     x[!is.na(x$value), ] })
-  d <- Reduce(function(a, b) rbind(a[!(a$date %in% b$date), ], b), parts)
+  # chain: indeksit eri perusvuosilla ketjutetaan paallekkaisen jakson keskiarvolla (aiemmat osat uuteen tasoon)
+  d <- Reduce(function(a, b) { if (isTRUE(s$chain)) { o <- intersect(a$date, b$date)
+      if (!length(o)) stop(s$id, ": ketjutettavilla osilla ei paallekkaista jaksoa")
+      a$value <- a$value * mean(b$value[b$date %in% o]) / mean(a$value[a$date %in% o]) }
+    rbind(a[!(a$date %in% b$date), ], b) }, parts)
   d[order(d$date), ]
 }
 
