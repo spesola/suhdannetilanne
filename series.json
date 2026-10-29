@@ -293,7 +293,7 @@
               "k_netto",
               "k_muu"
             ],
-            "note": "Edellisen vuoden hinnoin. Lähde: Tilastokeskus.",
+            "note": "Kontribuutiot laskettu edellisen vuoden hinnoin, jotta osat summautuvat kasvuun. Lähde: Tilastokeskus.",
             "resid": [
               "k_muu"
             ]
@@ -353,7 +353,7 @@
                 "kd_bkt_kulutus_6"
               ],
               "unit": "%",
-              "note": "Edellisen vuoden hinnoin, %-yks. Lähde: Tilastokeskus.",
+              "note": "Kontribuutiot laskettu edellisen vuoden hinnoin, jotta osat summautuvat kasvuun. Lähde: Tilastokeskus.",
               "stackUnit": "%-yks.",
               "dec": 1
             },
@@ -369,7 +369,7 @@
                 "kd_bkt_inv_6"
               ],
               "unit": "%",
-              "note": "Edellisen vuoden hinnoin, %-yks. Lähde: Tilastokeskus.",
+              "note": "Kontribuutiot laskettu edellisen vuoden hinnoin, jotta osat summautuvat kasvuun. Lähde: Tilastokeskus.",
               "stackUnit": "%-yks.",
               "dec": 1
             },
@@ -381,7 +381,7 @@
                 "kd_bkt_vienti_2"
               ],
               "unit": "%",
-              "note": "Edellisen vuoden hinnoin, %-yks. Lähde: Tilastokeskus.",
+              "note": "Kontribuutiot laskettu edellisen vuoden hinnoin, jotta osat summautuvat kasvuun. Lähde: Tilastokeskus.",
               "stackUnit": "%-yks.",
               "dec": 1
             },
@@ -393,7 +393,7 @@
                 "kd_bkt_tuonti_2"
               ],
               "unit": "%",
-              "note": "Edellisen vuoden hinnoin, %-yks. Lähde: Tilastokeskus.",
+              "note": "Kontribuutiot laskettu edellisen vuoden hinnoin, jotta osat summautuvat kasvuun. Lähde: Tilastokeskus.",
               "stackUnit": "%-yks.",
               "dec": 1
             }
