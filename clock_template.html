@@ -231,11 +231,11 @@ button.dl:hover { text-decoration-color: var(--fg); }
 .step.play { font-size: 0.7rem; }
 .fsec { grid-column: 1 / -1; font-size: 1.45rem; line-height: 1.2; letter-spacing: -0.01em; color: var(--fg); font-weight: 600; margin: 24px 0 -26px; scroll-margin-top: 64px; }
 .fsec:first-child, .secnav + .fsec { margin-top: 0; }
-.grpair { display: grid; grid-template-columns: auto minmax(0, 1fr); gap: 40px; align-items: start; }
+.grpair { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 48px; align-items: start; }   /* samat palstat kuin alla olevassa ruudukossa */
 .grpair > .card { min-width: 0; }
 .grtab > .fnote { width: 0; min-width: 100%; }   /* alaviite ei levenna saraketta */
 .grpair .hm thead th { padding: 2px 0; font-size: 0.7rem; }
-.grpair table.hm { border-spacing: 2px 3px; font-size: 0.74rem; }   /* tiivis: kuvioille enemman tilaa */
+.grpair table.hm { border-spacing: 2px 3px; font-size: 0.74rem; width: 100%; }   /* tiivis: kuvioille enemman tilaa */
 .grpair .hm td { width: 42px; min-width: 42px; padding: 5px 1px; }
 .grpair .hm th.rl { font-size: 0.82rem; padding-right: 8px; padding-left: 4px; }
 .grpair .hm th.rl.sub { padding-left: 12px; font-size: 0.76rem; }
@@ -1464,5 +1464,6 @@ footer b { color: var(--fg); font-weight: 600; }
   addEventListener("popstate", () => { if (applyHash()) renderAll(); });
   addEventListener("hashchange", () => { if (applyHash()) renderAll(); });
   applyHash(); renderFoot(); renderAll();
+  if (document.fonts && document.fonts.ready) document.fonts.ready.then(() => { if (set.growth && set.view === "charts") drawCharts(); });   // fontin latauksen jalkeen korkeudet uudelleen
 })();
 </script>
