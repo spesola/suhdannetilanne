@@ -239,6 +239,14 @@ button.dl:hover { text-decoration-color: var(--fg); }
 .grpair .hm td { width: 42px; min-width: 42px; padding: 5px 1px; }
 .grpair .hm th.rl { font-size: 0.82rem; padding-right: 8px; padding-left: 4px; }
 .grpair .hm th.rl.sub { padding-left: 12px; font-size: 0.76rem; }
+.grleft, .grside { display: flex; flex-direction: column; gap: 40px; min-width: 0; }
+.grside:empty { display: none; }
+.subtabs { display: flex; gap: 6px; overflow-x: auto; scrollbar-width: none; min-width: 0; margin-bottom: -16px; }
+.subtabs::-webkit-scrollbar { display: none; }
+.subtabs button { font: inherit; font-size: 0.86rem; white-space: nowrap; color: var(--fg); background: none; border: 1px solid var(--line); border-radius: 999px; padding: 5px 13px; cursor: pointer; }
+.subtabs button:hover { border-color: var(--fg); }
+.subtabs button[aria-selected="true"] { background: var(--fg); border-color: var(--fg); color: var(--bg); }
+.subtabs button:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
 .grcol { display: flex; flex-direction: column; gap: 40px; min-width: 0; }
 .grcol > .card { grid-column: auto; }
 .grmore { margin-top: 0; }
@@ -391,13 +399,14 @@ footer b { color: var(--fg); font-weight: 600; }
   </section>
 
   <section class="tiles" id="tiles" hidden></section>
+  <nav class="subtabs" id="subTabs" role="tablist" aria-label="Aiheet" hidden></nav>
   <section class="grpair" id="growthSec" hidden>
-    <div class="card grtab">
+    <div class="grleft"><div class="card grtab">
       <div class="phead"><h2 id="grTitle">Kasvu</h2>
         <div class="hmctl"><div class="mini" role="group" aria-label="Kasvuvauhti"><button type="button" id="gr-yy" aria-pressed="true">v/v</button><button type="button" id="gr-qq" aria-pressed="false">q/q</button></div><button type="button" class="dl" id="gr-dl">Lataa CSV</button></div></div>
       <div class="hmwrap"><table class="hm" id="grTable"></table></div>
-      <p class="fnote">Muutos, %. Värin voimakkuus suhteessa sarjan keskihajontaan vuodesta 2015 (pl. 2020–2021), täysi väri kahdesta keskihajonnasta. Hinnoissa ja palkoissa sininen väri. Klikkaa riviä nähdäksesi kuviot.</p>
-    </div>
+      <p class="fnote">Muutos, %. Värin voimakkuus suhteessa sarjan keskihajontaan vuodesta 2015 (pl. 2020–2021), täysi väri kahdesta keskihajonnasta.<span id="grNeutral"> Hinnoissa ja palkoissa sininen väri.</span> Klikkaa riviä nähdäksesi kuviot.</p>
+    </div><div class="grside" id="grSide"></div></div>
     <div class="grcol" id="grCharts"></div>
   </section>
   <section class="grmore" id="grMore" hidden><div class="fgrid" id="grMoreGrid"></div></section>
@@ -456,6 +465,7 @@ footer b { color: var(--fg); font-weight: 600; }
   const GVARS = ["--g1", "--g2", "--g3", "--g4", "--g5"];
   const LIM = 2.5;
 
+  D.sets.forEach(s => (s.tabs || []).forEach(tb => { tb.rows = [].concat(tb.rows); }));   // yhden rivin lista voi tulla merkkijonona
   let set = D.sets.find(s => s.default) || D.sets[0];
   const defIdx = st => st.composite ? Math.max(0, st.periods.indexOf(st.composite.last)) : st.periods.length - 1;   // viimeisin kuukausi, jolta kaikki sarjat
   let idx = defIdx(set);
@@ -512,7 +522,9 @@ footer b { color: var(--fg); font-weight: 600; }
     const box = $("sets"); box.innerHTML = "";
     D.sets.forEach(s => { const b = document.createElement("button"); b.type = "button"; b.innerHTML = `<span class="lg">${s.label}</span><span class="sh">${SHORT[s.id] || s.label}</span>`;
       b.setAttribute("aria-pressed", s.id === set.id); b.onclick = () => { if (s.id === set.id) return;
-        stopPlay(); set = s; idx = defIdx(s); sel = null; qf = null; renderAll(); }; box.appendChild(b); });
+        stopPlay(); set = s; idx = defIdx(s); sel = null; qf = null;
+        if (s.tabs) { subTab = s.tabs[0].id; grSel = s.tabs[0].default || s.tabs[0].rows[0]; }
+        writeHash(); renderAll(); }; box.appendChild(b); });
   }
 
   /* ---------- kello ---------- */
@@ -854,7 +866,7 @@ footer b { color: var(--fg); font-weight: 600; }
     $("topSec").hidden = !clock; $("detail").hidden = charts; $("charts").hidden = !charts;
     if (clock) { renderMeta(); renderTime(); renderClock(); renderPanel(); } else $("summary").innerHTML = "";
     $("tiles").hidden = !(charts && set.tiles && set.tiles.length);
-    $("growthSec").hidden = !(charts && set.growth); $("grMore").hidden = true;
+    $("growthSec").hidden = !(charts && set.growth); $("grMore").hidden = true; renderSubTabs();
     $("finSum").hidden = !(charts && set.summary && set.summary.length);
     $("charts").hidden = !charts || !!set.growth;
     if (charts) { renderTiles(); if (set.growth) renderGrowth(); if (set.summary) renderSummary(); drawCharts(); return; }
@@ -862,7 +874,20 @@ footer b { color: var(--fg); font-weight: 600; }
   }
 
   /* ---------- kasvutaulukko (kansantalous) ---------- */
-  let grMode = "yy", grSel = "bkt";
+  let grMode = "yy", grSel = "bkt", subTab = null;
+  const curTab = () => set.tabs ? (set.tabs.find(x => x.id === subTab) || set.tabs[0]) : null;
+  const tabRows = () => { const tb = curTab(); return tb ? set.growth.filter(r => tb.rows.includes(r.id)) : set.growth; };
+  function renderSubTabs() {
+    const nav = $("subTabs"); nav.hidden = !set.tabs; nav.innerHTML = ""; if (!set.tabs) return;
+    set.tabs.forEach((tb, k) => { const b = document.createElement("button"); b.type = "button"; b.setAttribute("role", "tab"); b.textContent = tb.label;
+      const on = tb.id === curTab().id; b.setAttribute("aria-selected", on); b.tabIndex = on ? 0 : -1;
+      b.onclick = () => { if (tb.id === curTab().id) return; subTab = tb.id; grSel = tb.default || tb.rows[0]; writeHash(); update(); };
+      b.onkeydown = e => { if (e.key !== "ArrowRight" && e.key !== "ArrowLeft") return; e.preventDefault();
+        const n = set.tabs[(k + (e.key === "ArrowRight" ? 1 : set.tabs.length - 1)) % set.tabs.length];
+        subTab = n.id; grSel = n.default || n.rows[0]; writeHash(); update(); const f = [...$("subTabs").children][set.tabs.indexOf(n)]; if (f) f.focus(); };
+      nav.appendChild(b); });
+    const a = nav.querySelector('[aria-selected="true"]'); if (a && nav.scrollWidth > nav.clientWidth) nav.scrollLeft = a.offsetLeft - nav.offsetLeft - 24;
+  }
   $("gr-yy").onclick = () => { grMode = "yy"; renderGrowth(); };
   $("gr-qq").onclick = () => { grMode = "qq"; renderGrowth(); };
   function renderGrowth() {
@@ -870,9 +895,11 @@ footer b { color: var(--fg); font-weight: 600; }
     $("grTitle").textContent = grMode === "yy" ? "Kasvu vuodentakaisesta" : "Kasvu edellisestä neljänneksestä";
     const ser = id => set.series.find(x => x.id === id), N = 8, P = set.periods, n = P.length;
     const lastOf = id => { const a = ser(id + "_" + grMode).values; for (let k = n - 1; k >= 0; k--) if (a[k] != null) return k; return 0; };
-    const end = Math.max(...set.growth.map(r => lastOf(r.id)));         // uusin havainto milla tahansa rivilla
+    const TR = tabRows();
+    if (!TR.some(r => r.id === grSel)) grSel = (curTab() && curTab().default) || TR[0].id;
+    const end = Math.max(...TR.map(r => lastOf(r.id)));                // uusin havainto milla tahansa valilehden rivilla
     const cols = P.slice(Math.max(0, end - N + 1), end + 1), i0 = Math.max(0, end - N + 1);
-    const rows = [...set.growth].sort((a, b) => (b.id === "bkt") - (a.id === "bkt"));
+    const rows = [...TR].sort((a, b) => (b.id === "bkt") - (a.id === "bkt"));
     let h = `<thead><tr><th></th>${cols.map(p => `<th title="${fmtP(p)}">${fmtP(p).replace(/\/20(\d\d)$/, "/$1")}</th>`).join("")}</tr></thead><tbody>`;
     rows.forEach(r => {
       const all = ser(r.id + "_" + grMode).values, a = all.slice(i0, end + 1);
@@ -883,7 +910,7 @@ footer b { color: var(--fg); font-weight: 600; }
         if (v == null) return `<td class="na"></td>`;
         const t = Math.min(1, Math.abs(v) / (2 * sd)), base = r.neutral ? "var(--accent)" : (v >= 0) !== !!r.invert ? "var(--q-up)" : "var(--q-down)";
         return `<td style="background:color-mix(in srgb, ${base} ${Math.round(6 + (r.neutral ? 34 : 46) * t)}%, var(--surface))">${+v.toFixed(1) > 0 ? "+" : ""}${fmtV(v, 1)}</td>`;
-      }).join("") + "</tr>" + (r.gap_after ? `<tr class="gap" aria-hidden="true"><td colspan="${cols.length + 1}"></td></tr>` : "");
+      }).join("") + "</tr>" + (r.gap_after && r !== rows[rows.length - 1] ? `<tr class="gap" aria-hidden="true"><td colspan="${cols.length + 1}"></td></tr>` : "");
     });
     $("grTable").innerHTML = h + "</tbody>";
     const wr = $("grTable").parentElement; wr.scrollLeft = wr.scrollWidth;   // kapealla uusimmat neljannekset nakyviin
@@ -896,6 +923,7 @@ footer b { color: var(--fg); font-weight: 600; }
       tr.onkeydown = e => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); go(true); }
         else if (e.key === "ArrowDown" || e.key === "ArrowUp") { e.preventDefault();
           const rs = [...$("grTable").querySelectorAll("tr.pick")], k = rs.indexOf(tr) + (e.key === "ArrowDown" ? 1 : -1); if (rs[k]) rs[k].focus(); } }; });
+    $("grNeutral").hidden = !TR.some(r => r.neutral);
     renderGKpi();
   }
 
@@ -995,10 +1023,10 @@ footer b { color: var(--fg); font-weight: 600; }
     saveFile(`suhdannetilanne-${slug(set.label)}-${{ raw: "arvo", level: "taso", change: "muutos" }[key]}.csv`, toCSV(rows));
   };
   $("gr-dl").onclick = () => {
-    const ser = id => set.series.find(x => x.id === id), rws = set.growth.filter(r => ser(r.id + "_" + grMode));
+    const ser = id => set.series.find(x => x.id === id), rws = tabRows().filter(r => ser(r.id + "_" + grMode));
     const rows = [["Jakso", ...rws.map(r => `${r.label} ${grMode === "yy" ? "v/v" : "q/q"} %`)]];
     set.periods.forEach((p, i) => { const r = rws.map(x => ser(x.id + "_" + grMode).values[i]); if (r.some(v => v != null)) rows.push([p, ...r]); });
-    saveFile(`suhdannetilanne-kasvu-${grMode}.csv`, toCSV(rows));
+    saveFile(`suhdannetilanne-kasvu-${curTab() ? curTab().id + "-" : ""}${grMode}.csv`, toCSV(rows));
   };
 
   /* ---------- toisto ajassa ---------- */
@@ -1158,14 +1186,15 @@ footer b { color: var(--fg); font-weight: 600; }
   }
   const stepDec = st => Number.isInteger(+st.toFixed(6)) ? 0 : Number.isInteger(+(st * 10).toFixed(6)) ? 1 : 2;   // tikkien desimaalit (2,5 -> 1)
   const chartBox = () => set.growth ? $("grCharts") : $("charts");
-  let colMainH = null, lastMainH = null, lastLower = false;
+  let colMainH = null, lastMainH = null, lastLower = false, sideLeft = false;
   function drawCharts() {
     if (!set.growth) return renderCharts($("charts"));
-    colMainH = null; renderCharts($("grCharts"));
     const two = getComputedStyle($("growthSec")).gridTemplateColumns.split(" ").length > 1;
+    sideLeft = two;                                                    // erittely/tunnusluvut taulukon alle, paakuvio oikealle koko korkeudelta
+    $("grSide").innerHTML = ""; colMainH = null; renderCharts($("grCharts"));
     if (two && lastMainH) {
-      const diff = $("growthSec").querySelector(".grtab").offsetHeight - $("grCharts").offsetHeight;
-      if (Math.abs(diff) > 3) { colMainH = Math.max(lastLower ? 240 : 190, Math.min(560, lastMainH + diff)); renderCharts($("grCharts")); colMainH = null; }
+      const diff = $("growthSec").querySelector(".grleft").offsetHeight - $("grCharts").offsetHeight;
+      if (Math.abs(diff) > 3) { colMainH = Math.max(lastLower ? 240 : 190, Math.min(560, lastMainH + diff)); $("grSide").innerHTML = ""; renderCharts($("grCharts")); colMainH = null; }
     }
   }
   function renderCharts(box = $("charts"), only = null) {
@@ -1175,7 +1204,8 @@ footer b { color: var(--fg); font-weight: 600; }
     const narrow = box.clientWidth < (col ? 420 : 640), colOf = {};
     const gRow = set.growth && set.growth.find(r => r.id === grSel);
     // valitulla rivilla voi olla kontribuutiokuvio (BKT: c.contrib, muut: c.contribs[rivi])
-    let charts = only ? only : !gRow ? set.charts : set.charts.flatMap(c => { if (c.id !== "bktkasvu") return c;
+    const rowCharts = (c, gRow) => {
+      const grSel = gRow.id;
       const fromCb = (cb, id) => ({ ...c, id: id || c.id, title: cb.title, note: cb.note, lines: (cb.lines || [cb.line]).filter(x => ser(x)), bars: undefined, stack: cb.stack.filter(x => ser(x)),
             unit: cb.unit || "%", dec: cb.dec != null ? cb.dec : c.dec, stackUnit: cb.stackUnit, dash: cb.dash, labels: cb.labels, colors: cb.colors, resid: cb.resid });
       const vw = c.views && c.views[gRow.id];               // rivikohtainen viivakuvio (esim. nimellis- ja reaalipalkat)
@@ -1188,7 +1218,12 @@ footer b { color: var(--fg); font-weight: 600; }
       if (vw) return { ...c, ...vw, bars: undefined, stack: undefined };
       const cb = (c.contribs && c.contribs[gRow.id]) || (gRow.id === "bkt" ? c.contrib : null);
       return cb && ser(cb.line) ? fromCb(cb)
-        : { ...c, title: `${gRow.label}: kasvu`, lines: [grSel + "_yy"], bars: grSel + "_qq" }; });
+        : { ...c, title: `${gRow.label}: kasvu`, lines: [grSel + "_yy"], bars: grSel + "_qq" }; };
+    // valilehti: valitun rivin paakuvio ylapariin, valilehden kaikkien rivien lisakuviot ruudukkoon (kukin kerran)
+    let charts = only ? only : !gRow ? set.charts : set.charts.flatMap(c => { if (c.id !== "bktkasvu") return c;
+      const own = [].concat(rowCharts(c, gRow)), seen = new Set(), extra = [];
+      [...tabRows()].sort((a, b) => (b.id === "bkt") - (a.id === "bkt")).forEach(r => [].concat(rowCharts(c, r)).slice(1).forEach(x => { if (seen.has(x.title)) return; seen.add(x.title); extra.push({ ...x, id: `${x.id}_${r.id}` }); }));
+      return [own[0], ...extra]; });
     if (!only) charts = charts.map(c => {                 // taulukosta valittu rivi korvaa parikuvion
       const tb = set.charts.find(t => t.type === "table" && t.pair === c.id && tblSel[t.id]);
       return tb ? rowChart(tb, tblSel[tb.id], c) : c; });
@@ -1366,7 +1401,7 @@ footer b { color: var(--fg); font-weight: 600; }
         const side = document.createElement("div"); side.className = "card fcard";
         const su0 = c.stackUnit != null ? c.stackUnit : "%-yks.";
         side.innerHTML = `<div class="fhead"><h2>Erittely</h2><span class="fval"></span></div><div class="brk"></div>`;
-        tgt.appendChild(side);
+        (sideLeft ? $("grSide") : tgt).appendChild(side);
         const bx = side.querySelector(".brk"), sv = side.querySelector(".fval"), u = c.unit === "%" ? " %" : c.unit ? " " + c.unit : "";
         const sg = (v, d) => (v == null ? "–" : (+v.toFixed(d) > 0 ? "+" : "") + fmtV(v, d));
         const draw = h => {
@@ -1386,11 +1421,11 @@ footer b { color: var(--fg); font-weight: 600; }
       hit.addEventListener("pointerleave", () => chartHooks.forEach(fn => fn(null)));
     });
     if (more) $("grMore").hidden = !more.children.length;
-    if (col && grSel && !box.querySelector(".brk") && ser(grSel + "_yy")) {   // aina toinen kortti: tunnusluvut
+    if (col && grSel && !box.querySelector(".brk") && !$("grSide").querySelector(".brk") && ser(grSel + "_yy")) {   // aina toinen kortti: tunnusluvut
       const gy = ser(grSel + "_yy").values, gq = ser(grSel + "_qq").values, N = set.periods.length;
       const card = document.createElement("div"); card.className = "card fcard";
       card.innerHTML = `<div class="fhead"><h2>Tunnusluvut</h2><span class="fval"></span></div><div class="kv"></div>`;
-      box.appendChild(card);
+      (sideLeft ? $("grSide") : box).appendChild(card);
       const sg1 = v => v == null ? "–" : (+v.toFixed(1) > 0 ? "+" : "") + fmtV(v, 1) + " %";
       const avg = a => { const x = a.filter(v => v != null); return x.length ? x.reduce((s, v) => s + v, 0) / x.length : null; };
       const y0 = set.periods[gy.findIndex(v => v != null)] || set.periods[0], lr = avg(gy);
@@ -1412,6 +1447,22 @@ footer b { color: var(--fg); font-weight: 600; }
     if (b.id === "grCharts") { clearTimeout(rzT); rzT = setTimeout(drawCharts, 150); return; }   // ylapari sovitetaan uudelleen
     if (nw !== lastNarrow) { lastNarrow = nw; renderCharts(b); } });
   function renderAll() { renderHeader(); update(); }
-  renderFoot(); renderAll();
+  const HASH = { suhdanne: "suhdanne", bkt: "reaalitalous", rahoitus: "rahoitus" };
+  function writeHash() {
+    const h = "#" + (HASH[set.id] || set.id) + (set.tabs ? "/" + curTab().id : "");
+    if (location.hash !== h) history.pushState(null, "", h);
+  }
+  function applyHash() {                                               // palauttaa tilan osoitteesta; tuntematon -> oletus
+    const [a, b] = decodeURIComponent(location.hash.slice(1)).split("/");
+    const s = D.sets.find(x => (HASH[x.id] || x.id) === a) || D.sets.find(x => x.default) || D.sets[0];
+    const tb = s.tabs ? (s.tabs.find(x => x.id === b) || s.tabs[0]) : null;
+    const changed = s !== set || (tb && tb.id !== (curTab() || {}).id);
+    if (s !== set) { stopPlay(); set = s; idx = defIdx(s); sel = null; qf = null; }
+    if (tb && (changed || !subTab)) { subTab = tb.id; grSel = tb.default || tb.rows[0]; }
+    return changed;
+  }
+  addEventListener("popstate", () => { if (applyHash()) renderAll(); });
+  addEventListener("hashchange", () => { if (applyHash()) renderAll(); });
+  applyHash(); renderFoot(); renderAll();
 })();
 </script>

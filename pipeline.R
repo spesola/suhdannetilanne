@@ -507,7 +507,7 @@ for (set in cfg$sets) {
     sets_out[[length(sets_out) + 1]] <- list(
       id = set$id, label = set$label, freq = freq, default = isTRUE(set$default), view = "charts",
       from = from_y, periods = periods, charts = set$charts, colors = set$colors,
-      growth = unname(rows),   # kasvunakyma: taulukko ja kuviot (ei karttaa)
+      growth = unname(rows), tabs = set$tabs,   # kasvunakyma: taulukko ja kuviot (ei karttaa), alavalilehdet
       series = unname(lapply(ser, function(x) { r <- raws[[x$id]]
         list(id = x$id, label = x$label, last = r$date[max(which(!is.na(r$value)))], values = r3(r$value[match(periods, r$date)])) })))
     next
