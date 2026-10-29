@@ -482,24 +482,10 @@ for (set in cfg$sets) {
     last_i  <- max(vapply(members, function(s) max(per_idx(raws[[s$id]]$date, freq)), numeric(1)))
     start_i <- per_idx(if (freq == "M") sprintf("%d-01", from_y) else sprintf("%d-Q1", from_y), freq)
     periods <- idx_per(start_i:last_i, freq)
-    # kasvukello: taso = v/v-kasvu standardoituna (ero omaan keskiarvoon), muutos = kasvun kiihtyminen
-    inds <- lapply(Filter(function(s) !isFALSE(s$in_table) && !isFALSE(s$in_clock), members), function(s) {
-      r <- raws[[paste0(s$id, "_yy")]]; r <- r[!is.na(r$value), ]
-      keep <- as.integer(substr(r$date, 1, 4)) >= Z_FROM
-      lvl <- (if (isTRUE(s$invert)) -1 else 1) * (r$value - mean(r$value[keep])) / sd(r$value[keep])
-      dl <- c(NA, diff(lvl)); chg <- dl / sd(dl[keep], na.rm = TRUE)
-      list(id = s$id, label = s$label, group = s$group, kind = "growth", invert = isTRUE(s$invert),
-           in_composite = !isFALSE(s$in_composite), last = r$date[nrow(r)], last_raw = round(tail(r$value, 1), 2),
-           level = r3(lvl[match(periods, r$date)]), change = r3(chg[match(periods, r$date)]))
-    })
-    L <- sapply(Filter(function(x) x$in_composite, inds), function(x) unlist(lapply(x$level, function(v) if (is.null(v)) NA else v)))
-    comp_lvl <- rowMeans(L); dlc <- c(NA, diff(comp_lvl)); comp_chg <- dlc / sd(dlc, na.rm = TRUE)
     sets_out[[length(sets_out) + 1]] <- list(
       id = set$id, label = set$label, freq = freq, default = isTRUE(set$default), view = "charts",
-      from = from_y, periods = periods, charts = set$charts, colors = set$colors, groups = set$groups, lead = set$lead,
-      tail = TAIL_N[[freq]], indicators = unname(inds),
-      composite = list(last = periods[max(which(!is.na(comp_lvl)))], level = r3(comp_lvl), change = r3(comp_chg)),
-      growth = unname(rows),
+      from = from_y, periods = periods, charts = set$charts, colors = set$colors,
+      growth = unname(rows),   # kasvunakyma: taulukko ja kuviot (ei karttaa)
       series = unname(lapply(ser, function(x) { r <- raws[[x$id]]
         list(id = x$id, label = x$label, last = r$date[max(which(!is.na(r$value)))], values = r3(r$value[match(periods, r$date)])) })))
     next
