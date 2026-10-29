@@ -230,8 +230,24 @@ button.dl:hover { text-decoration-color: var(--fg); }
 .fmeta > .dl { margin-left: auto; }
 .fhead > .dl { margin-left: auto; }
 .step.play { font-size: 0.7rem; }
-.fsec { grid-column: 1 / -1; font-size: 1.05rem; color: var(--fg); font-weight: 600; margin: 8px 0 -28px; }
-.fsec:first-child { margin-top: 0; }
+.fsec { grid-column: 1 / -1; font-size: 1.45rem; line-height: 1.2; letter-spacing: -0.01em; color: var(--fg); font-weight: 600; margin: 24px 0 -26px; scroll-margin-top: 64px; }
+.fsec:first-child, .secnav + .fsec { margin-top: 0; }
+.secnav { grid-column: 1 / -1; position: sticky; top: 0; z-index: 5; background: var(--bg); display: flex; gap: 6px; overflow-x: auto; scrollbar-width: none;
+  padding: 10px 0; margin: -10px 0 -30px; border-bottom: 1px solid var(--line); min-width: 0; box-shadow: 0 0 0 100vmax var(--bg); clip-path: inset(0 -100vmax); }
+.secnav::-webkit-scrollbar { display: none; }
+.secnav button { font: inherit; font-size: 0.8rem; white-space: nowrap; color: var(--fg); background: none; border: 1px solid var(--line); border-radius: 999px; padding: 4px 11px; cursor: pointer; }
+.secnav button:hover { border-color: var(--fg); }
+.secnav button.on { background: var(--fg); border-color: var(--fg); color: var(--bg); }
+.legend span.hx::before { background: repeating-linear-gradient(45deg, var(--muted) 0 1.5px, color-mix(in srgb, var(--muted) 18%, var(--surface)) 1.5px 4px); }
+.brk { margin-top: 14px; display: grid; grid-template-columns: minmax(0, 1fr) 46% auto; gap: 7px 10px; align-items: center; font-size: 0.82rem; }
+.brk .bl { color: var(--fg); }
+.brk .bt { font-weight: 600; }
+.brk .bb { position: relative; height: 14px; }
+.brk .bb::before { content: ""; position: absolute; left: 50%; top: -4px; bottom: -4px; border-left: 1px solid var(--muted); opacity: .5; }
+.brk .bb i { position: absolute; top: 0; bottom: 0; border-radius: 2px; background: var(--qc); }
+.brk .bb i.hx { background: repeating-linear-gradient(45deg, var(--muted) 0 1.5px, color-mix(in srgb, var(--muted) 18%, var(--surface)) 1.5px 4px); }
+.brk .bv { text-align: right; font-variant-numeric: tabular-nums; white-space: nowrap; }
+.brk .sep { grid-column: 1 / -1; border-top: 1px solid var(--line); }
 #finSum table { width: 100%; border-collapse: collapse; font-variant-numeric: tabular-nums; font-size: 0.88rem; }
 #finSum th, #finSum td { padding: 7px 6px; border-bottom: 1px solid var(--line); text-align: right; white-space: nowrap; }
 #finSum thead th { font-weight: 500; font-size: 0.74rem; color: var(--muted); text-transform: uppercase; letter-spacing: .08em; }
@@ -254,7 +270,8 @@ table.snap { width: 100%; border-collapse: collapse; font-size: 0.84rem; font-va
 .tcard .snap tr.pick:hover th, .tcard .snap tr.pick:focus-visible th { color: var(--accent); }
 .tcard .snap tr.pick:focus-visible { outline: 2px solid var(--accent); outline-offset: -2px; }
 .tcard .snap tr.on th { color: var(--accent); font-weight: 600; box-shadow: inset 2px 0 0 var(--accent); padding-left: 8px; }
-@media (max-width: 560px) { .snap { font-size: 0.78rem; } .snap th, .snap td { padding: 6px 3px; } .snap thead th:nth-child(3), .snap tbody td:nth-child(3) { display: none; } }
+@media (max-width: 560px) { .snap { font-size: 0.76rem; } .snap th, .snap td { padding: 6px 3px; } .snap thead th { white-space: normal; } .snap .dt { display: block; margin-left: 0; }
+  .snap tbody th { overflow-wrap: anywhere; } .snap thead th:nth-child(3), .snap tbody td:nth-child(3) { display: none; } }
 .fhead h2 { font-family: var(--font-body); font-weight: 600; font-size: 1rem; margin: 0; text-wrap: balance; }
 .fval { font-family: var(--font-data); font-size: 0.82rem; color: var(--muted); font-variant-numeric: tabular-nums; }
 .fval b { font-weight: 500; font-size: 0.95rem; color: var(--fg); }
@@ -270,7 +287,9 @@ table.snap { width: 100%; border-collapse: collapse; font-size: 0.84rem; font-va
 .mini button:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; }
 table.hm { border-collapse: separate; border-spacing: 2px; font-variant-numeric: tabular-nums; font-family: var(--font-data); font-size: 0.78rem; }
 .hm th { font-weight: 400; color: var(--muted); padding: 2px 6px; white-space: nowrap; }
-.hm th.rl { text-align: left; font-family: var(--font-body); font-size: 0.85rem; color: var(--fg); padding-right: 12px; }
+.hm th.rl { text-align: left; font-family: var(--font-body); font-size: 0.85rem; color: var(--fg); padding-right: 12px; position: sticky; left: 0; z-index: 1; background: var(--surface); }
+.hm thead th:first-child { position: sticky; left: 0; z-index: 1; background: var(--surface); }
+@media (max-width: 560px) { .hm th.rl { white-space: normal; min-width: 104px; max-width: 128px; font-size: 0.8rem; line-height: 1.25; padding-right: 6px; } .hm th.rl.sub { padding-left: 8px; font-size: 0.76rem; } }
 .hm td { width: 52px; min-width: 52px; text-align: center; padding: 5px 2px; border-radius: 4px; color: var(--fg); }
 .hm td.na { color: var(--muted); }
 .hm tr.tot th.rl { font-weight: 600; }
@@ -429,6 +448,7 @@ footer b { color: var(--fg); font-weight: 600; }
   const qcol = q => `var(${Q[q].v})`;
   const gcol = g => `var(${GVARS[Math.max(0, set.groups.indexOf(g)) % GVARS.length]})`;
   const fmtP = p => p.includes("Q") ? p.slice(5) + "/" + p.slice(0, 4) : (+p.slice(5)) + "/" + p.slice(0, 4);
+  const thou = s => s.replace(/^\d{4,}/, m => m.replace(/\B(?=(\d{3})+$)/g, "\u00a0"));   // tuhaterotin myos nelinumeroisiin
   const fmtN = v => { const r = Math.round(v * 10) / 10; return (r > 0 ? "+" : r < 0 ? "−" : "") + Math.abs(r).toFixed(1).replace(".", ","); };
   const tick = v => (v > 0 ? "+" : v < 0 ? "−" : "") + Math.abs(v);
   const clip = v => Math.max(-LIM + 0.08, Math.min(LIM - 0.08, v));
@@ -750,7 +770,7 @@ footer b { color: var(--fg); font-weight: 600; }
   $("hm-lvl").onclick = () => { hmMode = "lvl"; update(); };
   $("hm-chg").onclick = () => { hmMode = "chg"; update(); };
   $("hm-raw").onclick = () => { hmMode = "raw"; update(); };
-  const fmtRaw = v => v == null ? "–" : Math.abs(v) >= 1000 ? Math.round(v).toLocaleString("fi-FI")
+  const fmtRaw = v => v == null ? "–" : Math.abs(v) >= 1000 ? (v < 0 ? "−" : "") + thou(String(Math.round(Math.abs(v))))
     : (+v.toFixed(1) < 0 ? "−" : "") + Math.abs(v).toFixed(1).replace(".", ",");
   function renderHM() {
     const N = set.freq === "M" ? 12 : 8, start = Math.max(0, idx - N + 1);
@@ -842,7 +862,7 @@ footer b { color: var(--fg); font-weight: 600; }
   }
 
   /* ---------- markkinaruudut: paivittaiset sarjat ---------- */
-  const fmtNum = (v, dec) => v.toLocaleString("fi-FI", { minimumFractionDigits: dec, maximumFractionDigits: dec });
+  const fmtNum = (v, dec) => (v < 0 ? "−" : "") + thou(Math.abs(v).toFixed(dec).replace(".", ","));
   const fmtDay = d => `${+d.slice(8, 10)}.${+d.slice(5, 7)}.${d.slice(0, 4)}`;
   function renderTiles() {
     const box = $("tiles"); box.innerHTML = "";
@@ -883,14 +903,23 @@ footer b { color: var(--fg); font-weight: 600; }
   const LINE_COLS = ["var(--accent)", "var(--g2)", "var(--fg)", "var(--q-turn)"];
   const STACK_COLS = ["var(--g1)", "var(--g2)", "var(--g3)", "#c9a56b", "var(--g5)", "#b9c0c8", "#8fb0a6"];
   const fmtV = (v, dec) => { if (v == null) return "–"; const r = +v.toFixed(dec), a = Math.abs(r);
-    return (r < 0 ? "−" : "") + (a >= 10000 ? a.toLocaleString("fi-FI", { minimumFractionDigits: dec, maximumFractionDigits: dec }) : a.toFixed(dec).replace(".", ",")); };
+    return (r < 0 ? "−" : "") + thou(a.toFixed(dec).replace(".", ",")); };
   const withU = (v, c) => fmtV(v, c.dec) + (c.unit ? (c.unit === "%" ? " %" : " " + c.unit) : "");
   const niceStep = r => { if (!(r > 0)) return 1;                   // 1, 2, 2,5 tai 5 kertaa 10^k, enintaan noin 5 valia
     const m = Math.pow(10, Math.floor(Math.log10(r / 5)));
     return [1, 2, 2.5, 5, 10].map(f => f * m).find(st => r / st <= 5); };
   const lastNN = a => { for (let k = a.length - 1; k >= 0; k--) if (a[k] != null) return k; return -1; };
   const pctile = (a, v) => { const xs = a.filter(x => x != null); return Math.round(100 * xs.filter(x => x < v).length / xs.length); };
-  let chartHooks = [];
+  let chartHooks = [], secRaf = 0;
+  function secSync() {                                                 // aktiivinen osio: viimeinen otsikko ylareunan ylapuolella
+    const nav = document.querySelector("#charts .secnav"); if (!nav || $("charts").hidden) return;
+    const hs = [...$("charts").querySelectorAll(".fsec")]; let k = 0;
+    const end = innerHeight + scrollY >= document.documentElement.scrollHeight - 4;   // sivun lopussa viimeinen nakyva osio
+    hs.forEach((h, j) => { if (h.getBoundingClientRect().top < (end ? innerHeight * 0.6 : 90)) k = j; });
+    nav.querySelectorAll("button").forEach((b, j) => { const on = j === k;
+      if (on && !b.classList.contains("on") && nav.scrollWidth > nav.clientWidth) nav.scrollTo({ left: b.offsetLeft - nav.offsetLeft - 24, behavior: "smooth" });
+      b.classList.toggle("on", on); }); }
+  addEventListener("scroll", () => { if (!secRaf) secRaf = requestAnimationFrame(() => { secRaf = 0; secSync(); }); }, { passive: true });
 
   /* ---------- CSV-lataus: puolipiste ja desimaalipilkku (Excel fi), UTF-8 BOM ---------- */
   let dlP = null;
@@ -1050,7 +1079,7 @@ footer b { color: var(--fg); font-weight: 600; }
       const cb = (c.contribs && c.contribs[gRow.id]) || (gRow.id === "bkt" ? c.contrib : null);
       return cb && ser(cb.line)
         ? { ...c, title: cb.title, note: cb.note, lines: (cb.lines || [cb.line]).filter(id => ser(id)), bars: undefined, stack: cb.stack.filter(id => ser(id)),
-            unit: cb.unit || "%", dec: cb.dec != null ? cb.dec : c.dec, stackUnit: cb.stackUnit, dash: cb.dash, labels: cb.labels, colors: cb.colors }
+            unit: cb.unit || "%", dec: cb.dec != null ? cb.dec : c.dec, stackUnit: cb.stackUnit, dash: cb.dash, labels: cb.labels, colors: cb.colors, resid: cb.resid }
         : { ...c, title: `${gRow.label}: kasvu`, lines: [grSel + "_yy"], bars: grSel + "_qq" }; });
     if (!only) charts = charts.map(c => {                 // taulukosta valittu rivi korvaa parikuvion
       const tb = set.charts.find(t => t.type === "table" && t.pair === c.id && tblSel[t.id]);
@@ -1059,6 +1088,14 @@ footer b { color: var(--fg); font-weight: 600; }
     charts.forEach(c => { if (!c.lines) return; if (c.colors) Object.assign(colOf, c.colors); else if (c.lineColor) colOf[c.lines[0]] = c.lineColor; });
     charts.forEach(c => (c.lines || []).forEach((id, k) => { if (!(id in colOf)) colOf[id] = LINE_COLS[k % LINE_COLS.length]; }));
     let lastSec = null;
+    const secs = [...new Set(charts.map(c => c.section).filter(Boolean))];
+    if (secs.length > 2) {                                               // pitka sivu: osioiden pikalinkit, kiinnittyy ylareunaan
+      const nav = document.createElement("nav"); nav.className = "secnav"; nav.setAttribute("aria-label", "Osiot");
+      secs.forEach((s, k) => { const b = document.createElement("button"); b.type = "button"; b.textContent = s;
+        b.onclick = () => box.querySelectorAll(".fsec")[k].scrollIntoView({ behavior: "smooth", block: "start" }); nav.appendChild(b); });
+      box.appendChild(nav);
+      secSync();
+    }
     charts.forEach(c0 => {
       if (c0.section && c0.section !== lastSec) {                        // valiotsikko osioiden valiin
         const h = document.createElement("h3"); h.className = "fsec"; h.textContent = c0.section; box.appendChild(h); lastSec = c0.section; }
@@ -1080,7 +1117,7 @@ footer b { color: var(--fg); font-weight: 600; }
       if (c.lines.length > 1 || c.bars || c.stack) {
         const lg = document.createElement("div"); lg.className = "legend";
         lg.innerHTML = c.lines.map(id => `<span${(c.dash || []).includes(id) ? ' class="ds"' : ""} style="--qc:${colOf[id]}">${lbl(id)}${(c.y2 || []).includes(id) ? " (oikea akseli)" : ""}</span>`).join("") +
-          (c.stack || []).map((id, k) => `<span class="sq" style="--qc:${STACK_COLS[k % STACK_COLS.length]}">${ser(id).label}</span>`).join("") +
+          (c.stack || []).map((id, k) => `<span class="sq${(c.resid || []).includes(id) ? " hx" : ""}" style="--qc:${STACK_COLS[k % STACK_COLS.length]}">${ser(id).label}</span>`).join("") +
           (!c.bars ? "" : c.barsNeutral ? `<span style="--qc:var(--g3)">${ser(c.bars).label} (palkit)</span>`
             : `<span style="--qc:var(--q-up)">${(c.barsLegend || [])[0] || "Normaali käyrä"}</span><span style="--qc:var(--q-down)">${(c.barsLegend || [])[1] || "Käänteinen käyrä"}</span>`);
         fm.appendChild(lg);
@@ -1139,12 +1176,16 @@ footer b { color: var(--fg); font-weight: 600; }
         B.forEach((v, i) => { if (v == null) return;
           el("rect", { x: xs(i) - bw / 2, y: Math.min(ys(0), ys(v)), width: bw + 0.3, height: Math.abs(ys(v) - ys(0)),
             fill: c.barsNeutral ? "var(--g3)" : v >= 0 ? "var(--q-up)" : "var(--q-down)", "fill-opacity": c.barsNeutral ? 0.22 : 0.26 }, svg); }); }
+      const hid = `hx-${c.id}`;
+      if ((c.resid || []).length) { const pt = el("pattern", { id: hid, width: 4, height: 4, patternUnits: "userSpaceOnUse", patternTransform: "rotate(45)" }, el("defs", {}, svg));
+        el("rect", { width: 4, height: 4, fill: "color-mix(in srgb, var(--muted) 18%, var(--surface))" }, pt);
+        el("line", { x1: 0, y1: 0, x2: 0, y2: 4, stroke: "var(--muted)", "stroke-width": 1.5 }, pt); }
       if (S.length) { const bw = (W2 - ml - mr) / n * 0.78;   // pinotut kontribuutiot: positiiviset ylos, negatiiviset alas
         P.forEach((_, i) => { let up = 0, dn = 0;
           S.forEach((s, k) => { const v = s[i]; if (v == null || v === 0) return;
             const y0 = v > 0 ? up : dn, y1 = y0 + v; if (v > 0) up = y1; else dn = y1;
             el("rect", { x: xs(i) - bw / 2, y: ys(Math.max(y0, y1)), width: bw, height: Math.abs(ys(y1) - ys(y0)),
-              fill: STACK_COLS[k % STACK_COLS.length], "fill-opacity": 0.82 }, svg); }); }); }
+              fill: (c.resid || []).includes(c.stack[k]) ? `url(#${hid})` : STACK_COLS[k % STACK_COLS.length], "fill-opacity": (c.resid || []).includes(c.stack[k]) ? 0.7 : 0.82 }, svg); }); }); }
       const path = (a, step, yf = ys) => { let d = "", pen = false;
         a.forEach((v, i) => { if (v == null) { if (!c.connect) pen = false; return; }   // connect: harva sarja (nelj.) yhtenaisena
           d += pen ? (step ? `H${xs(i).toFixed(1)}V${yf(v).toFixed(1)}` : `L${xs(i).toFixed(1)} ${yf(v).toFixed(1)}`) : `M${xs(i).toFixed(1)} ${yf(v).toFixed(1)}`; pen = true; }); return d; };
@@ -1195,6 +1236,22 @@ footer b { color: var(--fg); font-weight: 600; }
         }
       };
       show(null); chartHooks.push(show);
+      if (S.length && c.size === "tt" && !narrow) {                     // kolmannes tyhjaa tilaa: valitun jakson erittely
+        const side = document.createElement("div"); side.className = "card fcard";
+        side.innerHTML = `<div class="fhead"><h2>Erittely</h2><span class="fval"></span></div><p class="fsub">${c.stackUnit != null ? (c.stackUnit ? "Kontribuutiot, " + c.stackUnit : "Kontribuutiot") : "Kontribuutiot, %-yks."}</p><div class="brk"></div>`;
+        box.appendChild(side);
+        const bx = side.querySelector(".brk"), sv = side.querySelector(".fval"), u = c.unit === "%" ? " %" : c.unit ? " " + c.unit : "";
+        const sg = (v, d) => (v == null ? "–" : (+v.toFixed(d) > 0 ? "+" : "") + fmtV(v, d));
+        const draw = h => {
+          const i = h == null ? lastNN(L[0]) : Math.max(0, Math.min(n - 1, h - i0)), g = L[0][i];
+          const vals = S.map(s => s[i]), mx = Math.max(Math.abs(g || 0), ...vals.map(v => Math.abs(v || 0)), 0.1);
+          const bar = (v, col, cls) => { if (v == null) return `<span class="bb"></span>`; const w = Math.abs(v) / mx * 50;
+            return `<span class="bb"><i class="${cls || ""}" style="--qc:${col};left:${v >= 0 ? 50 : 50 - w}%;width:${Math.max(w, 0.6)}%"></i></span>`; };
+          sv.textContent = fmtP(P[i]);
+          bx.innerHTML = `<span class="bl bt">${lbl(c.lines[0])}</span>${bar(g, "var(--fg)")}<span class="bv bt">${sg(g, c.dec)}${u}</span><span class="sep"></span>` +
+            c.stack.map((id, k) => `<span class="bl">${ser(id).label}</span>${bar(vals[k], STACK_COLS[k % STACK_COLS.length], (c.resid || []).includes(id) ? "hx" : "")}<span class="bv">${sg(vals[k], c.dec)}</span>`).join(""); };
+        draw(null); chartHooks.push(draw);
+      }
       const hit = el("rect", { x: ml, y: mt, width: W2 - ml - mr, height: H2 - mt - mb, fill: "transparent" }, svg);
       hit.addEventListener("pointermove", e => { const r = svg.getBoundingClientRect();
         const i = Math.max(0, Math.min(n - 1, Math.round(((e.clientX - r.left) / r.width * W2 - ml) / (W2 - ml - mr) * (n - 1))));

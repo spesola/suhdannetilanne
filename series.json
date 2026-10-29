@@ -293,7 +293,10 @@
               "k_netto",
               "k_muu"
             ],
-            "note": "Edellisen vuoden hinnoin. Lähde: Tilastokeskus."
+            "note": "Edellisen vuoden hinnoin. Lähde: Tilastokeskus.",
+            "resid": [
+              "k_muu"
+            ]
           },
           "contribs": {
             "tyottomat": {
@@ -1094,13 +1097,13 @@
       "table": "ttvi/14mh.px",
       "pick": {
         "toimiala_78_20180201": "BTD",
-        "contentscode": "ttvi-Trendi"
+        "contentscode": "ttvi-Kausitasoitettu"
       },
-      "handling": "trend",
+      "handling": "none",
       "kind": "volume",
       "invert": false,
       "unit": "ind. 2021=100",
-      "raw_desc": "Trendisarja"
+      "raw_desc": "Kausitasoitettu sarja"
     },
     {
       "id": "kapasiteetti",
@@ -1130,13 +1133,13 @@
       "table": "ktkk/132f.px",
       "pick": {
         "toimiala_79_20180101": "SSS",
-        "contentscode": "ind_trendi_2015"
+        "contentscode": "ind_kausit_2015"
       },
-      "handling": "trend",
+      "handling": "none",
       "kind": "volume",
       "invert": false,
       "unit": "ind. 2015=100",
-      "raw_desc": "Trendisarja"
+      "raw_desc": "Kausitasoitettu sarja"
     },
     {
       "id": "rak_alo",
@@ -1183,13 +1186,13 @@
       "source": "statfin",
       "table": "tyti/135z.px",
       "pick": {
-        "contentscode": "tyollaste_15_64_trendi"
+        "contentscode": "Tyollaste_15_64_kausi"
       },
-      "handling": "trend",
+      "handling": "none",
       "kind": "balance",
       "invert": false,
       "unit": "%",
-      "raw_desc": "Trendisarja, 15–64-vuotiaat"
+      "raw_desc": "Kausitasoitettu sarja, 15–64-vuotiaat"
     },
     {
       "id": "tyottom",
@@ -1199,13 +1202,13 @@
       "source": "statfin",
       "table": "tyti/135z.px",
       "pick": {
-        "contentscode": "tyottaste_trendi"
+        "contentscode": "Tyottaste_kausi"
       },
-      "handling": "trend",
+      "handling": "none",
       "kind": "balance",
       "invert": true,
       "unit": "%",
-      "raw_desc": "Trendisarja"
+      "raw_desc": "Kausitasoitettu sarja"
     },
     {
       "id": "avoimet",
