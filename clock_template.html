@@ -868,7 +868,7 @@ footer b { color: var(--fg); font-weight: 600; }
 
   /* ---------- kasvutaulukko (kansantalous) ---------- */
   let grMode = "yy", grSel = "bkt";
-  // aiheet (series.json: tabs): valitun rivin aiheen kaikki lisakuviot naytetaan ruudukossa, esim. tyottomat -> tyomarkkinat
+  // aiheryhmat (series.json: tabs): ryhman riveilla yhteiset lisakuviot (tyottomat ja tyotunnit -> kaikki tyomarkkinakuviot), muilla rivin omat
   const curTab = () => set.tabs ? (set.tabs.find(x => x.rows.includes(grSel)) || null) : null;
   const tabRows = () => { const tb = curTab(); return tb ? set.growth.filter(r => tb.rows.includes(r.id)) : set.growth.filter(r => r.id === grSel); };
   $("gr-yy").onclick = () => { grMode = "yy"; renderGrowth(); };

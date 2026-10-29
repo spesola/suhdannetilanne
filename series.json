@@ -718,21 +718,6 @@
       ],
       "tabs": [
         {
-          "id": "bkt",
-          "label": "BKT ja kysyntä",
-          "rows": [
-            "bkt",
-            "bkt_kulutus",
-            "bkt_julk",
-            "bkt_inv",
-            "inv_yks",
-            "inv_julk",
-            "bkt_vienti",
-            "bkt_tuonti"
-          ],
-          "default": "bkt"
-        },
-        {
           "id": "tyomarkkinat",
           "label": "Työmarkkinat",
           "rows": [
@@ -748,15 +733,6 @@
             "asuntohinnat"
           ],
           "default": "asuntohinnat"
-        },
-        {
-          "id": "hinnat",
-          "label": "Hinnat ja palkat",
-          "rows": [
-            "inflaatio",
-            "palkat"
-          ],
-          "default": "inflaatio"
         }
       ]
     },
