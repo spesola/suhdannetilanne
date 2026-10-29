@@ -44,7 +44,8 @@ idx_per <- function(i, freq) {
 }
 
 get_text <- function(url) {
-  r <- RETRY("GET", url, timeout(40), times = 3, pause_base = 2, quiet = TRUE)
+  px <- grepl("pxdata.stat.fi", url, fixed = TRUE)   # Tilastokeskus rajoittaa kyselytiheytta (429): odota rajoitusikkuna yli
+  r <- RETRY("GET", url, timeout(40), times = if (px) 5 else 3, pause_base = if (px) 5 else 2, pause_min = if (px) 11 else 1, quiet = TRUE)
   stop_for_status(r)
   content(r, "text", encoding = "UTF-8")
 }
@@ -236,7 +237,7 @@ fetch_series <- function(s) {
     write.csv(x, cache, row.names = FALSE); x
   }, error = function(e) {
     if (!file.exists(cache)) stop("Haku epaonnistui eika valimuistia ole: ", s$id, " (", conditionMessage(e), ")")
-    message("  VAROITUS ", s$id, ": lahde ei vastannut, kaytetaan valimuistia (", format(file.mtime(cache), "%d.%m.%Y"), ")")
+    message("  VAROITUS ", s$id, ": lahde ei vastannut, kaytetaan valimuistia (", format(file.mtime(cache), "%d.%m.%Y"), "): ", conditionMessage(e))
     STALE <<- c(STALE, s$id)
     read.csv(cache, colClasses = c("character", "numeric"))
   })
