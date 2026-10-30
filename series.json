@@ -639,6 +639,22 @@
                 "unit": "%",
                 "dec": 1,
                 "note": "Kiinteän pääoman bruttomuodostus käyvin hinnoin, kausitasoitettu. Lähde: Tilastokeskus."
+              },
+              {
+                "title": "Rakentamisen liikevaihdon volyymi (2021=100)",
+                "lines": [
+                  "x_rlv_41",
+                  "x_rlv_42",
+                  "x_rlv_43"
+                ],
+                "colors": {
+                  "x_rlv_41": "var(--q-down)",
+                  "x_rlv_42": "var(--g3)",
+                  "x_rlv_43": "var(--accent)"
+                },
+                "unit": "",
+                "dec": 1,
+                "note": "Myynnin määrä, kausitasoitettu, neljänneksen keskiarvo. Lähde: Tilastokeskus, rakentamisen liikevaihtokuvaaja."
               }
             ],
             "bkt_vienti": [
@@ -4821,6 +4837,48 @@
       "pick": {
         "nace_8_20180101": "ATX",
         "contentscode": "ktps-alkuperainen"
+      },
+      "to_quarter": true
+    },
+    {
+      "id": "x_rlv_41",
+      "label": "Talonrakentaminen",
+      "set": "bkt",
+      "chart_only": true,
+      "source": "statfin",
+      "table": "rlv/14lz.px",
+      "pick": {
+        "nace_8_20180101": "F41",
+        "luokkaryhma_2_20180301": "mi",
+        "contentscode": "rlv-kausitasoitettu"
+      },
+      "to_quarter": true
+    },
+    {
+      "id": "x_rlv_42",
+      "label": "Maa- ja vesirakentaminen",
+      "set": "bkt",
+      "chart_only": true,
+      "source": "statfin",
+      "table": "rlv/14lz.px",
+      "pick": {
+        "nace_8_20180101": "F42",
+        "luokkaryhma_2_20180301": "mi",
+        "contentscode": "rlv-kausitasoitettu"
+      },
+      "to_quarter": true
+    },
+    {
+      "id": "x_rlv_43",
+      "label": "Erikoistunut rakentaminen",
+      "set": "bkt",
+      "chart_only": true,
+      "source": "statfin",
+      "table": "rlv/14lz.px",
+      "pick": {
+        "nace_8_20180101": "F43",
+        "luokkaryhma_2_20180301": "mi",
+        "contentscode": "rlv-kausitasoitettu"
       },
       "to_quarter": true
     }
