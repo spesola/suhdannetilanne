@@ -910,7 +910,7 @@ footer b { color: var(--fg); font-weight: 600; }
     $("grTable").innerHTML = h + "</tbody>";
     const wr = $("grTable").parentElement; wr.scrollLeft = wr.scrollWidth;   // kapealla uusimmat neljannekset nakyviin
     $("grTable").querySelectorAll("tr.pick").forEach(tr => {
-      const go = kb => { grSel = tr.dataset.id; renderGrowth(); drawCharts(); history.replaceState(null, "", hashFor());
+      const go = kb => { grSel = tr.dataset.id; renderGrowth(); drawCharts(); if (location.hash !== hashFor()) history.pushState(null, "", hashFor());   // rivin vaihto historiaan: takaisin palaa edelliseen
         if (kb) { const f = $("grTable").querySelector(`tr[data-id="${grSel}"]`); if (f) f.focus(); return; }   // nappaimisto: kohdistus pysyy rivilla
         const col = $("grCharts"), r = col.getBoundingClientRect();     // allekkain (kapea): kuvio nakyviin
         if (getComputedStyle($("growthSec")).gridTemplateColumns.split(" ").length === 1 && r.top > innerHeight * 0.4) col.scrollIntoView({ behavior: "smooth", block: "start" }); };
@@ -1376,7 +1376,7 @@ footer b { color: var(--fg); font-weight: 600; }
           let j = i; while (j > 0 && L.every(a => a[j] == null)) j--;
           if (valEl) valEl.innerHTML = `${fmtP(P[j])}`;
           const sg = v => c.ts && !c.rawv && v > 0 ? "+" : "";
-          subEl.textContent = (c.ts ? `${fmtP(P[j])}: ` : "") +
+          subEl.textContent = (c.ts ? `${fmtP(P[j])}: ` : c.avg ? `${fmtP(P[j])} keskiarvo: ` : "") +   // avg: kuukausisarjat neljanneksen keskiarvona
             c.lines.map(id => { const v = L[c.lines.indexOf(id)][j]; return `${lbl(id)} ${sg(v)}${fmtV(v, c.dec)}${c.unit === "%" ? " %" : ""}`; }).join(", ") +
             (LW && LW[j] != null ? `, ${c.lower.label} ${LW[j] > 0 ? "+" : ""}${fmtV(LW[j], c.lower.dec != null ? c.lower.dec : 1)}` : "") + ".";
         } else {
