@@ -613,25 +613,78 @@ for (set in cfg$sets) {
     indicators = unname(inds), series = unname(cser), contribs = contribs)
 }
 
+# ---------------------------------------------------------------------
+# Lahdeluettelo generoidaan kaytossa olevista sarjoista: tuntematon koodi -> tarkistushuomio
+# ---------------------------------------------------------------------
+SRC_NAMES <- list(
+  statfin  = list(.n = "Tilastokeskus", ntp = "kansantalouden tilinpito", jtume = "julkisyhteisöjen tulot ja menot",
+                  tyti = "työvoimatutkimus", atp = "avoimet työpaikat", tyonv = "työnvälitystilasto", ati = "ansiotasoindeksi",
+                  ktps = "palkkasummakuvaajat", khi = "kuluttajahintaindeksi", kbar = "kuluttajabarometri",
+                  ashi = "osakeasuntojen hinnat", asvu = "asuntojen vuokrat", raku = "rakennus- ja asuntotuotanto",
+                  rlv = "rakentamisen liikevaihtokuvaaja", ttvi = "teollisuustuotanto", teul = "teollisuuden uudet tilaukset",
+                  ktkk = "tuotannon suhdannekuvaaja", kony = "konkurssit"),
+  eurostat = list(.n = "Eurostat", ei_bsin_m_r2 = "Euroopan komission luottamuskyselyt", ei_bsbu_m_r2 = "Euroopan komission luottamuskyselyt",
+                  ei_bsrt_m_r2 = "Euroopan komission luottamuskyselyt", ei_bsse_m_r2 = "Euroopan komission luottamuskyselyt",
+                  ei_bsin_q_r2 = "kapasiteetin käyttöaste", sts_trtu_m = "vähittäiskaupan liikevaihto", sts_setu_m = "palvelujen liikevaihto",
+                  prc_hicp_minr = "YKHI", prc_hicp_iw = "YKHI-painot", namq_10_gdp = "BKT vertailumaissa",
+                  bop_c6_q = "maksutase", ext_st_27_2020msbec = "tavarakauppa"),
+  bof      = list(.n = "Suomen Pankki", .all = "luotonanto ja lainojen korot"),
+  ecb      = list(.n = "EKP", FM = "markkinakorot", EST = "€STR", YC = "tuottokäyrä", IRS = "valtionlainojen korot", EXR = "valuuttakurssit",
+                  CISS = "rahoitusstressi", CLIFS = "rahoitusstressi", BLS = "pankkien luotonantokysely", SPF = "ammattiennustajien kysely"),
+  wb       = list(.n = "Maailmanpankki", .all = "raaka-aineiden hinnat, Pink Sheet"),
+  fred     = list(.n = "FRED", EUEPUINDXM = "talouspoliittisen epävarmuuden indeksi", GS10 = "Yhdysvaltain korot © OECD",
+                  FEDFUNDS = "Yhdysvaltain korot © OECD", IRLTLT01JPM156N = "Japanin korot © OECD", IRSTCI01JPM156N = "Japanin korot © OECD",
+                  DCOILBRENTEU = "Brent ja WTI © EIA", DCOILWTICO = "Brent ja WTI © EIA"))
+src_used <- list()
+src_add <- function(p, code) {
+  nm <- SRC_NAMES[[p]]; it <- if (!is.null(nm$.all)) nm$.all else nm[[code]]
+  if (is.null(it)) { CHECKS <<- c(CHECKS, sprintf("lähdeluettelo: nimi puuttuu (%s %s)", p, code)); return() }
+  src_used[[p]] <<- unique(c(src_used[[p]], it)) }
+src_walk <- function(x) {
+  if (!is.list(x)) return()
+  sc <- x$source
+  if (!is.null(sc)) {
+    if (sc == "statfin" || (sc == "splice" && !is.null(x$table))) src_add("statfin", sub("/.*", "", x$table))
+    else if (sc == "eurostat") src_add("eurostat", x$ds)
+    else if (sc == "ecb") src_add("ecb", x$flow)
+    else if (sc == "fred") src_add("fred", x$fred_id)
+    else if (sc %in% c("bof", "wb")) src_add(sc, "")
+    else if (sc == "ntp_ctrb") src_add("statfin", "ntp")
+    else if (sc == "hicp_ctrb") { src_add("eurostat", "prc_hicp_minr"); src_add("eurostat", "prc_hicp_iw") }
+  } else if (!is.null(x$table)) src_add("statfin", sub("/.*", "", x$table))   # splice-osat
+  for (k in setdiff(names(x), "pick")) if (is.list(x[[k]])) src_walk(x[[k]])
+  if (is.null(names(x))) for (v in x) src_walk(v)
+}
+for (s in Filter(function(s) !isFALSE(s$enabled), cfg$series)) src_walk(s)
+sources_out <- lapply(intersect(names(SRC_NAMES), names(src_used)), function(p)
+  list(name = SRC_NAMES[[p]]$.n, items = I(intersect(unique(unlist(SRC_NAMES[[p]][names(SRC_NAMES[[p]]) != ".n"])), src_used[[p]]))))   # jarjestys SRC_NAMES:n mukaan
+
 out <- list(
   meta = list(
     generated = format(Sys.time(), "%Y-%m-%dT%H:%M:%S%z"),
     stale = STALE,
-    method = paste0("Taso: kohinasuodatetun sarjan (HP-suodin, λ = ", LAMBDA_S[["M"]], " kuukausisarjoille, ",
-                    LAMBDA_S[["Q"]], " neljännessarjoille) poikkeama pitkän aikavälin HP-trendistä (λ = ",
+    method = paste0("Suhdannetilanne: kunkin sarjan taso on kohinasuodatetun sarjan (HP-suodin, λ = ", LAMBDA_S[["M"]],
+                    " kuukausisarjoille, ", LAMBDA_S[["Q"]], " neljännessarjoille) poikkeama pitkän aikavälin HP-trendistä (λ = ",
                     format(LAMBDA[["M"]], big.mark = " "), " kuukausisarjoille, ", format(LAMBDA[["Q"]], big.mark = " "),
                     " neljännessarjoille), volyymeille log-muodossa, standardoitu vuodesta ", Z_FROM, " alkaen. ",
-                    "Muutos: tason muutos edellisestä jaksosta jaettuna sen keskihajonnalla. Käännetyissä sarjoissa (",
-"työttömyysaste ja konkurssit, Reaalitaloudessa työttömät) etumerkki on vaihdettu, joten ylhäällä = parempi. Majoitus- ja ravitsemuspalveluiden liikevaihto ",
-                    "on deflatoitu alan kuluttajahintaindeksillä (HICP CP11), koska Eurostat ei julkaise Suomelle volyymisarjaa. ",
-                    "Reaalitalous: q/q kausitasoitetusta sarjasta, v/v työpäiväkorjatusta (tilinpito) tai ",
-                    "alkuperäisestä sarjasta (inflaatio, asuntohinnat, ansiot, työttömät), kuten virallisissa tilastoissa."),
+                    "Muutos on tason muutos edellisestä jaksosta jaettuna sen keskihajonnalla. Käännetyissä sarjoissa ",
+                    "(työttömyysaste, konkurssit) etumerkki on vaihdettu, joten ylhäällä = parempi. Majoitus- ja ravitsemuspalvelujen ",
+                    "myynti on deflatoitu alan kuluttajahintaindeksillä, koska Eurostat ei julkaise Suomelle volyymisarjaa."),
+    growth = paste0("Reaalitalous: q/q kausitasoitetusta sarjasta, v/v työpäiväkorjatusta (tilinpito) tai alkuperäisestä sarjasta ",
+                    "(inflaatio, asuntohinnat, ansiot, työttömät), kuten virallisissa tilastoissa. Taulukon värin voimakkuus on muutos ",
+                    "suhteessa sarjan keskihajontaan vuodesta 2015 ilman vuosia 2020–2021. Kontribuutiot on laskettu edellisen vuoden ",
+                    "hinnoin, jolloin osat summautuvat kasvuun; erotus näkyy viivoitettuna jäännöksenä. Rahoitusjäämät ja vaihtotase ovat ",
+                    "neljän neljänneksen summia suhteessa saman jakson BKT:hen. Kuukausisarjat näytetään neljänneksen keskiarvoina. ",
+                    "Tilastokeskuksen vuokraindeksi on ketjutettu perusvuoden vaihdon (2025) yli päällekkäisen vuoden keskiarvolla. ",
+                    "Avoimien työpaikkojen aste on avoimet työpaikat / (avoimet + työlliset), ja sarjat, joille ei julkaista ",
+                    "kausitasoitettua versiota, on kausitasoitettu STL-menetelmällä."),
     charts = paste0("Rahoitusmarkkinat: taulukoissa päivä- tai kuukausiarvot, kuvioissa kuukausiarvot ",
                     "(kuukausikeskiarvo tai kuun viimeinen havainto, ks. kuvion huomautus). ",
                     "Riskilisä on Suomen ja Saksan 10 vuoden korkojen ero."),
     caveat = paste0("Trendisuotimen loppupisteet tarkentuvat uuden datan myötä, ",
                     "joten viimeisimmät pisteet voivat siirtyä."),
-    composite = "Kokonaisindikaattori: sarjojen tasojen keskiarvo jaksoilta, joilla kaikki sarjat ovat saatavilla. BKT ei ole mukana keskiarvossa."),
+    composite = "Kokonaisindikaattori: sarjojen tasojen keskiarvo jaksoilta, joilla kaikki sarjat ovat saatavilla. BKT ei ole mukana keskiarvossa.",
+    sources = sources_out),
   sets = sets_out)
 
 # ---------------------------------------------------------------------

@@ -177,6 +177,7 @@ body { font-variant-numeric: tabular-nums; background: var(--bg); min-height: 10
 .legend { display: flex; flex-wrap: wrap; gap: 14px; font-size: 0.8rem; color: var(--muted); margin-top: 8px; }
 .legend span.sq::before { height: 10px; width: 10px; border-radius: 2px; vertical-align: -1px; }
 .legend span::before { content: ""; display: inline-block; width: 14px; height: 3px; border-radius: 2px; background: var(--qc); vertical-align: middle; margin-right: 6px; }
+.legend.hide, .legend.nostack span.st { display: none; }
 .legend span.ds::before { background: repeating-linear-gradient(90deg, var(--qc) 0 4px, transparent 4px 7px); }
 .legend.dots span::before { width: 7px; height: 7px; border-radius: 50%; vertical-align: 0; }
 
@@ -229,6 +230,7 @@ button.dl:hover { text-decoration-color: var(--fg); }
 .fmeta .legend { margin-top: 0; }
 .fmeta > .dl { margin-left: auto; }
 .fhead > .dl { margin-left: auto; }
+.fmeta > .dl + .dl, .fhead > .dl + .dl { margin-left: 12px; }
 .step.play { font-size: 0.7rem; }
 .fsec { grid-column: 1 / -1; font-size: 1.45rem; line-height: 1.2; letter-spacing: -0.01em; color: var(--fg); font-weight: 600; margin: 24px 0 -26px; scroll-margin-top: 64px; }
 .fsec:first-child, .secnav + .fsec { margin-top: 0; }
@@ -859,9 +861,9 @@ footer b { color: var(--fg); font-weight: 600; }
   $("tab-hm").onclick = () => { setTab("hm"); update(); };
 
   function renderFoot() {
-    $("foot").innerHTML = `<p>Suomen talouden suhdannetilanne avoimista tilastoista. Päivittyy arkisin.</p><details><summary>Menetelmä ja lähteet</summary><div class="fbody"><p><b>Menetelmä.</b> ${D.meta.method}</p><p>${D.meta.composite}</p><p>${D.meta.charts || ""}</p>
+    $("foot").innerHTML = `<p>Suomen talouden suhdannetilanne avoimista tilastoista. Päivittyy arkisin.</p><details><summary>Menetelmä ja lähteet</summary><div class="fbody"><p><b>Menetelmä.</b> ${D.meta.method}</p><p>${D.meta.composite}</p><p>${D.meta.growth || ""}</p><p>${D.meta.charts || ""}</p>
       <p><b>Huomio.</b> ${D.meta.caveat} Kartan suurin piste on kokonaisindikaattori, ja viiva näyttää sen kulun kuuden kuukauden ajalta. Haaleat pisteet: sarjan viimeisin havainto on valittua ajankohtaa vanhempi. Ontot pisteet eivät ole mukana kokonaisindikaattorissa.</p>
-      <p><b>Lähteet.</b> Tilastokeskus (StatFin: kansantalouden tilinpito ja sektoritilit, julkisyhteisöjen tulot ja menot, työvoimatutkimus, avoimet työpaikat, työnvälitystilasto, vuokrat, palkkasummakuvaajat, rakentamisen liikevaihtokuvaaja, rakennus- ja asuntotuotanto, hinnat ja ansiot, rakentaminen, asuntojen hinnat ja kaupat, konkurssit, kuluttajabarometri), Eurostat (Euroopan komission yritysten luottamuskyselyt ja kapasiteetin käyttöaste, HICP-painot, kaupan ja palvelujen liikevaihto, BKT ja YKHI vertailumaissa, maksutase, tavarakauppa), Suomen Pankki (luotonanto ja lainojen korot), EKP (korot, €STR, tuottokäyrä, valuuttakurssit, rahoitusstressi, pankkien luotonantokysely, ammattiennustajien kysely), Maailmanpankki (raaka-aineiden hinnat, Pink Sheet), FRED (epävarmuusindeksi, Yhdysvaltain ja Japanin korot © OECD, Brent ja WTI © EIA).</p>
+      <p><b>Lähteet.</b> ${(D.meta.sources || []).map(x => `${x.name} (${[].concat(x.items).join(", ")})`).join(", ")}.</p>
       <p><b>Käyttöehdot.</b> Tilastokeskuksen ja Maailmanpankin aineistot CC BY 4.0. Muut aineistot lähteiden käyttöehtojen mukaisesti, lähde mainiten. Epävarmuusindeksi: Baker, Bloom ja Davis, policyuncertainty.com. Laskelmat ja esitystapa ovat omia.</p>
       <p><b>Vastuuvapaus.</b> Sivuston tiedot perustuvat avoimiin lähteisiin, eivätkä ole tarkoitettu sijoitusneuvoiksi.</p></div></details>`;
   }
@@ -1015,6 +1017,87 @@ footer b { color: var(--fg); font-weight: 600; }
     const a = document.createElement("a"); a.href = URL.createObjectURL(new Blob([data], { type: "text/csv;charset=utf-8" }));
     a.download = filename; document.body.appendChild(a); a.click(); setTimeout(() => { URL.revokeObjectURL(a.href); a.remove(); }, 1500);
   }
+
+  /* ---------- kuvion lataus PNG:na: otsikko, kuvio, selite, lahde ja tunniste ---------- */
+  let fontP = null;
+  function fontCSS() {                     // Manrope upotetaan SVG-kuvaan (muuten kuvan teksti putoaa varafonttiin)
+    if (!fontP) fontP = (async () => {
+      const css = await (await fetch("https://fonts.googleapis.com/css2?family=Manrope:wght@400;600&display=swap")).text();
+      const m = [...css.matchAll(/\/\* latin \*\/[\s\S]*?url\((https:[^)]+)\)/g)].map(x => x[1]);
+      if (!m.length) return "";
+      const buf = await (await fetch(m[0])).arrayBuffer(); let bin = ""; const u = new Uint8Array(buf);
+      for (let i = 0; i < u.length; i += 0x8000) bin += String.fromCharCode.apply(null, u.subarray(i, i + 0x8000));
+      return `@font-face{font-family:Manrope;font-weight:300 700;src:url(data:font/woff2;base64,${btoa(bin)}) format("woff2");}`;
+    })().catch(() => "");
+    return fontP;
+  }
+  async function saveBlob(filename, blob) {
+    try {
+      if (window.claude && typeof window.claude.use === "function") {
+        if (!dlP) dlP = window.claude.use("downloads");
+        const dl = await dlP;
+        if (dl) { try { await dl.save({ filename, data: blob }); return; } catch (e) { /* jatketaan tavallisella latauksella */ } }
+      }
+    } catch (e) { /* jatketaan */ }
+    const a = document.createElement("a"); a.href = URL.createObjectURL(blob);
+    a.download = filename; document.body.appendChild(a); a.click(); setTimeout(() => { URL.revokeObjectURL(a.href); a.remove(); }, 1500);
+  }
+  async function chartPNG(card) {
+    const svg = card.querySelector("svg.fc"); if (!svg) return;
+    const cs = getComputedStyle(document.documentElement), col = v => cs.getPropertyValue(v).trim();
+    const R = svg.getBoundingClientRect(), vb = svg.viewBox.baseVal;
+    // kopio, jossa CSS-muuttujat ja color-mix korvattu lasketuilla vareilla
+    const cl = svg.cloneNode(true), so = [svg, ...svg.querySelectorAll("*")], sc = [cl, ...cl.querySelectorAll("*")];
+    so.forEach((o, i) => { const st = getComputedStyle(o);
+      [["fill", "fill"], ["stroke", "stroke"], ["stop-color", "stopColor"]].forEach(([a, k]) => {
+        const v = o.getAttribute(a); if (v && /var\(|color-mix/.test(v)) sc[i].setAttribute(a, st[k]); }); });
+    cl.setAttribute("xmlns", "http://www.w3.org/2000/svg"); cl.setAttribute("width", R.width); cl.setAttribute("height", R.height);
+    cl.setAttribute("font-family", "Manrope, system-ui, sans-serif"); cl.setAttribute("overflow", "visible");
+    const ff = await fontCSS();
+    if (ff) { const s = document.createElementNS("http://www.w3.org/2000/svg", "style"); s.textContent = ff; cl.insertBefore(s, cl.firstChild); }
+    const img = new Image(); img.src = "data:image/svg+xml;charset=utf-8," + encodeURIComponent(new XMLSerializer().serializeToString(cl));
+    await img.decode();
+    // asettelu
+    const pad = 24, W = Math.round(R.width + 2 * pad), sc2 = 2, F = "Manrope, system-ui, sans-serif";
+    const title = card.querySelector(".fhead h2").textContent, val = (card.querySelector(".fhead .fval") || {}).textContent || "";
+    const subEl = card.querySelector(".fsub"), sub = subEl && !subEl.hidden ? subEl.textContent : "";
+    const leg = [...card.querySelectorAll(".legend span")].map(s => ({ t: s.textContent, c: getComputedStyle(s).getPropertyValue("--qc").trim() || col("--fg"),
+      k: s.classList.contains("hx") ? "hx" : s.classList.contains("sq") ? "sq" : s.classList.contains("ds") ? "ds" : "ln" }));
+    const note = [...card.querySelectorAll(".fnote")].map(p => p.textContent).join(" ");
+    const cv = document.createElement("canvas"), ctx = cv.getContext("2d");
+    const wrap = (txt, font, maxW) => { ctx.font = font; const out = []; let line = "";
+      txt.split(" ").forEach(w => { const tl = line ? line + " " + w : w; if (ctx.measureText(tl).width > maxW && line) { out.push(line); line = w; } else line = tl; });
+      if (line) out.push(line); return out; };
+    const tW = W - 2 * pad, fT = `600 17px ${F}`, fS = `400 12.5px ${F}`;
+    const subL = sub ? wrap(sub, fS, tW) : [], noteL = wrap((note ? note + " " : ""), fS, tW - 130);
+    // selitteen rivitys
+    ctx.font = fS; let lx = 0, rows = 1; const legPos = leg.map(l => { const w = 22 + ctx.measureText(l.t).width + 16;
+      if (lx + w > tW && lx > 0) { lx = 0; rows++; } const p = { x: lx, r: rows - 1 }; lx += w; return p; });
+    const hTop = pad + 22 + subL.length * 18 + 10, hChart = R.height, hLeg = leg.length ? rows * 20 + 8 : 0;
+    const H = Math.round(hTop + hChart + 8 + hLeg + Math.max(1, noteL.length) * 18 + pad);
+    cv.width = W * sc2; cv.height = H * sc2; ctx.scale(sc2, sc2);
+    ctx.fillStyle = col("--bg") || "#fff"; ctx.fillRect(0, 0, W, H);
+    ctx.fillStyle = col("--fg"); ctx.font = fT; ctx.textBaseline = "alphabetic"; ctx.fillText(title, pad, pad + 16);
+    if (val) { ctx.font = `400 12.5px ${F}`; ctx.fillStyle = col("--muted"); ctx.textAlign = "right"; ctx.fillText(val, W - pad, pad + 16); ctx.textAlign = "left"; }
+    ctx.font = fS; ctx.fillStyle = col("--muted"); subL.forEach((l, i) => ctx.fillText(l, pad, pad + 40 + i * 18));
+    ctx.drawImage(img, pad, hTop, R.width, R.height);
+    const ly0 = hTop + hChart + 18;
+    leg.forEach((l, i) => { const x = pad + legPos[i].x, y = ly0 + legPos[i].r * 20;
+      ctx.fillStyle = l.c; ctx.strokeStyle = l.c;
+      if (l.k === "hx") {                                              // jaannos: harmaa viivoitus kuten kuviossa
+        ctx.save(); ctx.beginPath(); ctx.rect(x, y - 9, 10, 10); ctx.clip(); ctx.fillStyle = col("--surface"); ctx.fillRect(x, y - 9, 10, 10);
+        ctx.strokeStyle = col("--muted"); ctx.lineWidth = 1.3; for (let k = -10; k < 12; k += 3.5) { ctx.beginPath(); ctx.moveTo(x + k, y + 1); ctx.lineTo(x + k + 10, y - 9); ctx.stroke(); } ctx.restore(); }
+      else if (l.k === "sq") { ctx.globalAlpha = 0.85; ctx.fillRect(x, y - 9, 10, 10); ctx.globalAlpha = 1; }
+      else { ctx.lineWidth = 2.5; ctx.setLineDash(l.k === "ds" ? [4, 3] : []); ctx.beginPath(); ctx.moveTo(x, y - 4); ctx.lineTo(x + 14, y - 4); ctx.stroke(); ctx.setLineDash([]); }
+      ctx.fillStyle = col("--muted"); ctx.font = fS; ctx.fillText(l.t, x + 22, y); });
+    const ny = ly0 + hLeg - (leg.length ? 0 : 10) + 4;
+    ctx.fillStyle = col("--muted"); ctx.font = fS; noteL.forEach((l, i) => ctx.fillText(l, pad, ny + i * 18));
+    ctx.fillStyle = col("--fg"); ctx.font = `600 12.5px ${F}`; ctx.textAlign = "right"; ctx.fillText("suhdannetilanne.fi", W - pad, ny + (noteL.length - 1) * 18); ctx.textAlign = "left";
+    cv.toBlob(b => saveBlob(`suhdannetilanne-${slug(title)}.png`, b), "image/png");
+  }
+  function addPng(db, card) {             // "Lataa kuva" CSV-linkin viereen
+    const b = document.createElement("button"); b.type = "button"; b.className = "dl"; b.textContent = "Lataa kuva"; b.title = "Lataa kuvio PNG-kuvana";
+    b.onclick = () => chartPNG(card).catch(e => console.warn("PNG", e)); db.after(b); return b; }
   const slug = s => s.toLowerCase().replace(/[åä]/g, "a").replace(/ö/g, "o").replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "").slice(0, 60);
   function chartCSV(c) {
     const ser = id => set.series.find(x => x.id === id), lbl = id => (c.labels && c.labels[id]) || ser(id).label;
@@ -1140,7 +1223,7 @@ footer b { color: var(--fg); font-weight: 600; }
     const fm = document.createElement("div"); fm.className = "fmeta";
     const db = document.createElement("button"); db.type = "button"; db.className = "dl"; db.textContent = "Lataa CSV";
     db.onclick = () => saveFile(`suhdannetilanne-${slug(c.title)}.csv`, toCSV([["Jakso", c.xlab, c.ylab], ...pts.map(i => [set.periods[i], X[i], Y[i]])]));
-    fm.appendChild(db); card.appendChild(fm);
+    fm.appendChild(db); addPng(db, card); card.appendChild(fm);
     if (c.note) { const p = document.createElement("p"); p.className = "fnote"; p.textContent = c.note; card.appendChild(p); }
     return card;
   }
@@ -1179,7 +1262,7 @@ footer b { color: var(--fg); font-weight: 600; }
     fm.appendChild(lg);
     const db = document.createElement("button"); db.type = "button"; db.className = "dl"; db.textContent = "Lataa CSV";
     db.onclick = () => saveFile(`suhdannetilanne-${slug(c.title)}.csv`, toCSV([["Maturiteetti", ...K.lines.map(l => `${l.label} ${l.date}`)], ...K.labels.map((m, i) => [m, ...K.lines.map(l => l.values[i])])]));
-    fm.appendChild(db); card.appendChild(fm);
+    fm.appendChild(db); addPng(db, card); card.appendChild(fm);
     if (c.note) { const p = document.createElement("p"); p.className = "fnote"; p.textContent = c.note; card.appendChild(p); }
     return card;
   }
@@ -1275,10 +1358,11 @@ footer b { color: var(--fg); font-weight: 600; }
       const ml = big ? 44 : 52, mr = 10 + (c.bars || c.stack ? W2 / set.periods.length / 2 : 0) + (Y2.length ? 34 : 0), mt = 10, mb = big ? 28 : 34;
       const svg = el("svg", { class: "fc", viewBox: `0 0 ${W2} ${H2}`, role: "img", "aria-label": c.title }, card);
       const fm = document.createElement("div"); fm.className = "fmeta";
-      if ((c.lines.length > 1 || c.bars || c.stack) && !(erit && col && c.lines.length < 2)) {   // erittely toimii pinon selitteena
-        const lg = document.createElement("div"); lg.className = "legend";
+      if (c.lines.length > 1 || c.bars || c.stack) {
+        // erittelyn rinnalla pinon selite piilotetaan (erittely toimii selitteena), mutta se pysyy PNG-kuvaa varten
+        const lg = document.createElement("div"); lg.className = "legend" + (erit && col ? (c.lines.length < 2 ? " hide" : " nostack") : "");
         lg.innerHTML = c.lines.map(id => `<span${(c.dash || []).includes(id) ? ' class="ds"' : ""} style="--qc:${colOf[id]}">${lbl(id)}${(c.y2 || []).includes(id) ? " (oikea akseli)" : ""}</span>`).join("") +
-          (erit && col ? [] : c.stack || []).map((id, k) => `<span class="sq${isRes(id) ? " hx" : ""}" style="--qc:${STACK_COLS[k % STACK_COLS.length]}">${ser(id).label}</span>`).join("") +
+          (c.stack || []).map((id, k) => `<span class="sq st${isRes(id) ? " hx" : ""}" style="--qc:${STACK_COLS[k % STACK_COLS.length]}">${ser(id).label}</span>`).join("") +
           (!c.bars ? "" : c.barsNeutral ? `<span style="--qc:var(--g3)">${ser(c.bars).label} (palkit)</span>`
             : `<span style="--qc:var(--q-up)">${(c.barsLegend || [])[0] || "Normaali käyrä"}</span><span style="--qc:var(--q-down)">${(c.barsLegend || [])[1] || "Käänteinen käyrä"}</span>`);
         fm.appendChild(lg);
@@ -1286,9 +1370,10 @@ footer b { color: var(--fg); font-weight: 600; }
       const db = document.createElement("button"); db.type = "button"; db.className = "dl"; db.textContent = "Lataa CSV"; db.title = "Lataa kuvan data";
       db.onclick = () => chartCSV(c);
       if (c.ts) card.querySelector(".fhead").appendChild(db); else fm.appendChild(db);   // aikasarjanakymassa kuten vasen kuvio: otsikkoriville
+      addPng(db, card);
       if (fm.children.length) card.appendChild(fm);
       if (c.note) { const p = document.createElement("p"); p.className = "fnote"; p.textContent = c.note;   // ilman selitetta: huomautus samalle riville latauslinkin kanssa
-        if (fm.children.length === 1 && fm.firstChild === db && card.contains(fm)) fm.insertBefore(p, db); else card.appendChild(p); }
+        if ([...fm.children].every(x => x.classList.contains("dl") || x.classList.contains("hide")) && card.contains(fm)) fm.insertBefore(p, db); else card.appendChild(p); }
       tgt.appendChild(card); if (main) { lastMainH = H2; lastLower = !!c.lower; }
 
       // kuviokohtainen alkuvuosi: indeksit paikallisia (i), jaettu hover globaali (i + i0)

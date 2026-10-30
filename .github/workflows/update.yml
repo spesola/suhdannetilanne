@@ -41,6 +41,13 @@ jobs:
           { echo '<!doctype html><html lang="fi">'; cat suhdannetilanne.html; } > public/index.html
           cp clock.json favicon.svg public/
 
+      - name: Savutesti (estää julkaisun, jos sivu on rikki)
+        if: hashFiles('public/index.html') != ''
+        run: |
+          npm install --no-save playwright@1.49.1
+          npx playwright install --with-deps chromium
+          node tests/smoke.js public/index.html
+
       - name: Julkaise Cloudflareen
         id: deploy
         if: hashFiles('public/index.html') != ''
