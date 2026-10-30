@@ -126,6 +126,7 @@ body { font-variant-numeric: tabular-nums; background: var(--bg); min-height: 10
 .pt.hl .lbl { opacity: 1; }
 .pt.hl > circle:last-of-type, .pt.hl > path:last-of-type { stroke: var(--fg); stroke-width: 2.5; }
 .ind.hl, .gh.hl { background: var(--grid); }
+@media (min-width: 1200px) { .ind .nm { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; } }   /* leveällä yksi rivi, kapeammalla rivitys */
 .ind .nm sup { color: var(--muted); font-size: 0.7em; margin-left: 2px; }
 .ind .nm .inv { color: var(--muted); font-size: 0.72em; font-weight: 400; }
 .lnote { font-size: 0.74rem; color: var(--muted); margin-top: 10px; }
@@ -558,13 +559,20 @@ footer b { color: var(--fg); font-weight: 600; }
     const K = svg.clientWidth && svg.clientWidth < 420 ? 1.6 : 1;   // kapealla naytolla pisteet suuremmiksi
     const mid = W / 2, inner = W - 2 * M;
     // tausta: vaiheiden neljannekset vaalealla savylla, valkoinen ruudukko
-    [["turn", M, M], ["up", mid, M], ["down", M, mid], ["rec", mid, mid]].forEach(([q, x, y]) =>
-      el("rect", { x, y, width: inner / 2, height: inner / 2, fill: `color-mix(in srgb, ${qcol(q)} 6%, var(--plot))` }, svg));
+    // saeteittainen savytys: lapinakyva origossa, voimistuu reunoja kohti (etaisyys trendista = vaiheen voimakkuus)
+    const defs = el("defs", {}, svg);
+    [["turn", M, M], ["up", mid, M], ["down", M, mid], ["rec", mid, mid]].forEach(([q, x, y]) => {
+      const g = el("radialGradient", { id: `rg-${q}`, gradientUnits: "userSpaceOnUse", cx: mid, cy: mid, r: inner / 2 * Math.SQRT2 }, defs);
+      el("stop", { offset: "0", "stop-color": qcol(q), "stop-opacity": 0 }, g);
+      el("stop", { offset: "0.71", "stop-color": qcol(q), "stop-opacity": 0.13 }, g);
+      el("stop", { offset: "1", "stop-color": qcol(q), "stop-opacity": 0.2 }, g);
+      el("rect", { x, y, width: inner / 2, height: inner / 2, fill: "var(--plot)" }, svg);
+      el("rect", { x, y, width: inner / 2, height: inner / 2, fill: `url(#rg-${q})` }, svg); });
     for (let v = -2; v <= 2; v++) { if (!v) continue;
       el("line", { x1: X(v), x2: X(v), y1: M, y2: W - M, stroke: "var(--plot)", "stroke-width": 1.5 }, svg);
       el("line", { y1: Y(v), y2: Y(v), x1: M, x2: W - M, stroke: "var(--plot)", "stroke-width": 1.5 }, svg);
       el("text", { x: X(v), y: W - M + 16, "text-anchor": "middle", "font-size": 11, fill: "var(--muted)" }, svg).textContent = tick(v);
-      el("text", { x: M + 5, y: Y(v) - 4, "text-anchor": "start", "font-size": 11, fill: "var(--muted)" }, svg).textContent = tick(v);   // y-asteikko piirtoalueen sisalla
+      el("text", { x: M - 6, y: Y(v) + 4, "text-anchor": "end", "font-size": 11, fill: "var(--muted)" }, svg).textContent = tick(v);   // y-asteikko marginaalissa kuten x
     }
     el("line", { x1: mid, x2: mid, y1: M, y2: W - M, stroke: "var(--muted)", "stroke-width": 1, "stroke-opacity": 0.55 }, svg);
     el("line", { y1: mid, y2: mid, x1: M, x2: W - M, stroke: "var(--muted)", "stroke-width": 1, "stroke-opacity": 0.55 }, svg);
@@ -661,7 +669,7 @@ footer b { color: var(--fg); font-weight: 600; }
       const out = !s.comp && !s.in_composite;
       b.dataset.id = s.id;
       b.innerHTML = `<span class="per" title="Havaintokausi">${p ? fmtP(set.periods[p.i]) : "–"}</span>` +
-        `<span class="nm">${s.label}${s.invert ? ` <span class="inv" title="Käännetty sarja: nousu näkyy negatiivisena">käänt.</span>` : ""}${out ? `<sup title="Ei mukana kokonaisindikaattorissa">*</sup>` : ""}</span>` +
+        `<span class="nm" title="${s.label}">${s.label}${s.invert ? ` <span class="inv" title="Käännetty sarja: nousu näkyy negatiivisena">käänt.</span>` : ""}${out ? `<sup title="Ei mukana kokonaisindikaattorissa">*</sup>` : ""}</span>` +
         `<span class="v">${p ? fmtN(p.l) : "–"}</span><span class="v">${p ? fmtN(p.c) : "–"}</span>` +
         (q ? `<span class="ph" style="--qc:${qcol(q)}" title="${Q[q].name}"><i></i><span class="pt-t">${Q[q].short}</span></span>` : `<span></span>`);
       b.onclick = () => select(s.id);

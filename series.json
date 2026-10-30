@@ -1154,7 +1154,7 @@
   "series": [
     {
       "id": "ek_teol",
-      "label": "Teollisuuden luottamus",
+      "label": "Luottamus, teollisuus",
       "set": "suhdanne",
       "group": "Luottamus",
       "source": "eurostat",
@@ -1172,7 +1172,7 @@
     },
     {
       "id": "ek_rak",
-      "label": "Rakentamisen luottamus",
+      "label": "Luottamus, rakentaminen",
       "set": "suhdanne",
       "group": "Luottamus",
       "source": "eurostat",
@@ -1189,7 +1189,7 @@
     },
     {
       "id": "ek_palv",
-      "label": "Palveluiden luottamus",
+      "label": "Luottamus, palvelut",
       "set": "suhdanne",
       "group": "Luottamus",
       "source": "eurostat",
@@ -1207,7 +1207,7 @@
     },
     {
       "id": "ek_kau",
-      "label": "Kaupan luottamus",
+      "label": "Luottamus, kauppa",
       "set": "suhdanne",
       "group": "Luottamus",
       "source": "eurostat",
@@ -1225,7 +1225,7 @@
     },
     {
       "id": "kul_luot",
-      "label": "Kuluttajien luottamus",
+      "label": "Luottamus, kuluttajat",
       "set": "suhdanne",
       "group": "Luottamus",
       "source": "statfin",
@@ -1241,7 +1241,7 @@
     },
     {
       "id": "ek_til",
-      "label": "Tilauskanta, teollisuus (EK)",
+      "label": "Tilauskanta, teollisuus",
       "set": "suhdanne",
       "group": "Tilaukset ja luvat",
       "source": "eurostat",
@@ -1259,7 +1259,7 @@
     },
     {
       "id": "tilaukset",
-      "label": "Teollisuuden uudet tilaukset",
+      "label": "Uudet tilaukset, teollisuus",
       "set": "suhdanne",
       "group": "Tilaukset ja luvat",
       "source": "statfin",
@@ -1276,7 +1276,7 @@
     },
     {
       "id": "rak_luv",
-      "label": "Rakentaminen, luvat",
+      "label": "Luvat, rakentaminen",
       "set": "suhdanne",
       "group": "Tilaukset ja luvat",
       "source": "statfin",
@@ -1322,7 +1322,7 @@
     },
     {
       "id": "vahittais",
-      "label": "Vähittäiskaupan myynti",
+      "label": "Myynti, vähittäiskauppa",
       "set": "suhdanne",
       "group": "Kulutus",
       "source": "eurostat",
@@ -1341,7 +1341,7 @@
     },
     {
       "id": "ravitsemus",
-      "label": "Majoitus- ja ravitsemuspalvelut",
+      "label": "Myynti, majoitus ja ravitsemus",
       "set": "suhdanne",
       "group": "Kulutus",
       "source": "eurostat",
@@ -1369,7 +1369,7 @@
     },
     {
       "id": "teoltuot",
-      "label": "Teollisuustuotanto",
+      "label": "Tuotanto, teollisuus",
       "set": "suhdanne",
       "group": "Tuotanto",
       "source": "statfin",
@@ -1386,7 +1386,7 @@
     },
     {
       "id": "kapasiteetti",
-      "label": "Teollisuuden kapasiteetin käyttöaste",
+      "label": "Käyttöaste, teollisuus",
       "set": "suhdanne",
       "group": "Tuotanto",
       "source": "eurostat",
@@ -1405,7 +1405,7 @@
     },
     {
       "id": "tsk",
-      "label": "Tuotannon suhdannekuvaaja",
+      "label": "Tuotanto, koko talous",
       "set": "suhdanne",
       "group": "Tuotanto",
       "source": "statfin",
@@ -1422,7 +1422,7 @@
     },
     {
       "id": "rak_alo",
-      "label": "Rakentaminen, aloitukset",
+      "label": "Aloitukset, rakentaminen",
       "set": "suhdanne",
       "group": "Tuotanto",
       "source": "statfin",
@@ -1491,7 +1491,7 @@
     },
     {
       "id": "avoimet",
-      "label": "Avoimet työpaikat (TE‑palvelut)",
+      "label": "Avoimet työpaikat, TE-palvelut",
       "set": "suhdanne",
       "group": "Työmarkkinat",
       "source": "statfin",
