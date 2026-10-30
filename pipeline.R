@@ -254,6 +254,11 @@ fetch_series <- function(s) {
     full <- min(mi):max(mi)
     d <- data.frame(date = sprintf("%d-%02d", full %/% 12, full %% 12 + 1), value = approx(mi, d$value, full)$y)
   }
+  if (!is.null(s$shift_q)) {                       # neljannesten siirto (esim. luotonantokysely: kierros koskee edellista neljannesta)
+    qi <- as.integer(substr(d$date, 1, 4)) * 4 + as.integer(substr(d$date, 7, 7)) - 1 + s$shift_q
+    d$date <- sprintf("%d-Q%d", qi %/% 4, qi %% 4 + 1) }
+  if (!is.null(s$ma)) {                            # liukuva keskiarvo (jakson omassa frekvenssissa, ennen kuukausinakymaan siirtoa)
+    d <- d[order(d$date), ]; d$value <- as.numeric(stats::filter(d$value, rep(1 / s$ma, s$ma), sides = 1)) }
   if (isTRUE(s$q_to_m)) {                         # neljannesvuosisarja kuukausinakymaan: neljanneksen viimeinen kuukausi
     d$date <- sprintf("%s-%02d", substr(d$date, 1, 4), 3 * as.integer(substr(d$date, 7, 7)))
   }
@@ -638,7 +643,8 @@ for (st in sets_out) {
   end_i <- per_idx(st$periods[length(st$periods)], st$freq)
   lasts <- c(lapply(st$indicators, function(x) list(id = x$id, last = x$last)),
              lapply(st$series, function(x) list(id = x$id, last = x$last)))
-  for (x in lasts) if (!is.null(x$last) && length(x$last) && end_i - per_idx(x$last, st$freq) > lag_max)
+  qm <- vapply(Filter(function(s) isTRUE(s$q_to_m), cfg$series), function(s) s$id, "")   # neljannessarja kuukausinakymassa: julkaisuviive pidempi
+  for (x in lasts) if (!is.null(x$last) && length(x$last) && end_i - per_idx(x$last, st$freq) > lag_max + if (x$id %in% qm) 3 else 0)
     CHECKS <- c(CHECKS, sprintf("%s/%s: viimeisin havainto %s", st$id, x$id, x$last))
 }
 if (length(STALE)) CHECKS <- c(CHECKS, paste("valimuistista:", paste(STALE, collapse = ", ")))

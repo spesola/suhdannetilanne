@@ -411,6 +411,20 @@
               "stackUnit": "% BKT:stä",
               "dec": 1,
               "note": "Nettoluotonanto alasektoreittain, neljän neljänneksen summa. Kunnat ja hyvinvointialueet erikseen. Lähde: Tilastokeskus."
+            },
+            "__ca": {
+              "title": "Vaihtotase ja sen osat, % BKT:stä",
+              "line": "x_ca",
+              "stack": [
+                "x_ca_g",
+                "x_ca_s",
+                "x_ca_in1",
+                "x_ca_in2"
+              ],
+              "unit": "%",
+              "stackUnit": "% BKT:stä",
+              "dec": 1,
+              "note": "Neljän neljänneksen summa. Ensitulo: mm. palkat ja pääomatulot, toisiotulo: tulonsiirrot. Lähde: Eurostat."
             }
           },
           "views": {
@@ -480,6 +494,22 @@
                 "unit": "",
                 "dec": 1,
                 "note": "Vanhojen osakeasuntojen hinnat suhteessa kotitalouksien käytettävissä oleviin tuloihin asukasta kohden ja vapaarahoitteisiin vuokriin. Lähde: Tilastokeskus."
+              },
+              {
+                "title": "Uudet asunnot, tuhatta (4 nelj. summa)",
+                "lines": [
+                  "x_as_luv",
+                  "x_as_alo",
+                  "x_as_val"
+                ],
+                "colors": {
+                  "x_as_luv": "var(--g2)",
+                  "x_as_alo": "var(--fg)",
+                  "x_as_val": "var(--g3)"
+                },
+                "unit": "",
+                "dec": 1,
+                "note": "Rakentamisluvan saaneet, aloitetut ja valmistuneet asunnot, kaikki talotyypit. Lähde: Tilastokeskus."
               }
             ],
             "tyottomat": [
@@ -679,6 +709,25 @@
                 "unit": "",
                 "dec": 1,
                 "note": "Implisiittiset hintaindeksit. Vaihtosuhde = vientihinnat / tuontihinnat. Lähde: Tilastokeskus."
+              },
+              {
+                "contrib": "__ca"
+              },
+              {
+                "title": "Tavaravienti käyttötarkoituksen mukaan, volyymi (2021=100)",
+                "lines": [
+                  "x_ex_int",
+                  "x_ex_cap",
+                  "x_ex_cons"
+                ],
+                "colors": {
+                  "x_ex_int": "var(--fg)",
+                  "x_ex_cap": "var(--accent)",
+                  "x_ex_cons": "var(--g3)"
+                },
+                "unit": "",
+                "dec": 1,
+                "note": "Kausitasoitettu volyymi-indeksi, neljänneksen keskiarvo. Yksittäiset suuret toimitukset, kuten laivat, näkyvät piikkeinä. Lähde: Eurostat."
               }
             ],
             "bkt_tuonti": [
@@ -703,6 +752,22 @@
                 "unit": "",
                 "dec": 1,
                 "note": "Implisiittiset hintaindeksit. Vaihtosuhde = vientihinnat / tuontihinnat. Lähde: Tilastokeskus."
+              },
+              {
+                "title": "Tavaratuonti käyttötarkoituksen mukaan, volyymi (2021=100)",
+                "lines": [
+                  "x_im_int",
+                  "x_im_cap",
+                  "x_im_cons"
+                ],
+                "colors": {
+                  "x_im_int": "var(--fg)",
+                  "x_im_cap": "var(--accent)",
+                  "x_im_cons": "var(--g3)"
+                },
+                "unit": "",
+                "dec": 1,
+                "note": "Kausitasoitettu volyymi-indeksi, neljänneksen keskiarvo. Lähde: Eurostat."
               }
             ],
             "tyotunnit": [
@@ -748,6 +813,30 @@
                 "unit": "%",
                 "dec": 1,
                 "note": "YKHI, vuosimuutos, neljänneksen keskiarvo. Lähde: Eurostat."
+              },
+              {
+                "title": "Inflaatio-odotukset, %",
+                "lines": [
+                  "x_ie_kul",
+                  "x_ie_nyt",
+                  "ki_khi",
+                  "x_ie_spf"
+                ],
+                "labels": {
+                  "ki_khi": "Toteutunut (KHI)"
+                },
+                "colors": {
+                  "x_ie_kul": "var(--accent)",
+                  "x_ie_nyt": "var(--g2)",
+                  "ki_khi": "var(--fg)",
+                  "x_ie_spf": "var(--g3)"
+                },
+                "dash": [
+                  "x_ie_spf"
+                ],
+                "unit": "%",
+                "dec": 1,
+                "note": "Kuluttajabarometri, neljänneksen keskiarvo. Ammattiennustajat: EKP:n SPF, noin viiden vuoden päähän. Lähteet: Tilastokeskus, EKP."
               }
             ]
           },
@@ -1143,6 +1232,33 @@
           "note": "Velat suhteessa käytettävissä oleviin tuloihin. Lähde: Tilastokeskus.",
           "size": "half",
           "from": 2010
+        },
+        {
+          "id": "bls",
+          "section": "Luotonanto",
+          "title": "Pankkien luotonantokysely, Suomi",
+          "unit": "",
+          "dec": 0,
+          "size": "half",
+          "from": 2012,
+          "connect": true,
+          "lines": [
+            "bls_e_st",
+            "bls_h_st",
+            "bls_e_d",
+            "bls_h_d"
+          ],
+          "dash": [
+            "bls_e_d",
+            "bls_h_d"
+          ],
+          "colors": {
+            "bls_e_st": "var(--accent)",
+            "bls_h_st": "var(--q-down)",
+            "bls_e_d": "var(--accent)",
+            "bls_h_d": "var(--q-down)"
+          },
+          "note": "Nettoprosentti, neljän neljänneksen liukuva keskiarvo, kyselyä edeltävä neljännes. Luottoehdot: positiivinen = kiristyneet. Kysyntä (katkoviiva): positiivinen = kasvanut. Lähde: EKP."
         },
         {
           "id": "clifs",
@@ -4881,6 +4997,362 @@
         "contentscode": "rlv-kausitasoitettu"
       },
       "to_quarter": true
+    },
+    {
+      "id": "x_ie_kul",
+      "label": "Kuluttajien odotus 12 kk",
+      "set": "bkt",
+      "chart_only": true,
+      "source": "statfin",
+      "table": "kbar/11cc.px",
+      "pick": {
+        "contentscode": "CCI_B6"
+      },
+      "to_quarter": true
+    },
+    {
+      "id": "x_ie_nyt",
+      "label": "Kuluttajien käsitys nyt",
+      "set": "bkt",
+      "chart_only": true,
+      "source": "statfin",
+      "table": "kbar/11cc.px",
+      "pick": {
+        "contentscode": "CCI_B5"
+      },
+      "to_quarter": true
+    },
+    {
+      "id": "x_ie_spf",
+      "label": "Ammattiennustajat, euroalue, pitkä aikaväli",
+      "set": "bkt",
+      "chart_only": true,
+      "source": "ecb",
+      "flow": "SPF",
+      "key": "Q.U2.HICP.POINT.LT.Q.AVG"
+    },
+    {
+      "id": "x_as_luv",
+      "label": "Luvat",
+      "set": "bkt",
+      "chart_only": true,
+      "source": "statfin",
+      "table": "raku/156f.px",
+      "pick": {
+        "rakennusvaihe_1_20250101": "1",
+        "alue_23_20260101": "SSS",
+        "rakennus_6_20180101": "SSS",
+        "contentscode": "raku-uusiAsuntoLkm"
+      },
+      "to_quarter": "sum",
+      "roll": 4,
+      "mult": 0.001
+    },
+    {
+      "id": "x_as_alo",
+      "label": "Aloitetut",
+      "set": "bkt",
+      "chart_only": true,
+      "source": "statfin",
+      "table": "raku/156f.px",
+      "pick": {
+        "rakennusvaihe_1_20250101": "2",
+        "alue_23_20260101": "SSS",
+        "rakennus_6_20180101": "SSS",
+        "contentscode": "raku-uusiAsuntoLkm"
+      },
+      "to_quarter": "sum",
+      "roll": 4,
+      "mult": 0.001
+    },
+    {
+      "id": "x_as_val",
+      "label": "Valmistuneet",
+      "set": "bkt",
+      "chart_only": true,
+      "source": "statfin",
+      "table": "raku/156f.px",
+      "pick": {
+        "rakennusvaihe_1_20250101": "3",
+        "alue_23_20260101": "SSS",
+        "rakennus_6_20180101": "SSS",
+        "contentscode": "raku-uusiAsuntoLkm"
+      },
+      "to_quarter": "sum",
+      "roll": 4,
+      "mult": 0.001
+    },
+    {
+      "id": "x_ca",
+      "label": "Vaihtotase",
+      "set": "bkt",
+      "chart_only": true,
+      "source": "eurostat",
+      "ds": "bop_c6_q",
+      "pick": {
+        "bop_item": "CA",
+        "stk_flow": "BAL",
+        "partner": "WRL_REST",
+        "currency": "MIO_EUR",
+        "sector10": "S1",
+        "sectpart": "S1"
+      },
+      "roll": 4,
+      "div": {
+        "source": "statfin",
+        "table": "ntp/132h.px",
+        "pick": {
+          "taloustoimi_1_20180101": "B1GMH",
+          "contentscode": "tasmcp"
+        },
+        "roll": 4
+      }
+    },
+    {
+      "id": "x_ca_g",
+      "label": "Tavarat",
+      "set": "bkt",
+      "chart_only": true,
+      "source": "eurostat",
+      "ds": "bop_c6_q",
+      "pick": {
+        "bop_item": "G",
+        "stk_flow": "BAL",
+        "partner": "WRL_REST",
+        "currency": "MIO_EUR",
+        "sector10": "S1",
+        "sectpart": "S1"
+      },
+      "roll": 4,
+      "div": {
+        "source": "statfin",
+        "table": "ntp/132h.px",
+        "pick": {
+          "taloustoimi_1_20180101": "B1GMH",
+          "contentscode": "tasmcp"
+        },
+        "roll": 4
+      }
+    },
+    {
+      "id": "x_ca_s",
+      "label": "Palvelut",
+      "set": "bkt",
+      "chart_only": true,
+      "source": "eurostat",
+      "ds": "bop_c6_q",
+      "pick": {
+        "bop_item": "S",
+        "stk_flow": "BAL",
+        "partner": "WRL_REST",
+        "currency": "MIO_EUR",
+        "sector10": "S1",
+        "sectpart": "S1"
+      },
+      "roll": 4,
+      "div": {
+        "source": "statfin",
+        "table": "ntp/132h.px",
+        "pick": {
+          "taloustoimi_1_20180101": "B1GMH",
+          "contentscode": "tasmcp"
+        },
+        "roll": 4
+      }
+    },
+    {
+      "id": "x_ca_in1",
+      "label": "Ensitulo",
+      "set": "bkt",
+      "chart_only": true,
+      "source": "eurostat",
+      "ds": "bop_c6_q",
+      "pick": {
+        "bop_item": "IN1",
+        "stk_flow": "BAL",
+        "partner": "WRL_REST",
+        "currency": "MIO_EUR",
+        "sector10": "S1",
+        "sectpart": "S1"
+      },
+      "roll": 4,
+      "div": {
+        "source": "statfin",
+        "table": "ntp/132h.px",
+        "pick": {
+          "taloustoimi_1_20180101": "B1GMH",
+          "contentscode": "tasmcp"
+        },
+        "roll": 4
+      }
+    },
+    {
+      "id": "x_ca_in2",
+      "label": "Toisiotulo",
+      "set": "bkt",
+      "chart_only": true,
+      "source": "eurostat",
+      "ds": "bop_c6_q",
+      "pick": {
+        "bop_item": "IN2",
+        "stk_flow": "BAL",
+        "partner": "WRL_REST",
+        "currency": "MIO_EUR",
+        "sector10": "S1",
+        "sectpart": "S1"
+      },
+      "roll": 4,
+      "div": {
+        "source": "statfin",
+        "table": "ntp/132h.px",
+        "pick": {
+          "taloustoimi_1_20180101": "B1GMH",
+          "contentscode": "tasmcp"
+        },
+        "roll": 4
+      }
+    },
+    {
+      "id": "x_ex_int",
+      "label": "Välituotteet",
+      "set": "bkt",
+      "chart_only": true,
+      "source": "eurostat",
+      "ds": "ext_st_27_2020msbec",
+      "pick": {
+        "stk_flow": "EXP",
+        "indic_et": "IVOL_SCA",
+        "partner": "WORLD",
+        "bclas_bec": "INT"
+      },
+      "to_quarter": true
+    },
+    {
+      "id": "x_ex_cap",
+      "label": "Investointitavarat",
+      "set": "bkt",
+      "chart_only": true,
+      "source": "eurostat",
+      "ds": "ext_st_27_2020msbec",
+      "pick": {
+        "stk_flow": "EXP",
+        "indic_et": "IVOL_SCA",
+        "partner": "WORLD",
+        "bclas_bec": "CAP"
+      },
+      "to_quarter": true
+    },
+    {
+      "id": "x_ex_cons",
+      "label": "Kulutustavarat",
+      "set": "bkt",
+      "chart_only": true,
+      "source": "eurostat",
+      "ds": "ext_st_27_2020msbec",
+      "pick": {
+        "stk_flow": "EXP",
+        "indic_et": "IVOL_SCA",
+        "partner": "WORLD",
+        "bclas_bec": "CONS"
+      },
+      "to_quarter": true
+    },
+    {
+      "id": "x_im_int",
+      "label": "Välituotteet",
+      "set": "bkt",
+      "chart_only": true,
+      "source": "eurostat",
+      "ds": "ext_st_27_2020msbec",
+      "pick": {
+        "stk_flow": "IMP",
+        "indic_et": "IVOL_SCA",
+        "partner": "WORLD",
+        "bclas_bec": "INT"
+      },
+      "to_quarter": true
+    },
+    {
+      "id": "x_im_cap",
+      "label": "Investointitavarat",
+      "set": "bkt",
+      "chart_only": true,
+      "source": "eurostat",
+      "ds": "ext_st_27_2020msbec",
+      "pick": {
+        "stk_flow": "IMP",
+        "indic_et": "IVOL_SCA",
+        "partner": "WORLD",
+        "bclas_bec": "CAP"
+      },
+      "to_quarter": true
+    },
+    {
+      "id": "x_im_cons",
+      "label": "Kulutustavarat",
+      "set": "bkt",
+      "chart_only": true,
+      "source": "eurostat",
+      "ds": "ext_st_27_2020msbec",
+      "pick": {
+        "stk_flow": "IMP",
+        "indic_et": "IVOL_SCA",
+        "partner": "WORLD",
+        "bclas_bec": "CONS"
+      },
+      "to_quarter": true
+    },
+    {
+      "id": "bls_e_st",
+      "label": "Luottoehdot, yritykset",
+      "set": "rahoitus",
+      "source": "ecb",
+      "flow": "BLS",
+      "key": "Q.FI.ALL.O.E.Z.B3.ST.S.FNET",
+      "q_to_m": true,
+      "handling": "none",
+      "kind": "level",
+      "shift_q": -1,
+      "ma": 4
+    },
+    {
+      "id": "bls_h_st",
+      "label": "Luottoehdot, asuntolainat",
+      "set": "rahoitus",
+      "source": "ecb",
+      "flow": "BLS",
+      "key": "Q.FI.ALL.Z.H.H.B3.ST.S.FNET",
+      "q_to_m": true,
+      "handling": "none",
+      "kind": "level",
+      "shift_q": -1,
+      "ma": 4
+    },
+    {
+      "id": "bls_e_d",
+      "label": "Kysyntä, yritykset",
+      "set": "rahoitus",
+      "source": "ecb",
+      "flow": "BLS",
+      "key": "Q.FI.ALL.O.E.Z.B3.ZZ.D.FNET",
+      "q_to_m": true,
+      "handling": "none",
+      "kind": "level",
+      "shift_q": -1,
+      "ma": 4
+    },
+    {
+      "id": "bls_h_d",
+      "label": "Kysyntä, asuntolainat",
+      "set": "rahoitus",
+      "source": "ecb",
+      "flow": "BLS",
+      "key": "Q.FI.ALL.Z.H.H.B3.ZZ.D.FNET",
+      "q_to_m": true,
+      "handling": "none",
+      "kind": "level",
+      "shift_q": -1,
+      "ma": 4
     }
   ]
 }
