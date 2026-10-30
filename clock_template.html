@@ -241,7 +241,19 @@ button.dl:hover { text-decoration-color: var(--fg); }
 .grpair .hm th.rl.sub { padding-left: 12px; font-size: 0.76rem; }
 .grleft, .grside { display: flex; flex-direction: column; gap: 40px; min-width: 0; }
 .grside:empty { display: none; }
-.grcol { display: flex; flex-direction: column; gap: 40px; min-width: 0; }
+.grcol { display: flex; flex-direction: column; gap: 28px; min-width: 0; }
+.fmeta > .fnote { margin: 0; flex: 1 1 260px; }
+/* erittely ja tunnusluvut: tiivis tukikortti, paakuvio saa tilan */
+.fcard.side { padding-top: 10px; }
+.fcard.side .fhead h2 { font-size: 0.88rem; }
+.fcard.side .fval { font-size: 0.74rem; }
+.fcard.side .brk { margin-top: 6px; gap: 1px 10px; font-size: 0.76rem; }
+.fcard.side .brk .bb { height: 9px; }
+.fcard.side .brk .bb::before { top: -2px; bottom: -2px; }
+.fcard.side .kv { margin-top: 4px; }
+.fcard.side .kv > div { padding: 5px 0; }
+.fcard.side .kv b { font-size: 0.98rem; }
+.fcard.side .kv .sm b { font-size: 0.86rem; }
 .grcol > .card { grid-column: auto; }
 .grmore { margin-top: 0; }
 .grmore .fhead h2 { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; min-width: 0; flex: 1 1 0; }   /* tasakorkeat kortit */
@@ -1263,7 +1275,8 @@ footer b { color: var(--fg); font-weight: 600; }
       db.onclick = () => chartCSV(c);
       if (c.ts) card.querySelector(".fhead").appendChild(db); else fm.appendChild(db);   // aikasarjanakymassa kuten vasen kuvio: otsikkoriville
       if (fm.children.length) card.appendChild(fm);
-      if (c.note) { const p = document.createElement("p"); p.className = "fnote"; p.textContent = c.note; card.appendChild(p); }
+      if (c.note) { const p = document.createElement("p"); p.className = "fnote"; p.textContent = c.note;   // ilman selitetta: huomautus samalle riville latauslinkin kanssa
+        if (fm.children.length === 1 && fm.firstChild === db && card.contains(fm)) fm.insertBefore(p, db); else card.appendChild(p); }
       tgt.appendChild(card); if (main) { lastMainH = H2; lastLower = !!c.lower; }
 
       // kuviokohtainen alkuvuosi: indeksit paikallisia (i), jaettu hover globaali (i + i0)
@@ -1381,7 +1394,7 @@ footer b { color: var(--fg); font-weight: 600; }
       };
       show(null); chartHooks.push(show);
       if (S.length && erit) {                                             // valitun jakson erittely kuvion viereen tai alle
-        const side = document.createElement("div"); side.className = "card fcard";
+        const side = document.createElement("div"); side.className = "card fcard side";
         const su0 = c.stackUnit != null ? c.stackUnit : "%-yks.";
         side.innerHTML = `<div class="fhead"><h2>Erittely</h2><span class="fval"></span></div><div class="brk"></div>`;
         (sideLeft ? $("grSide") : tgt).appendChild(side);
@@ -1406,7 +1419,7 @@ footer b { color: var(--fg); font-weight: 600; }
     if (more) $("grMore").hidden = !more.children.length;
     if (col && grSel && !box.querySelector(".brk") && !$("grSide").querySelector(".brk") && ser(grSel + "_yy")) {   // aina toinen kortti: tunnusluvut
       const gy = ser(grSel + "_yy").values, gq = ser(grSel + "_qq").values, N = set.periods.length;
-      const card = document.createElement("div"); card.className = "card fcard";
+      const card = document.createElement("div"); card.className = "card fcard side";
       card.innerHTML = `<div class="fhead"><h2>Tunnusluvut</h2><span class="fval"></span></div><div class="kv"></div>`;
       (sideLeft ? $("grSide") : box).appendChild(card);
       const sg1 = v => v == null ? "–" : (+v.toFixed(1) > 0 ? "+" : "") + fmtV(v, 1) + " %";
