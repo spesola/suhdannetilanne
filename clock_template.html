@@ -141,13 +141,13 @@ body { font-variant-numeric: tabular-nums; background: var(--bg); min-height: 10
 .lhead { display: grid; grid-template-columns: var(--cols); column-gap: 10px; align-items: baseline; font-size: 0.72rem; color: var(--muted); padding: 0 0 6px; border-bottom: 1px solid var(--line); }
 .lhead span:nth-child(3), .lhead span:nth-child(4) { text-align: right; }
 .lhead span:nth-child(1) { font-size: 0.66rem; }
-.lhead span:nth-child(5) { padding-left: 4px; }
+.lhead span:nth-child(5) { text-align: right; }   /* taso, muutos ja vaihe oikeaan reunaan */
 .grp h3 { font-size: 0.72rem; text-transform: uppercase; letter-spacing: .07em; color: var(--muted); font-weight: 600; margin: 0 0 4px; display: flex; align-items: center; gap: 7px; }
 .grp h3 i { width: 9px; height: 9px; border-radius: 50%; background: var(--gc); display: inline-block; }
 .ind { display: grid; grid-template-columns: var(--cols); column-gap: 10px; align-items: baseline; width: 100%;   /* eri kokoiset tekstit samalle perusviivalle */
   font: inherit; color: inherit; text-align: left; background: none; border: 0; border-bottom: 1px solid var(--line); border-radius: 0; padding: 6px 0; cursor: pointer; }
 .ind .v { font-size: 0.84rem; text-align: right; font-variant-numeric: tabular-nums; }
-.ind .ph { display: block; overflow: hidden; text-overflow: ellipsis; font-size: 0.8rem; color: var(--fg); white-space: nowrap; padding-left: 4px; }
+.ind .ph { display: block; overflow: hidden; text-overflow: ellipsis; font-size: 0.8rem; color: var(--fg); white-space: nowrap; text-align: right; }
 .ind .ph i { display: inline-block; width: 8px; height: 8px; border-radius: 50%; background: var(--qc); margin-right: 7px; vertical-align: 0; }   /* teksti samalle perusviivalle kuin luvut */
 .ind:hover { background: var(--grid); }
 .ind[aria-pressed="true"] { background: color-mix(in srgb, var(--accent) 14%, var(--surface)); }
