@@ -82,7 +82,7 @@ body { font-variant-numeric: tabular-nums; background: var(--bg); min-height: 10
 .clegend i { width: 8px; height: 8px; border-radius: 50%; background: var(--pt); display: inline-block; }
 .clegend i.o { background: transparent; box-shadow: inset 0 0 0 1.5px var(--pt); }
 .phead .meta { font-size: 0.85rem; color: var(--muted); }
-#clock { width: 100%; height: auto; display: block; overflow: visible; }   /* piirtoalue kortin reunasta reunaan */
+#clock { width: 100%; height: auto; display: block; overflow: visible; }   /* y-asteikko palstan sisalla, piirtoalue sisennetty */
 #clock text { font-family: var(--font-body); }
 .pt { cursor: pointer; }
 .pt .lbl { opacity: 0; transition: opacity .12s; pointer-events: none; }
@@ -148,7 +148,7 @@ body { font-variant-numeric: tabular-nums; background: var(--bg); min-height: 10
   font: inherit; color: inherit; text-align: left; background: none; border: 0; border-bottom: 1px solid var(--line); border-radius: 0; padding: 6px 0; cursor: pointer; }
 .ind .v { font-size: 0.84rem; text-align: right; font-variant-numeric: tabular-nums; }
 .ind .ph { display: flex; align-items: center; gap: 7px; font-size: 0.8rem; color: var(--fg); white-space: nowrap; padding-left: 4px; }
-.ind .ph i { width: 7px; height: 7px; border-radius: 50%; background: var(--qc); flex: none; }
+.ind .ph i { width: 8px; height: 8px; border-radius: 50%; background: var(--qc); flex: none; }
 .ind:hover { background: var(--grid); }
 .ind[aria-pressed="true"] { background: color-mix(in srgb, var(--accent) 14%, var(--surface)); }
 .ind .nm { font-size: 0.86rem; overflow-wrap: break-word; hyphens: auto; min-width: 0; }
@@ -170,7 +170,7 @@ body { font-variant-numeric: tabular-nums; background: var(--bg); min-height: 10
 .viewhead { display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: 8px; margin-bottom: 6px; }
 .viewhead h2 { font-family: var(--font-body); font-weight: 600; font-size: 1rem; margin: 0; text-wrap: balance; }
 .tsnow { display: flex; align-items: center; gap: 7px; font-size: 0.82rem; color: var(--fg); margin: 0 0 4px; }
-.tsnow i { width: 7px; height: 7px; border-radius: 50%; background: var(--qc); flex: none; }
+.tsnow i { width: 8px; height: 8px; border-radius: 50%; background: var(--qc); flex: none; }
 .viewhead .now { font-size: 0.85rem; color: var(--muted); }
 #ts { width: 100%; height: auto; display: block; }
 #ts text { font-family: var(--font-body); }
@@ -389,7 +389,7 @@ footer b { color: var(--fg); font-weight: 600; }
       <div class="phead"><h2 id="clockTitle">Suhdannekartta</h2><label class="tg" id="tailsTg"><input type="checkbox" id="tails"> <span id="tailsLbl">Kulku</span></label></div>
       <p class="cdesc" id="clockDesc"></p>
       <div class="clegend" id="clockLegend"></div>
-      <svg id="clock" viewBox="40 22 520 578" role="img" aria-label="Suhdannekartta"></svg>
+      <svg id="clock" viewBox="12 22 548 578" role="img" aria-label="Suhdannekartta"></svg>
       <div class="timebar">
         <label for="per">Ajankohta</label>
         <button class="step play" id="play" type="button" aria-label="Toista ajassa" title="Toista ajassa">&#9654;</button>
@@ -563,24 +563,28 @@ footer b { color: var(--fg); font-weight: 600; }
     const defs = el("defs", {}, svg);
     [["turn", M, M], ["up", mid, M], ["down", M, mid], ["rec", mid, mid]].forEach(([q, x, y]) => {
       const g = el("radialGradient", { id: `rg-${q}`, gradientUnits: "userSpaceOnUse", cx: mid, cy: mid, r: inner / 2 * Math.SQRT2 }, defs);
-      el("stop", { offset: "0", "stop-color": qcol(q), "stop-opacity": 0 }, g);
-      el("stop", { offset: "0.71", "stop-color": qcol(q), "stop-opacity": 0.13 }, g);
-      el("stop", { offset: "1", "stop-color": qcol(q), "stop-opacity": 0.2 }, g);
+      const sc = q === "up" ? "#2e8b57" : qcol(q);                    // nousun tumma vihrea harmaantuu ohuena: savytykseen kirkkaampi
+      el("stop", { offset: "0", "stop-color": sc, "stop-opacity": 0 }, g);
+      el("stop", { offset: "0.71", "stop-color": sc, "stop-opacity": 0.13 }, g);
+      el("stop", { offset: "1", "stop-color": sc, "stop-opacity": 0.2 }, g);
       el("rect", { x, y, width: inner / 2, height: inner / 2, fill: "var(--plot)" }, svg);
       el("rect", { x, y, width: inner / 2, height: inner / 2, fill: `url(#rg-${q})` }, svg); });
     for (let v = -2; v <= 2; v++) { if (!v) continue;
-      el("line", { x1: X(v), x2: X(v), y1: M, y2: W - M, stroke: "var(--plot)", "stroke-width": 1.5 }, svg);
-      el("line", { y1: Y(v), y2: Y(v), x1: M, x2: W - M, stroke: "var(--plot)", "stroke-width": 1.5 }, svg);
+      el("line", { x1: X(v), x2: X(v), y1: M, y2: W - M, stroke: "color-mix(in srgb, var(--fg) 7%, transparent)", "stroke-width": 1 }, svg);   // ruudukko nakyy myos vaalealla keskella
+      el("line", { y1: Y(v), y2: Y(v), x1: M, x2: W - M, stroke: "color-mix(in srgb, var(--fg) 7%, transparent)", "stroke-width": 1 }, svg);
       el("text", { x: X(v), y: W - M + 16, "text-anchor": "middle", "font-size": 11, fill: "var(--muted)" }, svg).textContent = tick(v);
       el("text", { x: M - 6, y: Y(v) + 4, "text-anchor": "end", "font-size": 11, fill: "var(--muted)" }, svg).textContent = tick(v);   // y-asteikko marginaalissa kuten x
     }
     el("line", { x1: mid, x2: mid, y1: M, y2: W - M, stroke: "var(--muted)", "stroke-width": 1, "stroke-opacity": 0.55 }, svg);
     el("line", { y1: mid, y2: mid, x1: M, x2: W - M, stroke: "var(--muted)", "stroke-width": 1, "stroke-opacity": 0.55 }, svg);
     // vaiheiden nimet kulmiin
+    // vaiheen piste samankokoinen kuin listassa ja jakaumaselitteessa (8 px naytolla)
+    const pxu = 548 / (svg.clientWidth || 548), dr = 4 * pxu;
     [["turn", M + 12, M + 22, "start"], ["up", W - M - 12, M + 22, "end"], ["down", M + 12, W - M - 14, "start"], ["rec", W - M - 12, W - M - 14, "end"]].forEach(([q, x, y, a]) => {
-      const t = el("text", { x, y, "text-anchor": a, "font-size": 12, "font-weight": 600, fill: "var(--fg)" }, svg);
-      el("tspan", { fill: qcol(q), "font-size": "1.05em" }, t).textContent = "\u25CF ";
-      el("tspan", {}, t).textContent = Q[q].short; });
+      const tx = a === "start" ? x + 2 * dr + 5 * pxu : x;
+      const t = el("text", { x: tx, y, "text-anchor": a, "font-size": 12, "font-weight": 600, fill: "var(--fg)" }, svg); t.textContent = Q[q].short;
+      const x0 = a === "start" ? x : x - t.getComputedTextLength() - 2 * dr - 5 * pxu;
+      el("circle", { cx: x0 + dr, cy: y - 4, r: dr, fill: qcol(q) }, svg); });
     const growthClock = set.indicators.every(x => x.kind === "growth");
     const T = growthClock ? ["Keskimääräistä nopeampi kasvu", "Keskimääräistä hitaampi kasvu", "Kasvu hidastuu", "Kasvu kiihtyy"]
                           : ["Trendin yläpuolella", "Trendin alapuolella", "Heikentynyt", "Vahvistunut"];
