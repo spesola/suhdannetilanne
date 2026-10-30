@@ -589,6 +589,27 @@
                 "unit": "%",
                 "dec": 1,
                 "note": "Säästö suhteessa käytettävissä oleviin tuloihin, kausitasoitettu. Lähde: Tilastokeskus."
+              },
+              {
+                "title": "Palkkasumma, vuosimuutos %",
+                "lines": [
+                  "x_ps_tot",
+                  "x_ps_yks",
+                  "x_ps_julk",
+                  "x_ps_real"
+                ],
+                "colors": {
+                  "x_ps_tot": "var(--fg)",
+                  "x_ps_yks": "var(--accent)",
+                  "x_ps_julk": "var(--g3)",
+                  "x_ps_real": "var(--q-down)"
+                },
+                "dash": [
+                  "x_ps_real"
+                ],
+                "unit": "%",
+                "dec": 1,
+                "note": "Palkkasummakuvaajat, neljänneksen keskiarvo. Reaalinen: deflatoitu kuluttajahintaindeksillä. Lähde: Tilastokeskus."
               }
             ],
             "bkt_julk": [
@@ -4737,6 +4758,71 @@
         "huoneluku_1_20111212": "00",
         "contentscode": "ashivq_indeksi_2015"
       }
+    },
+    {
+      "id": "x_ps_tot",
+      "label": "Koko talous",
+      "set": "bkt",
+      "chart_only": true,
+      "pct_lag": 4,
+      "source": "statfin",
+      "table": "ktps/14mr.px",
+      "pick": {
+        "nace_8_20180101": "ATX",
+        "contentscode": "ktps-alkuperainen"
+      },
+      "to_quarter": true
+    },
+    {
+      "id": "x_ps_yks",
+      "label": "Yksityinen sektori",
+      "set": "bkt",
+      "chart_only": true,
+      "pct_lag": 4,
+      "source": "statfin",
+      "table": "ktps/14mr.px",
+      "pick": {
+        "nace_8_20180101": "ATXS11",
+        "contentscode": "ktps-alkuperainen"
+      },
+      "to_quarter": true
+    },
+    {
+      "id": "x_ps_julk",
+      "label": "Julkiset toimialat (OPQ)",
+      "set": "bkt",
+      "chart_only": true,
+      "pct_lag": 4,
+      "source": "statfin",
+      "table": "ktps/14mr.px",
+      "pick": {
+        "nace_8_20180101": "O_P_Q",
+        "contentscode": "ktps-alkuperainen"
+      },
+      "to_quarter": true
+    },
+    {
+      "id": "x_ps_real",
+      "label": "Koko talous, reaalinen",
+      "set": "bkt",
+      "chart_only": true,
+      "pct_lag": 4,
+      "div": {
+        "source": "statfin",
+        "table": "khi/11xs.px",
+        "pick": {
+          "contentscode": "ip_0_2015"
+        },
+        "to_quarter": true
+      },
+      "div_mult": 100,
+      "source": "statfin",
+      "table": "ktps/14mr.px",
+      "pick": {
+        "nace_8_20180101": "ATX",
+        "contentscode": "ktps-alkuperainen"
+      },
+      "to_quarter": true
     }
   ]
 }
