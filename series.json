@@ -1154,7 +1154,7 @@
   "series": [
     {
       "id": "ek_teol",
-      "label": "Luottamus, teollisuus",
+      "label": "Teollisuuden luottamus",
       "set": "suhdanne",
       "group": "Luottamus",
       "source": "eurostat",
@@ -1168,11 +1168,12 @@
       "kind": "balance",
       "invert": false,
       "unit": "saldo",
-      "raw_desc": "Kausitasoitettu saldoluku"
+      "raw_desc": "Kausitasoitettu saldoluku",
+      "list": "Teollisuus"
     },
     {
       "id": "ek_rak",
-      "label": "Luottamus, rakentaminen",
+      "label": "Rakentamisen luottamus",
       "set": "suhdanne",
       "group": "Luottamus",
       "source": "eurostat",
@@ -1185,11 +1186,12 @@
       "kind": "balance",
       "invert": false,
       "unit": "saldo",
-      "raw_desc": "Kausitasoitettu saldoluku"
+      "raw_desc": "Kausitasoitettu saldoluku",
+      "list": "Rakentaminen"
     },
     {
       "id": "ek_palv",
-      "label": "Luottamus, palvelut",
+      "label": "Palvelujen luottamus",
       "set": "suhdanne",
       "group": "Luottamus",
       "source": "eurostat",
@@ -1203,11 +1205,12 @@
       "kind": "balance",
       "invert": false,
       "unit": "saldo",
-      "raw_desc": "Kausitasoitettu saldoluku"
+      "raw_desc": "Kausitasoitettu saldoluku",
+      "list": "Palvelut"
     },
     {
       "id": "ek_kau",
-      "label": "Luottamus, kauppa",
+      "label": "Kaupan luottamus",
       "set": "suhdanne",
       "group": "Luottamus",
       "source": "eurostat",
@@ -1221,11 +1224,12 @@
       "kind": "balance",
       "invert": false,
       "unit": "saldo",
-      "raw_desc": "Kausitasoitettu saldoluku"
+      "raw_desc": "Kausitasoitettu saldoluku",
+      "list": "Kauppa"
     },
     {
       "id": "kul_luot",
-      "label": "Luottamus, kuluttajat",
+      "label": "Kuluttajien luottamus",
       "set": "suhdanne",
       "group": "Luottamus",
       "source": "statfin",
@@ -1237,11 +1241,12 @@
       "kind": "balance",
       "invert": false,
       "unit": "saldo",
-      "raw_desc": "Kausitasoittamaton saldoluku"
+      "raw_desc": "Kausitasoittamaton saldoluku",
+      "list": "Kuluttajat"
     },
     {
       "id": "ek_til",
-      "label": "Tilauskanta, teollisuus",
+      "label": "Teollisuuden tilauskanta (EK)",
       "set": "suhdanne",
       "group": "Tilaukset ja luvat",
       "source": "eurostat",
@@ -1259,7 +1264,7 @@
     },
     {
       "id": "tilaukset",
-      "label": "Uudet tilaukset, teollisuus",
+      "label": "Teollisuuden uudet tilaukset",
       "set": "suhdanne",
       "group": "Tilaukset ja luvat",
       "source": "statfin",
@@ -1276,7 +1281,7 @@
     },
     {
       "id": "rak_luv",
-      "label": "Luvat, rakentaminen",
+      "label": "Rakennusluvat",
       "set": "suhdanne",
       "group": "Tilaukset ja luvat",
       "source": "statfin",
@@ -1322,7 +1327,7 @@
     },
     {
       "id": "vahittais",
-      "label": "Myynti, vähittäiskauppa",
+      "label": "Vähittäiskaupan myynti",
       "set": "suhdanne",
       "group": "Kulutus",
       "source": "eurostat",
@@ -1337,11 +1342,12 @@
       "kind": "volume",
       "invert": false,
       "unit": "ind. 2021=100",
-      "raw_desc": "Kausitasoitettu volyymi-indeksi"
+      "raw_desc": "Kausitasoitettu volyymi-indeksi",
+      "list": "Vähittäiskauppa"
     },
     {
       "id": "ravitsemus",
-      "label": "Myynti, majoitus ja ravitsemus",
+      "label": "Majoitus- ja ravitsemuspalvelujen myynti",
       "set": "suhdanne",
       "group": "Kulutus",
       "source": "eurostat",
@@ -1365,11 +1371,12 @@
       },
       "note": "Liikevaihto deflatoitu alan kuluttajahintaindeksillä (HICP CP11).",
       "unit": "ind. 2021=100",
-      "raw_desc": "Kausitasoitettu, deflatoitu liikevaihto"
+      "raw_desc": "Kausitasoitettu, deflatoitu liikevaihto",
+      "list": "Majoitus ja ravitsemus"
     },
     {
       "id": "teoltuot",
-      "label": "Tuotanto, teollisuus",
+      "label": "Teollisuustuotanto",
       "set": "suhdanne",
       "group": "Tuotanto",
       "source": "statfin",
@@ -1386,7 +1393,7 @@
     },
     {
       "id": "kapasiteetti",
-      "label": "Käyttöaste, teollisuus",
+      "label": "Teollisuuden käyttöaste",
       "set": "suhdanne",
       "group": "Tuotanto",
       "source": "eurostat",
@@ -1405,7 +1412,7 @@
     },
     {
       "id": "tsk",
-      "label": "Tuotanto, koko talous",
+      "label": "Tuotannon suhdannekuvaaja",
       "set": "suhdanne",
       "group": "Tuotanto",
       "source": "statfin",
@@ -1422,7 +1429,7 @@
     },
     {
       "id": "rak_alo",
-      "label": "Aloitukset, rakentaminen",
+      "label": "Aloitetut rakennukset",
       "set": "suhdanne",
       "group": "Tuotanto",
       "source": "statfin",
@@ -1491,7 +1498,7 @@
     },
     {
       "id": "avoimet",
-      "label": "Avoimet työpaikat, TE-palvelut",
+      "label": "Avoimet työpaikat (TE‑palvelut)",
       "set": "suhdanne",
       "group": "Työmarkkinat",
       "source": "statfin",

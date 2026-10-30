@@ -669,7 +669,7 @@ footer b { color: var(--fg); font-weight: 600; }
       const out = !s.comp && !s.in_composite;
       b.dataset.id = s.id;
       b.innerHTML = `<span class="per" title="Havaintokausi">${p ? fmtP(set.periods[p.i]) : "–"}</span>` +
-        `<span class="nm" title="${s.label}">${s.label}${s.invert ? ` <span class="inv" title="Käännetty sarja: nousu näkyy negatiivisena">käänt.</span>` : ""}${out ? `<sup title="Ei mukana kokonaisindikaattorissa">*</sup>` : ""}</span>` +
+        `<span class="nm" title="${s.label}">${s.list || s.label}${s.invert ? ` <span class="inv" title="Käännetty sarja: nousu näkyy negatiivisena">käänt.</span>` : ""}${out ? `<sup title="Ei mukana kokonaisindikaattorissa">*</sup>` : ""}</span>` +
         `<span class="v">${p ? fmtN(p.l) : "–"}</span><span class="v">${p ? fmtN(p.c) : "–"}</span>` +
         (q ? `<span class="ph" style="--qc:${qcol(q)}" title="${Q[q].name}"><i></i><span class="pt-t">${Q[q].short}</span></span>` : `<span></span>`);
       b.onclick = () => select(s.id);
