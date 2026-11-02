@@ -19,6 +19,7 @@ Z_FROM   <- 2010          # standardointi-ikkunan ja julkaisun alkuvuosi
 LAMBDA   <- c(M = 129600, Q = 1600)  # trendi
 LAMBDA_S <- c(M = 14,     Q = 1)     # kohinasuodin: poistaa alle ~12 kk syklit
 TAIL_N   <- c(M = 6, Q = 4)
+EXT_H    <- c(M = 12, Q = 4)  # ennustejatke ennen suodatusta (paatepisteongelma, Kaiser ja Maravall 1999)
 TILE_N   <- 130           # markkinaruutujen paivahavainnot; sivu nayttaa niista viimeiset 3 kk
 CACHE_DIR <- "cache"      # edelliset onnistuneet haut sarjoittain
 STALE    <- character(0)  # sarjat, joiden data tuli valimuistista
@@ -335,12 +336,23 @@ hp_trend <- function(y, lambda) {
   as.numeric(solve(diag(n) + lambda * crossprod(D), y))
 }
 
+# jatketaan sarjaa AR-ennusteella: volyymit erotuksista (kasvuvauhti jatkuu), muut tasoista (palautuu keskiarvoon)
+ext_ar <- function(y, h, freq, kind) {
+  om <- if (freq == "M") 12 else 4
+  if (kind == "volume") { f <- ar(diff(y), order.max = om, aic = TRUE, method = "yule-walker")
+    return(c(y, y[length(y)] + cumsum(as.numeric(predict(f, n.ahead = h)$pred)))) }
+  f <- ar(y, order.max = om, aic = TRUE, method = "yule-walker")
+  c(y, as.numeric(predict(f, n.ahead = h)$pred))
+}
+
 clock_series <- function(d, s, freq) {
   y <- if (s$kind == "volume") 100 * log(d$value) else d$value
-  sm <- hp_trend(y, LAMBDA_S[[freq]])                                  # kohinasuodin
+  n <- length(y); ye <- ext_ar(y, EXT_H[[freq]], freq, s$kind)
+  lam <- if (is.null(s$lambda)) LAMBDA[[freq]] else s$lambda          # tyomarkkina-asteille jaykempi trendi
+  sm <- hp_trend(ye, LAMBDA_S[[freq]])[1:n]                            # kohinasuodin
   # volume/balance: poikkeama pitkan aikavalin trendista (HP-kaistanpaasto)
   # level (korot, stressi, epavarmuus): taso suhteessa omaan historiaan, ei trendia
-  tr  <- if (s$kind == "level") rep(NA_real_, length(y)) else hp_trend(y, LAMBDA[[freq]])
+  tr  <- if (s$kind == "level") rep(NA_real_, n) else hp_trend(ye, lam)[1:n]
   gap <- if (s$kind == "level") sm else sm - tr
   keep <- as.integer(substr(d$date, 1, 4)) >= Z_FROM
   lvl <- (gap - mean(gap[keep])) / sd(gap[keep])
@@ -667,6 +679,7 @@ out <- list(
                     " kuukausisarjoille, ", LAMBDA_S[["Q"]], " neljännessarjoille) poikkeama pitkän aikavälin HP-trendistä (λ = ",
                     format(LAMBDA[["M"]], big.mark = " "), " kuukausisarjoille, ", format(LAMBDA[["Q"]], big.mark = " "),
                     " neljännessarjoille), volyymeille log-muodossa, standardoitu vuodesta ", Z_FROM, " alkaen. ",
+                    "Ennen suodatusta sarjoja jatketaan vuoden AR-ennusteella päätepisteongelman lieventämiseksi (Kaiser ja Maravall 1999). ",
                     "Muutos on tason muutos edellisestä jaksosta jaettuna sen keskihajonnalla. Käännetyissä sarjoissa ",
                     "(työttömyysaste, konkurssit) etumerkki on vaihdettu, joten ylhäällä = parempi. Majoitus- ja ravitsemuspalvelujen ",
                     "myynti on deflatoitu alan kuluttajahintaindeksillä, koska Eurostat ei julkaise Suomelle volyymisarjaa."),
