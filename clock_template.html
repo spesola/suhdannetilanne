@@ -232,7 +232,12 @@ body { font-variant-numeric: tabular-nums; background: var(--bg); min-height: 10
 .cmenu[hidden] { display: none !important; }
 .cmenu button.dl { margin: 0 !important; text-decoration: none; text-align: left; padding: 7px 10px; border-radius: 5px; font-size: 0.82rem; }
 .cmenu button.dl:hover, .cmenu button.dl:focus-visible { background: color-mix(in srgb, var(--fg) 6%, transparent); outline: 0; }
-.card.fcard.zoomable svg.fc { cursor: zoom-in; }
+.fcw { position: relative; }
+.card.fcard.zoomable svg.fc { cursor: pointer; }
+.zhint { position: absolute; top: 10px; right: 4px; width: 26px; height: 26px; display: grid; place-items: center; border-radius: 6px; pointer-events: none;
+  background: color-mix(in srgb, var(--bg) 88%, transparent); border: 1px solid var(--line); color: var(--fg); opacity: 0; transition: opacity .15s; }
+.zhint svg { display: block; fill: none; stroke: currentColor; stroke-width: 1.6; stroke-linecap: round; stroke-linejoin: round; }
+.fcw:hover .zhint { opacity: 1; }
 .card.fcard.zoomable { transition: border-color .15s, box-shadow .15s; }
 .card.fcard.zoomable:has(svg.fc:hover) { border-color: color-mix(in srgb, var(--fg) 30%, var(--line)); box-shadow: 0 2px 12px rgba(22, 27, 34, .06); }
 .secnav + .fsec { margin-top: 14px !important; }
@@ -1141,7 +1146,7 @@ footer b { color: var(--fg); font-weight: 600; }
   function addPng(db, card) {             // "Lataa kuva" CSV-linkin viereen
     const b = document.createElement("button"); b.type = "button"; b.className = "dl"; b.textContent = "Lataa kuva"; b.title = "Lataa kuvio PNG-kuvana";
     b.onclick = () => chartPNG(card).catch(e => console.warn("PNG", e)); db.after(b);
-    if (card._zc && !zoomRendering) { const z = document.createElement("button"); z.type = "button"; z.className = "dl"; z.textContent = "Suurenna";
+    if (card._zc && !zoomRendering && !FINE.matches) { const z = document.createElement("button"); z.type = "button"; z.className = "dl"; z.textContent = "Suurenna";
       z.title = "Avaa kuvio isompana"; z.onclick = () => openZoom(card._zc); b.after(z); }
     return b; }
   // suurennus: kuvio piirretaan uudelleen isompana dialogiin (tekstit pysyvat normaalikokoisina, hover toimii)
@@ -1365,7 +1370,10 @@ footer b { color: var(--fg); font-weight: 600; }
     mb.onclick = e => { e.stopPropagation(); const open = m.hidden; closeMenus(); if (open) { m.hidden = false; mb.setAttribute("aria-expanded", "true"); m.querySelector("button").focus(); } };
     m.addEventListener("click", e => { e.stopPropagation(); if (e.target.closest("button")) { closeMenus(); mb.focus({ preventScroll: true }); } });
     const svg = card.querySelector(":scope > svg.fc");
-    if (card._zc && svg && !zoomRendering && FINE.matches) { card.classList.add("zoomable"); svg.addEventListener("click", () => openZoom(card._zc)); }
+    if (card._zc && svg && !zoomRendering && FINE.matches) {          // hiirella: kuvan klikkaus suurentaa, hover nayttaa suurennusikonin
+      card.classList.add("zoomable"); const w = document.createElement("div"); w.className = "fcw"; svg.before(w); w.appendChild(svg);
+      w.insertAdjacentHTML("beforeend", '<span class="zhint" aria-hidden="true"><svg viewBox="0 0 16 16" width="14" height="14"><path d="M9.5 2.5h4v4M13.5 2.5 9 7M6.5 13.5h-4v-4M2.5 13.5 7 9"/></svg></span>');
+      svg.addEventListener("click", () => openZoom(card._zc)); svg.setAttribute("aria-description", "Klikkaa suurentaaksesi"); }
   }
   function renderCharts(box = $("charts"), only = null) {
     const r = renderCharts0(box, only);
