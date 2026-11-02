@@ -218,13 +218,25 @@ body { font-variant-numeric: tabular-nums; background: var(--bg); min-height: 10
   .tile .tv { font-size: 1.2rem; }
   .tile .tfn { display: none; }
 }
-.fgrid { display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); gap: 48px 48px; }
+.fgrid { display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); gap: 24px; }
 .fcard { grid-column: span 2; }
-.tsgrid { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 48px; align-items: start; }
+/* kuviokortit: ohut reuna */
+.card.fcard, .tsmain, .card.grtab { border: 1px solid var(--line); border-radius: 10px; padding: 14px 16px; background: var(--plot); }
+.secnav + .fsec { margin-top: 14px !important; }
+.zoom { width: min(1280px, calc(100vw - 24px)); max-width: none; max-height: calc(100vh - 24px); border: 0; border-radius: 12px; padding: 14px 20px 20px; background: var(--plot); color: var(--fg); box-shadow: 0 12px 48px rgba(0,0,0,.22); }
+.zoom::backdrop { background: rgba(22, 27, 34, .45); }
+.zoom .zbar { display: flex; justify-content: flex-end; margin-bottom: 2px; }
+.zoom .zbar button { font: inherit; font-size: 0.85rem; color: var(--fg); background: none; border: 1px solid var(--line); border-radius: 6px; padding: 3px 10px; cursor: pointer; }
+.zoom .zbar button:hover { border-color: var(--fg); }
+.zoom .fgrid { grid-template-columns: minmax(0, 1fr); }
+.zoom .card.fcard { border: 0; padding: 0; grid-column: 1 / -1; }
+body.zoomed { overflow: hidden; }
+@media (max-width: 640px) { .card.fcard, .tsmain, .card.grtab { padding: 12px; } .zoom { padding: 10px 12px 14px; } }
+.tsgrid { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 24px; align-items: start; }
 .tsgrid.solo { grid-template-columns: minmax(0, 1fr); }
 #tsContrib { grid-template-columns: minmax(0, 1fr); }
-#tsContrib .card { border-top: 0; padding-top: 0; }
-@media (max-width: 860px) { .tsgrid { grid-template-columns: minmax(0, 1fr); } #tsContrib .card { border-top: 1px solid var(--rule); padding-top: 14px; } }
+#tsContrib .card:not(.fcard) { border-top: 0; padding-top: 0; }
+@media (max-width: 860px) { .tsgrid { grid-template-columns: minmax(0, 1fr); } #tsContrib .card:not(.fcard) { border-top: 1px solid var(--rule); padding-top: 14px; } }
 .fcard.half { grid-column: span 3; }
 .fcard.wide { grid-column: 1 / -1; }
 .fcard.tt { grid-column: 1 / span 4; }
@@ -238,9 +250,9 @@ button.dl:hover { text-decoration-color: var(--fg); }
 .fhead > .dl { margin-left: auto; }
 .fmeta > .dl + .dl, .fhead > .dl + .dl { margin-left: 12px; }
 .step.play { font-size: 0.7rem; }
-.fsec { grid-column: 1 / -1; font-size: 1.45rem; line-height: 1.2; letter-spacing: -0.01em; color: var(--fg); font-weight: 600; margin: 24px 0 -26px; scroll-margin-top: 64px; }
+.fsec { grid-column: 1 / -1; font-size: 1.45rem; line-height: 1.2; letter-spacing: -0.01em; color: var(--fg); font-weight: 600; margin: 24px 0 -8px; scroll-margin-top: 64px; }
 .fsec:first-child, .secnav + .fsec { margin-top: 0; }
-.grpair { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 48px; align-items: start; }   /* samat palstat kuin alla olevassa ruudukossa */
+.grpair { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 24px; align-items: start; }   /* samat palstat kuin alla olevassa ruudukossa */
 .grpair > .card { min-width: 0; }
 .grtab > .fnote { width: 0; min-width: 100%; }   /* alaviite ei levenna saraketta */
 .grpair .hm thead th { padding: 2px 0; font-size: 0.7rem; }
@@ -248,9 +260,9 @@ button.dl:hover { text-decoration-color: var(--fg); }
 .grpair .hm td { width: 42px; min-width: 42px; padding: 6px 1px; }
 .grpair .hm th.rl { font-size: 0.82rem; padding-right: 8px; padding-left: 4px; }
 .grpair .hm th.rl.sub { padding-left: 12px; font-size: 0.76rem; }
-.grleft, .grside { display: flex; flex-direction: column; gap: 40px; min-width: 0; }
+.grleft, .grside { display: flex; flex-direction: column; gap: 24px; min-width: 0; }
 .grside:empty { display: none; }
-.grcol { display: flex; flex-direction: column; gap: 28px; min-width: 0; }
+.grcol { display: flex; flex-direction: column; gap: 24px; min-width: 0; }
 .fmeta > .fnote { margin: 0; flex: 1 1 260px; }
 /* erittely ja tunnusluvut: tiivis tukikortti, paakuvio saa tilan */
 .fcard.side { padding-top: 10px; }
@@ -427,6 +439,7 @@ footer b { color: var(--fg); font-weight: 600; }
   <section class="grmore" id="grMore" hidden><div class="fgrid" id="grMoreGrid"></div></section>
   <section class="card" id="finSum" hidden></section>
   <section class="fgrid" id="charts" hidden></section>
+  <dialog class="zoom" id="zoom" aria-label="Suurennettu kuvio"><div class="zbar"><button type="button" id="zoomClose">Sulje</button></div><div class="fgrid" id="zoomBody"></div></dialog>
 
   <section class="card" id="detail">
     <div class="tabs" role="tablist">
@@ -1114,7 +1127,24 @@ footer b { color: var(--fg); font-weight: 600; }
   }
   function addPng(db, card) {             // "Lataa kuva" CSV-linkin viereen
     const b = document.createElement("button"); b.type = "button"; b.className = "dl"; b.textContent = "Lataa kuva"; b.title = "Lataa kuvio PNG-kuvana";
-    b.onclick = () => chartPNG(card).catch(e => console.warn("PNG", e)); db.after(b); return b; }
+    b.onclick = () => chartPNG(card).catch(e => console.warn("PNG", e)); db.after(b);
+    if (card._zc && !zoomRendering) { const z = document.createElement("button"); z.type = "button"; z.className = "dl"; z.textContent = "Suurenna";
+      z.title = "Avaa kuvio isompana"; z.onclick = () => openZoom(card._zc); b.after(z); }
+    return b; }
+  // suurennus: kuvio piirretaan uudelleen isompana dialogiin (tekstit pysyvat normaalikokoisina, hover toimii)
+  let zoomHooks = null, zoomRendering = false;
+  function openZoom(cfg) {
+    const d = $("zoom"), b = $("zoomBody"); zoomHooks = chartHooks; b.innerHTML = "";
+    d.showModal(); document.body.classList.add("zoomed");
+    const w = Math.round(b.clientWidth), nar = w < 640;
+    const h = Math.max(220, Math.round(Math.min(nar ? w * 0.85 : w * 0.5, innerHeight - (nar ? 300 : 240))));
+    zoomRendering = true;
+    try { renderCharts(b, [{ ...cfg, section: undefined, size: undefined, wide: true, w, height: cfg.lower ? Math.round(h * 1.15) : h }]); } finally { zoomRendering = false; }
+    $("zoomClose").focus();
+  }
+  $("zoom").addEventListener("close", () => { $("zoomBody").innerHTML = ""; document.body.classList.remove("zoomed"); if (zoomHooks) chartHooks = zoomHooks; zoomHooks = null; });
+  $("zoom").addEventListener("click", e => { if (e.target === $("zoom")) $("zoom").close(); });
+  $("zoomClose").onclick = () => $("zoom").close();
   const slug = s => s.toLowerCase().replace(/[åä]/g, "a").replace(/ö/g, "o").replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "").slice(0, 60);
   function chartCSV(c) {
     const ser = id => set.series.find(x => x.id === id), lbl = id => (c.labels && c.labels[id]) || ser(id).label;
@@ -1199,9 +1229,9 @@ footer b { color: var(--fg); font-weight: 600; }
   // hajontakuvio ajassa (esim. Beveridgen kayra): pisteet yhdistetty, uusimmat tummimpina
   function scatterCard(c, narrow) {
     const ser = id => set.series.find(x => x.id === id), X = ser(c.x).values, Y = ser(c.y).values;
-    const card = document.createElement("div"); card.className = "card fcard" + (narrow ? "" : " half");
+    const card = document.createElement("div"); card.className = "card fcard" + (narrow ? "" : " half"); card._zc = c;
     card.innerHTML = `<div class="fhead"><h2>${c.title}</h2><span class="fval"></span></div><p class="fsub"></p>`;
-    const W2 = narrow ? 420 : 560, H2 = narrow ? 300 : 260, fs = narrow ? 13 : 12, ml = 44, mr = 14, mt = 10, mb = 40;
+    const W2 = c.w || (narrow ? 420 : 560), H2 = c.height || (narrow ? 300 : 260), fs = c.w ? 12 : narrow ? 13 : 12, ml = 44, mr = 14, mt = 10, mb = 40;
     const i0 = c.from ? Math.max(0, set.periods.findIndex(p => p >= String(c.from))) : 0;
     const pts = []; for (let i = i0; i < set.periods.length; i++) if (X[i] != null && Y[i] != null) pts.push(i);
     const svg = el("svg", { class: "fc", viewBox: `0 0 ${W2} ${H2}`, role: "img", "aria-label": c.title }, card);
@@ -1245,9 +1275,9 @@ footer b { color: var(--fg); font-weight: 600; }
     return card;
   }
   function curveCard(c, narrow) {
-    const K = c.curve, card = document.createElement("div"); card.className = "card fcard" + (narrow ? "" : " half");
+    const K = c.curve, card = document.createElement("div"); card.className = "card fcard" + (narrow ? "" : " half"); card._zc = c;
     card.innerHTML = `<div class="fhead"><h2>${c.title}</h2><span class="fval"></span></div><p class="fsub"></p>`;
-    const W2 = narrow ? 420 : 560, H2 = 300, fs = narrow ? 13 : 12, ml = 44, mr = 14, mt = 10, mb = 30, n = K.maturities.length;
+    const W2 = c.w || (narrow ? 420 : 560), H2 = c.height || 300, fs = c.w ? 12 : narrow ? 13 : 12, ml = 44, mr = 14, mt = 10, mb = 30, n = K.maturities.length;
     const svg = el("svg", { class: "fc", viewBox: `0 0 ${W2} ${H2}`, role: "img", "aria-label": c.title }, card);
     const all = K.lines.flatMap(l => l.values).filter(v => v != null);
     let lo = Math.min(...all), hi = Math.max(...all); const step = niceStep(hi - lo) || 0.5;
@@ -1301,7 +1331,7 @@ footer b { color: var(--fg); font-weight: 600; }
     $("grSide").innerHTML = ""; colMainH = null; renderCharts($("grCharts"));
     if (two && lastMainH) {
       const diff = $("growthSec").querySelector(".grleft").offsetHeight - $("grCharts").offsetHeight;
-      if (Math.abs(diff) > 3) { colMainH = Math.max(lastLower ? 240 : 190, Math.min(560, lastMainH + diff)); $("grSide").innerHTML = ""; renderCharts($("grCharts")); colMainH = null; }
+      if (Math.abs(diff) > 3) { colMainH = Math.max(lastLower ? 200 : 190, Math.min(560, lastMainH + diff)); $("grSide").innerHTML = ""; renderCharts($("grCharts")); colMainH = null; }
     }
   }
   function renderCharts(box = $("charts"), only = null) {
@@ -1361,7 +1391,7 @@ footer b { color: var(--fg); font-weight: 600; }
       const main = col && tgt === box;
       const erit = main ? !!(c.stack && c.stack.length) : !col && c.size === "tt" && !narrow;   // pinotuille: valitun jakson erittely
       if (main) { c.size = "half"; c.wide = false; delete c.w; delete c.height;
-        if (!narrow) { c.w = Math.round(box.clientWidth); c.height = colMainH || Math.round(Math.min(290, Math.max(240, c.w * 0.52))); } }   // 1:1 mittakaava; korkeus sovitetaan taulukkoon
+        if (!narrow) { c.w = Math.round(box.clientWidth - 34); c.height = colMainH || Math.round(Math.min(290, Math.max(240, c.w * 0.52))); } }   // 1:1 mittakaava; korkeus sovitetaan taulukkoon
       else if (col) { c.size = c.lower ? undefined : "half"; c.wide = !!c.lower; delete c.w; c.height = c.lower ? 300 : 260; }   // ruudukko: kiinteä piirtoalue, alipaneeli koko leveys
       const lbl = id => (c.labels && c.labels[id]) || ser(id).label;
       if (c.bars && !ser(c.bars)) delete c.bars;
@@ -1386,6 +1416,7 @@ footer b { color: var(--fg); font-weight: 600; }
       }
       const db = document.createElement("button"); db.type = "button"; db.className = "dl"; db.textContent = "Lataa CSV"; db.title = "Lataa kuvan data";
       db.onclick = () => chartCSV(c);
+      card._zc = { ...c, colors: Object.fromEntries([...c.lines].map(id => [id, colOf[id]])) };   // suurennus: samat varit
       if (c.ts) card.querySelector(".fhead").appendChild(db); else fm.appendChild(db);   // aikasarjanakymassa kuten vasen kuvio: otsikkoriville
       addPng(db, card);
       if (fm.children.length) card.appendChild(fm);
@@ -1552,7 +1583,7 @@ footer b { color: var(--fg); font-weight: 600; }
   let lastNarrow = null, lastK = null, rzT = null;
   addEventListener("resize", () => { const c = $("clock"); if (!c || $("topSec").hidden) return;   // kartan pistekoko kapealla
     const k = c.clientWidth < 420; if (k !== lastK) { lastK = k; renderClock(); } });
-  addEventListener("resize", () => { if (set.view !== "charts") return;
+  addEventListener("resize", () => { if (set.view !== "charts" || $("zoom").open) return;
     const b = chartBox(), nw = b.clientWidth < (b.id === "grCharts" ? 420 : 640);
     if (b.id === "grCharts") { clearTimeout(rzT); rzT = setTimeout(drawCharts, 150); return; }   // ylapari sovitetaan uudelleen
     if (nw !== lastNarrow) { lastNarrow = nw; renderCharts(b); } });
