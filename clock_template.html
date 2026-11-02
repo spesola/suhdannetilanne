@@ -221,9 +221,22 @@ body { font-variant-numeric: tabular-nums; background: var(--bg); min-height: 10
 .fgrid { display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); gap: 24px; }
 .fcard { grid-column: span 2; }
 /* kuviokortit: ohut reuna */
-.card.fcard, .tsmain, .card.grtab { border: 1px solid var(--line); border-radius: 10px; padding: 14px 16px; background: var(--plot); }
+.card.fcard, .tsmain, .card.grtab { border: 1px solid var(--line); border-radius: 10px; padding: 14px 16px; }
+.card.fcard { position: relative; }
+.hasmenu > .fhead { padding-right: 30px; }
+.more { position: absolute; top: 10px; right: 8px; width: 28px; height: 28px; display: grid; place-items: center; border: 0; border-radius: 6px; background: none; color: var(--muted); cursor: pointer; padding: 0; }
+.more:hover, .more[aria-expanded="true"] { background: color-mix(in srgb, var(--fg) 7%, transparent); color: var(--fg); }
+.more:focus-visible { outline: 2px solid var(--accent); outline-offset: 1px; }
+.more svg { fill: currentColor; display: block; }
+.cmenu { position: absolute; top: 40px; right: 8px; z-index: 30; min-width: 150px; background: var(--bg); border: 1px solid var(--line); border-radius: 8px; box-shadow: 0 6px 24px rgba(0,0,0,.12); padding: 4px; display: flex; flex-direction: column; }
+.cmenu[hidden] { display: none !important; }
+.cmenu button.dl { margin: 0 !important; text-decoration: none; text-align: left; padding: 7px 10px; border-radius: 5px; font-size: 0.82rem; }
+.cmenu button.dl:hover, .cmenu button.dl:focus-visible { background: color-mix(in srgb, var(--fg) 6%, transparent); outline: 0; }
+.card.fcard.zoomable svg.fc { cursor: zoom-in; }
+.card.fcard.zoomable { transition: border-color .15s, box-shadow .15s; }
+.card.fcard.zoomable:has(svg.fc:hover) { border-color: color-mix(in srgb, var(--fg) 30%, var(--line)); box-shadow: 0 2px 12px rgba(22, 27, 34, .06); }
 .secnav + .fsec { margin-top: 14px !important; }
-.zoom { width: min(1280px, calc(100vw - 24px)); max-width: none; max-height: calc(100vh - 24px); border: 0; border-radius: 12px; padding: 14px 20px 20px; background: var(--plot); color: var(--fg); box-shadow: 0 12px 48px rgba(0,0,0,.22); }
+.zoom { width: min(1280px, calc(100vw - 24px)); max-width: none; max-height: calc(100vh - 24px); border: 0; border-radius: 12px; padding: 14px 20px 20px; background: var(--bg); color: var(--fg); box-shadow: 0 12px 48px rgba(0,0,0,.22); }
 .zoom::backdrop { background: rgba(22, 27, 34, .45); }
 .zoom .zbar { display: flex; justify-content: flex-end; margin-bottom: 2px; }
 .zoom .zbar button { font: inherit; font-size: 0.85rem; color: var(--fg); background: none; border: 1px solid var(--line); border-radius: 6px; padding: 3px 10px; cursor: pointer; }
@@ -1334,7 +1347,32 @@ footer b { color: var(--fg); font-weight: 600; }
       if (Math.abs(diff) > 3) { colMainH = Math.max(lastLower ? 200 : 190, Math.min(560, lastMainH + diff)); $("grSide").innerHTML = ""; renderCharts($("grCharts")); colMainH = null; }
     }
   }
+  // kuviokortin toiminnot (CSV, kuva, suurennus) kolmen pisteen valikon taakse; hiirella kuvan klikkaus suurentaa
+  const DOTS = '<svg viewBox="0 0 16 16" width="16" height="16" aria-hidden="true"><circle cx="3" cy="8" r="1.5"/><circle cx="8" cy="8" r="1.5"/><circle cx="13" cy="8" r="1.5"/></svg>';
+  const FINE = matchMedia("(hover: hover) and (pointer: fine)");
+  function closeMenus() { document.querySelectorAll(".cmenu:not([hidden])").forEach(m => { m.hidden = true; const b = m.parentNode.querySelector(":scope > .more"); if (b) b.setAttribute("aria-expanded", "false"); }); }
+  document.addEventListener("click", closeMenus);
+  document.addEventListener("keydown", e => { if (e.key === "Escape") closeMenus(); });
+  function menuize(card) {
+    if (card._menu) return;
+    const btns = [...card.querySelectorAll(":scope > .fhead > button.dl, :scope > .fmeta > button.dl")]; if (!btns.length) return;
+    card._menu = true; card.classList.add("hasmenu");
+    const mb = document.createElement("button"); mb.type = "button"; mb.className = "more"; mb.innerHTML = DOTS; mb.title = "Lataa tai suurenna";
+    mb.setAttribute("aria-label", "Toiminnot: " + ((card.querySelector(".fhead h2") || {}).textContent || "kuvio")); mb.setAttribute("aria-haspopup", "true"); mb.setAttribute("aria-expanded", "false");
+    const m = document.createElement("div"); m.className = "cmenu"; m.hidden = true; btns.forEach(b => m.appendChild(b));
+    card.append(mb, m);
+    card.querySelectorAll(":scope > .fmeta").forEach(f => { if (!f.children.length) f.remove(); });
+    mb.onclick = e => { e.stopPropagation(); const open = m.hidden; closeMenus(); if (open) { m.hidden = false; mb.setAttribute("aria-expanded", "true"); m.querySelector("button").focus(); } };
+    m.addEventListener("click", e => { e.stopPropagation(); if (e.target.closest("button")) { closeMenus(); mb.focus({ preventScroll: true }); } });
+    const svg = card.querySelector(":scope > svg.fc");
+    if (card._zc && svg && !zoomRendering && FINE.matches) { card.classList.add("zoomable"); svg.addEventListener("click", () => openZoom(card._zc)); }
+  }
   function renderCharts(box = $("charts"), only = null) {
+    const r = renderCharts0(box, only);
+    [box, $("grMoreGrid")].forEach(x => x && x.querySelectorAll(".fcard").forEach(menuize));
+    return r;
+  }
+  function renderCharts0(box = $("charts"), only = null) {
     box.innerHTML = ""; chartHooks = [];
     const ser = id => set.series.find(x => x.id === id);
     const col = box.id === "grCharts";                                  // taulukon vieressa allekkain: kuviot puolikkaan kokoisina
