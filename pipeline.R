@@ -357,7 +357,9 @@ clock_series <- function(d, s, freq) {
   keep <- as.integer(substr(d$date, 1, 4)) >= Z_FROM
   lvl <- (gap - mean(gap[keep])) / sd(gap[keep])
   if (isTRUE(s$invert)) lvl <- -lvl
-  dl  <- c(NA, diff(lvl))
+  # muutos: volyymeilla poikkeaman muutos; saldoluvuilla ja asteilla (ei kasvutrendia) tasoitetun sarjan oma muutos,
+  # jotta trendin liike ei nay muutoksena (paikallaan pysyva aste = nollamuutos)
+  dl  <- if (s$kind == "balance") (if (isTRUE(s$invert)) -1 else 1) * c(NA, diff(sm)) else c(NA, diff(lvl))
   chg <- dl / sd(dl[keep], na.rm = TRUE)          # ei keskistysta: etumerkki sailyy
   # trendi sarjan omassa yksikossa (volyymit log-muodosta takaisin), naytetaan julkaistun arvon kuvassa
   trend <- if (s$kind == "volume") exp(tr / 100) else tr
@@ -680,7 +682,9 @@ out <- list(
                     format(LAMBDA[["M"]], big.mark = " "), " kuukausisarjoille, ", format(LAMBDA[["Q"]], big.mark = " "),
                     " neljännessarjoille), volyymeille log-muodossa, standardoitu vuodesta ", Z_FROM, " alkaen. ",
                     "Ennen suodatusta sarjoja jatketaan vuoden AR-ennusteella päätepisteongelman lieventämiseksi (Kaiser ja Maravall 1999). ",
-                    "Muutos on tason muutos edellisestä jaksosta jaettuna sen keskihajonnalla. Käännetyissä sarjoissa ",
+                    "Muutos on tason muutos edellisestä jaksosta jaettuna sen keskihajonnalla. Sarjoissa, joilla ei ole kasvutrendiä (saldoluvut, ",
+                    "käyttöaste, työllisyys- ja työttömyysaste), muutos lasketaan kohinasuodatetun sarjan omasta muutoksesta, jotta trendin ",
+                    "liike ei näy muutoksena. Käännetyissä sarjoissa ",
                     "(työttömyysaste, konkurssit) etumerkki on vaihdettu, joten ylhäällä = parempi. Majoitus- ja ravitsemuspalvelujen ",
                     "myynti on deflatoitu alan kuluttajahintaindeksillä, koska Eurostat ei julkaise Suomelle volyymisarjaa."),
     growth = paste0("Reaalitalous: q/q kausitasoitetusta sarjasta, v/v työpäiväkorjatusta (tilinpito) tai alkuperäisestä sarjasta ",
