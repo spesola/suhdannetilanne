@@ -30,7 +30,7 @@
           ],
           "lineColor": "var(--fg)",
           "from": 2016,
-          "note": "Kysymysten saldoluvut / 3, varastot käänteisinä. Lähde: EK, Euroopan komissio."
+          "note": "Kysymysten saldoluvut / 3. Lähde: EK, Euroopan komissio."
         },
         "ek_rak": {
           "id": "luot_ek_rak",
@@ -86,7 +86,7 @@
           ],
           "lineColor": "var(--fg)",
           "from": 2016,
-          "note": "Kysymysten saldoluvut / 3, varastot käänteisinä. Lähde: EK, Euroopan komissio."
+          "note": "Kysymysten saldoluvut / 3. Lähde: EK, Euroopan komissio."
         },
         "kul_luot": {
           "id": "luot_kul_luot",
@@ -131,7 +131,7 @@
             "kc_teoltuot_5",
             "kc_teoltuot_muu"
           ],
-          "note": "3 kk liukuva keskiarvo. Muut-erässä muut toimialat ja laskentaero. Lähde: Tilastokeskus."
+          "note": "3 kk liukuva keskiarvo. Lähde: Tilastokeskus."
         },
         "rak_luv": {
           "id": "kontr_rak_luv",
@@ -204,7 +204,7 @@
             "kc_konkurssit_6",
             "kc_konkurssit_muu"
           ],
-          "note": "12 kk summa. Kartassa käänteisenä ja ilman trendiä, ei kokonaisindikaattorissa. Lähde: Tilastokeskus."
+          "note": "12 kk summa. Lähde: Tilastokeskus."
         },
         "comp": {
           "id": "validointi",
@@ -223,7 +223,7 @@
             "val_gdp": "BKT:n trendipoikkeama"
           },
           "lineColor": "var(--fg)",
-          "note": "Standardoidut poikkeamat trendistä. BKT: Tilastokeskus."
+          "note": "Standardoidut poikkeamat trendistä. Lähde: Tilastokeskus."
         },
         "g:Työmarkkinat": {
           "id": "tyomarkkinat",
@@ -242,7 +242,7 @@
           "unit": "%",
           "dec": 1,
           "from": 2010,
-          "note": "Trendisarjat, %. Lähde: Tilastokeskus."
+          "note": "Kausitasoitetut, %. Lähde: Tilastokeskus."
         }
       }
     },
@@ -281,7 +281,6 @@
             "Neljännesmuutos, kasvu",
             "Neljännesmuutos, supistuminen"
           ],
-          "note": "Palkit q/q, viiva v/v.",
           "lineColor": "var(--fg)",
           "contrib": {
             "title": "BKT:n kasvu ja kontribuutiot",
@@ -293,7 +292,7 @@
               "k_netto",
               "k_muu"
             ],
-            "note": "Kontribuutiot laskettu edellisen vuoden hinnoin, jotta osat summautuvat kasvuun. Lähde: Tilastokeskus.",
+            "note": "Kontribuutiot edellisen vuoden hinnoin. Lähde: Tilastokeskus.",
             "resid": [
               "k_muu"
             ]
@@ -310,7 +309,7 @@
               "unit": "tuhatta",
               "stackUnit": "tuhatta",
               "dec": 0,
-              "note": "15–64-vuotiaat, tuhatta. Positiivinen osa lisää työttömiä. Lähde: työvoimatutkimus."
+              "note": "15–64-vuotiaat, tuhatta. Lähde: Tilastokeskus, työvoimatutkimus."
             },
             "inflaatio": {
               "title": "Inflaatio ja kontribuutiot",
@@ -353,7 +352,7 @@
                 "kd_bkt_kulutus_6"
               ],
               "unit": "%",
-              "note": "Kontribuutiot laskettu edellisen vuoden hinnoin, jotta osat summautuvat kasvuun. Lähde: Tilastokeskus.",
+              "note": "Kontribuutiot edellisen vuoden hinnoin. Lähde: Tilastokeskus.",
               "stackUnit": "%-yks.",
               "dec": 1
             },
@@ -369,7 +368,7 @@
                 "kd_bkt_inv_6"
               ],
               "unit": "%",
-              "note": "Kontribuutiot laskettu edellisen vuoden hinnoin, jotta osat summautuvat kasvuun. Lähde: Tilastokeskus.",
+              "note": "Kontribuutiot edellisen vuoden hinnoin. Lähde: Tilastokeskus.",
               "stackUnit": "%-yks.",
               "dec": 1
             },
@@ -381,7 +380,7 @@
                 "kd_bkt_vienti_2"
               ],
               "unit": "%",
-              "note": "Kontribuutiot laskettu edellisen vuoden hinnoin, jotta osat summautuvat kasvuun. Lähde: Tilastokeskus.",
+              "note": "Kontribuutiot edellisen vuoden hinnoin. Lähde: Tilastokeskus.",
               "stackUnit": "%-yks.",
               "dec": 1
             },
@@ -393,7 +392,7 @@
                 "kd_bkt_tuonti_2"
               ],
               "unit": "%",
-              "note": "Kontribuutiot laskettu edellisen vuoden hinnoin, jotta osat summautuvat kasvuun. Lähde: Tilastokeskus.",
+              "note": "Kontribuutiot edellisen vuoden hinnoin. Lähde: Tilastokeskus.",
               "stackUnit": "%-yks.",
               "dec": 1
             },
@@ -410,7 +409,7 @@
               "unit": "%",
               "stackUnit": "% BKT:stä",
               "dec": 1,
-              "note": "Nettoluotonanto alasektoreittain, neljän neljänneksen summa. Kunnat ja hyvinvointialueet erikseen. Lähde: Tilastokeskus."
+              "note": "Nettoluotonanto, neljän neljänneksen summa. Lähde: Tilastokeskus."
             },
             "__ca": {
               "title": "Vaihtotase ja sen osat, % BKT:stä",
@@ -424,7 +423,7 @@
               "unit": "%",
               "stackUnit": "% BKT:stä",
               "dec": 1,
-              "note": "Neljän neljänneksen summa. Ensitulo: mm. palkat ja pääomatulot, toisiotulo: tulonsiirrot. Lähde: Eurostat."
+              "note": "Neljän neljänneksen summa. Lähde: Eurostat."
             }
           },
           "views": {
@@ -441,7 +440,7 @@
               "lineColor": "var(--accent)",
               "unit": "%",
               "dec": 1,
-              "note": "Reaaliansiot deflatoitu KHI:llä. Lähde: Tilastokeskus."
+              "note": "Lähde: Tilastokeskus."
             },
             "asuntohinnat": [
               {
@@ -493,7 +492,7 @@
                 },
                 "unit": "",
                 "dec": 1,
-                "note": "Vanhojen osakeasuntojen hinnat suhteessa kotitalouksien käytettävissä oleviin tuloihin asukasta kohden ja vapaarahoitteisiin vuokriin. Lähde: Tilastokeskus."
+                "note": "Lähde: Tilastokeskus."
               },
               {
                 "title": "Uudet asunnot, tuhatta (4 nelj. summa)",
@@ -509,7 +508,7 @@
                 },
                 "unit": "",
                 "dec": 1,
-                "note": "Rakentamisluvan saaneet, aloitetut ja valmistuneet asunnot, kaikki talotyypit. Lähde: Tilastokeskus."
+                "note": "Kaikki talotyypit. Lähde: Tilastokeskus."
               }
             ],
             "tyottomat": [
@@ -550,7 +549,7 @@
                 },
                 "unit": "",
                 "dec": 1,
-                "note": "Kausitasoitettu (STL). TE-palvelut: kuukauden lopussa avoinna, neljänneksen keskiarvo. Lähde: Tilastokeskus."
+                "note": "Kausitasoitettu, neljänneksen keskiarvo. Lähde: Tilastokeskus."
               },
               {
                 "type": "scatter",
@@ -560,7 +559,7 @@
                 "xlab": "Työttömyysaste, %",
                 "ylab": "Avoimien työpaikkojen aste, %",
                 "dec": 1,
-                "note": "Avoimien työpaikkojen aste = avoimet / (avoimet + työlliset). Kausitasoitettu. Lähde: Tilastokeskus."
+                "note": "Kausitasoitettu. Lähde: Tilastokeskus."
               }
             ],
             "bkt": [
@@ -601,7 +600,7 @@
                 },
                 "unit": "%",
                 "dec": 1,
-                "note": "Nettoluotonanto, neljän neljänneksen summa. Ulkomaat: positiivinen = Suomi ottaa velkaa ulkomailta. Lähde: Tilastokeskus."
+                "note": "Nettoluotonanto, neljän neljänneksen summa. Lähde: Tilastokeskus."
               }
             ],
             "bkt_kulutus": [
@@ -618,7 +617,7 @@
                 },
                 "unit": "%",
                 "dec": 1,
-                "note": "Säästö suhteessa käytettävissä oleviin tuloihin, kausitasoitettu. Lähde: Tilastokeskus."
+                "note": "Kausitasoitettu. Lähde: Tilastokeskus."
               },
               {
                 "title": "Palkkasumma, vuosimuutos %",
@@ -639,7 +638,7 @@
                 ],
                 "unit": "%",
                 "dec": 1,
-                "note": "Palkkasummakuvaajat, neljänneksen keskiarvo. Reaalinen: deflatoitu kuluttajahintaindeksillä. Lähde: Tilastokeskus."
+                "note": "Neljänneksen keskiarvo. Lähde: Tilastokeskus, palkkasummakuvaajat."
               }
             ],
             "bkt_julk": [
@@ -708,7 +707,7 @@
                 ],
                 "unit": "",
                 "dec": 1,
-                "note": "Implisiittiset hintaindeksit. Vaihtosuhde = vientihinnat / tuontihinnat. Lähde: Tilastokeskus."
+                "note": "Implisiittiset hintaindeksit. Lähde: Tilastokeskus."
               },
               {
                 "contrib": "__ca"
@@ -727,7 +726,7 @@
                 },
                 "unit": "",
                 "dec": 1,
-                "note": "Kausitasoitettu volyymi-indeksi, neljänneksen keskiarvo. Yksittäiset suuret toimitukset, kuten laivat, näkyvät piikkeinä. Lähde: Eurostat."
+                "note": "Kausitasoitettu volyymi-indeksi, neljänneksen keskiarvo. Lähde: Eurostat."
               }
             ],
             "bkt_tuonti": [
@@ -751,7 +750,7 @@
                 ],
                 "unit": "",
                 "dec": 1,
-                "note": "Implisiittiset hintaindeksit. Vaihtosuhde = vientihinnat / tuontihinnat. Lähde: Tilastokeskus."
+                "note": "Implisiittiset hintaindeksit. Lähde: Tilastokeskus."
               },
               {
                 "title": "Tavaratuonti käyttötarkoituksen mukaan, volyymi (2021=100)",
@@ -788,7 +787,7 @@
                 },
                 "unit": "",
                 "dec": 1,
-                "note": "Kansantalouden tilinpito, kausitasoitettu. Tuottavuus = BKT:n volyymi / tehdyt työtunnit. Lähde: Tilastokeskus."
+                "note": "Kausitasoitettu. Lähde: Tilastokeskus, kansantalouden tilinpito."
               }
             ],
             "inflaatio": [
@@ -836,7 +835,7 @@
                 ],
                 "unit": "%",
                 "dec": 1,
-                "note": "Kuluttajabarometri, neljänneksen keskiarvo. Ammattiennustajat: EKP:n SPF, noin viiden vuoden päähän. Lähteet: Tilastokeskus, EKP."
+                "note": "Neljänneksen keskiarvo. Lähteet: Tilastokeskus, EKP."
               }
             ]
           },
@@ -976,7 +975,7 @@
           "step": [
             "dfr"
           ],
-          "note": "Euribor kuukausikeskiarvo, forward-korot kuun viimeinen havainto. Katkoviivat: forward-korot EKP:n tuottokäyrästä, sisältävät termipreemion.",
+          "note": "Euribor kuukausikeskiarvo, forward-korot kuun viimeinen havainto. Lähde: EKP.",
           "section": "Korot ja rahapolitiikka",
           "dash": [
             "fwd1y",
@@ -1002,7 +1001,7 @@
             "reaali_lyh": "3 kk Euribor − inflaatio",
             "reaali_10": "Suomen 10 v − inflaatio"
           },
-          "note": "Korko miinus inflaatio (YKHI)."
+          "note": "Lähteet: EKP, Eurostat."
         },
         {
           "id": "maat",
@@ -1043,7 +1042,7 @@
             "fed": "Yhdysvallat",
             "jp_short": "Japani"
           },
-          "note": "Yhdysvallat: Fed funds. Japani: lyhyt markkinakorko (OECD)."
+          "note": "Lähteet: EKP, FRED, OECD."
         },
         {
           "id": "t_fx",
@@ -1082,7 +1081,7 @@
               "id": "wti"
             }
           ],
-          "note": "Valuuttakurssit vierasta valuuttaa euroa kohden, nousu = euro vahvistuu. Lähteet: EKP, EIA. Klikkaa riviä nähdäksesi historian.",
+          "note": "Vierasta valuuttaa euroa kohden. Lähteet: EKP, EIA. Klikkaa riviä nähdäksesi historian.",
           "pair": "eer"
         },
         {
@@ -1188,7 +1187,7 @@
             "asuntokorko": "Asuntolainat",
             "yrityskorko": "Yritys- ja taloyhtiölainat"
           },
-          "note": "Yrityslainoissa mukana taloyhtiöt. Lähde: Suomen Pankki."
+          "note": "Lähde: Suomen Pankki."
         },
         {
           "id": "uudet",
@@ -1229,7 +1228,7 @@
             "velkaaste"
           ],
           "connect": true,
-          "note": "Velat suhteessa käytettävissä oleviin tuloihin. Lähde: Tilastokeskus.",
+          "note": "Lähde: Tilastokeskus.",
           "size": "half",
           "from": 2010
         },
@@ -1258,7 +1257,7 @@
             "bls_e_d": "var(--accent)",
             "bls_h_d": "var(--q-down)"
           },
-          "note": "Nettoprosentti, neljän neljänneksen liukuva keskiarvo, kyselyä edeltävä neljännes. Luottoehdot: positiivinen = kiristyneet. Kysyntä (katkoviiva): positiivinen = kasvanut. Lähde: EKP."
+          "note": "Nettoprosentti, neljän neljänneksen liukuva keskiarvo. Lähde: EKP."
         },
         {
           "id": "clifs",
@@ -1268,7 +1267,7 @@
           "lines": [
             "clifs"
           ],
-          "note": "Kuukausiarvot. 0 = ei stressiä, 1 = äärimmäinen. Lähde: EKP.",
+          "note": "Kuukausiarvot. Lähde: EKP.",
           "section": "Riskit ja epävarmuus",
           "size": "half"
         },
@@ -1280,7 +1279,7 @@
           "lines": [
             "epu"
           ],
-          "note": "Uutisointiin perustuva indeksi. Lähde: FRED.",
+          "note": "Lähde: Baker, Bloom ja Davis, FRED.",
           "section": "Riskit ja epävarmuus",
           "size": "half"
         }
@@ -5304,7 +5303,7 @@
     },
     {
       "id": "bls_e_st",
-      "label": "Luottoehdot, yritykset",
+      "label": "Luottoehtojen kiristyminen, yritykset",
       "set": "rahoitus",
       "source": "ecb",
       "flow": "BLS",
@@ -5317,7 +5316,7 @@
     },
     {
       "id": "bls_h_st",
-      "label": "Luottoehdot, asuntolainat",
+      "label": "Luottoehtojen kiristyminen, asuntolainat",
       "set": "rahoitus",
       "source": "ecb",
       "flow": "BLS",
@@ -5330,7 +5329,7 @@
     },
     {
       "id": "bls_e_d",
-      "label": "Kysyntä, yritykset",
+      "label": "Kysynnän kasvu, yritykset",
       "set": "rahoitus",
       "source": "ecb",
       "flow": "BLS",
@@ -5343,7 +5342,7 @@
     },
     {
       "id": "bls_h_d",
-      "label": "Kysyntä, asuntolainat",
+      "label": "Kysynnän kasvu, asuntolainat",
       "set": "rahoitus",
       "source": "ecb",
       "flow": "BLS",
