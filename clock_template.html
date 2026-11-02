@@ -49,8 +49,14 @@ body { font-variant-numeric: tabular-nums; background: var(--bg); min-height: 10
 .sets button:hover { color: var(--fg); }
 .sets button[aria-pressed="true"] { color: var(--fg); border-bottom-color: var(--fg); font-weight: 600; }
 .sets button:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; }
-.hero { padding-top: 4px; }
-.hsum { max-width: 340px; }
+.hero { padding-top: 4px; display: grid; grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr); gap: 20px 56px; align-items: end; }   /* samat palstat kuin kartta ja lista */
+.hlead:empty { display: none; }
+.hlead .hl { font-size: 0.76rem; color: var(--muted); margin: 0; }
+.hlead .hp { display: flex; align-items: center; gap: 12px; font-size: 2.1rem; font-weight: 600; letter-spacing: -0.02em; line-height: 1.15; margin: 4px 0 6px; }
+.hlead .hp i { width: 14px; height: 14px; border-radius: 50%; background: var(--qc); flex: none; }
+.hlead .hd { font-size: 0.88rem; margin: 0; }
+.hlead .hd b { font-weight: 600; color: var(--accent); }
+@media (max-width: 860px) { .hero { grid-template-columns: minmax(0, 1fr); } }
 .brand h1 { font: inherit; font-weight: 600; font-size: 1.02rem; letter-spacing: -0.01em; margin: 0; }
 .hsum { display: flex; flex-direction: column; gap: 12px; }
 #summary { display: flex; flex-direction: column; gap: 8px; }
@@ -60,10 +66,10 @@ body { font-variant-numeric: tabular-nums; background: var(--bg); min-height: 10
 .sbar { display: flex; gap: 2px; height: 8px; }
 .sbar button { flex-basis: 0; min-width: 4px; border: 0; padding: 0; border-radius: 1px; background: var(--qc); cursor: pointer; }
 .sbar.f button:not(.on) { opacity: .25; }
-.slegend { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 4px 18px; }
+.slegend { display: flex; flex-wrap: wrap; gap: 4px 18px; }
 .sl { display: flex; align-items: center; gap: 7px; font: inherit; font-size: 0.82rem; color: var(--fg); background: none; border: 0; padding: 2px 0; cursor: pointer; text-align: left; }
 .sl i { width: 8px; height: 8px; border-radius: 50%; background: var(--qc); flex: none; }
-.sl span { flex: 1; }
+.sl span { flex: none; }
 .sl b { font-weight: 600; font-variant-numeric: tabular-nums; }
 .sl.dim { opacity: .4; }
 .sl:hover { opacity: 1; }
@@ -383,6 +389,7 @@ footer b { color: var(--fg); font-weight: 600; }
   </header>
 
   <section class="hero">
+    <div class="hlead" id="hlead"></div>
     <div class="hsum"><div id="summary"></div><p class="upd" id="sub"></p></div>
   </section>
 
@@ -661,7 +668,17 @@ footer b { color: var(--fg); font-weight: 600; }
     const counts = { up: 0, turn: 0, down: 0, rec: 0 }; let n = 0;
     set.indicators.forEach(s => { if (!s.in_composite) return; const p = at(s, idx); if (p) { counts[quad(p.l, p.c)]++; n++; } });
     // yhteenveto: vaiheiden osuudet palkkina ja lukuina; klikkaus suodattaa kartan ja luettelon
-    $("summary").innerHTML = `<div class="shead"><span>Kokonaisindikaattorin ${n} sarjaa</span><span>${fmtP(set.periods[idx])}</span></div>` +
+    // ylaosa: kokonaisindikaattorin vaihe, taso ja muutos seka vaiheen kesto
+    const cp = at(comp(), idx);
+    if (cp) { const q = quad(cp.l, cp.c), C = comp(); let k = cp.i;
+      while (k > 0 && C.level[k - 1] != null && C.change[k - 1] != null && quad(C.level[k - 1], C.change[k - 1]) === q) k--;
+      const PH = { up: "Nousuvaiheessa", turn: "Hidastumisvaiheessa", down: "Laskuvaiheessa", rec: "Elpymisvaiheessa" };
+      const KK = ["tammikuusta", "helmikuusta", "maaliskuusta", "huhtikuusta", "toukokuusta", "kesäkuusta", "heinäkuusta", "elokuusta", "syyskuusta", "lokakuusta", "marraskuusta", "joulukuusta"];
+      const p0 = set.periods[k], since = set.freq === "M" ? `${KK[+p0.slice(5, 7) - 1]} ${p0.slice(0, 4)} alkaen` : `${fmtP(p0)} alkaen`;
+      $("hlead").innerHTML = `<p class="hl">Kokonaisindikaattori ${fmtP(set.periods[cp.i])}</p><p class="hp" style="--qc:${qcol(q)}"><i></i>${Q[q].short}</p>` +
+        `<p class="hd">Taso <b>${fmtN(cp.l)}</b> ja muutos <b>${fmtN(cp.c)}</b>. ${k === cp.i ? `${PH[q]} ${fmtP(set.periods[cp.i])}.` : `${PH[q]} ${since}.`}</p>`;
+    } else $("hlead").innerHTML = "";
+    $("summary").innerHTML = `<div class="shead"><span>Kokonaisindikaattorin ${n} sarjaa vaiheittain</span></div>` +
       `<div class="sbar${qf ? " f" : ""}">${QORDER.filter(q => counts[q]).map(q => `<button type="button" data-q="${q}" class="${qf === q ? "on" : ""}" style="--qc:${qcol(q)};flex-grow:${counts[q]}" title="${Q[q].name}: ${counts[q]}" aria-label="${Q[q].name}: ${counts[q]}"></button>`).join("")}</div>` +
       `<div class="slegend">${QORDER.map(q => `<button type="button" class="sl${qf && qf !== q ? " dim" : ""}" data-q="${q}" aria-pressed="${qf === q}" style="--qc:${qcol(q)}" title="Näytä vain: ${Q[q].name.toLowerCase()}"><i></i><span>${Q[q].short}</span><b>${counts[q]}</b></button>`).join("")}</div>`;
     $("summary").querySelectorAll("[data-q]").forEach(b => b.onclick = () => { qf = qf === b.dataset.q ? null : b.dataset.q; update(); });
@@ -883,7 +900,7 @@ footer b { color: var(--fg); font-weight: 600; }
   function update() {
     const charts = set.view === "charts", clock = !!(set.indicators && set.indicators.length) && !set.growth;   // kasvunakyma: taulukko ja kuviot kartan sijaan
     $("topSec").hidden = !clock; $("detail").hidden = charts; $("charts").hidden = !charts;
-    if (clock) { renderMeta(); renderTime(); renderClock(); renderPanel(); } else $("summary").innerHTML = "";
+    if (clock) { renderMeta(); renderTime(); renderClock(); renderPanel(); } else { $("summary").innerHTML = ""; $("hlead").innerHTML = ""; }
     $("tiles").hidden = !(charts && set.tiles && set.tiles.length);
     $("growthSec").hidden = !(charts && set.growth); $("grMore").hidden = true;
     $("finSum").hidden = !(charts && set.summary && set.summary.length);
