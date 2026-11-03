@@ -232,6 +232,9 @@ body { font-variant-numeric: tabular-nums; background: var(--bg); min-height: 10
 .haszoom > .more:not(.zb), .haszoom > .cmenu { right: 38px; }
 .more.zb svg { fill: none; stroke: currentColor; stroke-width: 1.6; stroke-linecap: round; stroke-linejoin: round; }
 .haszoom > .fhead { padding-right: 62px; }
+.ffoot { display: flex; flex-wrap: wrap; align-items: baseline; gap: 6px 16px; margin-top: 8px; }
+.ffoot > .fnote { margin: 0; flex: 1 1 260px; }
+.ffoot > .fval, .fmeta > .fval { margin-left: auto; white-space: nowrap; }
 .cmenu { position: absolute; top: 44px; right: 8px; z-index: 30; min-width: 150px; background: var(--bg); border: 1px solid var(--line); border-radius: 8px; box-shadow: 0 6px 24px rgba(0,0,0,.12); padding: 4px; display: flex; flex-direction: column; }
 .cmenu[hidden] { display: none !important; }
 .cmenu button.dl { margin: 0 !important; text-decoration: none; text-align: left; padding: 7px 10px; border-radius: 5px; font-size: 0.82rem; }
@@ -1104,7 +1107,7 @@ footer b { color: var(--fg); font-weight: 600; }
     await img.decode();
     // asettelu
     const pad = 24, W = Math.round(R.width + 2 * pad), sc2 = 2, F = "Manrope, system-ui, sans-serif";
-    const title = card.querySelector(".fhead h2").textContent, val = (card.querySelector(".fhead .fval") || {}).textContent || "";
+    const title = card.querySelector(".fhead h2").textContent, val = (card.querySelector(".fval") || {}).textContent || "";
     const subEl = card.querySelector(".fsub"), sub = subEl && !subEl.hidden ? subEl.textContent : "";
     const leg = [...card.querySelectorAll(".legend span")].map(s => ({ t: s.textContent, c: getComputedStyle(s).getPropertyValue("--qc").trim() || col("--fg"),
       k: s.classList.contains("hx") ? "hx" : s.classList.contains("sq") ? "sq" : s.classList.contains("ds") ? "ds" : "ln" }));
@@ -1352,8 +1355,17 @@ footer b { color: var(--fg); font-weight: 600; }
   function closeMenus() { document.querySelectorAll(".cmenu:not([hidden])").forEach(m => { m.hidden = true; const b = m.parentNode.querySelector(":scope > .more"); if (b) b.setAttribute("aria-expanded", "false"); }); }
   document.addEventListener("click", closeMenus);
   document.addEventListener("keydown", e => { if (e.key === "Escape") closeMenus(); });
+  // kuvion ajankohta oikeaan alakulmaan (viimeiselle riville); paakuvion v/v- ja q/q-otsake jaa ylos
+  function dateDown(card) {
+    const fv = card.querySelector(":scope > .fhead > .fval"); if (!fv || !card.querySelector(":scope > svg.fc") || (card._zc && card._zc.hdr)) return;
+    const last = card.lastElementChild;
+    if (last && last.classList.contains("fnote")) { const f = document.createElement("div"); f.className = "ffoot"; last.before(f); f.append(last, fv); }
+    else if (last && last.classList.contains("fmeta")) last.appendChild(fv);
+    else { const f = document.createElement("div"); f.className = "ffoot"; f.appendChild(fv); card.appendChild(f); }
+  }
   function menuize(card) {
     if (card._menu) return;
+    dateDown(card);
     const btns = [...card.querySelectorAll(":scope > .fhead > button.dl, :scope > .fmeta > button.dl")]; if (!btns.length) return;
     card._menu = true; card.classList.add("hasmenu");
     const mb = document.createElement("button"); mb.type = "button"; mb.className = "more"; mb.innerHTML = DOTS; mb.title = "Lataa tai suurenna";
