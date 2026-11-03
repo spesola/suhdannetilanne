@@ -178,7 +178,7 @@ body { font-variant-numeric: tabular-nums; background: var(--bg); min-height: 10
 .tsnow { display: flex; align-items: center; gap: 7px; font-size: 0.82rem; color: var(--fg); margin: 0 0 4px; }
 .tsnow i { width: 8px; height: 8px; border-radius: 50%; background: var(--qc); flex: none; }
 .viewhead .now { font-size: 0.85rem; color: var(--muted); }
-#ts { width: 100%; height: auto; display: block; }
+#ts { width: 100%; height: auto; display: block; margin-top: 12px; }
 #ts text { font-family: var(--font-body); }
 .legend { display: flex; flex-wrap: wrap; gap: 14px; font-size: 0.8rem; color: var(--muted); margin-top: 8px; }
 .legend span.sq::before { height: 10px; width: 10px; border-radius: 2px; vertical-align: -1px; }
@@ -221,25 +221,21 @@ body { font-variant-numeric: tabular-nums; background: var(--bg); min-height: 10
 .fgrid { display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); gap: 24px; }
 .fcard { grid-column: span 2; }
 /* kuviokortit: ohut reuna */
-.card.fcard, .tsmain, .card.grtab { border: 1px solid var(--line); border-radius: 10px; padding: 14px 16px; }
+.card.fcard, .tsmain, .card.grtab { border: 1px solid var(--line); border-radius: 10px; padding: 18px 16px 14px; }
 .card.fcard { position: relative; }
 .hasmenu > .fhead { padding-right: 30px; }
-.more { position: absolute; top: 10px; right: 8px; width: 28px; height: 28px; display: grid; place-items: center; border: 0; border-radius: 6px; background: none; color: var(--muted); cursor: pointer; padding: 0; }
+.more { position: absolute; top: 14px; right: 8px; width: 28px; height: 28px; display: grid; place-items: center; border: 0; border-radius: 6px; background: none; color: var(--muted); cursor: pointer; padding: 0; }
 .more:hover, .more[aria-expanded="true"] { background: color-mix(in srgb, var(--fg) 7%, transparent); color: var(--fg); }
 .more:focus-visible { outline: 2px solid var(--accent); outline-offset: 1px; }
 .more svg { fill: currentColor; display: block; }
-.cmenu { position: absolute; top: 40px; right: 8px; z-index: 30; min-width: 150px; background: var(--bg); border: 1px solid var(--line); border-radius: 8px; box-shadow: 0 6px 24px rgba(0,0,0,.12); padding: 4px; display: flex; flex-direction: column; }
+.more.zb { right: 38px; }
+.more.zb svg { fill: none; stroke: currentColor; stroke-width: 1.6; stroke-linecap: round; stroke-linejoin: round; }
+.haszoom > .fhead { padding-right: 62px; }
+.cmenu { position: absolute; top: 44px; right: 8px; z-index: 30; min-width: 150px; background: var(--bg); border: 1px solid var(--line); border-radius: 8px; box-shadow: 0 6px 24px rgba(0,0,0,.12); padding: 4px; display: flex; flex-direction: column; }
 .cmenu[hidden] { display: none !important; }
 .cmenu button.dl { margin: 0 !important; text-decoration: none; text-align: left; padding: 7px 10px; border-radius: 5px; font-size: 0.82rem; }
 .cmenu button.dl:hover, .cmenu button.dl:focus-visible { background: color-mix(in srgb, var(--fg) 6%, transparent); outline: 0; }
-.fcw { position: relative; }
-.card.fcard.zoomable svg.fc { cursor: pointer; }
-.zhint { position: absolute; top: 10px; right: 4px; width: 26px; height: 26px; display: grid; place-items: center; border-radius: 6px; pointer-events: none;
-  background: color-mix(in srgb, var(--bg) 88%, transparent); border: 1px solid var(--line); color: var(--fg); opacity: 0; transition: opacity .15s; }
-.zhint svg { display: block; fill: none; stroke: currentColor; stroke-width: 1.6; stroke-linecap: round; stroke-linejoin: round; }
-.fcw:hover .zhint { opacity: 1; }
-.card.fcard.zoomable { transition: border-color .15s, box-shadow .15s; }
-.card.fcard.zoomable:has(svg.fc:hover) { border-color: color-mix(in srgb, var(--fg) 30%, var(--line)); box-shadow: 0 2px 12px rgba(22, 27, 34, .06); }
+
 .secnav + .fsec { margin-top: 14px !important; }
 .zoom { width: min(1280px, calc(100vw - 24px)); max-width: none; max-height: calc(100vh - 24px); border: 0; border-radius: 12px; padding: 14px 20px 20px; background: var(--bg); color: var(--fg); box-shadow: 0 12px 48px rgba(0,0,0,.22); }
 .zoom::backdrop { background: rgba(22, 27, 34, .45); }
@@ -350,7 +346,7 @@ table.snap { width: 100%; border-collapse: collapse; font-size: 0.84rem; font-va
 .fval b { font-weight: 500; font-size: 0.95rem; color: var(--fg); }
 .fsub { color: var(--muted); font-size: 0.8rem; margin: 2px 0 0; min-height: 1.2em; }
 .fnote { color: var(--muted); font-size: 0.8rem; margin: 8px 0 0; }
-.fc { width: 100%; height: auto; display: block; margin-top: 8px; touch-action: pan-y; }
+.fc { width: 100%; height: auto; display: block; margin-top: 16px; touch-action: pan-y; }
 .fc text { font-family: var(--font-body); }
 .hmwrap { overflow-x: auto; }
 .hmctl { display: flex; align-items: baseline; gap: 16px; flex-wrap: wrap; }
@@ -1146,8 +1142,6 @@ footer b { color: var(--fg); font-weight: 600; }
   function addPng(db, card) {             // "Lataa kuva" CSV-linkin viereen
     const b = document.createElement("button"); b.type = "button"; b.className = "dl"; b.textContent = "Lataa kuva"; b.title = "Lataa kuvio PNG-kuvana";
     b.onclick = () => chartPNG(card).catch(e => console.warn("PNG", e)); db.after(b);
-    if (card._zc && !zoomRendering && !FINE.matches) { const z = document.createElement("button"); z.type = "button"; z.className = "dl"; z.textContent = "Suurenna";
-      z.title = "Avaa kuvio isompana"; z.onclick = () => openZoom(card._zc); b.after(z); }
     return b; }
   // suurennus: kuvio piirretaan uudelleen isompana dialogiin (tekstit pysyvat normaalikokoisina, hover toimii)
   let zoomHooks = null, zoomRendering = false;
@@ -1349,12 +1343,11 @@ footer b { color: var(--fg); font-weight: 600; }
     $("grSide").innerHTML = ""; colMainH = null; renderCharts($("grCharts"));
     if (two && lastMainH) {
       const diff = $("growthSec").querySelector(".grleft").offsetHeight - $("grCharts").offsetHeight;
-      if (Math.abs(diff) > 3) { colMainH = Math.max(lastLower ? 200 : 190, Math.min(560, lastMainH + diff)); $("grSide").innerHTML = ""; renderCharts($("grCharts")); colMainH = null; }
+      if (Math.abs(diff) > 1) { colMainH = Math.max(lastLower ? 200 : 190, Math.min(560, lastMainH + diff)); $("grSide").innerHTML = ""; renderCharts($("grCharts")); colMainH = null; }
     }
   }
   // kuviokortin toiminnot (CSV, kuva, suurennus) kolmen pisteen valikon taakse; hiirella kuvan klikkaus suurentaa
   const DOTS = '<svg viewBox="0 0 16 16" width="16" height="16" aria-hidden="true"><circle cx="3" cy="8" r="1.5"/><circle cx="8" cy="8" r="1.5"/><circle cx="13" cy="8" r="1.5"/></svg>';
-  const FINE = matchMedia("(hover: hover) and (pointer: fine)");
   function closeMenus() { document.querySelectorAll(".cmenu:not([hidden])").forEach(m => { m.hidden = true; const b = m.parentNode.querySelector(":scope > .more"); if (b) b.setAttribute("aria-expanded", "false"); }); }
   document.addEventListener("click", closeMenus);
   document.addEventListener("keydown", e => { if (e.key === "Escape") closeMenus(); });
@@ -1370,10 +1363,11 @@ footer b { color: var(--fg); font-weight: 600; }
     mb.onclick = e => { e.stopPropagation(); const open = m.hidden; closeMenus(); if (open) { m.hidden = false; mb.setAttribute("aria-expanded", "true"); m.querySelector("button").focus(); } };
     m.addEventListener("click", e => { e.stopPropagation(); if (e.target.closest("button")) { closeMenus(); mb.focus({ preventScroll: true }); } });
     const svg = card.querySelector(":scope > svg.fc");
-    if (card._zc && svg && !zoomRendering && FINE.matches) {          // hiirella: kuvan klikkaus suurentaa, hover nayttaa suurennusikonin
-      card.classList.add("zoomable"); const w = document.createElement("div"); w.className = "fcw"; svg.before(w); w.appendChild(svg);
-      w.insertAdjacentHTML("beforeend", '<span class="zhint" aria-hidden="true"><svg viewBox="0 0 16 16" width="14" height="14"><path d="M9.5 2.5h4v4M13.5 2.5 9 7M6.5 13.5h-4v-4M2.5 13.5 7 9"/></svg></span>');
-      svg.addEventListener("click", () => openZoom(card._zc)); svg.setAttribute("aria-description", "Klikkaa suurentaaksesi"); }
+    if (card._zc && svg && !zoomRendering) {                          // suurennuspainike kolmen pisteen viereen
+      const zb = document.createElement("button"); zb.type = "button"; zb.className = "more zb"; zb.title = "Suurenna";
+      zb.setAttribute("aria-label", "Suurenna: " + ((card.querySelector(".fhead h2") || {}).textContent || "kuvio"));
+      zb.innerHTML = '<svg viewBox="0 0 16 16" width="15" height="15" aria-hidden="true"><path d="M9.5 2.5h4v4M13.5 2.5 9 7M6.5 13.5h-4v-4M2.5 13.5 7 9"/></svg>';
+      zb.onclick = e => { e.stopPropagation(); closeMenus(); openZoom(card._zc); }; mb.before(zb); card.classList.add("haszoom"); }
   }
   function renderCharts(box = $("charts"), only = null) {
     const r = renderCharts0(box, only);
