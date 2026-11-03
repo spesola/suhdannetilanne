@@ -228,7 +228,8 @@ body { font-variant-numeric: tabular-nums; background: var(--bg); min-height: 10
 .more:hover, .more[aria-expanded="true"] { background: color-mix(in srgb, var(--fg) 7%, transparent); color: var(--fg); }
 .more:focus-visible { outline: 2px solid var(--accent); outline-offset: 1px; }
 .more svg { fill: currentColor; display: block; }
-.more.zb { right: 38px; }
+.more.zb { right: 8px; }
+.haszoom > .more:not(.zb), .haszoom > .cmenu { right: 38px; }
 .more.zb svg { fill: none; stroke: currentColor; stroke-width: 1.6; stroke-linecap: round; stroke-linejoin: round; }
 .haszoom > .fhead { padding-right: 62px; }
 .cmenu { position: absolute; top: 44px; right: 8px; z-index: 30; min-width: 150px; background: var(--bg); border: 1px solid var(--line); border-radius: 8px; box-shadow: 0 6px 24px rgba(0,0,0,.12); padding: 4px; display: flex; flex-direction: column; }
@@ -1367,7 +1368,7 @@ footer b { color: var(--fg); font-weight: 600; }
       const zb = document.createElement("button"); zb.type = "button"; zb.className = "more zb"; zb.title = "Suurenna";
       zb.setAttribute("aria-label", "Suurenna: " + ((card.querySelector(".fhead h2") || {}).textContent || "kuvio"));
       zb.innerHTML = '<svg viewBox="0 0 16 16" width="15" height="15" aria-hidden="true"><path d="M9.5 2.5h4v4M13.5 2.5 9 7M6.5 13.5h-4v-4M2.5 13.5 7 9"/></svg>';
-      zb.onclick = e => { e.stopPropagation(); closeMenus(); openZoom(card._zc); }; mb.before(zb); card.classList.add("haszoom"); }
+      zb.onclick = e => { e.stopPropagation(); closeMenus(); openZoom(card._zc); }; mb.after(zb); card.classList.add("haszoom"); }
   }
   function renderCharts(box = $("charts"), only = null) {
     const r = renderCharts0(box, only);
