@@ -639,6 +639,18 @@
                 "unit": "%",
                 "dec": 1,
                 "note": "Neljänneksen keskiarvo. Lähde: Tilastokeskus, palkkasummakuvaajat."
+              },
+              {
+                "title": "Henkilöautojen ensirekisteröinnit, liukuva vuosisumma, tuhatta",
+                "lines": [
+                  "x_ensirek"
+                ],
+                "colors": {
+                  "x_ensirek": "var(--accent)"
+                },
+                "unit": "",
+                "dec": 0,
+                "note": "Neljän neljänneksen summa. Lähde: Tilastokeskus."
               }
             ],
             "bkt_julk": [
@@ -1580,6 +1592,46 @@
       "raw_desc": "Kausitasoitettu sarja"
     },
     {
+      "id": "palv_vol",
+      "label": "Palvelualojen liikevaihdon volyymi",
+      "set": "suhdanne",
+      "group": "Tuotanto",
+      "source": "statfin",
+      "table": "plv/14k7.px",
+      "pick": {
+        "nace_8_20180101": "H_I_J_L_M_N_R_S",
+        "luokkaryhma_2_20180301": "vo",
+        "contentscode": "plv-kausitasoitettu"
+      },
+      "handling": "none",
+      "kind": "volume",
+      "invert": false,
+      "unit": "ind. 2021=100",
+      "raw_desc": "Kausitasoitettu volyymi-indeksi, palvelualat (H–S pl. G)",
+      "list": "Palvelualat"
+    },
+    {
+      "id": "vienti_vol",
+      "label": "Tavaraviennin volyymi",
+      "set": "suhdanne",
+      "group": "Tuotanto",
+      "source": "eurostat",
+      "ds": "ext_st_27_2020msbec",
+      "pick": {
+        "stk_flow": "EXP",
+        "indic_et": "IVOL_SCA",
+        "partner": "WORLD",
+        "bclas_bec": "TOTAL"
+      },
+      "handling": "none",
+      "kind": "volume",
+      "invert": false,
+      "in_composite": false,
+      "unit": "ind. 2021=100",
+      "raw_desc": "Kausitasoitettu volyymi-indeksi",
+      "list": "Tavaravienti"
+    },
+    {
       "id": "rak_alo",
       "label": "Aloitetut rakennukset",
       "set": "suhdanne",
@@ -1667,7 +1719,7 @@
     },
     {
       "id": "lomautetut",
-      "label": "Lomautetut (kokoaikaisesti)",
+      "label": "Kokoaikaisesti lomautetut",
       "set": "suhdanne",
       "group": "Työmarkkinat",
       "source": "statfin",
@@ -1676,10 +1728,12 @@
         "Alue": "SSS",
         "contentscode": "LOMAUTETTU"
       },
-      "handling": "sa_trend",
+      "handling": "sa",
       "kind": "volume",
       "invert": true,
-      "enabled": false
+      "unit": "henkilöä",
+      "raw_desc": "Kausitasoittamaton kuukausiluku",
+      "list": "Lomautetut"
     },
     {
       "id": "kc_ek_teol",
@@ -4231,6 +4285,22 @@
       "to_quarter": true,
       "stl": true,
       "mult": 0.001
+    },
+    {
+      "id": "x_ensirek",
+      "label": "Henkilöautot",
+      "set": "bkt",
+      "chart_only": true,
+      "source": "statfin",
+      "table": "merek/11ar.px",
+      "pick": {
+        "ajoneuvolaji_2_20190101": "01",
+        "maakunta_26_20190101": "MA1",
+        "contentscode": "merek-N"
+      },
+      "to_quarter": "sum",
+      "mult": 0.001,
+      "roll": 4
     },
     {
       "id": "tm_vr",

@@ -636,7 +636,8 @@ SRC_NAMES <- list(
                   ktps = "palkkasummakuvaajat", khi = "kuluttajahintaindeksi", kbar = "kuluttajabarometri",
                   ashi = "osakeasuntojen hinnat", asvu = "asuntojen vuokrat", raku = "rakennus- ja asuntotuotanto",
                   rlv = "rakentamisen liikevaihtokuvaaja", ttvi = "teollisuustuotanto", teul = "teollisuuden uudet tilaukset",
-                  ktkk = "tuotannon suhdannekuvaaja", kony = "konkurssit"),
+                  ktkk = "tuotannon suhdannekuvaaja", kony = "konkurssit",
+                  plv = "palvelualojen liikevaihtokuvaaja", merek = "ajoneuvojen ensirekisteröinnit"),
   eurostat = list(.n = "Eurostat", ei_bsin_m_r2 = "Euroopan komission luottamuskyselyt", ei_bsbu_m_r2 = "Euroopan komission luottamuskyselyt",
                   ei_bsrt_m_r2 = "Euroopan komission luottamuskyselyt", ei_bsse_m_r2 = "Euroopan komission luottamuskyselyt",
                   ei_bsin_q_r2 = "kapasiteetin käyttöaste", sts_trtu_m = "vähittäiskaupan liikevaihto", sts_setu_m = "palvelujen liikevaihto",
@@ -685,7 +686,7 @@ out <- list(
                     "Muutos on tason muutos edellisestä jaksosta jaettuna sen keskihajonnalla. Sarjoissa, joilla ei ole kasvutrendiä (saldoluvut, ",
                     "käyttöaste, työllisyys- ja työttömyysaste), muutos lasketaan kohinasuodatetun sarjan omasta muutoksesta, jotta trendin ",
                     "liike ei näy muutoksena. Käännetyissä sarjoissa ",
-                    "(työttömyysaste, konkurssit) etumerkki on vaihdettu, joten ylhäällä = parempi. Majoitus- ja ravitsemuspalvelujen ",
+                    "(työttömyysaste, lomautetut, konkurssit) etumerkki on vaihdettu, joten ylhäällä = parempi. Majoitus- ja ravitsemuspalvelujen ",
                     "myynti on deflatoitu alan kuluttajahintaindeksillä, koska Eurostat ei julkaise Suomelle volyymisarjaa."),
     growth = paste0("Reaalitalous: q/q kausitasoitetusta sarjasta, v/v työpäiväkorjatusta (tilinpito) tai alkuperäisestä sarjasta ",
                     "(inflaatio, asuntohinnat, ansiot, työttömät), kuten virallisissa tilastoissa. Taulukon värin voimakkuus on muutos ",
@@ -702,7 +703,7 @@ out <- list(
                     "Riskilisä on Suomen ja Saksan 10 vuoden korkojen ero."),
     caveat = paste0("Trendisuotimen loppupisteet tarkentuvat uuden datan myötä, ",
                     "joten viimeisimmät pisteet voivat siirtyä."),
-    composite = "Kokonaisindikaattori: sarjojen tasojen keskiarvo jaksoilta, joilla kaikki sarjat ovat saatavilla. BKT ei ole mukana keskiarvossa.",
+    composite = "Kokonaisindikaattori: sarjojen tasojen keskiarvo jaksoilta, joilla kaikki sarjat ovat saatavilla. BKT ei ole mukana keskiarvossa. Käyttöaste, konkurssit ja tavaravienti näkyvät kartalla, mutta eivät ole mukana keskiarvossa; tavaravienti julkaistaan muita myöhemmin.",
     sources = sources_out),
   sets = sets_out)
 
