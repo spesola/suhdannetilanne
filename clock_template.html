@@ -544,9 +544,11 @@ footer b { color: var(--fg); font-weight: 600; }
   function comp() { return { id: "comp", label: "Kokonaisindikaattori", last: set.composite.last,
     level: set.composite.level, change: set.composite.change, comp: true }; }
   // ryhmapiste: ryhman sarjojen tasojen keskiarvo (vain jaksot, joilla kaikki sarjat ovat saatavilla)
+  // ryhman jasenet keskiarvoon: kokonaisindikaattorin sarjat (ei *-merkittyja), jos niita on
+  const grpMem = g => { const a = set.indicators.filter(s => s.group === g), c = a.filter(s => s.in_composite); return c.length ? c : a; };
   function grp(g) {
     const key = set.id + "|" + g; if (gcache.has(key)) return gcache.get(key);
-    const mem = set.indicators.filter(s => s.group === g), n = set.periods.length, lvl = new Array(n).fill(null);
+    const mem = grpMem(g), n = set.periods.length, lvl = new Array(n).fill(null);
     for (let k = 0; k < n; k++) { let sum = 0, ok = true;
       for (const s of mem) { const v = s.level[k]; if (v == null) { ok = false; break; } sum += v; }
       if (ok) lvl[k] = sum / mem.length; }
@@ -805,7 +807,7 @@ footer b { color: var(--fg); font-weight: 600; }
     // oikea puoli: osatekijat (luottamus ym.), BKT-vertailu (kokonaisindikaattori) tai lahteen julkaisema arvo
     let cc = set.contribs && set.contribs[sel || "comp"];
     if (!cc && s.isGroup) {               // ryhma = sarjojen poikkeamien keskiarvo, joten osuus = poikkeama / n (tasmalleen)
-      const mem = set.indicators.filter(x => x.group === s.group), n0 = mem.length;
+      const mem = grpMem(s.group), n0 = mem.length;
       set.series = (set.series || []).filter(x => !x.id.startsWith("__g"))
         .concat([{ id: "__gline", label: s.label, values: s.level }],
                 mem.map(x => ({ id: "__g_" + x.id, label: x.label, values: x.level.map((v, k) => s.level[k] == null || v == null ? null : v / n0) })));
