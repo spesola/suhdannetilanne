@@ -99,10 +99,17 @@ body { font-variant-numeric: tabular-nums; background: var(--bg); min-height: 10
 .tg input:checked { background: var(--fg); }
 .tg input:checked::after { transform: translateX(12px); }
 .tg input:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
-.gh { display: flex; align-items: center; gap: 8px; width: 100%; font: inherit; background: none; border: 0; border-bottom: 1px solid var(--line); padding: 16px 0 6px; margin: 0; border-radius: 0; cursor: pointer; color: var(--fg); text-align: left; }
+.gh { display: grid; grid-template-columns: var(--cols); column-gap: 10px; align-items: baseline; width: 100%; font: inherit; background: none; border: 0; border-bottom: 1px solid var(--line); padding: 9px 0; margin: 0; border-radius: 0; cursor: pointer; color: var(--fg); text-align: left; }
+.gh .chev { color: var(--muted); align-self: center; }
+.gh .chev svg { display: block; fill: none; stroke: currentColor; stroke-width: 1.6; stroke-linecap: round; stroke-linejoin: round; transition: transform .15s; }
+.gh[aria-expanded="true"] .chev svg { transform: rotate(90deg); }
+.gh .cnt { font-size: 0.7rem; font-weight: 400; color: var(--muted); margin-left: 6px; }
+.gh .v { font-size: 0.84rem; text-align: right; font-variant-numeric: tabular-nums; font-weight: 600; }
+.gh .ph { display: block; overflow: hidden; text-overflow: ellipsis; font-size: 0.8rem; white-space: nowrap; text-align: right; font-weight: 600; }
+.gh .ph i { display: inline-block; width: 8px; height: 8px; border-radius: 50%; background: var(--qc); margin-right: 7px; }
 .gh:hover { background: var(--grid); }
 .gh:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
-.gh .gn { flex: 1; font-size: 0.78rem; font-weight: 600; }
+.gh .gn { font-size: 0.86rem; font-weight: 600; min-width: 0; }
 .gh[aria-pressed="true"] { background: color-mix(in srgb, var(--accent) 14%, var(--surface)); }
 
 .timebar { display: flex; align-items: center; gap: 10px; margin-top: 14px; flex-wrap: wrap; }
@@ -397,9 +404,9 @@ footer b { color: var(--fg); font-weight: 600; }
   .sets .lg { display: none; }
   .sets .sh { display: inline; }
   .list { --cols: 2.7rem minmax(0, 1fr) 2.7rem 2.9rem 0.9rem; }
-  .lhead, .ind { column-gap: 6px; }
+  .lhead, .ind, .gh { column-gap: 6px; }
   .ind .per, .lhead span:nth-child(1) { font-size: 0.62rem; }
-  .ind .ph .pt-t, .lhead span:nth-child(5) { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); }
+  .ind .ph .pt-t, .gh .ph .pt-t, .lhead span:nth-child(5) { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); }
   .timebar input[type=range] { flex-basis: 120px; }
   #clock text { font-size: 17px; }
   #tsContrib .fc text { font-size: 17px; }
@@ -517,6 +524,7 @@ footer b { color: var(--fg); font-weight: 600; }
   let idx = defIdx(set);
   let sel = null;            // indikaattorin id, "comp" tai null
   let qf = null;             // vaihesuodatin: up/turn/down/rec tai null
+  const openG = new Set();   // luettelossa auki olevat ryhmat (oletuksena kiinni)
   let tab = "ts";
   let showTails = false;
   const gcache = new Map();
@@ -667,10 +675,13 @@ footer b { color: var(--fg); font-weight: 600; }
       g.addEventListener("mouseleave", () => hlRow(null));
     });
     placed.forEach(t => svg.appendChild(t.parentNode));   // valittujen nimet muiden pisteiden paalle
-    // nimien tormaysten esto: ylhaalta alas, paallekkainen nimi siirtyy rivin alemmas
+    declutter(placed);
+  }
+  // nimien tormaysten esto: ylhaalta alas, paallekkainen nimi siirtyy rivin alemmas (alkuperainen paikka talteen)
+  function declutter(labels) {
     const boxes = [];
-    placed.map(t => ({ t, x: +t.getAttribute("x"), y: +t.getAttribute("y"), w: t.textContent.length * 7.4,
-                       end: t.getAttribute("text-anchor") === "end" }))
+    labels.map(t => { if (!t.dataset.y0) t.dataset.y0 = t.getAttribute("y"); let w = 0; try { w = t.getComputedTextLength(); } catch (e) {}
+        return { t, x: +t.getAttribute("x"), y: +t.dataset.y0, w: (w || t.textContent.length * 7.4) + 4, end: t.getAttribute("text-anchor") === "end" }; })
       .sort((a, b) => a.y - b.y)
       .forEach(o => {
         const x0 = o.end ? o.x - o.w : o.x, x1 = x0 + o.w; let y = o.y;
@@ -742,11 +753,19 @@ footer b { color: var(--fg); font-weight: 600; }
       const h = document.createElement("button"); h.type = "button"; h.className = "gh";
       h.style.setProperty("--gc", `var(${GVARS[gi % GVARS.length]})`);
       const gp = all.length > 1 ? at(grp(g), idx) : null, gq = gp ? quad(gp.l, gp.c) : null;
-      h.setAttribute("aria-pressed", sel === "g:" + g);
-      h.innerHTML = `<span class="gn">${g}</span>`;   // ryhman vaihe nakyy valittaessa, ei listassa
-      h.onclick = () => select("g:" + g); h.dataset.g = g;
+      // ryhma auki: kayttaja avasi, vaihesuodatin paalla tai ryhman sarja valittuna
+      const open = openG.has(g) || !!qf || all.some(x => x.id === sel);
+      h.setAttribute("aria-pressed", sel === "g:" + g); h.setAttribute("aria-expanded", open);
+      h.innerHTML = `<span class="chev" aria-hidden="true"><svg viewBox="0 0 12 12" width="11" height="11"><path d="M4 2.5 7.5 6 4 9.5"/></svg></span>` +
+        `<span class="gn">${g}<span class="cnt">${all.length}</span></span>` +
+        `<span class="v">${gp ? fmtN(gp.l) : ""}</span><span class="v">${gp ? fmtN(gp.c) : ""}</span>` +
+        (gq ? `<span class="ph" style="--qc:${qcol(gq)}" title="Ryhmän keskiarvo: ${Q[gq].name}"><i></i><span class="pt-t">${Q[gq].short}</span></span>` : `<span></span>`);
+      h.title = open ? "Sulje ryhmä" : "Avaa ryhmän sarjat";
+      h.onclick = () => { if (open && !qf) { openG.delete(g); if (sel === "g:" + g || all.some(x => x.id === sel)) select(sel); else update(); }
+                          else { openG.add(g); if (sel !== "g:" + g) select("g:" + g); else update(); } };
+      h.dataset.g = g;
       h.onmouseenter = () => hlPoints(all.map(x => x.id)); h.onmouseleave = () => hlPoints([]);
-      box.appendChild(h); mem.forEach(s => box.appendChild(mk(s))); list.appendChild(box);
+      box.appendChild(h); if (open) mem.forEach(s => box.appendChild(mk(s))); list.appendChild(box);
     });
     if (list.children.length === 1) list.insertAdjacentHTML("beforeend", `<div class="empty">Ei indikaattoreita vaiheessa ${Q[qf].name.toLowerCase()}.</div>`);
     const notes = [set.indicators.some(s => !s.in_composite) ? "* Ei mukana kokonaisindikaattorissa." : "",
@@ -759,6 +778,8 @@ footer b { color: var(--fg); font-weight: 600; }
     const svg = $("clock");
     svg.querySelectorAll(".pt.hl").forEach(g => g.classList.remove("hl"));
     ids.forEach(id => { const g = svg.querySelector(`.pt[data-id="${CSS.escape(id)}"]`); if (g) { g.classList.add("hl"); svg.appendChild(g); } });
+    svg.querySelectorAll(".pt .lbl").forEach(t => { if (t.dataset.y0) t.setAttribute("y", t.dataset.y0); });
+    declutter([...svg.querySelectorAll(".pt.hl .lbl, .pt.sel .lbl")]);   // nakyvat nimet eivat mene paallekkain
   }
   function hlRow(id) {
     document.querySelectorAll("#list .ind.hl").forEach(r => r.classList.remove("hl"));
