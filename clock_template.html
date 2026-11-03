@@ -137,6 +137,8 @@ body { font-variant-numeric: tabular-nums; background: var(--bg); min-height: 10
 .empty { color: var(--muted); font-size: 0.88rem; padding: 8px 4px; }
 .pt.off { opacity: .14; }
 .pt.hl { opacity: 1; }
+.pt.dim { opacity: .3; transition: opacity .15s; }
+.pt.dim:hover, .pt.dim.hl { opacity: 1; }
 .pt.hl .lbl { opacity: 1; }
 .pt.hl > circle:last-of-type, .pt.hl > path:last-of-type { stroke: var(--fg); stroke-width: 2.5; }
 .ind.hl, .gh.hl { background: var(--grid); }
@@ -654,11 +656,14 @@ footer b { color: var(--fg); font-weight: 600; }
     items.push({ s: comp(), col: "var(--fg)" });
     const placed = [];
     const hi = s => sel === s.id || (!!sel && sel === "g:" + s.group && !s.isGroup && !s.comp);
+    const gSel = sel && sel.startsWith("g:"), gMany = gSel && set.indicators.filter(x => "g:" + x.group === sel).length > 3;
     items.forEach(({ s, col }) => {
       const p = at(s, idx); if (!p) return;
       const off = qf && (quad(p.l, p.c) !== qf || (!s.comp && !s.isGroup && !s.in_composite)) && !hi(s);
-      const g = el("g", { class: "pt" + (hi(s) ? " sel" : "") + (off ? " off" : ""), tabindex: -1, "data-id": s.id, opacity: p.stale && !s.comp ? 0.45 : 1 }, svg);
-      const pts = [], from = (showTails || hi(s) || s.comp) ? Math.max(0, p.i - set.tail) : p.i;   // kokonaisindikaattorin polku aina
+      const dim = !!sel && !off && !hi(s) && !s.comp;                   // valinta: muut pisteet himmeiksi
+      const g = el("g", { class: "pt" + (hi(s) ? " sel" : "") + (off ? " off" : "") + (dim ? " dim" : ""), tabindex: -1, "data-id": s.id, opacity: p.stale && !s.comp ? 0.45 : 1 }, svg);
+      // polku: kokonaisindikaattorilla aina, valitulla sarjalla ja pienella ryhmalla; isossa ryhmassa vain kulku-valinnalla
+      const pts = [], from = (showTails || (hi(s) && !gMany) || s.comp) ? Math.max(0, p.i - set.tail) : p.i;
       for (let k = from; k <= p.i; k++)
         if (s.level[k] != null && s.change[k] != null) pts.push([X(s.change[k]), Y(s.level[k])]);
       if (pts.length > 1) {
@@ -673,7 +678,7 @@ footer b { color: var(--fg); font-weight: 600; }
       const right = hx + r + 8 + s.label.length * 6.6 < W - M;   // nimi oikealle, jos mahtuu kehyksen sisaan
       const lbl = el("text", { class: "lbl", x: hx + (right ? r + 6 : -r - 6), y: hy - 10, "text-anchor": right ? "start" : "end",
         "font-size": s.isGroup ? 12.5 : 12, "font-weight": s.isGroup ? 600 : 500, fill: "var(--fg)", stroke: "var(--surface)", "stroke-width": 4, "paint-order": "stroke" }, g);
-      lbl.textContent = s.label;
+      lbl.textContent = gSel && hi(s) && s.list ? s.list : s.label;      // ryhman sisalla lyhyet nimet
       el("title", {}, g).textContent = `${s.label}, ${fmtP(set.periods[p.i])}: taso ${fmtN(p.l)}, muutos ${fmtN(p.c)}`;
       if (hi(s)) placed.push(lbl);
       g.addEventListener("click", () => select(s.id));
@@ -685,17 +690,31 @@ footer b { color: var(--fg); font-weight: 600; }
   }
   // nimien tormaysten esto: ylhaalta alas, paallekkainen nimi siirtyy rivin alemmas (alkuperainen paikka talteen)
   function declutter(labels) {
-    const boxes = [];
-    labels.map(t => { if (!t.dataset.y0) t.dataset.y0 = t.getAttribute("y"); let w = 0; try { w = t.getComputedTextLength(); } catch (e) {}
-        return { t, x: +t.getAttribute("x"), y: +t.dataset.y0, w: (w || t.textContent.length * 7.4) + 4, end: t.getAttribute("text-anchor") === "end" }; })
-      .sort((a, b) => a.y - b.y)
+    if (!labels.length) return;
+    const svg = $("clock"), head = t => { const cs = t.parentNode.querySelectorAll(":scope > circle"); const c = cs[cs.length - 1];
+      return c ? { x: +c.getAttribute("cx"), y: +c.getAttribute("cy"), r: +c.getAttribute("r") } : null; };
+    // esteet: nakyvien pisteiden paat seka kartan omat tekstit (vaiheet, akselit)
+    const obst = [];
+    svg.querySelectorAll(".pt:not(.dim):not(.off)").forEach(g => { const cs = g.querySelectorAll(":scope > circle"), c = cs[cs.length - 1];
+      if (c) { const x = +c.getAttribute("cx"), y = +c.getAttribute("cy"), r = +c.getAttribute("r") + 2; obst.push({ x0: x - r, x1: x + r, y0: y - r, y1: y + r }); } });
+    svg.querySelectorAll(":scope > text").forEach(t => { try { const b = t.getBBox(); obst.push({ x0: b.x, x1: b.x + b.width, y0: b.y, y1: b.y + b.height }); } catch (e) {} });
+    const ov = (a, b) => Math.max(0, Math.min(a.x1, b.x1) - Math.max(a.x0, b.x0)) * Math.max(0, Math.min(a.y1, b.y1) - Math.max(a.y0, b.y0));
+    const placed = [];
+    labels.map(t => ({ t, h: head(t), w: (() => { try { return t.getComputedTextLength(); } catch (e) { return t.textContent.length * 7; } })() || t.textContent.length * 7 }))
+      .filter(o => o.h).sort((a, b) => a.h.y - b.h.y)
       .forEach(o => {
-        const x0 = o.end ? o.x - o.w : o.x, x1 = x0 + o.w; let y = o.y;
-        for (let k = 0; k < 8; k++) {
-          const hit = boxes.find(b => x0 < b.x1 && x1 > b.x0 && Math.abs(y - b.y) < 15);
-          if (!hit) break; y = hit.y + 15;
-        }
-        o.t.setAttribute("y", y); boxes.push({ x0, x1, y });
+        const { x, y, r } = o.h, w = o.w + 4, d = r + 5;
+        const C = [[x + d, y - 6, "start"], [x - d, y - 6, "end"], [x + d, y + 14, "start"], [x - d, y + 14, "end"],
+                   [x, y - d - 4, "middle"], [x, y + d + 12, "middle"], [x + d, y + 4, "start"], [x - d, y + 4, "end"],
+                   [x + d, y - 20, "start"], [x - d, y - 20, "end"], [x + d, y + 28, "start"], [x - d, y + 28, "end"]];
+        let best = null, bs = Infinity;
+        C.forEach(([lx, ly, a], k) => {
+          const x0 = a === "start" ? lx : a === "end" ? lx - w : lx - w / 2, bx = { x0, x1: x0 + w, y0: ly - 11, y1: ly + 3 };
+          let sc = k * 0.5;                                                // lahimmat paikat ensin
+          if (bx.x0 < M || bx.x1 > W - M || bx.y0 < M || bx.y1 > W - M) sc += 5000;
+          placed.forEach(b => sc += 40 * ov(bx, b)); obst.forEach(b => sc += 12 * ov(bx, b));
+          if (sc < bs) { bs = sc; best = { lx, ly, a, bx }; } });
+        o.t.setAttribute("x", best.lx); o.t.setAttribute("y", best.ly); o.t.setAttribute("text-anchor", best.a); placed.push(best.bx);
       });
   }
 
@@ -803,7 +822,6 @@ footer b { color: var(--fg); font-weight: 600; }
     const svg = $("clock");
     svg.querySelectorAll(".pt.hl").forEach(g => g.classList.remove("hl"));
     ids.forEach(id => { const g = svg.querySelector(`.pt[data-id="${CSS.escape(id)}"]`); if (g) { g.classList.add("hl"); svg.appendChild(g); } });
-    svg.querySelectorAll(".pt .lbl").forEach(t => { if (t.dataset.y0) t.setAttribute("y", t.dataset.y0); });
     declutter([...svg.querySelectorAll(".pt.hl .lbl, .pt.sel .lbl")]);   // nakyvat nimet eivat mene paallekkain
   }
   function hlRow(id) {
