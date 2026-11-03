@@ -101,8 +101,9 @@ body { font-variant-numeric: tabular-nums; background: var(--bg); min-height: 10
 .tg input:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
 .gh { display: grid; grid-template-columns: var(--cols); column-gap: 10px; align-items: baseline; width: 100%; font: inherit; background: none; border: 0; border-bottom: 1px solid var(--line); padding: 9px 0; margin: 0; border-radius: 0; cursor: pointer; color: var(--fg); text-align: left; }
 .gh .chev { color: var(--muted); align-self: center; }
-.gh .chev svg { display: block; fill: none; stroke: currentColor; stroke-width: 1.6; stroke-linecap: round; stroke-linejoin: round; transition: transform .15s; }
+.gh .chev svg { display: block; fill: none; stroke: currentColor; stroke-width: 1.6; stroke-linecap: round; stroke-linejoin: round; }
 .gh[aria-expanded="true"] .chev svg { transform: rotate(90deg); }
+.gh { transition: background-color .15s; }
 .gh .cnt { font-size: 0.7rem; font-weight: 400; color: var(--muted); margin-left: 6px; }
 .gh .v { font-size: 0.84rem; text-align: right; font-variant-numeric: tabular-nums; font-weight: 600; }
 .gh .ph { display: block; overflow: hidden; text-overflow: ellipsis; font-size: 0.8rem; white-space: nowrap; text-align: right; font-weight: 600; }
@@ -525,6 +526,9 @@ footer b { color: var(--fg); font-weight: 600; }
   let sel = null;            // indikaattorin id, "comp" tai null
   let qf = null;             // vaihesuodatin: up/turn/down/rec tai null
   const openG = new Set();   // luettelossa auki olevat ryhmat (oletuksena kiinni)
+  let gAnim = null;          // juuri avattu/suljettu ryhma: siirtyma piirron jalkeen
+  const REDUCED = matchMedia("(prefers-reduced-motion: reduce)");
+  const EASE = "cubic-bezier(.2, .7, .2, 1)";
   let tab = "ts";
   let showTails = false;
   const gcache = new Map();
@@ -763,16 +767,35 @@ footer b { color: var(--fg); font-weight: 600; }
         `<span class="v">${gp ? fmtN(gp.l) : ""}</span><span class="v">${gp ? fmtN(gp.c) : ""}</span>` +
         (gq ? `<span class="ph" style="--qc:${qcol(gq)}" title="Ryhmän keskiarvo: ${Q[gq].name}"><i></i><span class="pt-t">${Q[gq].short}</span></span>` : `<span></span>`);
       h.title = open ? "Sulje ryhmä" : "Avaa ryhmän sarjat";
-      h.onclick = () => { if (open && !qf) { openG.delete(g); if (sel === "g:" + g || all.some(x => x.id === sel)) select(sel); else update(); }
-                          else { openG.add(g); if (sel !== "g:" + g) select("g:" + g); else update(); } };
+      const doClose = () => { openG.delete(g); gAnim = { g, dir: "close" }; if (sel === "g:" + g || all.some(x => x.id === sel)) select(sel); else update(); };
+      h.onclick = () => {
+        if (open && !qf) {                                                // sulkeminen: rivit ensin pehmeasti kiinni, sitten tila
+          const body = box.querySelector(".gbody");
+          if (!body || REDUCED.matches) return doClose();
+          const ch = h.querySelector(".chev svg"); if (ch) ch.animate([{ transform: "rotate(90deg)" }, { transform: "rotate(0deg)" }], { duration: 200, easing: EASE, fill: "forwards" });
+          body.style.overflow = "hidden";
+          body.animate([{ height: body.offsetHeight + "px", opacity: 1 }, { height: "0px", opacity: 0 }], { duration: 200, easing: EASE, fill: "forwards" }).onfinish = doClose;
+        } else { openG.add(g); gAnim = { g, dir: "open" }; if (sel !== "g:" + g) select("g:" + g); else update(); } };
       h.dataset.g = g;
       h.onmouseenter = () => hlPoints(all.map(x => x.id)); h.onmouseleave = () => hlPoints([]);
-      box.appendChild(h); if (open) mem.forEach(s => box.appendChild(mk(s))); list.appendChild(box);
+      box.dataset.g = g; box.appendChild(h);
+      if (open) { const body = document.createElement("div"); body.className = "gbody"; mem.forEach(s => body.appendChild(mk(s))); box.appendChild(body); }
+      list.appendChild(box);
     });
     if (list.children.length === 1) list.insertAdjacentHTML("beforeend", `<div class="empty">Ei indikaattoreita vaiheessa ${Q[qf].name.toLowerCase()}.</div>`);
     const notes = [set.indicators.some(s => !s.in_composite) ? "* Ei mukana kokonaisindikaattorissa." : "",
                    set.indicators.some(s => s.invert) ? "Käänt. = käännetty sarja, nousu näkyy negatiivisena." : ""].filter(Boolean);
     if (notes.length) list.insertAdjacentHTML("beforeend", `<p class="lnote">${notes.join(" ")}</p>`);
+    if (gAnim && !REDUCED.matches) {                                     // avaus: rivit liukuvat auki, nuoli kaantyy
+      const box = [...list.querySelectorAll(".grp")].find(b => b.dataset.g === gAnim.g), body = box && box.querySelector(".gbody");
+      const ch = box && box.querySelector(".chev svg");
+      if (gAnim.dir === "open" && body) {
+        if (ch) ch.animate([{ transform: "rotate(0deg)" }, { transform: "rotate(90deg)" }], { duration: 220, easing: EASE });
+        body.style.overflow = "hidden";
+        body.animate([{ height: "0px", opacity: 0 }, { height: body.offsetHeight + "px", opacity: 1 }], { duration: 240, easing: EASE }).onfinish = () => { body.style.overflow = ""; };
+      }
+    }
+    gAnim = null;
   }
 
   // kartan ja luettelon kytkentä: rivin hover korostaa pisteen ja nayttaa nimen, pisteen hover korostaa rivin
