@@ -168,10 +168,12 @@ body { font-variant-numeric: tabular-nums; background: var(--bg); min-height: 10
 .ind .ph { display: block; overflow: hidden; text-overflow: ellipsis; font-size: 0.8rem; color: var(--fg); white-space: nowrap; text-align: right; }
 .ind .ph i { display: inline-block; width: 8px; height: 8px; border-radius: 50%; background: var(--qc); margin-right: 7px; vertical-align: 0; }   /* teksti samalle perusviivalle kuin luvut */
 .ind:hover { background: var(--grid); }
-.ind, .gh { position: relative; }
-.ind[aria-pressed="true"], .gh[aria-pressed="true"] { background: none; }   /* valinta: pieni merkki rivin vasemmalla puolella, sarakkeet eivat siirry */
-.ind[aria-pressed="true"]::before, .gh[aria-pressed="true"]::before { content: ""; position: absolute; left: -10px; top: 8px; bottom: 8px; width: 3px; border-radius: 2px; background: var(--fg); }
-.ind[aria-pressed="true"]:hover, .gh[aria-pressed="true"]:hover { background: var(--grid); }
+.ind, .gh { position: relative; isolation: isolate; }
+/* valinta: korostusvarinen pyoristetty tausta rivikohtaisesti, rivien valiin jaa tilaa; sarakkeet eivat siirry */
+.ind[aria-pressed="true"], .gh[aria-pressed="true"] { background: none; }
+.ind[aria-pressed="true"]::before, .gh[aria-pressed="true"]::before { content: ""; position: absolute; z-index: -1; inset: 3px -6px; border-radius: 6px;
+  background: color-mix(in srgb, var(--accent) 11%, transparent); }
+.ind[aria-pressed="true"]:hover::before, .gh[aria-pressed="true"]:hover::before { background: color-mix(in srgb, var(--accent) 17%, transparent); }
 .ind .nm { font-size: 0.86rem; overflow-wrap: break-word; hyphens: auto; min-width: 0; }
 .ind .per { font-size: 0.68rem; color: var(--muted); white-space: nowrap; overflow: hidden; }
 .chip { font-size: 0.78rem; font-weight: 500; white-space: nowrap; color: var(--qc); }
