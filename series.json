@@ -1113,7 +1113,7 @@
         {
           "id": "ea_m2c",
           "section": "Korot ja rahapolitiikka",
-          "title": "Rahan määrä M2 euroalueella, vuosimuutos %",
+          "title": "M2 euroalueella, vuosimuutos %",
           "size": "half",
           "lines": [
             "ea_m2"
