@@ -92,7 +92,7 @@ body { font-variant-numeric: tabular-nums; background: var(--bg); min-height: 10
 #clock text { font-family: var(--font-body); }
 .pt { cursor: pointer; }
 .pt .lbl { opacity: 0; transition: opacity .12s; pointer-events: none; }
-.pt:hover .lbl, .pt.sel .lbl { opacity: 1; }
+.pt:hover .lbl, .pt.sel .lbl, .pt.comp .lbl { opacity: 1; }
 .tg { display: inline-flex; align-items: center; gap: 6px; font-size: 0.82rem; color: var(--muted); cursor: pointer; }
 .tg input { appearance: none; -webkit-appearance: none; width: 28px; height: 16px; border-radius: 8px; background: var(--line); position: relative; margin: 0; cursor: pointer; transition: background .15s; flex: none; }
 .tg input::after { content: ""; position: absolute; top: 2px; left: 2px; width: 12px; height: 12px; border-radius: 50%; background: #fff; box-shadow: 0 1px 2px rgba(0,0,0,.2); transition: transform .15s; }
@@ -622,17 +622,8 @@ footer b { color: var(--fg); font-weight: 600; }
     const svg = $("clock"); svg.innerHTML = "";
     const K = svg.clientWidth && svg.clientWidth < 420 ? 1.6 : 1;   // kapealla naytolla pisteet suuremmiksi
     const mid = W / 2, inner = W - 2 * M;
-    // tausta: vaiheiden neljannekset vaalealla savylla, valkoinen ruudukko
-    // saeteittainen savytys: lapinakyva origossa, voimistuu reunoja kohti (etaisyys trendista = vaiheen voimakkuus)
-    const defs = el("defs", {}, svg);
-    [["turn", M, M], ["up", mid, M], ["down", M, mid], ["rec", mid, mid]].forEach(([q, x, y]) => {
-      const g = el("radialGradient", { id: `rg-${q}`, gradientUnits: "userSpaceOnUse", cx: mid, cy: mid, r: inner / 2 * Math.SQRT2 }, defs);
-      const sc = q === "up" ? "#2e8b57" : qcol(q);                    // nousun tumma vihrea harmaantuu ohuena: savytykseen kirkkaampi
-      el("stop", { offset: "0", "stop-color": sc, "stop-opacity": 0 }, g);
-      el("stop", { offset: "0.71", "stop-color": sc, "stop-opacity": 0.13 }, g);
-      el("stop", { offset: "1", "stop-color": sc, "stop-opacity": 0.2 }, g);
-      el("rect", { x, y, width: inner / 2, height: inner / 2, fill: "var(--plot)" }, svg);
-      el("rect", { x, y, width: inner / 2, height: inner / 2, fill: `url(#rg-${q})` }, svg); });
+    // tausta: valkoinen ruudukko ilman vaihesavyja; pisteiden vari kertoo vaiheen
+    el("rect", { x: M, y: M, width: inner, height: inner, fill: "var(--plot)" }, svg);
     for (let v = -2; v <= 2; v++) { if (!v) continue;
       el("line", { x1: X(v), x2: X(v), y1: M, y2: W - M, stroke: "color-mix(in srgb, var(--fg) 7%, transparent)", "stroke-width": 1 }, svg);   // ruudukko nakyy myos vaalealla keskella
       el("line", { y1: Y(v), y2: Y(v), x1: M, x2: W - M, stroke: "color-mix(in srgb, var(--fg) 7%, transparent)", "stroke-width": 1 }, svg);
@@ -667,25 +658,27 @@ footer b { color: var(--fg); font-weight: 600; }
     const many = picked.size > 1;
     items.forEach(({ s, col }) => {
       const p = at(s, idx); if (!p) return;
+      const tailCol = s.comp ? col : "var(--muted)"; if (!s.comp) col = qcol(quad(p.l, p.c));   // piste vaiheen varilla, polku neutraali
       const off = qf && (quad(p.l, p.c) !== qf || (!s.comp && !s.isGroup && !s.in_composite)) && !hi(s);
       const dim = (!!sel || picked.size > 0) && !off && !hi(s) && !s.comp;   // valinta: muut pisteet himmeiksi
-      const g = el("g", { class: "pt" + (hi(s) ? " sel" : "") + (off ? " off" : "") + (dim ? " dim" : ""), tabindex: -1, "data-id": s.id, opacity: p.stale && !s.comp ? 0.45 : 1 }, svg);
+      const g = el("g", { class: "pt" + (s.comp ? " comp" : "") + (hi(s) ? " sel" : "") + (off ? " off" : "") + (dim ? " dim" : ""), tabindex: -1, "data-id": s.id, opacity: p.stale && !s.comp ? 0.45 : 1 }, svg);
       const pts = [], from = (showTails || hi(s) || s.comp) ? Math.max(0, p.i - set.tail) : p.i;   // polku: kokonaisindikaattori ja valitut
       for (let k = from; k <= p.i; k++)
         if (s.level[k] != null && s.change[k] != null) pts.push([X(s.change[k]), Y(s.level[k])]);
       if (pts.length > 1) {
-        el("polyline", { points: pts.map(q => q.join(",")).join(" "), fill: "none", stroke: col,
+        el("polyline", { points: pts.map(q => q.join(",")).join(" "), fill: "none", stroke: tailCol,
           "stroke-width": s.comp || s.isGroup ? 1.2 : 1.1, "stroke-opacity": s.comp ? 0.45 : 0.4, "stroke-linejoin": "round", "stroke-linecap": "round" }, g);
-        pts.slice(0, -1).forEach((q, k) => el("circle", { cx: q[0], cy: q[1], r: (s.comp ? 1.7 : 1.6) * K, fill: col, "fill-opacity": 0.2 + 0.4 * k / pts.length }, g));
+        pts.slice(0, -1).forEach((q, k) => el("circle", { cx: q[0], cy: q[1], r: (s.comp ? 1.7 : 1.6) * K, fill: tailCol, "fill-opacity": 0.2 + 0.4 * k / pts.length }, g));
       }
       const [hx, hy] = pts[pts.length - 1];
-      const r = ((s.comp ? 6.5 : s.isGroup ? 7 : 5) + (hi(s) ? 2 : 0)) * K;
+      const r = ((s.comp ? 8 : s.isGroup ? 7 : 4.5) + (hi(s) ? 2 : 0)) * K;
       const hollow = !s.comp && !s.isGroup && !s.in_composite;           // ei kokonaisindikaattorissa: ontto piste
       el("circle", { cx: hx, cy: hy, r, fill: hollow ? "var(--plot)" : s.comp ? "var(--fg)" : col, stroke: hollow ? col : "var(--plot)", "stroke-width": hollow ? 1.6 : 1.5 }, g);
       const right = hx + r + 8 + s.label.length * 6.6 < W - M;   // nimi oikealle, jos mahtuu kehyksen sisaan
       const lbl = el("text", { class: "lbl", x: hx + (right ? r + 6 : -r - 6), y: hy - 10, "text-anchor": right ? "start" : "end",
         "font-size": s.isGroup ? 12.5 : 12, "font-weight": s.isGroup ? 600 : 500, fill: "var(--fg)", stroke: "var(--surface)", "stroke-width": 4, "paint-order": "stroke" }, g);
       lbl.textContent = many && hi(s) && s.list ? s.list : s.label;      // useita valittuna: lyhyet nimet
+      if (s.comp) { lbl.setAttribute("font-weight", 600); placed.push(lbl); }   // kokonaisindikaattorin nimi aina nakyvissa
       el("title", {}, g).textContent = `${s.label}, ${fmtP(set.periods[p.i])}: taso ${fmtN(p.l)}, muutos ${fmtN(p.c)}`;
       if (hi(s)) placed.push(lbl);
       g.addEventListener("click", () => s.comp || s.isGroup ? select(s.id) : pick(s.id));
@@ -831,7 +824,7 @@ footer b { color: var(--fg); font-weight: 600; }
     const svg = $("clock");
     svg.querySelectorAll(".pt.hl").forEach(g => g.classList.remove("hl"));
     ids.forEach(id => { const g = svg.querySelector(`.pt[data-id="${CSS.escape(id)}"]`); if (g) { g.classList.add("hl"); svg.appendChild(g); } });
-    declutter([...svg.querySelectorAll(".pt.hl .lbl, .pt.sel .lbl")]);   // nakyvat nimet eivat mene paallekkain
+    declutter([...svg.querySelectorAll(".pt.hl .lbl, .pt.sel .lbl, .pt.comp .lbl")]);   // nakyvat nimet eivat mene paallekkain
   }
   function hlRow(id) {
     document.querySelectorAll("#list .ind.hl").forEach(r => r.classList.remove("hl"));
