@@ -1094,7 +1094,6 @@
           "id": "ekp_tase",
           "section": "Korot ja rahapolitiikka",
           "title": "Eurojärjestelmän tase, mrd. €",
-          "wide": true,
           "lines": [
             "ekp_tase",
             "ekp_rp",
@@ -1108,7 +1107,24 @@
             "ekp_rp": "var(--accent)",
             "ekp_lain": "var(--g3)"
           },
-          "note": "Kuukauden viimeinen viikkotase. Lähde: EKP."
+          "note": "Kuukauden viimeinen viikkotase. Lähde: EKP.",
+          "size": "half"
+        },
+        {
+          "id": "ea_m2c",
+          "section": "Korot ja rahapolitiikka",
+          "title": "Rahan määrä M2 euroalueella, vuosimuutos %",
+          "size": "half",
+          "lines": [
+            "ea_m2"
+          ],
+          "unit": "%",
+          "dec": 1,
+          "from": 2007,
+          "colors": {
+            "ea_m2": "var(--fg)"
+          },
+          "note": "Kausitasoitettu. Lähde: EKP."
         },
         {
           "id": "t_fx",
@@ -1287,10 +1303,9 @@
         {
           "id": "ea_raha",
           "section": "Luotonanto",
-          "title": "Rahan määrä ja luotonanto euroalueella, vuosimuutos %",
+          "title": "Luotonanto euroalueella, vuosimuutos %",
           "size": "half",
           "lines": [
-            "ea_m2",
             "ea_lyr",
             "ea_lkt"
           ],
@@ -1298,7 +1313,6 @@
           "dec": 1,
           "from": 2010,
           "colors": {
-            "ea_m2": "var(--fg)",
             "ea_lyr": "var(--accent)",
             "ea_lkt": "var(--g3)"
           },
