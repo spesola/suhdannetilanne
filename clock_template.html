@@ -381,6 +381,15 @@ table.snap { width: 100%; border-collapse: collapse; font-size: 0.84rem; font-va
 .fval { font-family: var(--font-data); font-size: 0.82rem; color: var(--muted); font-variant-numeric: tabular-nums; }
 .fval b { font-weight: 500; font-size: 0.95rem; color: var(--fg); }
 .fsub { color: var(--muted); font-size: 0.8rem; margin: 2px 0 0; min-height: 1.2em; }
+.fsub b { color: var(--fg); font-weight: 500; }
+/* rivin kuviot linjaan: jokainen kortti viisi rivia, kuviokortit jakavat rivit (subgrid) */
+/* rivivali marginaalina eika gapina: muuten gap jaa kuviokortin sisaisten rivien valiin */
+.fgrid { row-gap: 0; }
+.fgrid > * { margin-bottom: 48px; }
+.fgrid > .fsec { margin-bottom: 22px; }
+.fgrid > :last-child { margin-bottom: 0; }
+.fgrid > .fcard.sg { grid-row: span 5; display: grid; grid-template-rows: subgrid; row-gap: 0; align-content: start; }
+.fgrid > .fcard.sg > * { align-self: start; min-width: 0; }
 .fnote { color: var(--muted); font-size: 0.8rem; margin: 8px 0 0; }
 .fc { width: 100%; height: auto; display: block; margin-top: 16px; touch-action: pan-y; }
 .fc text { font-family: var(--font-body); }
@@ -1492,8 +1501,9 @@ footer b { color: var(--fg); font-weight: 600; }
   document.addEventListener("click", closeMenus);
   document.addEventListener("keydown", e => { if (e.key === "Escape") closeMenus(); });
   // kuvion ajankohta oikeaan alakulmaan (viimeiselle riville); paakuvion v/v- ja q/q-otsake jaa ylos
+  const escH = t => t.replace(/&/g, "&amp;").replace(/</g, "&lt;");
   function dateDown(card) {
-    const fv = card.querySelector(":scope > .fhead > .fval"); if (!fv || !card.querySelector(":scope > svg.fc") || (card._zc && card._zc.hdr)) return;
+    const fv = card.querySelector(":scope > .fhead > .fval"); if (!fv || !fv.innerHTML.trim() || !card.querySelector(":scope > svg.fc") || (card._zc && card._zc.hdr)) return;
     const last = card.lastElementChild;
     if (last && last.classList.contains("fnote")) { const f = document.createElement("div"); f.className = "ffoot"; last.before(f); f.append(last, fv); }
     else if (last && last.classList.contains("fmeta")) last.appendChild(fv);
@@ -1521,7 +1531,17 @@ footer b { color: var(--fg); font-weight: 600; }
   function renderCharts(box = $("charts"), only = null) {
     const r = renderCharts0(box, only);
     [box, $("grMoreGrid")].forEach(x => x && x.querySelectorAll(".fcard").forEach(menuize));
+    [box, $("grMoreGrid")].forEach(x => x && (x.classList.contains("fgrid") ? [x] : [...x.querySelectorAll(".fgrid")]).forEach(pairRows));
     return r;
+  }
+  // rinnakkaiset kuviokortit samaan linjaan: parille yhteiset rivit (subgrid); taulukon vieressa ei
+  function pairRows(g) {
+    let row = [], used = 0;
+    const flush = () => { const ok = row.length > 1 && row.every(c => c.classList.contains("fcard") && !c.classList.contains("tcard"));
+      row.forEach(c => c.classList.toggle("sg", ok)); row = []; used = 0; };
+    [...g.children].forEach(c => { const w = c.classList.contains("half") ? 3 : 6;
+      if (used + w > 6) flush(); row.push(c); used += w; if (used >= 6) flush(); });
+    flush();
   }
   function renderCharts0(box = $("charts"), only = null) {
     box.innerHTML = ""; chartHooks = [];
@@ -1696,22 +1716,23 @@ footer b { color: var(--fg); font-weight: 600; }
           const su = c.stackUnit != null ? c.stackUnit : "%-yks.";
           subEl.hidden = erit; if (!erit) subEl.textContent = (c.ts ? `${fmtP(P[i])}: ${ser(c.lines[0]).label} ${g > 0 ? "+" : ""}${fmtV(g, c.dec)}${u}. ` : "") +
             c.stack.map((id, k) => `${ser(id).label} ${+(S[k][i] || 0).toFixed(c.dec) > 0 ? "+" : ""}${fmtV(S[k][i], c.dec)}`).join(", ") + (su ? " " + su : "") + (su && su.endsWith(".") ? "" : ".");
+          if (!erit && valEl && valEl.innerHTML) { subEl.innerHTML = valEl.innerHTML + ". " + escH(subEl.textContent); valEl.innerHTML = ""; }   // arvo otsikon alle
         } else if (c.bars) {
           const d = B[i]; if (valEl) valEl.innerHTML = `${fmtP(P[i])}: ${c.barsName || "ero"} <b style="color:${c.barsNeutral ? "var(--fg)" : d >= 0 ? "var(--q-up)" : "var(--q-down)"}">${d > 0 ? "+" : ""}${fmtV(d, c.dec)} ${c.barsUnit || "%-yks."}</b>`;
           subEl.hidden = !!c.hdr;                                          // otsakkeessa jo v/v ja q/q
           subEl.textContent = c.lines.map(id => `${ser(id).label} ${withU(L[c.lines.indexOf(id)][i], c)}`).join(", ") + ".";
+          if (!c.hdr && valEl && valEl.innerHTML) { subEl.innerHTML = valEl.innerHTML + ". " + escH(subEl.textContent); valEl.innerHTML = ""; }
         } else if (L.length > 1) {
           let j = i; while (j > 0 && L.every(a => a[j] == null)) j--;
-          if (valEl) valEl.innerHTML = `${fmtP(P[j])}`;
+          if (valEl) valEl.innerHTML = "";                                   // pvm ja arvot otsikon alle, ei alakulmaan
           const sg = v => c.ts && !c.rawv && v > 0 ? "+" : "";
-          subEl.textContent = (c.ts ? `${fmtP(P[j])}: ` : c.avg ? `${fmtP(P[j])} keskiarvo: ` : "") +   // avg: kuukausisarjat neljanneksen keskiarvona
+          subEl.textContent = (c.avg ? `${fmtP(P[j])} keskiarvo: ` : `${fmtP(P[j])}: `) +   // avg: kuukausisarjat neljanneksen keskiarvona
             c.lines.map(id => { const v = L[c.lines.indexOf(id)][j]; return `${lbl(id)} ${sg(v)}${fmtV(v, c.dec)}${c.unit === "%" ? " %" : ""}`; }).join(", ") +
             (LW && LW[j] != null ? `, ${c.lower.label} ${LW[j] > 0 ? "+" : ""}${fmtV(LW[j], c.lower.dec != null ? c.lower.dec : 1)}` : "") + ".";
         } else {
           const a = L[0]; let j = i; while (j > 0 && a[j] == null) j--;
-          if (valEl) valEl.innerHTML = `${fmtP(P[j])}: <b>${withU(a[j], c)}</b>`;
-          const y0 = P[a.findIndex(v => v != null)].slice(0, 4);
-          subEl.textContent = c.sub || "";
+          if (valEl) valEl.innerHTML = "";
+          subEl.innerHTML = `${fmtP(P[j])}: <b>${withU(a[j], c)}</b>`;
         }
         if (c.hdr && valEl) {                                              // valitun rivin kasvu, sama kaikissa kuvioissa
           const gy = ser(c.hdr + "_yy").values, gq = ser(c.hdr + "_qq").values, has = j => gy[j] != null || gq[j] != null;
