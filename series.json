@@ -1498,7 +1498,8 @@
       "kind": "balance",
       "invert": false,
       "unit": "saldo",
-      "raw_desc": "Kausitasoitettu saldoluku"
+      "raw_desc": "Kausitasoitettu saldoluku",
+      "map": "Tilauskanta (EK)"
     },
     {
       "id": "tilaukset",
@@ -1515,7 +1516,8 @@
       "kind": "volume",
       "invert": false,
       "unit": "ind. 2021=100",
-      "raw_desc": "Trendisarja"
+      "raw_desc": "Trendisarja",
+      "map": "Uudet tilaukset"
     },
     {
       "id": "rak_luv",
@@ -1610,7 +1612,8 @@
       "note": "Liikevaihto deflatoitu alan kuluttajahintaindeksillä (HICP CP11).",
       "unit": "ind. 2021=100",
       "raw_desc": "Kausitasoitettu, deflatoitu liikevaihto",
-      "list": "Majoitus ja ravitsemus"
+      "list": "Majoitus ja ravitsemus",
+      "map": "Majoitus ja ravitsemus"
     },
     {
       "id": "teoltuot",
@@ -1646,7 +1649,8 @@
       "invert": false,
       "in_composite": false,
       "unit": "%",
-      "raw_desc": "Kausitasoitettu, neljännesvuosikysely, kuukaudet interpoloitu"
+      "raw_desc": "Kausitasoitettu, neljännesvuosikysely, kuukaudet interpoloitu",
+      "map": "Käyttöaste"
     },
     {
       "id": "tsk",
@@ -1663,7 +1667,8 @@
       "kind": "volume",
       "invert": false,
       "unit": "ind. 2015=100",
-      "raw_desc": "Kausitasoitettu sarja"
+      "raw_desc": "Kausitasoitettu sarja",
+      "map": "Suhdannekuvaaja"
     },
     {
       "id": "palv_vol",
@@ -1789,7 +1794,8 @@
       "kind": "volume",
       "invert": false,
       "unit": "kpl",
-      "raw_desc": "Kausitasoittamaton kuukausiluku"
+      "raw_desc": "Kausitasoittamaton kuukausiluku",
+      "map": "Avoimet työpaikat"
     },
     {
       "id": "lomautetut",

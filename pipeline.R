@@ -589,6 +589,7 @@ for (set in cfg$sets) {
   inds <- Map(function(s, r) {
     lp <- r$date[nrow(r)]; rw <- raws[[s$id]]            # julkaistu arvo ennen esikasittelya
     list(id = s$id, label = s$label, list = if (is.null(s$list)) s$label else s$list,   # list: lyhyt nimi ryhman sisalla
+         map = s$map,                                                          # map: kartan lyhyt nimi useaa valittaessa
          group = s$group, kind = s$kind, unit = s$unit, raw_desc = s$raw_desc,
          invert = isTRUE(s$invert), in_composite = !isFALSE(s$in_composite),
          last = lp, last_raw = round(r$raw[nrow(r)], 2),
