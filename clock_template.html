@@ -1673,12 +1673,6 @@ footer b { color: var(--fg); font-weight: 600; }
       const path = (a, step, yf = ys) => { let d = "", pen = false;
         a.forEach((v, i) => { if (v == null) { if (!c.connect) pen = false; return; }   // connect: harva sarja (nelj.) yhtenaisena
           d += pen ? (step ? `H${xs(i).toFixed(1)}V${yf(v).toFixed(1)}` : `L${xs(i).toFixed(1)} ${yf(v).toFixed(1)}`) : `M${xs(i).toFixed(1)} ${yf(v).toFixed(1)}`; pen = true; }); return d; };
-      if (L.length === 1 && !B && !S.length) {   // yksi sarja: pinta ja mediaaniviiva vertailuksi
-        const a = L[0], f = a.findIndex(v => v != null), l = lastNN(a);
-        const srt = a.filter(v => v != null).sort((p, q) => p - q), med = srt[Math.floor(srt.length / 2)];
-        el("line", { x1: ml, x2: W2 - mr, y1: ys(med), y2: ys(med), stroke: "var(--muted)", "stroke-dasharray": "4 4", "stroke-width": 1 }, svg);
-        el("text", { x: ml + 4, y: ys(med) - 5, "font-size": fs - 1, fill: "var(--muted)", stroke: "var(--surface)", "stroke-width": 3, "paint-order": "stroke" }, svg).textContent = "mediaani";
-      }
       L.forEach((a, k) => { const id = c.lines[k], st = (c.step || []).includes(id);
         el("path", { d: path(a, st, isY2(k) ? ys2 : ys), fill: "none", stroke: colOf[id], "stroke-width": (c.thin || []).includes(id) ? 1.2 : k === 0 ? 2.2 : 1.6,
           "stroke-dasharray": (c.dot || []).includes(id) ? "1.5 3" : (c.dash || []).includes(id) ? "5 3" : "none",
