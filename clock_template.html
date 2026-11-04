@@ -260,6 +260,12 @@ body { font-variant-numeric: tabular-nums; background: var(--bg); min-height: 10
 
 .zoom { width: min(1280px, calc(100vw - 24px)); max-width: none; max-height: calc(100vh - 24px); border: 0; border-radius: 12px; padding: 14px 20px 20px; background: var(--bg); color: var(--fg); box-shadow: 0 12px 48px rgba(0,0,0,.22); }
 .zoom::backdrop { background: rgba(22, 27, 34, .45); }
+.zoom[open] { animation: zin .24s cubic-bezier(.2, .7, .2, 1); }
+.zoom[open]::backdrop { animation: zfade .24s ease; }
+.zoom.zout::backdrop { opacity: 0; transition: opacity .17s; }
+@keyframes zin { from { opacity: 0; transform: translateY(10px) scale(.985); } to { opacity: 1; transform: none; } }
+@keyframes zfade { from { opacity: 0; } }
+@media (prefers-reduced-motion: reduce) { .zoom[open], .zoom[open]::backdrop { animation: none; } }
 .zoom .zbar { display: flex; justify-content: flex-end; margin-bottom: 2px; }
 .zoom .zbar button { font: inherit; font-size: 0.85rem; color: var(--fg); background: none; border: 1px solid var(--line); border-radius: 6px; padding: 3px 10px; cursor: pointer; }
 .zoom .zbar button:hover { border-color: var(--fg); }
@@ -1232,8 +1238,15 @@ footer b { color: var(--fg); font-weight: 600; }
     $("zoomClose").focus();
   }
   $("zoom").addEventListener("close", () => { $("zoomBody").innerHTML = ""; document.body.classList.remove("zoomed"); if (zoomHooks) chartHooks = zoomHooks; zoomHooks = null; });
-  $("zoom").addEventListener("click", e => { if (e.target === $("zoom")) $("zoom").close(); });
-  $("zoomClose").onclick = () => $("zoom").close();
+  // sulkeminen pehmeasti: haivytys ennen close()-kutsua (Esc, Sulje, klikkaus taustaan)
+  function closeZoom() { const d = $("zoom"); if (!d.open || d._closing) return;
+    if (matchMedia("(prefers-reduced-motion: reduce)").matches) return d.close();
+    d._closing = true; d.classList.add("zout");
+    d.animate([{ opacity: 1, transform: "none" }, { opacity: 0, transform: "translateY(8px) scale(.985)" }], { duration: 170, easing: "cubic-bezier(.4, 0, .6, 1)" })
+      .onfinish = () => { d.close(); d.classList.remove("zout"); d._closing = false; }; }
+  $("zoom").addEventListener("cancel", e => { e.preventDefault(); closeZoom(); });
+  $("zoom").addEventListener("click", e => { if (e.target === $("zoom")) closeZoom(); });
+  $("zoomClose").onclick = closeZoom;
   const slug = s => s.toLowerCase().replace(/[åä]/g, "a").replace(/ö/g, "o").replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "").slice(0, 60);
   function chartCSV(c) {
     const ser = id => set.series.find(x => x.id === id), lbl = id => (c.labels && c.labels[id]) || ser(id).label;
