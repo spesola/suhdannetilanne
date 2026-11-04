@@ -892,6 +892,10 @@ footer b { color: var(--fg); font-weight: 600; }
   // sarjan valinta lisaa tai poistaa sen kartan korostuksista; aikasarjakuvio nayttaa viimeksi valitun
   // sarjan klikkaus lisaa tai poistaa sen valinnasta; aikasarjakuvio nayttaa viimeksi lisatyn (tai ryhman)
   function pick(id) {
+    // koko ryhma valittuna (ryhman avaus): sarjan klikkaus valitsee vain sen sarjan
+    const sg = (set.indicators.find(v => v.id === id) || {}).group, gm = set.indicators.filter(v => v.group === sg);
+    if (sel === "g:" + sg && gm.length > 1 && picked.size === gm.length && gm.every(v => picked.has(v.id))) {
+      picked.clear(); picked.add(id); sel = id; setTab("ts"); update(); return; }
     if (picked.has(id)) { picked.delete(id);
       if (sel && sel.startsWith("g:")) { if (![...picked].some(x => "g:" + (set.indicators.find(v => v.id === x) || {}).group === sel)) sel = [...picked].pop() || null; }   // ryhma pysyy kohteena, kun sen sarjoja on valittuna
       else if (sel === id) sel = [...picked].pop() || null; }
