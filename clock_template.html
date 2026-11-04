@@ -677,7 +677,7 @@ footer b { color: var(--fg); font-weight: 600; }
       const p = at(s, idx); if (!p) return;
       const tailCol = s.comp ? col : "var(--muted)"; if (!s.comp) col = qcol(quad(p.l, p.c));   // piste vaiheen varilla, polku neutraali
       const off = qf && (quad(p.l, p.c) !== qf || (!s.comp && !s.isGroup && !s.in_composite)) && !hi(s);
-      const dim = (!!sel || picked.size > 0) && !off && !hi(s) && !s.comp;   // valinta: muut pisteet himmeiksi
+      const dim = picked.size > 1 && !off && !hi(s) && !s.comp;        // useita valittuna: muut pisteet himmeiksi; yksi valinta: rengas
       const g = el("g", { class: "pt" + (s.comp ? " comp" : "") + (hi(s) ? " sel" : "") + (off ? " off" : "") + (dim ? " dim" : ""), tabindex: -1, "data-id": s.id, opacity: p.stale && !s.comp ? 0.45 : 1 }, svg);
       const pts = [], from = (showTails || hi(s) || s.comp) ? Math.max(0, p.i - set.tail) : p.i;   // polku: kokonaisindikaattori ja valitut
       for (let k = from; k <= p.i; k++)
@@ -691,11 +691,13 @@ footer b { color: var(--fg); font-weight: 600; }
       const r = ((s.comp ? 8 : s.isGroup ? 7 : 4.5) + (hi(s) ? 2 : 0)) * K;
       const hollow = !s.comp && !s.isGroup && !s.in_composite;           // ei kokonaisindikaattorissa: ontto piste
       el("circle", { cx: hx, cy: hy, r, fill: hollow ? "var(--plot)" : s.comp ? "var(--fg)" : col, stroke: hollow ? col : "var(--plot)", "stroke-width": hollow ? 1.6 : 1.5 }, g);
+      if (sel === s.id && !s.comp) el("circle", { class: "ring", cx: hx, cy: hy, r: r + 3.5 * K, fill: "none", stroke: "var(--fg)", "stroke-width": 1.4 }, g);   // kohdistettu sarja
       const right = hx + r + 8 + s.label.length * 6.6 < W - M;   // nimi oikealle, jos mahtuu kehyksen sisaan
       const lbl = el("text", { class: "lbl", x: hx + (right ? r + 6 : -r - 6), y: hy - 10, "text-anchor": right ? "start" : "end",
         "font-size": s.isGroup ? 12.5 : 12, "font-weight": s.isGroup ? 600 : 500, fill: "var(--fg)", stroke: "var(--surface)", "stroke-width": 4, "paint-order": "stroke" }, g);
       lbl.textContent = many && hi(s) && s.list ? s.list : s.label;      // useita valittuna: lyhyet nimet
       if (s.comp) { lbl.setAttribute("font-weight", 600); placed.push(lbl); }   // kokonaisindikaattorin nimi aina nakyvissa
+      if (sel === s.id) lbl.setAttribute("font-weight", 600);
       el("title", {}, g).textContent = `${s.label}, ${fmtP(set.periods[p.i])}: taso ${fmtN(p.l)}, muutos ${fmtN(p.c)}`;
       if (hi(s)) placed.push(lbl);
       g.addEventListener("click", () => s.comp || s.isGroup ? select(s.id) : pick(s.id));
@@ -720,7 +722,7 @@ footer b { color: var(--fg); font-weight: 600; }
     labels.map(t => ({ t, h: head(t), w: (() => { try { return t.getComputedTextLength(); } catch (e) { return t.textContent.length * 7; } })() || t.textContent.length * 7 }))
       .filter(o => o.h).sort((a, b) => a.h.y - b.h.y)
       .forEach(o => {
-        const { x, y, r } = o.h, w = o.w + 4, d = r + 5;
+        const isC = o.t.parentNode.classList.contains("comp"), { x, y, r } = o.h, w = o.w + 4, d = r + 5 + (isC ? 14 : 0);   // kokonaisindikaattorin nimi kauemmas, viiva pisteeseen
         const C = [[x + d, y - 6, "start"], [x - d, y - 6, "end"], [x + d, y + 14, "start"], [x - d, y + 14, "end"],
                    [x, y - d - 4, "middle"], [x, y + d + 12, "middle"], [x + d, y + 4, "start"], [x - d, y + 4, "end"],
                    [x + d, y - 20, "start"], [x - d, y - 20, "end"], [x + d, y + 28, "start"], [x - d, y + 28, "end"]];
@@ -732,6 +734,13 @@ footer b { color: var(--fg); font-weight: 600; }
           placed.forEach(b => sc += 40 * ov(bx, b)); obst.forEach(b => sc += 12 * ov(bx, b));
           if (sc < bs) { bs = sc; best = { lx, ly, a, bx }; } });
         o.t.setAttribute("x", best.lx); o.t.setAttribute("y", best.ly); o.t.setAttribute("text-anchor", best.a); placed.push(best.bx);
+        if (isC) { const g = o.t.parentNode, old = g.querySelector(".lead"); if (old) old.remove();
+          const bx = best.bx, tx = best.a === "start" ? bx.x0 - 2 : best.a === "end" ? bx.x1 + 2 : (bx.x0 + bx.x1) / 2, ty = best.ly - 4;
+          const ang = Math.atan2(ty - y, tx - x), sx = x + Math.cos(ang) * (r + 2), sy = y + Math.sin(ang) * (r + 2);
+          const ln = document.createElementNS("http://www.w3.org/2000/svg", "path"); ln.setAttribute("class", "lead");
+          ln.setAttribute("d", `M${sx.toFixed(1)},${sy.toFixed(1)} Q${sx.toFixed(1)},${ty.toFixed(1)} ${tx.toFixed(1)},${ty.toFixed(1)}`);
+          ln.setAttribute("fill", "none"); ln.setAttribute("stroke", "var(--fg)"); ln.setAttribute("stroke-width", 1); ln.setAttribute("stroke-opacity", 0.55);
+          g.insertBefore(ln, o.t); }
       });
   }
 
