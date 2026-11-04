@@ -293,12 +293,15 @@ button.dl:hover { text-decoration-color: var(--fg); }
 .step.play { font-size: 0.7rem; }
 .fsec { grid-column: 1 / -1; font-size: 1.45rem; line-height: 1.2; letter-spacing: -0.01em; color: var(--fg); font-weight: 600; margin: 24px 0 -26px; scroll-margin-top: 64px; }
 .fsec:first-child, .secnav + .fsec { margin-top: 0; }
-.grpair { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 48px; align-items: start; }   /* samat palstat kuin alla olevassa ruudukossa */
+.grpair { display: grid; grid-template-columns: minmax(0, 1fr); gap: 40px; align-items: start; }   /* taulukko koko leveydelta, alla paakuvio ja erittely */
+.grrow { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 48px; align-items: start; }   /* samat palstat kuin alla olevassa ruudukossa */
+@media (max-width: 860px) { .grrow { grid-template-columns: minmax(0, 1fr); gap: 40px; } }
 .grpair > .card { min-width: 0; }
 .grtab > .fnote { width: 0; min-width: 100%; }   /* alaviite ei levenna saraketta */
 .grpair .hm thead th { padding: 2px 0; font-size: 0.7rem; }
 .grpair table.hm { border-spacing: 2px 3px; font-size: 0.74rem; width: 100%; }   /* tiivis: kuvioille enemman tilaa */
-.grpair .hm td { width: 42px; min-width: 42px; padding: 6px 1px; }
+.grpair .hm td { min-width: 42px; padding: 6px 1px; }
+@media (min-width: 761px) { .grpair table.hm { table-layout: fixed; } .grpair .hm thead th:first-child, .grpair .hm th.rl { width: 210px; } }   /* nimisarake kiintea, neljannekset jakavat loput */
 .grpair .hm th.rl { font-size: 0.82rem; padding-right: 8px; padding-left: 4px; }
 .grpair .hm th.rl.sub { padding-left: 12px; font-size: 0.76rem; }
 .grleft, .grside { display: flex; flex-direction: column; gap: 40px; min-width: 0; }
@@ -320,7 +323,6 @@ button.dl:hover { text-decoration-color: var(--fg); }
 .grmore { margin-top: 0; }
 .grmore .fhead h2 { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; min-width: 0; flex: 1 1 0; }   /* tasakorkeat kortit */
 .grmore .fsub { display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; min-height: 2.4em; }
-@media (max-width: 1080px) { .grpair { grid-template-columns: minmax(0, 1fr); } }
 .secnav { grid-column: 1 / -1; position: sticky; top: 0; z-index: 5; background: var(--bg); display: flex; gap: 6px; overflow-x: auto; scrollbar-width: none;
   padding: 10px 0; margin: -10px 0 -30px; border-bottom: 1px solid var(--line); min-width: 0; box-shadow: 0 0 0 100vmax var(--bg); clip-path: inset(0 -100vmax); }
 .secnav::-webkit-scrollbar { display: none; }
@@ -474,8 +476,8 @@ footer b { color: var(--fg); font-weight: 600; }
         <div class="hmctl"><div class="mini" role="group" aria-label="Kasvuvauhti"><button type="button" id="gr-yy" aria-pressed="true">v/v</button><button type="button" id="gr-qq" aria-pressed="false">q/q</button></div><button type="button" class="dl" id="gr-dl">Lataa CSV</button></div></div>
       <div class="hmwrap"><table class="hm" id="grTable"></table></div>
       <p class="fnote">Muutos, %. Värin voimakkuus suhteessa sarjan keskihajontaan vuodesta 2015 (pl. 2020–2021), täysi väri kahdesta keskihajonnasta.<span id="grNeutral"> Hinnoissa ja palkoissa sininen väri.</span> Klikkaa riviä nähdäksesi kuviot.</p>
-    </div><div class="grside" id="grSide"></div></div>
-    <div class="grcol" id="grCharts"></div>
+    </div></div>
+    <div class="grrow"><div class="grcol" id="grCharts"></div><div class="grside" id="grSide"></div></div>
   </section>
   <section class="grmore" id="grMore" hidden><div class="fgrid" id="grMoreGrid"></div></section>
   <section class="card" id="finSum" hidden></section>
@@ -1029,7 +1031,8 @@ footer b { color: var(--fg); font-weight: 600; }
   function renderGrowth() {
     $("gr-yy").setAttribute("aria-pressed", grMode === "yy"); $("gr-qq").setAttribute("aria-pressed", grMode === "qq");
     $("grTitle").textContent = grMode === "yy" ? "Kasvu vuodentakaisesta" : "Kasvu edellisestä neljänneksestä";
-    const ser = id => set.series.find(x => x.id === id), N = 8, P = set.periods, n = P.length;
+    const gw = $("growthSec").clientWidth || 0, N = gw > 1000 ? 12 : gw > 760 ? 10 : 8;   // leveydelta riippuen 8-12 neljannesta
+    const ser = id => set.series.find(x => x.id === id), P = set.periods, n = P.length;
     const lastOf = id => { const a = ser(id + "_" + grMode).values; for (let k = n - 1; k >= 0; k--) if (a[k] != null) return k; return 0; };
     const TR = set.growth;
     if (!TR.some(r => r.id === grSel)) grSel = TR[0].id;
@@ -1053,8 +1056,8 @@ footer b { color: var(--fg); font-weight: 600; }
     $("grTable").querySelectorAll("tr.pick").forEach(tr => {
       const go = kb => { grSel = tr.dataset.id; renderGrowth(); drawCharts(); if (location.hash !== hashFor()) history.pushState(null, "", hashFor());   // rivin vaihto historiaan: takaisin palaa edelliseen
         if (kb) { const f = $("grTable").querySelector(`tr[data-id="${grSel}"]`); if (f) f.focus(); return; }   // nappaimisto: kohdistus pysyy rivilla
-        const col = $("grCharts"), r = col.getBoundingClientRect();     // allekkain (kapea): kuvio nakyviin
-        if (getComputedStyle($("growthSec")).gridTemplateColumns.split(" ").length === 1 && r.top > innerHeight * 0.4) col.scrollIntoView({ behavior: "smooth", block: "start" }); };
+        const col = $("grCharts"), r = col.getBoundingClientRect();     // kuvio taulukon alla: vieritetaan nakyviin, taulukon loppu jaa nakyviin
+        if (r.top > innerHeight * 0.7) scrollBy({ top: r.top - innerHeight * 0.4, behavior: "smooth" }); };
       tr.onclick = () => go(false);
       tr.onkeydown = e => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); go(true); }
         else if (e.key === "ArrowDown" || e.key === "ArrowUp") { e.preventDefault();
@@ -1429,9 +1432,9 @@ footer b { color: var(--fg); font-weight: 600; }
   function drawCharts() {
     if (!set.growth) return renderCharts($("charts"));
     const two = getComputedStyle($("growthSec")).gridTemplateColumns.split(" ").length > 1;
-    sideLeft = false;                                                  // erittely/tunnusluvut paakuvion alle
+    sideLeft = true;                                                   // erittely/tunnusluvut paakuvion oikealle puolelle
     $("grSide").innerHTML = ""; colMainH = null; renderCharts($("grCharts"));
-    if (two && lastMainH) {
+    if (false && two && lastMainH) {
       const diff = $("growthSec").querySelector(".grleft").offsetHeight - $("grCharts").offsetHeight;
       if (Math.abs(diff) > 1) { colMainH = Math.max(lastLower ? 200 : 190, Math.min(560, lastMainH + diff)); $("grSide").innerHTML = ""; renderCharts($("grCharts")); colMainH = null; }
     }
@@ -1701,7 +1704,7 @@ footer b { color: var(--fg); font-weight: 600; }
       hit.addEventListener("pointerleave", () => chartHooks.forEach(fn => fn(null)));
     });
     if (more) $("grMore").hidden = !more.children.length;
-    if (col && grSel && !box.querySelector(".brk") && !$("grSide").querySelector(".brk") && ser(grSel + "_yy")) {   // aina toinen kortti: tunnusluvut
+    if (col && grSel && ser(grSel + "_yy")) {                          // tunnusluvut aina (erittelyn alle, jos se on)
       const gy = ser(grSel + "_yy").values, gq = ser(grSel + "_qq").values, N = set.periods.length;
       const card = document.createElement("div"); card.className = "card fcard side";
       card.innerHTML = `<div class="fhead"><h2>Tunnusluvut</h2><span class="fval"></span></div><div class="kv"></div>`;
