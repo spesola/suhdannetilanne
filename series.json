@@ -440,6 +440,18 @@
               "stackUnit": "%-yks.",
               "dec": 1,
               "note": "Vuosimuutos ja kasvuvaikutukset, neljän neljänneksen summat. Lähde: Tilastokeskus."
+            },
+            "__gnp": {
+              "title": "BKT:n nimellinen kasvu: volyymi ja hinta",
+              "line": "x_gnp_nom",
+              "stack": [
+                "x_gnp_vol",
+                "x_gnp_pr"
+              ],
+              "unit": "%",
+              "stackUnit": "%-yks.",
+              "dec": 1,
+              "note": "Vuosimuutos, työpäiväkorjattu. Lähde: Tilastokeskus."
             }
           },
           "views": {
@@ -581,6 +593,9 @@
             "bkt": [
               {
                 "contrib": "bkt"
+              },
+              {
+                "contrib": "__gnp"
               },
               {
                 "title": "BKT:n volyymi, 2019 = 100",
@@ -4604,6 +4619,30 @@
         "sektoriluokitus_7_20230101": "S14",
         "contentscode": "ntp-kausit_b8n"
       }
+    },
+    {
+      "id": "x_gnp_nom",
+      "label": "Nimellinen BKT",
+      "set": "bkt",
+      "chart_only": true,
+      "source": "gdp_np",
+      "part": "nom"
+    },
+    {
+      "id": "x_gnp_vol",
+      "label": "Volyymi",
+      "set": "bkt",
+      "chart_only": true,
+      "source": "gdp_np",
+      "part": "vol"
+    },
+    {
+      "id": "x_gnp_pr",
+      "label": "Hinta (BKT:n deflaattori)",
+      "set": "bkt",
+      "chart_only": true,
+      "source": "gdp_np",
+      "part": "price"
     },
     {
       "id": "x_hhi_real",

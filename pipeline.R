@@ -242,6 +242,19 @@ fetch_hhi_ctrb <- function(s) {
   d <- .hhi$res; data.frame(date = d$date, value = d[[s$part]])
 }
 
+# BKT:n nimellinen vuosikasvu jaettuna volyymiin ja hintaan (deflaattori), tyopaivakorjattu; hinta = nimellinen - volyymi
+.gnp <- new.env()
+fetch_gdp_np <- function(s) {
+  if (is.null(.gnp$res)) {
+    g <- function(cc) { d <- fetch_statfin(list(table = "ntp/132h.px", pick = list(taloustoimi_1_20180101 = "B1GMH", contentscode = cc))); setNames(d$value, d$date) }
+    cp <- g("tyopcp"); vv <- g("tyopvv2015"); dates <- sort(intersect(names(cp), names(vv)))
+    L <- function(x) c(rep(NA, 4), head(x, -4)); a <- cp[dates]; b <- vv[dates]
+    nom <- 100 * (a / L(a) - 1); vol <- 100 * (b / L(b) - 1)
+    .gnp$res <- data.frame(date = dates, nom = unname(nom), vol = unname(vol), price = unname(nom - vol))
+  }
+  d <- .gnp$res; data.frame(date = d$date, value = d[[s$part]])
+}
+
 # saumaus: sama sarja useasta taulusta (esim. perusvuoden vaihtuessa), osat jarjestyksessa, myohempi osa voittaa
 # osan from/to rajaa jakson ("YYYY-MM"); tarkoitettu tasosarjoille kuten lukumaarille, ei indekseille
 fetch_splice <- function(s) {
@@ -259,7 +272,7 @@ fetch_splice <- function(s) {
 }
 
 fetch_series <- function(s) {
-  f <- switch(s$source, statfin = fetch_statfin, splice = fetch_splice, eurostat = fetch_eurostat, hicp_ctrb = fetch_hicp_ctrb, ntp_ctrb = fetch_ntp_ctrb, hhi_ctrb = fetch_hhi_ctrb,
+  f <- switch(s$source, statfin = fetch_statfin, splice = fetch_splice, eurostat = fetch_eurostat, hicp_ctrb = fetch_hicp_ctrb, ntp_ctrb = fetch_ntp_ctrb, hhi_ctrb = fetch_hhi_ctrb, gdp_np = fetch_gdp_np,
               ecb = fetch_ecb, fred = fetch_fred, bof = fetch_bof, wb = fetch_wb, stop("Tuntematon lahde ", s$source))
   # valimuisti: onnistunut haku tallennetaan, epaonnistuessa kaytetaan edellista hakua
   cache <- file.path(CACHE_DIR, paste0(s$id, ".csv"))
@@ -697,6 +710,7 @@ src_walk <- function(x) {
     else if (sc %in% c("bof", "wb")) src_add(sc, "")
     else if (sc == "ntp_ctrb") src_add("statfin", "ntp")
     else if (sc == "hhi_ctrb") src_add("statfin", "ntp")
+    else if (sc == "gdp_np") src_add("statfin", "ntp")
     else if (sc == "hicp_ctrb") { src_add("eurostat", "prc_hicp_minr"); src_add("eurostat", "prc_hicp_iw") }
   } else if (!is.null(x$table)) src_add("statfin", sub("/.*", "", x$table))   # splice-osat
   for (k in setdiff(names(x), "pick")) if (is.list(x[[k]])) src_walk(x[[k]])
