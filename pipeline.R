@@ -118,6 +118,10 @@ fetch_ecb <- function(s) {
   d <- read.csv(text = get_text(sprintf("%s%s/%s?format=csvdata%s", ECB, s$flow, s$key,
                                         if (is.null(s$start)) "" else paste0("&startPeriod=", s$start))))
   d <- data.frame(date = d$TIME_PERIOD, value = as.numeric(d$OBS_VALUE))
+  if (all(grepl("^\\d{4}-W\\d{2}$", d$date))) {      # viikkodata (esim. Eurojarjestelman tase): viikon perjantai paivamaaraksi
+    y <- as.integer(substr(d$date, 1, 4)); w <- as.integer(substr(d$date, 7, 8))
+    j4 <- as.Date(sprintf("%d-01-04", y)); mon <- j4 - (as.integer(format(j4, "%u")) - 1) + 7 * (w - 1)
+    d$date <- format(mon + 4, "%Y-%m-%d") }
   if (!isTRUE(s$daily) && all(nchar(d$date) == 10)) {   # paivadata -> kuukauden viimeinen havainto
     d <- d[order(d$date), ]; m <- substr(d$date, 1, 7)
     d <- data.frame(date = unique(m), value = tapply(d$value, m, function(v) tail(v, 1))[unique(m)])
@@ -212,6 +216,32 @@ fetch_ntp_ctrb <- function(s) {
   data.frame(date = dates, value = unname(v))
 }
 
+# kotitalouksien kaytettavissa olevan reaalitulon (S14, B6N) kasvu ja osatekijoiden kasvuvaikutukset, %-yks.:
+# neljan neljanneksen summat, vuosimuutos. Palkansaajakorvaukset jaetaan palkansaajien tehtyihin tyotunteihin ja
+# keskiansioon tyotuntia kohden; hinta = yksityisen kulutuksen deflaattori (reaali- ja nimellismuutoksen erotus).
+.hhi <- new.env()
+fetch_hhi_ctrb <- function(s) {
+  if (is.null(.hhi$res)) {
+    sk <- function(i) { d <- fetch_statfin(list(table = "ntp/15a6.px", pick = list(sektoriluokitus_7_20230101 = "S14", taloustoimi_1_20180101 = i, contentscode = "ntp-TASM")))
+      setNames(d$value, d$date) }
+    nt <- function(t, i, cc, extra = list()) { d <- fetch_statfin(list(table = t, pick = c(list(taloustoimi_1_20180101 = i), extra, list(contentscode = cc))))
+      setNames(d$value, d$date) }
+    X <- list(Y = sk("B6N"), W = sk("D1R"), B = sk("D62R"), T1 = sk("D5K"), T2 = sk("D61K"),
+              cp = nt("ntp/132h.px", "P3KS14_S15", "tasmcp"), vv = nt("ntp/132h.px", "P3KS14_S15", "tasmvv2015"),
+              H = nt("ntp/11tj.px", "E22", "ntp-TASM", list(toimiala_79_20180101 = "SSS")))
+    dates <- sort(Reduce(intersect, lapply(X, names)))
+    S4 <- lapply(X, function(x) as.numeric(stats::filter(x[dates], rep(1, 4), sides = 1)))
+    L <- function(x) c(rep(NA, 4), head(x, -4))
+    Y <- S4$Y; T <- S4$T1 + S4$T2; ly <- L(Y)
+    c_w <- 100 * (S4$W - L(S4$W)) / ly; c_b <- 100 * (S4$B - L(S4$B)) / ly; c_t <- -100 * (T - L(T)) / ly
+    g <- 100 * (Y / ly - 1); c_o <- g - c_w - c_b - c_t
+    c_h <- 100 * L(S4$W) / ly * (S4$H / L(S4$H) - 1)
+    P <- S4$cp / S4$vv; pi <- P / L(P) - 1; real <- 100 * ((1 + g / 100) / (1 + pi) - 1)
+    .hhi$res <- data.frame(date = dates, real = real, whour = c_w - c_h, hours = c_h, benef = c_b, tax = c_t, other = c_o, price = real - g)
+  }
+  d <- .hhi$res; data.frame(date = d$date, value = d[[s$part]])
+}
+
 # saumaus: sama sarja useasta taulusta (esim. perusvuoden vaihtuessa), osat jarjestyksessa, myohempi osa voittaa
 # osan from/to rajaa jakson ("YYYY-MM"); tarkoitettu tasosarjoille kuten lukumaarille, ei indekseille
 fetch_splice <- function(s) {
@@ -229,7 +259,7 @@ fetch_splice <- function(s) {
 }
 
 fetch_series <- function(s) {
-  f <- switch(s$source, statfin = fetch_statfin, splice = fetch_splice, eurostat = fetch_eurostat, hicp_ctrb = fetch_hicp_ctrb, ntp_ctrb = fetch_ntp_ctrb,
+  f <- switch(s$source, statfin = fetch_statfin, splice = fetch_splice, eurostat = fetch_eurostat, hicp_ctrb = fetch_hicp_ctrb, ntp_ctrb = fetch_ntp_ctrb, hhi_ctrb = fetch_hhi_ctrb,
               ecb = fetch_ecb, fred = fetch_fred, bof = fetch_bof, wb = fetch_wb, stop("Tuntematon lahde ", s$source))
   # valimuisti: onnistunut haku tallennetaan, epaonnistuessa kaytetaan edellista hakua
   cache <- file.path(CACHE_DIR, paste0(s$id, ".csv"))
@@ -645,7 +675,8 @@ SRC_NAMES <- list(
                   bop_c6_q = "maksutase", ext_st_27_2020msbec = "tavarakauppa"),
   bof      = list(.n = "Suomen Pankki", .all = "luotonanto ja lainojen korot"),
   ecb      = list(.n = "EKP", FM = "markkinakorot", EST = "€STR", YC = "tuottokäyrä", IRS = "valtionlainojen korot", EXR = "valuuttakurssit",
-                  CISS = "rahoitusstressi", CLIFS = "rahoitusstressi", BLS = "pankkien luotonantokysely", SPF = "ammattiennustajien kysely"),
+                  CISS = "rahoitusstressi", CLIFS = "rahoitusstressi", BLS = "pankkien luotonantokysely", SPF = "ammattiennustajien kysely",
+                  ILM = "Eurojärjestelmän viikkotase", BSI = "rahan määrä ja luotonanto"),
   wb       = list(.n = "Maailmanpankki", .all = "raaka-aineiden hinnat, Pink Sheet"),
   fred     = list(.n = "FRED", EUEPUINDXM = "talouspoliittisen epävarmuuden indeksi", GS10 = "Yhdysvaltain korot © OECD",
                   FEDFUNDS = "Yhdysvaltain korot © OECD", IRLTLT01JPM156N = "Japanin korot © OECD", IRSTCI01JPM156N = "Japanin korot © OECD",
@@ -665,6 +696,7 @@ src_walk <- function(x) {
     else if (sc == "fred") src_add("fred", x$fred_id)
     else if (sc %in% c("bof", "wb")) src_add(sc, "")
     else if (sc == "ntp_ctrb") src_add("statfin", "ntp")
+    else if (sc == "hhi_ctrb") src_add("statfin", "ntp")
     else if (sc == "hicp_ctrb") { src_add("eurostat", "prc_hicp_minr"); src_add("eurostat", "prc_hicp_iw") }
   } else if (!is.null(x$table)) src_add("statfin", sub("/.*", "", x$table))   # splice-osat
   for (k in setdiff(names(x), "pick")) if (is.list(x[[k]])) src_walk(x[[k]])

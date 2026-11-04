@@ -424,6 +424,22 @@
               "stackUnit": "% BKT:stä",
               "dec": 1,
               "note": "Neljän neljänneksen summa. Lähde: Eurostat."
+            },
+            "__hhi": {
+              "title": "Kotitalouksien käytettävissä oleva reaalitulo ja sen osatekijät",
+              "line": "x_hhi_real",
+              "stack": [
+                "x_hhi_wh",
+                "x_hhi_h",
+                "x_hhi_ben",
+                "x_hhi_tax",
+                "x_hhi_oth",
+                "x_hhi_pr"
+              ],
+              "unit": "%",
+              "stackUnit": "%-yks.",
+              "dec": 1,
+              "note": "Vuosimuutos ja kasvuvaikutukset, neljän neljänneksen summat. Lähde: Tilastokeskus."
             }
           },
           "views": {
@@ -606,6 +622,9 @@
             "bkt_kulutus": [
               {
                 "contrib": "bkt_kulutus"
+              },
+              {
+                "contrib": "__hhi"
               },
               {
                 "title": "Kotitalouksien säästämisaste, %",
@@ -1057,6 +1076,26 @@
           "note": "Lähteet: EKP, FRED, OECD."
         },
         {
+          "id": "ekp_tase",
+          "section": "Korot ja rahapolitiikka",
+          "title": "Eurojärjestelmän tase, mrd. €",
+          "wide": true,
+          "lines": [
+            "ekp_tase",
+            "ekp_rp",
+            "ekp_lain"
+          ],
+          "unit": "",
+          "dec": 0,
+          "from": 2007,
+          "colors": {
+            "ekp_tase": "var(--fg)",
+            "ekp_rp": "var(--accent)",
+            "ekp_lain": "var(--g3)"
+          },
+          "note": "Kuukauden viimeinen viikkotase. Lähde: EKP."
+        },
+        {
           "id": "t_fx",
           "type": "table",
           "section": "Valuutat ja raaka-aineet",
@@ -1229,6 +1268,26 @@
           "from": 2010,
           "section": "Luotonanto",
           "size": "half"
+        },
+        {
+          "id": "ea_raha",
+          "section": "Luotonanto",
+          "title": "Rahan määrä ja luotonanto euroalueella, vuosimuutos %",
+          "size": "half",
+          "lines": [
+            "ea_m2",
+            "ea_lyr",
+            "ea_lkt"
+          ],
+          "unit": "%",
+          "dec": 1,
+          "from": 2010,
+          "colors": {
+            "ea_m2": "var(--fg)",
+            "ea_lyr": "var(--accent)",
+            "ea_lkt": "var(--g3)"
+          },
+          "note": "Kausitasoitettu. Lähde: EKP."
         },
         {
           "id": "velka",
@@ -3717,6 +3776,69 @@
       "sheet": "Monthly Indices"
     },
     {
+      "id": "ekp_tase",
+      "label": "Taseen loppusumma",
+      "set": "rahoitus",
+      "source": "ecb",
+      "flow": "ILM",
+      "key": "W.U2.C.T000000.Z5.Z01",
+      "mult": 0.001,
+      "handling": "none",
+      "kind": "level"
+    },
+    {
+      "id": "ekp_rp",
+      "label": "Rahapoliittiset arvopaperiostot",
+      "set": "rahoitus",
+      "source": "ecb",
+      "flow": "ILM",
+      "key": "W.U2.C.A070100.U2.EUR",
+      "mult": 0.001,
+      "handling": "none",
+      "kind": "level"
+    },
+    {
+      "id": "ekp_lain",
+      "label": "Luotot pankeille",
+      "set": "rahoitus",
+      "source": "ecb",
+      "flow": "ILM",
+      "key": "W.U2.C.A050000.U2.EUR",
+      "mult": 0.001,
+      "handling": "none",
+      "kind": "level"
+    },
+    {
+      "id": "ea_m2",
+      "label": "M2",
+      "set": "rahoitus",
+      "source": "ecb",
+      "flow": "BSI",
+      "key": "M.U2.Y.V.M20.X.I.U2.2300.Z01.A",
+      "handling": "none",
+      "kind": "level"
+    },
+    {
+      "id": "ea_lyr",
+      "label": "Lainat yrityksille",
+      "set": "rahoitus",
+      "source": "ecb",
+      "flow": "BSI",
+      "key": "M.U2.Y.U.A20T.A.I.U2.2240.Z01.A",
+      "handling": "none",
+      "kind": "level"
+    },
+    {
+      "id": "ea_lkt",
+      "label": "Lainat kotitalouksille",
+      "set": "rahoitus",
+      "source": "ecb",
+      "flow": "BSI",
+      "key": "M.U2.Y.U.A20T.A.I.U2.2250.Z01.A",
+      "handling": "none",
+      "kind": "level"
+    },
+    {
       "id": "eer",
       "label": "Euron efektiivinen kurssi",
       "set": "rahoitus",
@@ -4482,6 +4604,62 @@
         "sektoriluokitus_7_20230101": "S14",
         "contentscode": "ntp-kausit_b8n"
       }
+    },
+    {
+      "id": "x_hhi_real",
+      "label": "Käytettävissä oleva reaalitulo",
+      "set": "bkt",
+      "chart_only": true,
+      "source": "hhi_ctrb",
+      "part": "real"
+    },
+    {
+      "id": "x_hhi_wh",
+      "label": "Keskiansio työtuntia kohden",
+      "set": "bkt",
+      "chart_only": true,
+      "source": "hhi_ctrb",
+      "part": "whour"
+    },
+    {
+      "id": "x_hhi_h",
+      "label": "Työtunnit",
+      "set": "bkt",
+      "chart_only": true,
+      "source": "hhi_ctrb",
+      "part": "hours"
+    },
+    {
+      "id": "x_hhi_ben",
+      "label": "Saadut rahamääräiset sosiaalietuudet",
+      "set": "bkt",
+      "chart_only": true,
+      "source": "hhi_ctrb",
+      "part": "benef"
+    },
+    {
+      "id": "x_hhi_tax",
+      "label": "Maksetut verot ja sosiaaliturvamaksut",
+      "set": "bkt",
+      "chart_only": true,
+      "source": "hhi_ctrb",
+      "part": "tax"
+    },
+    {
+      "id": "x_hhi_oth",
+      "label": "Omaisuus- ja yrittäjätulot sekä tulonsiirrot, netto",
+      "set": "bkt",
+      "chart_only": true,
+      "source": "hhi_ctrb",
+      "part": "other"
+    },
+    {
+      "id": "x_hhi_pr",
+      "label": "Yksityisen kulutuksen hinta",
+      "set": "bkt",
+      "chart_only": true,
+      "source": "hhi_ctrb",
+      "part": "price"
     },
     {
       "id": "x_jb_s13",
