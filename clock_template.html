@@ -312,8 +312,8 @@ button.dl:hover { text-decoration-color: var(--fg); }
 .fcard.side { padding-top: 10px; }
 .fcard.side .fhead h2 { font-size: 0.88rem; }
 .fcard.side .fval { font-size: 0.74rem; }
-.fcard.side .brk { margin-top: 6px; gap: 1px 10px; font-size: 0.76rem; }
-.fcard.side .brk .bb { height: 9px; }
+.fcard.side .brk { margin-top: 10px; gap: 6px 12px; font-size: 0.84rem; grid-template-columns: minmax(0, 1fr) 34% auto; }   /* kapea palsta: nimille enemman tilaa */
+.fcard.side .brk .bb { height: 12px; }
 .fcard.side .brk .bb::before { top: -2px; bottom: -2px; }
 .fcard.side .kv { margin-top: 4px; }
 .fcard.side .kv > div { padding: 5px 0; }
@@ -1714,9 +1714,7 @@ footer b { color: var(--fg); font-weight: 600; }
       const y0 = set.periods[gy.findIndex(v => v != null)] || set.periods[0], lr = avg(gy);
       const draw = h => { let j = h == null ? N - 1 : Math.min(N - 1, h); while (j > 0 && gy[j] == null && gq[j] == null) j--;
         card.querySelector(".fval").textContent = fmtP(set.periods[j]) + ", kasvu %";
-        const rows = [["Vuodentakaisesta (v/v)", gy[j]], ["Edellisestä neljänneksestä (q/q)", gq[j]],
-          ["v/v, 4 neljänneksen keskiarvo", j >= 3 && gy.slice(j - 3, j + 1).every(v => v != null) ? avg(gy.slice(j - 3, j + 1)) : null],
-          [`v/v, keskiarvo vuodesta ${y0.slice(0, 4)}`, lr]];
+        const rows = [["Vuodentakaisesta (v/v)", gy[j]], ["Edellisestä neljänneksestä (q/q)", gq[j]]];
         card.querySelector(".kv").innerHTML = rows.map(([l, v], k) => `<div${k >= 2 ? ' class="sm"' : ""}><span>${l}</span><b>${sg1(v)}</b></div>`).join(""); };
       draw(null); chartHooks.push(draw);
     }
