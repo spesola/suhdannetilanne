@@ -1499,7 +1499,7 @@
       "invert": false,
       "unit": "saldo",
       "raw_desc": "Kausitasoitettu saldoluku",
-      "map": "Tilauskanta (EK)"
+      "kname": "Tilauskanta (EK)"
     },
     {
       "id": "tilaukset",
@@ -1517,7 +1517,7 @@
       "invert": false,
       "unit": "ind. 2021=100",
       "raw_desc": "Trendisarja",
-      "map": "Uudet tilaukset"
+      "kname": "Uudet tilaukset"
     },
     {
       "id": "rak_luv",
@@ -1613,7 +1613,7 @@
       "unit": "ind. 2021=100",
       "raw_desc": "Kausitasoitettu, deflatoitu liikevaihto",
       "list": "Majoitus ja ravitsemus",
-      "map": "Majoitus ja ravitsemus"
+      "kname": "Majoitus ja ravitsemus"
     },
     {
       "id": "teoltuot",
@@ -1650,7 +1650,7 @@
       "in_composite": false,
       "unit": "%",
       "raw_desc": "Kausitasoitettu, neljännesvuosikysely, kuukaudet interpoloitu",
-      "map": "Käyttöaste"
+      "kname": "Käyttöaste"
     },
     {
       "id": "tsk",
@@ -1668,7 +1668,7 @@
       "invert": false,
       "unit": "ind. 2015=100",
       "raw_desc": "Kausitasoitettu sarja",
-      "map": "Suhdannekuvaaja"
+      "kname": "Suhdannekuvaaja"
     },
     {
       "id": "palv_vol",
@@ -1795,7 +1795,7 @@
       "invert": false,
       "unit": "kpl",
       "raw_desc": "Kausitasoittamaton kuukausiluku",
-      "map": "Avoimet työpaikat"
+      "kname": "Avoimet työpaikat"
     },
     {
       "id": "lomautetut",
