@@ -294,7 +294,7 @@ button.dl:hover { text-decoration-color: var(--fg); }
 .fsec { grid-column: 1 / -1; font-size: 1.45rem; line-height: 1.2; letter-spacing: -0.01em; color: var(--fg); font-weight: 600; margin: 24px 0 -26px; scroll-margin-top: 64px; }
 .fsec:first-child, .secnav + .fsec { margin-top: 0; }
 .grpair { display: grid; grid-template-columns: minmax(0, 1fr); gap: 40px; align-items: start; }   /* taulukko koko leveydelta, alla paakuvio ja erittely */
-.grrow { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 48px; align-items: start; }   /* samat palstat kuin alla olevassa ruudukossa */
+.grrow { display: grid; grid-template-columns: minmax(0, 2fr) minmax(0, 1fr); gap: 48px; align-items: start; }   /* paakuvio 2/3, erittely ja tunnusluvut 1/3 */
 @media (max-width: 860px) { .grrow { grid-template-columns: minmax(0, 1fr); gap: 40px; } }
 .grpair > .card { min-width: 0; }
 .grtab > .fnote { width: 0; min-width: 100%; }   /* alaviite ei levenna saraketta */
