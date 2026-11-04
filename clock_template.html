@@ -1688,7 +1688,7 @@ footer b { color: var(--fg); font-weight: 600; }
         const vv = Math.round(v / step) * step;
         el("line", { x1: ml, x2: W2 - mr, y1: ys(vv), y2: ys(vv), stroke: Math.abs(vv) < 1e-9 && (B || S.length || lo < 0) ? "var(--muted)" : "var(--grid)", "stroke-width": 1 }, svg);
         el("text", { x: ml - 6, y: ys(vv) + 4, "text-anchor": "end", "font-size": fs, fill: "var(--muted)" }, svg).textContent =
-          c.ts && !c.rawv && Number.isInteger(vv) ? tick(vv) : fmtV(vv, stepDec(step));
+          c.ts && !c.rawv && !c.lvl && Number.isInteger(vv) ? tick(vv) : fmtV(vv, stepDec(step));
       }
       let yl = null;
       if (LW) {                                                           // alapaneeli: palkit omalla asteikolla
@@ -1745,11 +1745,13 @@ footer b { color: var(--fg); font-weight: 600; }
           if (ok) { dots[k].setAttribute("cx", xs(i)); dots[k].setAttribute("cy", (isY2(k) ? ys2 : ys)(a[i])); } });
         if (S.length) {
           const g = L[0][i], u = c.unit === "%" ? " %" : c.unit ? " " + c.unit : "";
+          const sgn = v => c.lvl ? "" : v > 0 ? "+" : "";                 // lvl: pinotut tasot, ei etumerkkia
+          const yy = c.yy && ser(c.yy) ? ser(c.yy).values[i] : null, yyT = yy != null ? ` (${yy > 0 ? "+" : ""}${fmtV(yy, 1)} % v/v)` : "";
           if (valEl) valEl.innerHTML = `${fP(P[i])}: ` + c.lines.map((id, k) => { const v = L[k][i];   // useampi viiva: esim. YKHI ja KHI
-            return `${c.lines.length > 1 ? lbl(id) + " " : ""}<b>${v > 0 ? "+" : ""}${fmtV(v, c.dec)}${u}</b>`; }).join(", ");
+            return `${c.lines.length > 1 ? lbl(id) + " " : ""}<b>${sgn(v)}${fmtV(v, c.dec)}${u}</b>`; }).join(", ") + yyT;
           const su = c.stackUnit != null ? c.stackUnit : "%-yks.";
-          subEl.hidden = erit; if (!erit) subEl.textContent = (c.ts ? `${fP(P[i])}: ${ser(c.lines[0]).label} ${g > 0 ? "+" : ""}${fmtV(g, c.dec)}${u}. ` : "") +
-            c.stack.map((id, k) => `${ser(id).label} ${+(S[k][i] || 0).toFixed(c.dec) > 0 ? "+" : ""}${fmtV(S[k][i], c.dec)}`).join(", ") + (su ? " " + su : "") + (su && su.endsWith(".") ? "" : ".");
+          subEl.hidden = erit; if (!erit) subEl.textContent = (c.ts ? `${fP(P[i])}: ${ser(c.lines[0]).label} ${sgn(g)}${fmtV(g, c.dec)}${u}${yyT}. ` : "") +
+            c.stack.map((id, k) => `${ser(id).label} ${sgn(+(S[k][i] || 0).toFixed(c.dec))}${fmtV(S[k][i], c.dec)}`).join(", ") + (su ? " " + su : "") + (su && su.endsWith(".") ? "" : ".");
           if (!erit && valEl && valEl.innerHTML) { subEl.innerHTML = valEl.innerHTML + ". " + escH(subEl.textContent); valEl.innerHTML = ""; }   // arvo otsikon alle
         } else if (c.bars) {
           const d = B[i]; if (valEl) valEl.innerHTML = `${fP(P[i])}: ${c.barsName || "ero"} <b style="color:${c.barsNeutral ? "var(--fg)" : d >= 0 ? "var(--q-up)" : "var(--q-down)"}">${d > 0 ? "+" : ""}${fmtV(d, c.dec)} ${c.barsUnit || "%-yks."}</b>`;

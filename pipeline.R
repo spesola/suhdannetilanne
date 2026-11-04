@@ -635,6 +635,14 @@ for (set in cfg$sets) {
     dates <- R[[tot$id]]$date; j <- match(lagd(dates), dates)
     T1 <- R[[tot$id]]$value; T0 <- T1[j]
     val <- function(id, d = R[[id]]) d$value[match(dates, d$date)]
+    if (calc == "level") {                         # tasot pinottuina (esim. konkurssit 12 kk summana), kokonaisen vuosimuutos erikseen
+      add_c(tot$id, tot$label, data.frame(date = dates, value = T1))
+      add_c(paste0(tot$id, "_yy"), paste(tot$label, "v/v"), data.frame(date = dates, value = 100 * (T1 / T0 - 1)))
+      S <- 0
+      for (s in parts) { X1 <- val(s$id); S <- S + X1; add_c(s$id, s$label, data.frame(date = dates, value = X1)) }
+      if (!is.null(cc$residual)) add_c(paste0(tot$id, "_muu"), cc$residual, data.frame(date = dates, value = T1 - S))
+      next
+    }
     pv <- lapply(parts, function(s) { X1 <- val(s$id); X0 <- X1[j]
       if (calc == "additive") return(100 * (X1 - X0) / T0)
       w <- fetch_series(modifyList(s, list(id = paste0(s$id, "_w"), pick = modifyList(s$pick, list(contentscode = s$wpick)))))

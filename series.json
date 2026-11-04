@@ -183,15 +183,17 @@
         },
         "konkurssit": {
           "id": "kontr_konkurssit",
-          "title": "Konkurssit: toimialojen kontribuutiot",
+          "title": "Konkurssit toimialoittain, 12 kk summa",
           "wide": true,
-          "calc": "additive",
+          "calc": "level",
+          "lvl": true,
+          "yy": "kc_konkurssit_yy",
           "residual": "Muut ja tuntematon",
-          "unit": "%",
-          "stackUnit": "%-yks.",
-          "dec": 1,
+          "unit": "",
+          "stackUnit": "",
+          "dec": 0,
           "lineColor": "var(--fg)",
-          "from": 2016,
+          "from": 2010,
           "lines": [
             "kc_konkurssit"
           ],
@@ -204,7 +206,7 @@
             "kc_konkurssit_6",
             "kc_konkurssit_muu"
           ],
-          "note": "12 kk summa. Lähde: Tilastokeskus."
+          "note": "Lähde: Tilastokeskus."
         },
         "comp": {
           "id": "validointi",
@@ -2491,7 +2493,7 @@
     },
     {
       "id": "kc_konkurssit",
-      "label": "Konkurssit v/v",
+      "label": "Konkurssit yhteensä",
       "set": "suhdanne",
       "contrib": true,
       "contrib_group": "konkurssit",
