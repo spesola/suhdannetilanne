@@ -23,6 +23,8 @@ EXT_H    <- c(M = 12, Q = 4)  # ennustejatke ennen suodatusta (paatepisteongelma
 TILE_N   <- 130           # markkinaruutujen paivahavainnot; sivu nayttaa niista viimeiset 3 kk
 CACHE_DIR <- "cache"      # edelliset onnistuneet haut sarjoittain
 STALE    <- character(0)  # sarjat, joiden data tuli valimuistista
+STALE_OLD <- character(0) # ... ja valimuisti on yli STALE_DAYS vanha: vasta silloin tarkistushuomio (tilapaiset katkot eivat kaada ajoa)
+STALE_DAYS <- 3
 CHECKS   <- character(0)    # ajon tarkistusten huomiot (ks. lopun tarkistukset)
 
 STATFIN  <- "https://pxdata.stat.fi/PXWeb/api/v1/fi/StatFin/"
@@ -278,11 +280,14 @@ fetch_series <- function(s) {
   cache <- file.path(CACHE_DIR, paste0(s$id, ".csv"))
   d <- tryCatch({
     x <- f(s); dir.create(CACHE_DIR, showWarnings = FALSE)
-    write.csv(x, cache, row.names = FALSE); x
+    write.csv(x, cache, row.names = FALSE); writeLines(format(Sys.time(), "%Y-%m-%d %H:%M:%S"), paste0(cache, ".t")); x
   }, error = function(e) {
     if (!file.exists(cache)) stop("Haku epaonnistui eika valimuistia ole: ", s$id, " (", conditionMessage(e), ")")
-    message("  VAROITUS ", s$id, ": lahde ei vastannut, kaytetaan valimuistia (", format(file.mtime(cache), "%d.%m.%Y"), "): ", conditionMessage(e))
+    # valimuistin ika haun aikaleimasta (tiedoston mtime voi muuttua valimuistin palautuksessa)
+    t0 <- if (file.exists(paste0(cache, ".t"))) as.POSIXct(readLines(paste0(cache, ".t"))[1]) else file.mtime(cache)
+    message("  VAROITUS ", s$id, ": lahde ei vastannut, kaytetaan valimuistia (", format(t0, "%d.%m.%Y"), "): ", conditionMessage(e))
     STALE <<- c(STALE, s$id)
+    if (difftime(Sys.time(), t0, units = "days") > STALE_DAYS) STALE_OLD <<- c(STALE_OLD, s$id)
     read.csv(cache, colClasses = c("character", "numeric"))
   })
   if (isTRUE(s$to_quarter) || identical(s$to_quarter, "sum")) {   # kuukausisarja -> neljannes (keskiarvo tai "sum"), vain taydet neljannekset
@@ -743,7 +748,9 @@ out <- list(
                     "Tilastokeskuksen vuokraindeksi on ketjutettu perusvuoden vaihdon (2025) yli päällekkäisen vuoden keskiarvolla. ",
                     "Avoimien työpaikkojen aste on avoimet työpaikat / (avoimet + työlliset), työn tuottavuus BKT:n volyymi tehtyä työtuntia kohden ",
                     "ja vaihtosuhde vientihintojen ja tuontihintojen suhde. Asuntojen hinnat suhteutetaan kotitalouksien käytettävissä oleviin tuloihin ",
-                    "asukasta kohden ja vapaarahoitteisiin vuokriin. Sarjat, joille ei julkaista ",
+                    "asukasta kohden ja vapaarahoitteisiin vuokriin. Kotitalouksien reaalitulon osatekijöissä palkansaajakorvaukset on jaettu ",
+                    "palkansaajien tehtyihin työtunteihin ja keskiansioon työtuntia kohden; hinta on yksityisen kulutuksen deflaattori. ",
+                    "BKT:n hintaosuus on nimellisen ja volyymin vuosimuutoksen erotus. Sarjat, joille ei julkaista ",
                     "kausitasoitettua versiota, on kausitasoitettu STL-menetelmällä."),
     charts = paste0("Rahoitusmarkkinat: taulukoissa päivä- tai kuukausiarvot, kuvioissa kuukausiarvot ",
                     "(kuukausikeskiarvo tai kuun viimeinen havainto, ks. kuvion huomautus). ",
@@ -767,7 +774,8 @@ for (st in sets_out) {
   for (x in lasts) if (!is.null(x$last) && length(x$last) && end_i - per_idx(x$last, st$freq) > lag_max + if (x$id %in% qm) 3 else 0)
     CHECKS <- c(CHECKS, sprintf("%s/%s: viimeisin havainto %s", st$id, x$id, x$last))
 }
-if (length(STALE)) CHECKS <- c(CHECKS, paste("valimuistista:", paste(STALE, collapse = ", ")))
+if (length(STALE)) message("Valimuistista (tilapainen katko): ", paste(STALE, collapse = ", "))
+if (length(STALE_OLD)) CHECKS <- c(CHECKS, paste0("valimuisti yli ", STALE_DAYS, " pv vanha: ", paste(STALE_OLD, collapse = ", ")))
 CHECKS <- unique(CHECKS)
 if (length(CHECKS)) message("TARKISTUS: ", length(CHECKS), " huomiota\n  ", paste(CHECKS, collapse = "\n  ")) else message("TARKISTUS: ok")
 out$meta$checks <- CHECKS

@@ -164,13 +164,8 @@ body { font-variant-numeric: tabular-nums; background: var(--bg); min-height: 10
 .strip i { width: 9px; height: 12px; border-radius: 2px; background: color-mix(in srgb, var(--qc) 42%, var(--surface)); }
 .strip i.last { width: 14px; height: 14px; margin-left: 4px; background: var(--qc); border-radius: 3px; }
 .strip i.na { background: none; box-shadow: inset 0 0 0 1px var(--line); }
-.ind .det { grid-column: 1 / -1; display: flex; flex-wrap: wrap; gap: 4px 16px; font-size: 0.76rem; color: var(--muted); padding: 5px 0 2px; }
-.ind .det b { color: var(--fg); font-weight: 600; }
-.ind .det .dph { color: var(--fg); }
-.ind .det .dph i { display: inline-block; width: 7px; height: 7px; border-radius: 50%; background: var(--qc); margin-right: 6px; }
 .gh .gn { display: inline-flex; align-items: center; gap: 8px; }
 .grp:not(.gtop) .ind .nm { padding-left: 19px; }   /* ryhman sarjat sisennettyina ryhman nimen alle */
-.grp:not(.gtop) .ind .det { padding-left: 19px; }
 .ind { align-items: center; }
 .lhead { display: grid; grid-template-columns: var(--cols); column-gap: 10px; align-items: baseline; font-size: 0.72rem; color: var(--muted); padding: 0 0 6px; border-bottom: 1px solid var(--line); }
 .lhead span:nth-child(2) { text-align: right; }
@@ -803,11 +798,6 @@ footer b { color: var(--fg); font-weight: 600; }
         if (!pp) { h += `<i class="na${k === idx ? " last" : ""}"></i>`; continue; }
         const q = quad(pp.l, pp.c); h += `<i class="${k === idx ? "last" : ""}" style="--qc:${qcol(q)}" title="${fmtP(set.periods[pp.i])}: ${Q[q].name}"></i>`; }
       return `<span class="strip" aria-hidden="true">${h}</span>`; };
-    const since = (s, p) => { const q = quad(p.l, p.c); let k = p.i;
-      while (k > 0 && s.level[k - 1] != null && s.change[k - 1] != null && quad(s.level[k - 1], s.change[k - 1]) === q) k--; return set.periods[k]; };
-    const rawTxt = (s, p) => { const v = s.raw && s.raw[p.i]; if (v == null) return "";
-      const u = s.unit || "", d = Math.abs(v) >= 1000 ? 0 : 1;
-      return u === "saldo" ? `Saldoluku <b>${fmtV(v, d)}</b>` : u.startsWith("ind.") ? `Indeksi <b>${fmtV(v, d)}</b>` : `Arvo <b>${fmtV(v, d)}${u === "%" ? " %" : u ? " " + u : ""}</b>`; };
     const mk = (s, extraCls) => {
       const p = at(s, idx); const b = document.createElement("button"); b.type = "button";
       b.className = "ind" + (extraCls || ""); b.setAttribute("aria-pressed", s.comp ? sel === s.id : picked.has(s.id) && !fullG.includes(s.group));
