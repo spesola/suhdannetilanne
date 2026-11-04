@@ -192,7 +192,13 @@ body { font-variant-numeric: tabular-nums; background: var(--bg); min-height: 10
 .grp.gtop .ind:last-child { border-bottom: 1px solid color-mix(in srgb, var(--fg) 35%, transparent); }
 
 .tabs { display: flex; gap: 22px; margin: 0 0 22px; flex-wrap: wrap; border-bottom: 1px solid var(--line); }
-#detail { border-top: 0; padding-top: 0; }
+/* valitun sarjan aikasarjat listan alla oikeassa sarakkeessa, kartta pysyy kiinni vieressa */
+.tsside { margin-top: 40px; }
+.grrow.noside { grid-template-columns: minmax(0, 1fr) !important; }
+.tsside .tsgrid, .tsside .tsgrid.solo { grid-template-columns: minmax(0, 1fr); gap: 40px; }
+.tsside .tsmain, .tsside #tsContrib .card { border-top: 1px solid var(--rule); padding-top: 14px; }
+.tsside #tsContrib .card > .more { top: 10px; }
+.tsside #tsContrib .card > .cmenu { top: 40px; }
 .tabs button { font: inherit; font-size: 0.9rem; font-weight: 500; color: var(--muted); background: none; border: 0;
   border-bottom: 2px solid transparent; padding: 4px 0 10px; margin-bottom: -1px; cursor: pointer; }
 .tabs button[aria-selected="true"] { color: var(--fg); border-bottom-color: var(--fg); font-weight: 600; }
@@ -300,6 +306,12 @@ button.dl:hover { text-decoration-color: var(--fg); }
 .step.play { font-size: 0.7rem; }
 .fsec { grid-column: 1 / -1; font-size: 1.45rem; line-height: 1.2; letter-spacing: -0.01em; color: var(--fg); font-weight: 600; margin: 24px 0 -26px; scroll-margin-top: 64px; }
 .fsec:first-child, .secnav + .fsec { margin-top: 0; }
+.fsec[role="button"] { cursor: pointer; display: flex; align-items: center; gap: 10px; user-select: none; }
+.fsec .chev { color: var(--muted); display: flex; }
+.fsec .chev svg { fill: none; stroke: currentColor; stroke-width: 1.6; stroke-linecap: round; stroke-linejoin: round; transition: transform .2s; }
+.fsec[aria-expanded="true"] .chev svg { transform: rotate(90deg); }
+.fsec[role="button"]:hover .chev { color: var(--fg); }
+.fgrid > [hidden] { display: none !important; }
 .grpair { display: grid; grid-template-columns: minmax(0, 1fr); gap: 40px; align-items: start; }   /* taulukko koko leveydelta, alla paakuvio ja erittely */
 .grrow { display: grid; grid-template-columns: minmax(0, 2fr) minmax(0, 1fr); gap: 48px; align-items: start; }   /* paakuvio 2/3, erittely ja tunnusluvut 1/3 */
 @media (max-width: 860px) { .grrow { grid-template-columns: minmax(0, 1fr); gap: 40px; } }
@@ -481,6 +493,18 @@ footer b { color: var(--fg); font-weight: 600; }
     <div class="card">
       <div class="phead"><h2>Indikaattorit</h2><span class="pmeta"><button type="button" class="chip" id="clrSel" hidden></button><span class="meta" id="listMeta"></span></span></div>
       <div class="list" id="list"></div>
+      <div class="tsside" id="tsSide">
+      <div class="tsgrid" id="tsGrid">
+        <div class="tsmain">
+          <div class="viewhead"><h2 id="tsTitle"></h2></div>
+          <p class="tsnow" id="tsNow"></p>
+          <svg id="ts" viewBox="0 0 560 300" role="img" aria-label="Poikkeama trendistä ajassa"></svg>
+          <div class="legend dots" id="tsLegend"></div>
+          <p class="fnote" id="tsSub"></p>
+        </div>
+        <div class="fgrid" id="tsContrib"></div>
+      </div>
+      </div>
     </div>
   </section>
 
@@ -500,23 +524,7 @@ footer b { color: var(--fg); font-weight: 600; }
   <dialog class="zoom" id="zoom" aria-label="Suurennettu kuvio"><div class="zbar"><button type="button" id="zoomClose">Sulje</button></div><div class="fgrid" id="zoomBody"></div></dialog>
 
   <section class="card" id="detail">
-    <div class="tabs" role="tablist">
-      <button role="tab" id="tab-ts" aria-selected="true" type="button">Aikasarja</button>
-      <button role="tab" id="tab-hm" aria-selected="false" type="button">Taulukko</button>
-    </div>
-    <div id="view-ts">
-      <div class="tsgrid" id="tsGrid">
-        <div class="tsmain">
-          <div class="viewhead"><h2 id="tsTitle"></h2></div>
-          <p class="tsnow" id="tsNow"></p>
-          <svg id="ts" viewBox="0 0 560 300" role="img" aria-label="Poikkeama trendistä ajassa"></svg>
-          <div class="legend dots" id="tsLegend"></div>
-          <p class="fnote" id="tsSub"></p>
-        </div>
-        <div class="fgrid" id="tsContrib"></div>
-      </div>
-    </div>
-    <div id="view-hm" hidden>
+    <div id="view-hm">
       <div class="viewhead"><h2 id="hmTitle">Poikkeama trendistä</h2>
         <div class="hmctl"><span class="now" id="hmNote"></span>
           <div class="mini" role="group" aria-label="Taulukon arvo"><button type="button" id="hm-lvl" aria-pressed="true">Taso</button><button type="button" id="hm-chg" aria-pressed="false">Muutos</button><button type="button" id="hm-raw" aria-pressed="false">Arvo</button></div><button type="button" class="dl" id="hm-dl">Lataa CSV</button></div></div>
@@ -610,7 +618,7 @@ footer b { color: var(--fg); font-weight: 600; }
     const gen = new Date(D.meta.generated.replace(/(\+\d{2})(\d{2})$/, "$1:$2"));
     const c0 = set.view === "charts" ? set.charts.find(c => c.lines && c.lines.length) : null;
     const lastAll = c0 ? set.periods[lastNN(set.series.find(x => x.id === (c0.bars || c0.lines[0])).values)] : set.periods[set.periods.length - 1];
-    $("headline").textContent = set.label;
+    $("headline").textContent = "Suhdannetilanne";   // sivuston nimi pysyy, valilehti kertoo osion
     $("sub").textContent = `Päivitetty ${gen.toLocaleDateString("fi-FI")}. Viimeisin havainto ${fmtP(lastAll)}.`;
     const box = $("sets"); box.innerHTML = "";
     D.sets.forEach(s => { const b = document.createElement("button"); b.type = "button"; b.innerHTML = `<span class="lg">${s.label}</span><span class="sh">${SHORT[s.id] || s.label}</span>`;
@@ -954,7 +962,8 @@ footer b { color: var(--fg); font-weight: 600; }
     const p = at(s, idx);
     $("tsNow").innerHTML = p ? `<i style="--qc:${qcol(quad(p.l, p.c))}"></i>${Q[quad(p.l, p.c)].name} ${fmtP(set.periods[p.i])}. Taso ${fmtN(p.l)}, muutos ${fmtN(p.c)}.` : "";
     const svg = $("ts"); svg.innerHTML = "";
-    const solo = !cc, W2 = solo ? 960 : 560, H2 = solo ? 230 : 300, ml = 40, mr = 14, mt = 12, mb = 28;
+    const solo = false, W2 = 560, H2 = 300,   // aina kapeassa sarakkeessa listan alla
+    ml = 40, mr = 14, mt = 12, mb = 28;
     svg.setAttribute("viewBox", `0 0 ${W2} ${H2}`);
     const n = set.periods.length, xs = i => ml + i * (W2 - ml - mr) / (n - 1);
     const vals = s.level.filter(v => v != null);
@@ -1041,9 +1050,7 @@ footer b { color: var(--fg); font-weight: 600; }
   }
 
   function setTab(t) { tab = t;
-    ["ts", "hm"].forEach(k => { $("tab-" + k).setAttribute("aria-selected", t === k); $("view-" + k).hidden = t !== k; }); }
-  $("tab-ts").onclick = () => { setTab("ts"); update(); };
-  $("tab-hm").onclick = () => { setTab("hm"); update(); };
+  }   // aikasarja ja taulukko molemmat aina nakyvissa (aikasarja listan alla)
 
   function renderFoot() {
     $("foot").innerHTML = `<p>Suomen talouden suhdannetilanne avoimista tilastoista. Päivittyy arkisin.</p><details><summary>Menetelmä ja lähteet</summary><div class="fbody"><p><b>Menetelmä.</b> ${D.meta.method}</p><p>${D.meta.composite}</p><p>${D.meta.growth || ""}</p><p>${D.meta.charts || ""}</p>
@@ -1074,7 +1081,7 @@ footer b { color: var(--fg); font-weight: 600; }
     $("finSum").hidden = !(charts && set.summary && set.summary.length);
     $("charts").hidden = !charts || !!set.growth;
     if (charts) { renderTiles(); if (set.growth) renderGrowth(); if (set.summary) renderSummary(); drawCharts(); return; }
-    if (tab === "ts") renderTS(); else renderHM();
+    renderTS(); renderHM();
   }
 
   /* ---------- kasvutaulukko (kansantalous) ---------- */
@@ -1490,6 +1497,8 @@ footer b { color: var(--fg); font-weight: 600; }
     const two = getComputedStyle($("growthSec")).gridTemplateColumns.split(" ").length > 1;
     sideLeft = true;                                                   // erittely/tunnusluvut paakuvion oikealle puolelle
     $("grSide").innerHTML = ""; colMainH = null; renderCharts($("grCharts"));
+    const gr = $("grSide").parentElement, ns = !$("grSide").children.length;   // ei erittelya: paakuvio koko leveydelle (1:1, piirretaan uudelleen)
+    if (ns !== gr.classList.contains("noside")) { gr.classList.toggle("noside", ns); $("grSide").innerHTML = ""; renderCharts($("grCharts")); }
     if (false && two && lastMainH) {
       const diff = $("growthSec").querySelector(".grleft").offsetHeight - $("grCharts").offsetHeight;
       if (Math.abs(diff) > 1) { colMainH = Math.max(lastLower ? 200 : 190, Math.min(560, lastMainH + diff)); $("grSide").innerHTML = ""; renderCharts($("grCharts")); colMainH = null; }
@@ -1532,7 +1541,31 @@ footer b { color: var(--fg); font-weight: 600; }
     const r = renderCharts0(box, only);
     [box, $("grMoreGrid")].forEach(x => x && x.querySelectorAll(".fcard").forEach(menuize));
     [box, $("grMoreGrid")].forEach(x => x && (x.classList.contains("fgrid") ? [x] : [...x.querySelectorAll(".fgrid")]).forEach(pairRows));
+    if (box.id === "charts") secFold(box);
     return r;
+  }
+  // pitkan sivun osiot avattaviksi: oletuksena ensimmainen auki; tila sailyy uudelleenpiirrossa
+  const openSec = {};
+  function secFold(box, anim) {
+    const hs = [...box.querySelectorAll(":scope > .fsec")]; if (hs.length < 3) return;
+    const st = openSec[set.id] || (openSec[set.id] = new Set([hs[0].dataset.name || hs[0].textContent]));
+    let cur = null;
+    [...box.children].forEach(c => {
+      if (c.classList.contains("fsec")) { cur = c.dataset.name || (c.dataset.name = c.textContent);
+        if (!c.querySelector(".chev")) { c.insertAdjacentHTML("afterbegin", '<span class="chev" aria-hidden="true"><svg viewBox="0 0 12 12" width="14" height="14"><path d="M4 2.5 7.5 6 4 9.5"/></svg></span>');
+          c.tabIndex = 0; c.setAttribute("role", "button");
+          const tog = () => { const nm = c.dataset.name, on = !st.has(nm); on ? st.add(nm) : st.delete(nm); secFold(box, on ? nm : null); secSync(); };
+          c.onclick = tog; c.onkeydown = e => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); tog(); } }; }
+        c.setAttribute("aria-expanded", st.has(cur)); return; }
+      if (!cur || c.classList.contains("secnav")) return;
+      const show = st.has(cur); c.hidden = !show;
+      if (show && anim === cur) c.animate([{ opacity: 0, transform: "translateY(8px)" }, { opacity: 1, transform: "none" }], { duration: 260, easing: "cubic-bezier(.2,.7,.2,1)" });
+    });
+  }
+  function secOpen(box, k) {                                           // pikalinkki avaa osion
+    const h = box.querySelectorAll(":scope > .fsec")[k], st = openSec[set.id]; if (!h) return;
+    if (st && !st.has(h.dataset.name)) { st.add(h.dataset.name); secFold(box, h.dataset.name); }
+    h.scrollIntoView({ behavior: "smooth", block: "start" });
   }
   // rinnakkaiset kuviokortit samaan linjaan: parille yhteiset rivit (subgrid); taulukon vieressa ei
   function pairRows(g) {
@@ -1581,7 +1614,7 @@ footer b { color: var(--fg); font-weight: 600; }
     if (secs.length > 2) {                                               // pitka sivu: osioiden pikalinkit, kiinnittyy ylareunaan
       const nav = document.createElement("nav"); nav.className = "secnav"; nav.setAttribute("aria-label", "Osiot");
       secs.forEach((s, k) => { const b = document.createElement("button"); b.type = "button"; b.textContent = s;
-        b.onclick = () => box.querySelectorAll(".fsec")[k].scrollIntoView({ behavior: "smooth", block: "start" }); nav.appendChild(b); });
+        b.onclick = () => secOpen(box, k); nav.appendChild(b); });
       box.appendChild(nav);
       secSync();
     }
@@ -1701,6 +1734,7 @@ footer b { color: var(--fg); font-weight: 600; }
       const dots = L.map((a, k) => el("circle", { r: big ? 3.5 : 4, fill: colOf[c.lines[k]], stroke: "var(--surface)", "stroke-width": 1.5 }, svg));
 
       const valEl = card.querySelector(".fval"), subEl = card.querySelector(".fsub");
+      const fP = c.qlab ? (p => "Q" + Math.ceil(+p.slice(5, 7) / 3) + "/" + p.slice(0, 4)) : fmtP;   // kuukausijaksoille neljanneksen merkintä
       const show = h => {
         const iDef = c.defIdx != null && c.defIdx - i0 >= 0 && L[0][Math.min(c.defIdx - i0, lastNN(L[0]))] != null ? Math.min(c.defIdx - i0, lastNN(L[0])) : null;
         const i = h == null ? (iDef != null ? iDef : L.length > 1 && !B && !S.length ? Math.min(...L.map(lastNN)) : lastNN(B || L[0]))   // oletus: valittu tai viimeisin yhteinen jakso
@@ -1711,14 +1745,14 @@ footer b { color: var(--fg); font-weight: 600; }
           if (ok) { dots[k].setAttribute("cx", xs(i)); dots[k].setAttribute("cy", (isY2(k) ? ys2 : ys)(a[i])); } });
         if (S.length) {
           const g = L[0][i], u = c.unit === "%" ? " %" : c.unit ? " " + c.unit : "";
-          if (valEl) valEl.innerHTML = `${fmtP(P[i])}: ` + c.lines.map((id, k) => { const v = L[k][i];   // useampi viiva: esim. YKHI ja KHI
+          if (valEl) valEl.innerHTML = `${fP(P[i])}: ` + c.lines.map((id, k) => { const v = L[k][i];   // useampi viiva: esim. YKHI ja KHI
             return `${c.lines.length > 1 ? lbl(id) + " " : ""}<b>${v > 0 ? "+" : ""}${fmtV(v, c.dec)}${u}</b>`; }).join(", ");
           const su = c.stackUnit != null ? c.stackUnit : "%-yks.";
-          subEl.hidden = erit; if (!erit) subEl.textContent = (c.ts ? `${fmtP(P[i])}: ${ser(c.lines[0]).label} ${g > 0 ? "+" : ""}${fmtV(g, c.dec)}${u}. ` : "") +
+          subEl.hidden = erit; if (!erit) subEl.textContent = (c.ts ? `${fP(P[i])}: ${ser(c.lines[0]).label} ${g > 0 ? "+" : ""}${fmtV(g, c.dec)}${u}. ` : "") +
             c.stack.map((id, k) => `${ser(id).label} ${+(S[k][i] || 0).toFixed(c.dec) > 0 ? "+" : ""}${fmtV(S[k][i], c.dec)}`).join(", ") + (su ? " " + su : "") + (su && su.endsWith(".") ? "" : ".");
           if (!erit && valEl && valEl.innerHTML) { subEl.innerHTML = valEl.innerHTML + ". " + escH(subEl.textContent); valEl.innerHTML = ""; }   // arvo otsikon alle
         } else if (c.bars) {
-          const d = B[i]; if (valEl) valEl.innerHTML = `${fmtP(P[i])}: ${c.barsName || "ero"} <b style="color:${c.barsNeutral ? "var(--fg)" : d >= 0 ? "var(--q-up)" : "var(--q-down)"}">${d > 0 ? "+" : ""}${fmtV(d, c.dec)} ${c.barsUnit || "%-yks."}</b>`;
+          const d = B[i]; if (valEl) valEl.innerHTML = `${fP(P[i])}: ${c.barsName || "ero"} <b style="color:${c.barsNeutral ? "var(--fg)" : d >= 0 ? "var(--q-up)" : "var(--q-down)"}">${d > 0 ? "+" : ""}${fmtV(d, c.dec)} ${c.barsUnit || "%-yks."}</b>`;
           subEl.hidden = !!c.hdr;                                          // otsakkeessa jo v/v ja q/q
           subEl.textContent = c.lines.map(id => `${ser(id).label} ${withU(L[c.lines.indexOf(id)][i], c)}`).join(", ") + ".";
           if (!c.hdr && valEl && valEl.innerHTML) { subEl.innerHTML = valEl.innerHTML + ". " + escH(subEl.textContent); valEl.innerHTML = ""; }
@@ -1726,13 +1760,13 @@ footer b { color: var(--fg); font-weight: 600; }
           let j = i; while (j > 0 && L.every(a => a[j] == null)) j--;
           if (valEl) valEl.innerHTML = "";                                   // pvm ja arvot otsikon alle, ei alakulmaan
           const sg = v => c.ts && !c.rawv && v > 0 ? "+" : "";
-          subEl.textContent = (c.avg ? `${fmtP(P[j])} keskiarvo: ` : `${fmtP(P[j])}: `) +   // avg: kuukausisarjat neljanneksen keskiarvona
+          subEl.textContent = (c.avg ? `${fP(P[j])} keskiarvo: ` : `${fP(P[j])}: `) +   // avg: kuukausisarjat neljanneksen keskiarvona
             c.lines.map(id => { const v = L[c.lines.indexOf(id)][j]; return `${lbl(id)} ${sg(v)}${fmtV(v, c.dec)}${c.unit === "%" ? " %" : ""}`; }).join(", ") +
             (LW && LW[j] != null ? `, ${c.lower.label} ${LW[j] > 0 ? "+" : ""}${fmtV(LW[j], c.lower.dec != null ? c.lower.dec : 1)}` : "") + ".";
         } else {
           const a = L[0]; let j = i; while (j > 0 && a[j] == null) j--;
           if (valEl) valEl.innerHTML = "";
-          subEl.innerHTML = `${fmtP(P[j])}: <b>${withU(a[j], c)}</b>`;
+          subEl.innerHTML = `${fP(P[j])}: <b>${withU(a[j], c)}</b>`;
         }
         if (c.hdr && valEl) {                                              // valitun rivin kasvu, sama kaikissa kuvioissa
           const gy = ser(c.hdr + "_yy").values, gq = ser(c.hdr + "_qq").values, has = j => gy[j] != null || gq[j] != null;
@@ -1766,20 +1800,6 @@ footer b { color: var(--fg); font-weight: 600; }
       hit.addEventListener("pointerleave", () => chartHooks.forEach(fn => fn(null)));
     });
     if (more) $("grMore").hidden = !more.children.length;
-    if (col && grSel && ser(grSel + "_yy")) {                          // tunnusluvut aina (erittelyn alle, jos se on)
-      const gy = ser(grSel + "_yy").values, gq = ser(grSel + "_qq").values, N = set.periods.length;
-      const card = document.createElement("div"); card.className = "card fcard side";
-      card.innerHTML = `<div class="fhead"><h2>Tunnusluvut</h2><span class="fval"></span></div><div class="kv"></div>`;
-      (sideLeft ? $("grSide") : box).appendChild(card);
-      const sg1 = v => v == null ? "–" : (+v.toFixed(1) > 0 ? "+" : "") + fmtV(v, 1) + " %";
-      const avg = a => { const x = a.filter(v => v != null); return x.length ? x.reduce((s, v) => s + v, 0) / x.length : null; };
-      const y0 = set.periods[gy.findIndex(v => v != null)] || set.periods[0], lr = avg(gy);
-      const draw = h => { let j = h == null ? N - 1 : Math.min(N - 1, h); while (j > 0 && gy[j] == null && gq[j] == null) j--;
-        card.querySelector(".fval").textContent = fmtP(set.periods[j]) + ", kasvu %";
-        const rows = [["Vuodentakaisesta (v/v)", gy[j]], ["Edellisestä neljänneksestä (q/q)", gq[j]]];
-        card.querySelector(".kv").innerHTML = rows.map(([l, v], k) => `<div${k >= 2 ? ' class="sm"' : ""}><span>${l}</span><b>${sg1(v)}</b></div>`).join(""); };
-      draw(null); chartHooks.push(draw);
-    }
   }
 
   let lastNarrow = null, lastK = null, rzT = null;
