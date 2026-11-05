@@ -25,6 +25,7 @@ CACHE_DIR <- "cache"      # edelliset onnistuneet haut sarjoittain
 STALE    <- character(0)  # sarjat, joiden data tuli valimuistista
 STALE_OLD <- character(0) # ... ja valimuisti on yli STALE_DAYS vanha: vasta silloin tarkistushuomio (tilapaiset katkot eivat kaada ajoa)
 STALE_DAYS <- 3
+VALID_TXT <- ""
 CHECKS   <- character(0)    # ajon tarkistusten huomiot (ks. lopun tarkistukset)
 
 STATFIN  <- "https://pxdata.stat.fi/PXWeb/api/v1/fi/StatFin/"
@@ -689,9 +690,10 @@ for (set in cfg$sets) {
       values = r3(ifelse(as.integer(substr(periods, 6, 7)) %% 3 == 0, unname(cq[qq]), NA)))
     cser[[length(cser) + 1]] <- list(id = "val_gdp", label = "BKT:n trendipoikkeama", last = qm(tail(g$date, 1)),
       values = r3(g$level[match(periods, qm(g$date))]))
-    if (!is.null(contribs$comp)) contribs$comp$note <- paste0(contribs$comp$note, sprintf(
-      " Korrelaatio %s–%s: %s (ilman 2020–21: %s).", substr(both[1], 1, 4), substr(tail(both, 1), 1, 4),
-      sub(".", ",", sprintf("%.2f", r_all), fixed = TRUE), sub(".", ",", sprintf("%.2f", r_ex), fixed = TRUE)))
+    VALID_TXT <<- sprintf(   # vertailu BKT:hen menetelmakuvaukseen (kuvio poistettu sivulta)
+      " Kokonaisindikaattorin neljännesvuosikeskiarvon korrelaatio BKT:n trendipoikkeamaan %s–%s on %s (ilman vuosia 2020–21 %s).",
+      substr(both[1], 1, 4), substr(tail(both, 1), 1, 4),
+      sub(".", ",", sprintf("%.2f", r_all), fixed = TRUE), sub(".", ",", sprintf("%.2f", r_ex), fixed = TRUE))
     message(sprintf("  Kokonaisindikaattori vs BKT: r = %.2f (ilman 2020-21 %.2f)", r_all, r_ex))
   }
 
@@ -784,7 +786,7 @@ out <- list(
                     "Riskilisä on Suomen ja Saksan 10 vuoden korkojen ero."),
     caveat = paste0("Trendisuotimen loppupisteet tarkentuvat uuden datan myötä, ",
                     "joten viimeisimmät pisteet voivat siirtyä."),
-    composite = "Kokonaisindikaattori: sarjojen tasojen keskiarvo jaksoilta, joilla kaikki sarjat ovat saatavilla. BKT ei ole mukana keskiarvossa. Käyttöaste, konkurssit ja tavaravienti näkyvät kartalla, mutta eivät ole mukana keskiarvossa; tavaravienti julkaistaan muita myöhemmin.",
+    composite = paste0("Kokonaisindikaattori: sarjojen tasojen keskiarvo jaksoilta, joilla kaikki sarjat ovat saatavilla. BKT ei ole mukana keskiarvossa. Käyttöaste, konkurssit ja tavaravienti näkyvät kartalla, mutta eivät ole mukana keskiarvossa; tavaravienti julkaistaan muita myöhemmin.", VALID_TXT),
     sources = sources_out),
   sets = sets_out)
 

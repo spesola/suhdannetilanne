@@ -208,26 +208,6 @@
           ],
           "note": "Lähde: Tilastokeskus."
         },
-        "comp": {
-          "id": "validointi",
-          "title": "Kokonaisindikaattori ja BKT",
-          "wide": true,
-          "qlab": true,
-          "unit": "",
-          "dec": 2,
-          "connect": true,
-          "from": 2010,
-          "lines": [
-            "val_comp",
-            "val_gdp"
-          ],
-          "labels": {
-            "val_comp": "Kokonaisindikaattori, neljänneksen keskiarvo",
-            "val_gdp": "BKT:n trendipoikkeama"
-          },
-          "lineColor": "var(--fg)",
-          "note": "Standardoidut poikkeamat trendistä. Lähde: Tilastokeskus."
-        },
         "g:Työmarkkinat": {
           "id": "tyomarkkinat",
           "title": "Työllisyys- ja työttömyysaste",
