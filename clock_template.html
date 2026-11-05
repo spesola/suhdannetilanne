@@ -547,9 +547,10 @@ footer b { color: var(--fg); font-weight: 600; }
   <section class="card" id="detail">
     <div id="view-hm">
       <div class="viewhead"><h2 id="hmTitle">Poikkeama trendistä</h2>
-        <div class="hmctl"><span class="now" id="hmNote"></span>
-          <div class="mini" role="group" aria-label="Taulukon arvo"><button type="button" id="hm-lvl" aria-pressed="true">Taso</button><button type="button" id="hm-chg" aria-pressed="false">Muutos</button><button type="button" id="hm-raw" aria-pressed="false">Arvo</button></div><button type="button" class="dl" id="hm-dl">Lataa CSV</button></div></div>
+        <div class="hmctl">
+          <div class="mini" role="group" aria-label="Taulukon arvo"><button type="button" id="hm-chg" aria-pressed="true">Muutos</button><button type="button" id="hm-lvl" aria-pressed="false">Taso</button><button type="button" id="hm-raw" aria-pressed="false">Arvo</button></div><button type="button" class="dl" id="hm-dl">Lataa CSV</button></div></div>
       <div class="hmwrap"><table class="hm" id="hm"></table></div>
+      <p class="fnote" id="hmNote"></p>
     </div>
   </section>
 
@@ -1036,7 +1037,7 @@ footer b { color: var(--fg); font-weight: 600; }
   }
 
   /* ---------- heatmap ---------- */
-  let hmMode = "lvl";
+  let hmMode = "chg";
   $("hm-lvl").onclick = () => { hmMode = "lvl"; update(); };
   $("hm-chg").onclick = () => { hmMode = "chg"; update(); };
   $("hm-raw").onclick = () => { hmMode = "raw"; update(); };
