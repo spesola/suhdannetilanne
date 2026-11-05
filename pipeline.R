@@ -350,6 +350,10 @@ fetch_series <- function(s) {
     e <- fetch_series(c(s$vac_emp, list(id = paste0(s$id, "_emp"))))
     m <- merge(d, e, by = "date")
     d <- data.frame(date = m$date, value = 100 * m$value.x / (m$value.x + m$value.y)) }
+  if (!is.null(s$per)) {                           # suhde toiseen sarjaan (esim. avoimet tyopaikat / tyottomat)
+    e <- fetch_series(c(s$per, list(id = paste0(s$id, "_per"))))
+    m <- merge(d, e, by = "date")
+    d <- data.frame(date = m$date, value = m$value.x / m$value.y) }
   if (!is.null(s$mult)) d$value <- d$value * s$mult  # yksikonmuunnos (esim. milj. -> mrd. euroa)
   if (!is.null(s$pct_lag)) {                        # muutos %, edellisesta vuodesta (lag 4 nelj. / 12 kk)
     d <- d[order(d$date), ]; n <- nrow(d); L <- s$pct_lag
@@ -718,7 +722,7 @@ SRC_NAMES <- list(
   eurostat = list(.n = "Eurostat", ei_bsin_m_r2 = "Euroopan komission luottamuskyselyt", ei_bsbu_m_r2 = "Euroopan komission luottamuskyselyt",
                   ei_bsrt_m_r2 = "Euroopan komission luottamuskyselyt", ei_bsse_m_r2 = "Euroopan komission luottamuskyselyt",
                   ei_bsin_q_r2 = "kapasiteetin käyttöaste", sts_trtu_m = "vähittäiskaupan liikevaihto", sts_setu_m = "palvelujen liikevaihto",
-                  prc_hicp_minr = "YKHI", prc_hicp_iw = "YKHI-painot", namq_10_gdp = "BKT vertailumaissa",
+                  prc_hicp_minr = "YKHI", prc_hicp_iw = "YKHI-painot", namq_10_gdp = "BKT vertailumaissa", namq_10_lp_ulc = "yksikkötyökustannukset",
                   bop_c6_q = "maksutase", ext_st_27_2020msbec = "tavarakauppa"),
   bof      = list(.n = "Suomen Pankki", .all = "luotonanto ja lainojen korot"),
   ecb      = list(.n = "EKP", FM = "markkinakorot", EST = "€STR", YC = "tuottokäyrä", IRS = "valtionlainojen korot", EXR = "valuuttakurssit",

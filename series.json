@@ -489,21 +489,42 @@
             }
           },
           "views": {
-            "palkat": {
-              "title": "Ansiotaso ja reaaliansiot",
-              "lines": [
-                "palkat_yy",
-                "reaalipalkat_yy"
-              ],
-              "labels": {
-                "palkat_yy": "Ansiotasoindeksi",
-                "reaalipalkat_yy": "Reaaliansioindeksi"
+            "palkat": [
+              {
+                "title": "Ansiotaso ja reaaliansiot",
+                "lines": [
+                  "palkat_yy",
+                  "reaalipalkat_yy"
+                ],
+                "labels": {
+                  "palkat_yy": "Ansiotasoindeksi",
+                  "reaalipalkat_yy": "Reaaliansioindeksi"
+                },
+                "lineColor": "var(--accent)",
+                "unit": "%",
+                "dec": 1,
+                "note": "Lähde: Tilastokeskus."
               },
-              "lineColor": "var(--accent)",
-              "unit": "%",
-              "dec": 1,
-              "note": "Lähde: Tilastokeskus."
-            },
+              {
+                "title": "Yksikkötyökustannukset, vuosimuutos %",
+                "lines": [
+                  "x_ulc_fi",
+                  "x_ulc_se",
+                  "x_ulc_de",
+                  "x_ulc_ea"
+                ],
+                "colors": {
+                  "x_ulc_fi": "var(--fg)",
+                  "x_ulc_se": "var(--accent)",
+                  "x_ulc_de": "var(--g3)",
+                  "x_ulc_ea": "var(--g2)"
+                },
+                "unit": "%",
+                "dec": 1,
+                "from": 2015,
+                "note": "Henkeä kohden, kausitasoitettu. Lähde: Eurostat."
+              }
+            ],
             "asuntohinnat": [
               {
                 "title": "Vanhojen osakeasuntojen reaalihinnat (2022=100)",
@@ -612,6 +633,24 @@
                 "unit": "",
                 "dec": 1,
                 "note": "Kausitasoitettu, neljänneksen keskiarvo. Lähde: Tilastokeskus."
+              },
+              {
+                "title": "Avoimet työpaikat työtöntä kohden",
+                "lines": [
+                  "tm_vu_tk",
+                  "tm_vu_te"
+                ],
+                "colors": {
+                  "tm_vu_tk": "var(--fg)",
+                  "tm_vu_te": "var(--g2)"
+                },
+                "labels": {
+                  "tm_vu_tk": "Tilastokeskus",
+                  "tm_vu_te": "TE-palvelut"
+                },
+                "unit": "",
+                "dec": 2,
+                "note": "Kausitasoitettu, neljänneksen keskiarvo. Lähteet: Tilastokeskus (työpaikka- ja työvoimatutkimus), TE-palvelut."
               },
               {
                 "type": "scatter",
@@ -4665,6 +4704,51 @@
       }
     },
     {
+      "id": "tm_vu_tk",
+      "label": "Tilastokeskus",
+      "set": "bkt",
+      "chart_only": true,
+      "source": "statfin",
+      "table": "atp/11l1.px",
+      "pick": {
+        "contentscode": "atp_lkm"
+      },
+      "stl": true,
+      "per": {
+        "source": "statfin",
+        "table": "tyti/135z.px",
+        "pick": {
+          "contentscode": "Tyottomat_kausi"
+        },
+        "to_quarter": true,
+        "mult": 1000
+      }
+    },
+    {
+      "id": "tm_vu_te",
+      "label": "TE-palvelut",
+      "set": "bkt",
+      "chart_only": true,
+      "source": "statfin",
+      "table": "tyonv/12r5.px",
+      "pick": {
+        "Alue": "SSS",
+        "contentscode": "AVPAIKATLOPUSSA"
+      },
+      "to_quarter": true,
+      "stl": true,
+      "per": {
+        "source": "statfin",
+        "table": "tyonv/12r5.px",
+        "pick": {
+          "Alue": "SSS",
+          "contentscode": "TYOTTOMATLOPUSSA"
+        },
+        "to_quarter": true,
+        "stl": true
+      }
+    },
+    {
       "id": "x_gdp_fi",
       "label": "Suomi",
       "set": "bkt",
@@ -4723,6 +4807,62 @@
         "na_item": "B1GQ"
       },
       "rebase": 2019
+    },
+    {
+      "id": "x_ulc_fi",
+      "label": "Suomi",
+      "set": "bkt",
+      "chart_only": true,
+      "source": "eurostat",
+      "ds": "namq_10_lp_ulc",
+      "geo": "FI",
+      "pick": {
+        "unit": "PCH_SM",
+        "s_adj": "SCA",
+        "na_item": "NULC_PER"
+      }
+    },
+    {
+      "id": "x_ulc_se",
+      "label": "Ruotsi",
+      "set": "bkt",
+      "chart_only": true,
+      "source": "eurostat",
+      "ds": "namq_10_lp_ulc",
+      "geo": "SE",
+      "pick": {
+        "unit": "PCH_SM",
+        "s_adj": "SCA",
+        "na_item": "NULC_PER"
+      }
+    },
+    {
+      "id": "x_ulc_de",
+      "label": "Saksa",
+      "set": "bkt",
+      "chart_only": true,
+      "source": "eurostat",
+      "ds": "namq_10_lp_ulc",
+      "geo": "DE",
+      "pick": {
+        "unit": "PCH_SM",
+        "s_adj": "SCA",
+        "na_item": "NULC_PER"
+      }
+    },
+    {
+      "id": "x_ulc_ea",
+      "label": "Euroalue",
+      "set": "bkt",
+      "chart_only": true,
+      "source": "eurostat",
+      "ds": "namq_10_lp_ulc",
+      "geo": "EA",
+      "pick": {
+        "unit": "PCH_SM",
+        "s_adj": "SCA",
+        "na_item": "NULC_PER"
+      }
     },
     {
       "id": "x_nl_s11",
