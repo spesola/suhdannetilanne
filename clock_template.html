@@ -887,7 +887,7 @@ footer b { color: var(--fg); font-weight: 600; }
           const ch = h.querySelector(".chev svg"); if (ch) ch.animate([{ transform: "rotate(90deg)" }, { transform: "rotate(0deg)" }], { duration: 200, easing: EASE, fill: "forwards" });
           body.style.overflow = "hidden";
           body.animate([{ height: body.offsetHeight + "px", opacity: 1 }, { height: "0px", opacity: 0 }], { duration: 200, easing: EASE, fill: "forwards" }).onfinish = doClose;
-        } else { openG.clear(); openG.add(g); gAnim = { g, dir: "open" }; picked.clear(); all.forEach(x => picked.add(x.id)); sel = "g:" + g; setTab("ts"); update(); } };   // yksi ryhma auki kerrallaan
+        } else { openG.add(g); gAnim = { g, dir: "open" }; picked.clear(); all.forEach(x => picked.add(x.id)); sel = "g:" + g; setTab("ts"); update(); } };   // useampi ryhma voi olla auki; valinnaksi avatun ryhman sarjat
       h.dataset.g = g;
       h.onmouseenter = () => hlPoints(all.map(x => x.id)); h.onmouseleave = () => hlPoints([]);
       box.dataset.g = g; box.appendChild(h);
@@ -933,6 +933,9 @@ footer b { color: var(--fg); font-weight: 600; }
     const sg = (set.indicators.find(v => v.id === id) || {}).group, gm = set.indicators.filter(v => v.group === sg);
     if (sel === "g:" + sg && gm.length > 1 && picked.size === gm.length && gm.every(v => picked.has(v.id))) {
       picked.clear(); picked.add(id); sel = id; setTab("ts"); update(); return; }
+    // toinen ryhma kokonaan valittuna: toisen ryhman sarjan klikkaus aloittaa uuden valinnan
+    if (sel && sel.startsWith("g:") && sel !== "g:" + sg && !picked.has(id)) { const og = set.indicators.filter(v => "g:" + v.group === sel);
+      if (og.length && og.every(v => picked.has(v.id)) && picked.size === og.length) { picked.clear(); picked.add(id); sel = id; setTab("ts"); update(); return; } }
     if (picked.has(id)) { picked.delete(id);
       if (sel && sel.startsWith("g:")) { if (![...picked].some(x => "g:" + (set.indicators.find(v => v.id === x) || {}).group === sel)) sel = [...picked].pop() || null; }   // ryhma pysyy kohteena, kun sen sarjoja on valittuna
       else if (sel === id) sel = [...picked].pop() || null; }
