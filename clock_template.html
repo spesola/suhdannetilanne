@@ -713,7 +713,7 @@ footer b { color: var(--fg); font-weight: 600; }
     items.forEach(({ s, col }) => {
       const p = at(s, idx); if (!p) return;
       // vari: vaihevari, paitsi valintatilassa valitsemattomat neutraalin harmaina; yksittaisen valitun polku sen vaihevarilla
-      const single = picked.size <= 1 && !(sel && sel.startsWith("g:"));
+      const single = picked.size <= 4 && !(sel && sel.startsWith("g:"));   // yksitellen valitut (enintaan 4): kullekin oma polku; koko ryhma vain Kulku-kytkimella
       if (!s.comp) col = !selMode || hi(s) ? qcol(quad(p.l, p.c)) : "#c4c9d0";
       const tailCol = s.comp ? col : hi(s) && single ? col : "var(--muted)";
       const off = qf && (quad(p.l, p.c) !== qf || (!s.comp && !s.isGroup && !s.in_composite)) && !hi(s);
