@@ -251,6 +251,56 @@
     },
     {
       "id": "bkt",
+      "kpis": [
+        {
+          "label": "BKT, v/v",
+          "series": "bkt_yy",
+          "dec": 1,
+          "unit": "%",
+          "sign": true,
+          "cmp": {
+            "kind": "series",
+            "series": "bkt_qq",
+            "label": "q/q",
+            "unit": "%"
+          }
+        },
+        {
+          "label": "Työttömyysaste",
+          "series": "tm_tyottom",
+          "dec": 1,
+          "unit": "%",
+          "cmp": {
+            "kind": "diff",
+            "label": "vuodessa",
+            "unit": "%-yks."
+          }
+        },
+        {
+          "label": "Inflaatio (HICP), v/v",
+          "series": "inflaatio_yy",
+          "dec": 1,
+          "unit": "%",
+          "cmp": {
+            "kind": "diff",
+            "label": "vuodessa",
+            "unit": "%-yks."
+          }
+        },
+        {
+          "label": "Ansiotaso, v/v",
+          "series": "palkat_yy",
+          "dec": 1,
+          "unit": "%",
+          "sign": true,
+          "cmp": {
+            "kind": "series",
+            "series": "reaalipalkat_yy",
+            "label": "reaaliansiot",
+            "unit": "%"
+          }
+        }
+      ],
       "label": "Reaalitalous",
       "freq": "Q",
       "default": false,
@@ -913,6 +963,53 @@
     },
     {
       "id": "rahoitus",
+      "kpis": [
+        {
+          "label": "EKP:n talletuskorko",
+          "series": "dfr",
+          "row": "dfr_d",
+          "dec": 2,
+          "unit": "%",
+          "cmp": {
+            "kind": "kp",
+            "label": "vuodessa"
+          }
+        },
+        {
+          "label": "10 v korko, euroalue",
+          "series": "h_y10_ea",
+          "row": "y10_ea",
+          "dec": 2,
+          "unit": "%",
+          "cmp": {
+            "kind": "kp",
+            "label": "vuodessa"
+          }
+        },
+        {
+          "label": "EUR/USD",
+          "series": "h_eurusd",
+          "row": "eurusd",
+          "dec": 3,
+          "unit": "",
+          "cmp": {
+            "kind": "pct",
+            "label": "vuodessa"
+          }
+        },
+        {
+          "label": "M2 euroalueella, v/v",
+          "series": "ea_m2",
+          "dec": 1,
+          "unit": "%",
+          "sign": true,
+          "cmp": {
+            "kind": "yago",
+            "label": "vuosi sitten",
+            "unit": "%"
+          }
+        }
+      ],
       "label": "Rahoitusmarkkinat",
       "freq": "M",
       "default": false,

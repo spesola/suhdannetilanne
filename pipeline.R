@@ -507,7 +507,7 @@ for (set in cfg$sets) {
       list(id = paste0("h_", id), label = ser_cfg(id)$label, last = d$date[nrow(d)], values = r3(d$value[match(periods, d$date)])) })
     sets_out[[length(sets_out) + 1]] <- list(
       id = set$id, label = set$label, freq = freq, default = isTRUE(set$default), view = "charts",
-      from = from_y, periods = periods, charts = charts_out, colors = set$colors, tiles = unname(tiles), summary = set$summary,
+      from = from_y, periods = periods, charts = charts_out, colors = set$colors, tiles = unname(tiles), summary = set$summary, kpis = set$kpis,
       series = c(unname(lapply(members, function(s) { r <- raws[[s$id]]
         list(id = s$id, label = s$label, last = r$date[nrow(r)], values = r3(r$value[match(periods, r$date)])) })), hist))
     next
@@ -575,7 +575,7 @@ for (set in cfg$sets) {
     sets_out[[length(sets_out) + 1]] <- list(
       id = set$id, label = set$label, freq = freq, default = isTRUE(set$default), view = "charts",
       from = from_y, periods = periods, charts = set$charts, colors = set$colors,
-      growth = unname(rows), tabs = set$tabs,   # kasvunakyma: taulukko ja kuviot (ei karttaa), alavalilehdet
+      growth = unname(rows), tabs = set$tabs, kpis = set$kpis,   # kasvunakyma: taulukko ja kuviot (ei karttaa), alavalilehdet
       series = unname(lapply(ser, function(x) { r <- raws[[x$id]]
         list(id = x$id, label = x$label, last = r$date[max(which(!is.na(r$value)))], values = r3(r$value[match(periods, r$date)])) })))
     next

@@ -57,6 +57,26 @@ body { font-variant-numeric: tabular-nums; background: var(--bg); min-height: 10
 .hlead .hd { font-size: 0.88rem; margin: 0; }
 .hlead .hd b { font-weight: 600; color: var(--fg); }
 @media (max-width: 860px) { .hero { grid-template-columns: minmax(0, 1fr); } }
+/* avainluvut (reaalitalous, rahoitus) */
+.hero.haskpi { display: block; }
+.hero:not(.haskpi) .kpirow { display: none; }
+.kpirow { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); border-top: 1px solid var(--line); border-bottom: 1px solid var(--line); }
+.kpi { min-width: 0; padding: 18px 24px 14px; border-left: 1px solid var(--line); }
+.kpi:first-child { border-left: 0; padding-left: 0; }
+.kpih { display: flex; justify-content: space-between; align-items: baseline; gap: 10px; }
+.kpil { font-size: 0.88rem; font-weight: 500; color: var(--fg); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.kpip { font-size: 0.76rem; color: var(--muted); white-space: nowrap; font-variant-numeric: tabular-nums; }
+.kpiv { font-size: 1.45rem; letter-spacing: -0.01em; line-height: 1.2; margin-top: 10px; font-variant-numeric: tabular-nums; }
+.kpic { font-size: 0.76rem; color: var(--muted); margin-top: 3px; min-height: 1.2em; }
+.kpic b { color: var(--fg); font-weight: 500; white-space: nowrap; }
+.kpi svg { display: block; width: 100%; height: 72px; margin-top: 12px; }
+.kpiy { display: flex; justify-content: space-between; font-size: 0.72rem; color: var(--muted); margin-top: 5px; font-variant-numeric: tabular-nums; }
+.hero.haskpi .hsum { margin-top: 14px; }
+@media (max-width: 860px) {
+  .kpirow { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .kpi { padding: 16px 0 12px 16px; } .kpi:nth-child(odd) { border-left: 0; padding-left: 0; } .kpi:nth-child(n + 3) { border-top: 1px solid var(--line); }
+  .kpih { flex-direction: column; gap: 2px; } .kpiv { font-size: 1.25rem; } .kpi svg { height: 52px; }
+}
 .brand h1 { font: inherit; font-weight: 600; font-size: 1.02rem; letter-spacing: -0.01em; margin: 0; }
 .hsum { display: flex; flex-direction: column; gap: 12px; }
 #summary { display: flex; flex-direction: column; gap: 8px; }
@@ -472,6 +492,7 @@ footer b { color: var(--fg); font-weight: 600; }
 
   <section class="hero">
     <div class="hlead" id="hlead"></div>
+    <div class="kpirow" id="kpiRow"></div>
     <div class="hsum"><div id="summary"></div><p class="upd" id="sub"></p></div>
   </section>
 
@@ -1080,7 +1101,8 @@ footer b { color: var(--fg); font-weight: 600; }
     $("growthSec").hidden = !(charts && set.growth); $("grMore").hidden = true;
     $("finSum").hidden = !(charts && set.summary && set.summary.length);
     $("charts").hidden = !charts || !!set.growth;
-    if (charts) { renderTiles(); if (set.growth) renderGrowth(); if (set.summary) renderSummary(); drawCharts(); return; }
+    if (charts) { renderTiles(); if (set.growth) renderGrowth(); if (set.summary) renderSummary(); renderKpis(); drawCharts(); return; }
+    renderKpis();
     renderTS(); renderHM();
   }
 
@@ -1129,6 +1151,36 @@ footer b { color: var(--fg); font-weight: 600; }
     renderGKpi();
   }
 
+  // avainluvut sivun ylaosaan (series.json: kpis): luku, vertailu, viiden vuoden viiva; markkinaluvut paivatasolla taulukon rivilta
+  function renderKpis() {
+    const hero = document.querySelector("section.hero"), K = set.kpis || [];
+    hero.classList.toggle("haskpi", !!K.length); if (!K.length) { $("kpiRow").innerHTML = ""; return; }
+    $("summary").innerHTML = ""; $("hlead").innerHTML = "";
+    const lag = set.freq === "M" ? 12 : 4, win = set.freq === "M" ? 60 : 20, P = set.periods;
+    const rowOf = id => { for (const c of set.charts || []) for (const r of c.rows || []) if (r.id === id) return r; return null; };
+    const sg = (v, d) => (+v.toFixed(d) > 0 ? "+" : "") + fmtV(v, d);
+    const u = x => x ? (x === "%" ? " %" : " " + x) : "";
+    $("kpiRow").innerHTML = K.map(t => {
+      const s = set.series.find(x => x.id === t.series); if (!s) return "";
+      const v = s.values, k = lastNN(v), r = t.row ? rowOf(t.row) : null;
+      const val = r && r.last != null ? r.last : v[k];
+      const km = r ? Math.max(0, P.indexOf(r.date.slice(0, 7))) || k : k, kb = km - lag, base = kb >= 0 ? v[kb] : null;
+      const c = t.cmp || {}; let ct = "";
+      if (c.kind === "series") { const o = set.series.find(x => x.id === c.series); const ov = o ? o.values[k] : null; if (ov != null) ct = `${c.label} <b>${sg(ov, 1)}${u(c.unit)}</b>`; }
+      else if (base != null && c.kind === "diff") ct = `${c.label} <b>${sg(val - base, 1)}${u(c.unit)}</b>`;
+      else if (base != null && c.kind === "kp") ct = `${c.label} <b>${sg((val - base) * 100, 0)} kp</b>`;
+      else if (base != null && c.kind === "pct") ct = `${c.label} <b>${sg(100 * (val / base - 1), 1)} %</b>`;
+      else if (base != null && c.kind === "yago") ct = `${c.label} <b>${sg(base, 1)}${u(c.unit)}</b>`;
+      const a = v.slice(Math.max(0, k - win + 1), k + 1), f0 = Math.max(0, k - win + 1);
+      const nn = a.filter(x => x != null); let lo = Math.min(...nn), hi = Math.max(...nn); const pad = (hi - lo) * 0.1 || 1; lo -= pad; hi += pad;
+      const W = 240, H = 72, n = a.length, xs = i => i * W / (n - 1), ys = y => H - (y - lo) / (hi - lo) * H;
+      const pts = a.map((y, i) => y == null ? null : [xs(i).toFixed(1), ys(y).toFixed(1)]).filter(Boolean);
+      const d = pts.map((q, i) => `${i ? "L" : "M"}${q[0]} ${q[1]}`).join("");
+      const svg = pts.length > 1 ? `<svg viewBox="0 0 ${W} ${H}" preserveAspectRatio="none" aria-hidden="true"><path d="${d}L${pts[pts.length - 1][0]} ${H}L${pts[0][0]} ${H}Z" fill="var(--accent)" fill-opacity=".07"/><path d="${d}" fill="none" stroke="var(--accent)" stroke-width="1.4" stroke-linejoin="round" vector-effect="non-scaling-stroke"/></svg>` : "";
+      const vt = (t.sign ? sg(val, t.dec) : fmtV(val, t.dec)) + u(t.unit);
+      return `<div class="kpi"><div class="kpih"><span class="kpil">${t.label}</span><span class="kpip">${r ? fmtDay(r.date) : fmtP(P[k])}</span></div>
+        <div class="kpiv">${vt}</div><div class="kpic">${ct}</div>${svg}<div class="kpiy"><span>${P[f0].slice(0, 4)}</span><span>${P[k].slice(0, 4)}</span></div></div>`; }).join("");
+  }
   function renderGKpi() {                                               // ylaosan tunnusluku: BKT v/v ja q/q
     const sy = set.series.find(x => x.id === "bkt_yy"), sq = set.series.find(x => x.id === "bkt_qq"); if (!sy) { $("summary").innerHTML = ""; return; }
     const j = lastNN(sy.values), sg1 = v => v == null ? "–" : (+v.toFixed(1) > 0 ? "+" : "") + fmtV(v, 1) + " %";
