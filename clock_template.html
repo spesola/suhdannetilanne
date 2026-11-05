@@ -217,6 +217,8 @@ body { font-variant-numeric: tabular-nums; background: var(--bg); min-height: 10
 /* valitun sarjan aikasarjat listan alla oikeassa sarakkeessa, kartta pysyy kiinni vieressa */
 .tsside { margin-top: 40px; }
 .grrow.noside { grid-template-columns: minmax(0, 1fr) !important; }
+.grrow.noside.pair { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) !important; }
+@media (max-width: 860px) { .grrow.noside.pair { grid-template-columns: minmax(0, 1fr) !important; } }
 .tsside .tsgrid, .tsside .tsgrid.solo { grid-template-columns: minmax(0, 1fr); gap: 40px; }
 .tsside .tsmain, .tsside #tsContrib .card { border-top: 1px solid var(--rule); padding-top: 14px; }
 .tsside #tsContrib .card > .more { top: 10px; }
@@ -1564,6 +1566,10 @@ footer b { color: var(--fg); font-weight: 600; }
     $("grSide").innerHTML = ""; colMainH = null; renderCharts($("grCharts"));
     const gr = $("grSide").parentElement, ns = !$("grSide").children.length;   // ei erittelya: paakuvio koko leveydelle (1:1, piirretaan uudelleen)
     if (ns !== gr.classList.contains("noside")) { gr.classList.toggle("noside", ns); $("grSide").innerHTML = ""; renderCharts($("grCharts")); }
+    // ei erittelya mutta lisakuvioita: paakuvio ja ensimmainen lisakuvio rinnakkain puolikkaina
+    const hasMore = () => !!$("grMoreGrid").querySelector(":scope > .fcard"), pr = ns && hasMore();
+    if (pr !== gr.classList.contains("pair")) { gr.classList.toggle("pair", pr); $("grSide").innerHTML = ""; renderCharts($("grCharts")); }
+    if (pr && hasMore()) { $("grSide").appendChild($("grMoreGrid").querySelector(":scope > .fcard")); pairRows($("grMoreGrid")); $("grMore").hidden = !hasMore(); }
     if (false && two && lastMainH) {
       const diff = $("growthSec").querySelector(".grleft").offsetHeight - $("grCharts").offsetHeight;
       if (Math.abs(diff) > 1) { colMainH = Math.max(lastLower ? 200 : 190, Math.min(560, lastMainH + diff)); $("grSide").innerHTML = ""; renderCharts($("grCharts")); colMainH = null; }
