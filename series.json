@@ -661,6 +661,17 @@
                 "ylab": "Avoimien työpaikkojen aste, %",
                 "dec": 1,
                 "note": "Kausitasoitettu. Lähde: Tilastokeskus."
+              },
+              {
+                "title": "Sahmin sääntö, Suomi",
+                "lines": [
+                  "tm_sahm"
+                ],
+                "lineColor": "var(--q-down)",
+                "unit": "%-yks.",
+                "dec": 2,
+                "ref": 0.5,
+                "note": "Työttömyysasteen 3 kk keskiarvo miinus edeltävän 12 kk minimi, neljänneksen viimeinen kuukausi. Lähde: Tilastokeskus."
               }
             ],
             "bkt": [
@@ -1500,6 +1511,32 @@
             "epu"
           ],
           "note": "Lähde: Baker, Bloom ja Davis, FRED.",
+          "section": "Riskit ja epävarmuus",
+          "size": "half"
+        },
+        {
+          "id": "tpu",
+          "title": "Kauppapoliittinen epävarmuus",
+          "unit": "",
+          "dec": 0,
+          "lines": [
+            "tpu"
+          ],
+          "from": 2000,
+          "note": "Uutisiin perustuva indeksi (Yhdysvallat). Lähde: Caldara, Iacoviello ym.",
+          "section": "Riskit ja epävarmuus",
+          "size": "half"
+        },
+        {
+          "id": "cugold",
+          "title": "Kuparin ja kullan hintasuhde",
+          "unit": "",
+          "dec": 2,
+          "lines": [
+            "cugold"
+          ],
+          "from": 2000,
+          "note": "Kupari $/t jaettuna kullalla $/unssi. Lähde: Maailmanpankki (Pink Sheet), CC BY 4.0.",
           "section": "Riskit ja epävarmuus",
           "size": "half"
         }
@@ -3353,6 +3390,20 @@
       "kind": "level"
     },
     {
+      "set": "rahoitus",
+      "id": "tpu",
+      "label": "Kauppapoliittinen epävarmuus",
+      "source": "xlsx",
+      "src_key": "tpu",
+      "url": "https://www.matteoiacoviello.com/tpu_files/tpu_web_latest.xlsx",
+      "sheet": "TPU_MONTHLY",
+      "date_col": "DATE",
+      "value_col": "TPU",
+      "handling": "none",
+      "kind": "level",
+      "optional": true
+    },
+    {
       "id": "fwd1y",
       "label": "Markkinakorko 1 v päästä",
       "set": "rahoitus",
@@ -3833,6 +3884,20 @@
       "handling": "none",
       "kind": "level",
       "table_only": true
+    },
+    {
+      "id": "cugold",
+      "label": "Kupari / kulta",
+      "set": "rahoitus",
+      "source": "wb",
+      "series": "Copper",
+      "per": {
+        "source": "wb",
+        "series": "Gold"
+      },
+      "handling": "none",
+      "kind": "level",
+      "optional": true
     },
     {
       "id": "wb_silver",
@@ -4747,6 +4812,20 @@
         "to_quarter": true,
         "stl": true
       }
+    },
+    {
+      "id": "tm_sahm",
+      "label": "Sahmin sääntö",
+      "set": "bkt",
+      "chart_only": true,
+      "source": "statfin",
+      "table": "tyti/135z.px",
+      "pick": {
+        "contentscode": "Tyottaste_kausi"
+      },
+      "sahm": true,
+      "to_quarter": "last",
+      "optional": true
     },
     {
       "id": "x_gdp_fi",

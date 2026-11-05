@@ -1747,7 +1747,7 @@ footer b { color: var(--fg); font-weight: 600; }
       const pb = LW ? mt + (H2 - mt - mb) * 0.66 : H2 - mb;               // paakuvion alareuna; alle jaa alapaneeli
       const S = (c.stack || []).map(id => ser(id).values.slice(i0));
       const sums = S.length ? P.map((_, i) => [S.reduce((a, s) => a + Math.min(0, s[i] || 0), 0), S.reduce((a, s) => a + Math.max(0, s[i] || 0), 0)]) : [];
-      const all = [...L.filter((_, k) => !isY2(k)).flat(), ...(B || []), ...sums.flat()].filter(v => v != null);
+      const all = [...L.filter((_, k) => !isY2(k)).flat(), ...(B || []), ...sums.flat(), ...(c.ref != null ? [c.ref] : [])].filter(v => v != null);   // ref: kynnysviiva asteikkoon
       let lo = Math.min(...all, B || S.length ? 0 : Infinity), hi = Math.max(...all);
       const step = niceStep(hi - lo); lo = Math.floor(lo / step) * step; hi = Math.ceil(hi / step) * step;
       const xs = i => ml + i * (W2 - ml - mr) / (n - 1), ys = v => mt + (hi - v) / (hi - lo) * (pb - mt);
@@ -1763,6 +1763,10 @@ footer b { color: var(--fg); font-weight: 600; }
         el("line", { x1: ml, x2: W2 - mr, y1: ys(vv), y2: ys(vv), stroke: Math.abs(vv) < 1e-9 && (B || S.length || lo < 0) ? "var(--muted)" : "var(--grid)", "stroke-width": 1 }, svg);
         el("text", { x: ml - 6, y: ys(vv) + 4, "text-anchor": "end", "font-size": fs, fill: "var(--muted)" }, svg).textContent =
           c.ts && !c.rawv && !c.lvl && Number.isInteger(vv) ? tick(vv) : fmtV(vv, stepDec(step));
+      }
+      if (c.ref != null) {                                                // kynnysviiva (esim. Sahmin saanto 0,5)
+        el("line", { x1: ml, x2: W2 - mr, y1: ys(c.ref), y2: ys(c.ref), stroke: "var(--fg)", "stroke-opacity": 0.55, "stroke-dasharray": "4 3", "stroke-width": 1 }, svg);
+        el("text", { x: W2 - mr - 4, y: ys(c.ref) - 5, "text-anchor": "end", "font-size": fs, fill: "var(--muted)", stroke: "var(--surface)", "stroke-width": 3, "paint-order": "stroke" }, svg).textContent = `kynnys ${fmtV(c.ref, 1)}`;
       }
       let yl = null;
       if (LW) {                                                           // alapaneeli: palkit omalla asteikolla

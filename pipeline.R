@@ -157,6 +157,16 @@ fetch_wb <- function(s) {
   data.frame(date = sub("M", "-", x[[1]][rows]), value = suppressWarnings(as.numeric(x[[col]][rows])))
 }
 
+# Excel-tiedosto verkosta (esim. Caldara ym. kauppapoliittisen epavarmuuden indeksi): valilehti, paivays- ja arvosarake
+fetch_xlsx <- function(s) {
+  f <- tempfile(fileext = ".xlsx"); r <- RETRY("GET", s$url, write_disk(f, overwrite = TRUE), timeout(120), times = 3, quiet = TRUE)
+  stop_for_status(r)
+  x <- as.data.frame(readxl::read_excel(f, sheet = s$sheet))
+  d <- as.Date(x[[s$date_col]]); v <- suppressWarnings(as.numeric(x[[s$value_col]]))
+  ok <- !is.na(d) & !is.na(v)
+  data.frame(date = format(d[ok], "%Y-%m"), value = v[ok])
+}
+
 fetch_fred <- function(s) {
   d <- read.csv(text = get_text(paste0(FRED, s$fred_id)))
   data.frame(date = substr(d[[1]], 1, if (isTRUE(s$daily)) 10 else 7), value = suppressWarnings(as.numeric(d[[2]])))
@@ -293,7 +303,7 @@ fetch_splice <- function(s) {
 }
 
 fetch_series <- function(s) {
-  f <- switch(s$source, statfin = fetch_statfin, splice = fetch_splice, eurostat = fetch_eurostat, hicp_ctrb = fetch_hicp_ctrb, ntp_ctrb = fetch_ntp_ctrb, hhi_ctrb = fetch_hhi_ctrb, khi_ctrb = fetch_khi_ctrb, gdp_np = fetch_gdp_np,
+  f <- switch(s$source, statfin = fetch_statfin, splice = fetch_splice, eurostat = fetch_eurostat, hicp_ctrb = fetch_hicp_ctrb, ntp_ctrb = fetch_ntp_ctrb, hhi_ctrb = fetch_hhi_ctrb, khi_ctrb = fetch_khi_ctrb, xlsx = fetch_xlsx, gdp_np = fetch_gdp_np,
               ecb = fetch_ecb, fred = fetch_fred, bof = fetch_bof, wb = fetch_wb, stop("Tuntematon lahde ", s$source))
   # valimuisti: onnistunut haku tallennetaan, epaonnistuessa kaytetaan edellista hakua
   cache <- file.path(CACHE_DIR, paste0(s$id, ".csv"))
@@ -309,9 +319,13 @@ fetch_series <- function(s) {
     if (difftime(Sys.time(), t0, units = "days") > STALE_DAYS) STALE_OLD <<- c(STALE_OLD, s$id)
     read.csv(cache, colClasses = c("character", "numeric"))
   })
-  if (isTRUE(s$to_quarter) || identical(s$to_quarter, "sum")) {   # kuukausisarja -> neljannes (keskiarvo tai "sum"), vain taydet neljannekset
+  if (isTRUE(s$sahm)) {                            # Sahmin saanto: 3 kk keskiarvo miinus sen minimi edeltavalta 12 kk:lta (%-yks.)
+    d <- d[order(d$date), ]; m3 <- as.numeric(stats::filter(d$value, rep(1 / 3, 3), sides = 1))
+    mn <- vapply(seq_along(m3), function(i) if (i <= 12) NA_real_ else suppressWarnings(min(m3[(i - 12):(i - 1)], na.rm = TRUE)), 0)
+    d$value <- m3 - ifelse(is.finite(mn), mn, NA) }
+  if (isTRUE(s$to_quarter) || identical(s$to_quarter, "sum") || identical(s$to_quarter, "last")) {   # kuukausisarja -> neljannes (keskiarvo tai "sum"), vain taydet neljannekset
     q <- sprintf("%s-Q%d", substr(d$date, 1, 4), (as.integer(substr(d$date, 6, 7)) - 1) %/% 3 + 1)
-    agg <- if (identical(s$to_quarter, "sum")) sum else mean
+    agg <- if (identical(s$to_quarter, "sum")) sum else if (identical(s$to_quarter, "last")) function(v) v[3] else mean
     a <- tapply(d$value, q, function(v) if (sum(!is.na(v)) == 3) agg(v) else NA)
     d <- data.frame(date = names(a), value = as.numeric(a))
   }
@@ -450,6 +464,11 @@ sets_out <- list()
 # kuukausisarjoille vain muutos vuoden alusta (edellisen vuoden joulukuusta)
 # ---------------------------------------------------------------------
 TABLE_START <- format(Sys.Date() - 430, "%Y-%m-%d")    # paivasarjoista haetaan vain runsas vuosi
+# valinnaiset sarjat (optional): jos lahde ei vastaa eika valimuistia ole, sarja jatetaan pois (kuvio piirretaan ilman sita)
+for (k in rev(seq_along(cfg$series))) { s <- cfg$series[[k]]
+  if (isTRUE(s$optional) && !isFALSE(s$enabled) && !file.exists(file.path(CACHE_DIR, paste0(s$id, ".csv")))) {
+    ok <- tryCatch({ fetch_series(s); TRUE }, error = function(e) { message("  VAROITUS ", s$id, " ohitetaan: ", conditionMessage(e)); FALSE })
+    if (!ok) { cfg$series[[k]] <- NULL; CHECKS <- c(CHECKS, paste("valinnainen sarja puuttuu:", s$id)) } } }
 ser_cfg <- function(id) { x <- Filter(function(s) identical(s$id, id), cfg$series); if (!length(x)) stop("Sarjaa ei loydy: ", id); x[[1]] }
 .tbl_memo <- new.env()
 get_any <- function(id, raws) {
@@ -729,6 +748,7 @@ SRC_NAMES <- list(
                   CISS = "rahoitusstressi", CLIFS = "rahoitusstressi", BLS = "pankkien luotonantokysely", SPF = "ammattiennustajien kysely",
                   ILM = "Eurojärjestelmän viikkotase", BSI = "rahan määrä ja luotonanto"),
   wb       = list(.n = "Maailmanpankki", .all = "raaka-aineiden hinnat, Pink Sheet"),
+  xlsx     = list(.n = "Caldara, Iacoviello ym.", tpu = "kauppapoliittisen epävarmuuden indeksi"),
   fred     = list(.n = "FRED", EUEPUINDXM = "talouspoliittisen epävarmuuden indeksi", GS10 = "Yhdysvaltain korot © OECD",
                   FEDFUNDS = "Yhdysvaltain korot © OECD", IRLTLT01JPM156N = "Japanin korot © OECD", IRSTCI01JPM156N = "Japanin korot © OECD",
                   DCOILBRENTEU = "Brent ja WTI © EIA", DCOILWTICO = "Brent ja WTI © EIA"))
@@ -749,6 +769,7 @@ src_walk <- function(x) {
     else if (sc == "ntp_ctrb") src_add("statfin", "ntp")
     else if (sc == "hhi_ctrb") src_add("statfin", "ntp")
     else if (sc == "khi_ctrb") src_add("statfin", "khi")
+    else if (sc == "xlsx") src_add("xlsx", x$src_key)
     else if (sc == "gdp_np") src_add("statfin", "ntp")
     else if (sc == "hicp_ctrb") { src_add("eurostat", "prc_hicp_minr"); src_add("eurostat", "prc_hicp_iw") }
   } else if (!is.null(x$table)) src_add("statfin", sub("/.*", "", x$table))   # splice-osat
