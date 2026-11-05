@@ -661,17 +661,6 @@
                 "ylab": "Avoimien työpaikkojen aste, %",
                 "dec": 1,
                 "note": "Kausitasoitettu. Lähde: Tilastokeskus."
-              },
-              {
-                "title": "Sahmin sääntö, Suomi",
-                "lines": [
-                  "tm_sahm"
-                ],
-                "lineColor": "var(--q-down)",
-                "unit": "%-yks.",
-                "dec": 2,
-                "ref": 0.5,
-                "note": "Työttömyysasteen 3 kk keskiarvo miinus edeltävän 12 kk minimi, neljänneksen viimeinen kuukausi. Lähde: Tilastokeskus."
               }
             ],
             "bkt": [
@@ -4812,20 +4801,6 @@
         "to_quarter": true,
         "stl": true
       }
-    },
-    {
-      "id": "tm_sahm",
-      "label": "Sahmin sääntö",
-      "set": "bkt",
-      "chart_only": true,
-      "source": "statfin",
-      "table": "tyti/135z.px",
-      "pick": {
-        "contentscode": "Tyottaste_kausi"
-      },
-      "sahm": true,
-      "to_quarter": "last",
-      "optional": true
     },
     {
       "id": "x_gdp_fi",
