@@ -83,8 +83,10 @@ body { font-variant-numeric: tabular-nums; background: var(--bg); min-height: 10
 #summary:empty { display: none; }
 .upd { font-size: 0.76rem; color: var(--muted); margin: 0; }
 .shead { display: flex; justify-content: space-between; gap: 8px; font-size: 0.76rem; color: var(--muted); }
-.sbar { display: flex; gap: 2px; height: 8px; }
-.sbar button { flex-basis: 0; min-width: 4px; border: 0; padding: 0; border-radius: 1px; background: var(--qc); cursor: pointer; }
+/* vaihepalkki neliöinä: yksi neliö per sarja, vaiheet ryhminä; kapealla neliöt kutistuvat, rivi ei katkea */
+.sbar { display: flex; gap: 12px; margin: 2px 0; }
+.sbar button { display: flex; gap: 4px; flex: 0 1 calc(var(--n) * 20px + (var(--n) - 1) * 4px); min-width: 0; border: 0; padding: 0; background: none; cursor: pointer; border-radius: 3px; }
+.sbar i { flex: 1 1 0; min-width: 0; max-width: 20px; aspect-ratio: 1; border-radius: 3px; background: var(--qc); }
 .sbar.f button:not(.on) { opacity: .25; }
 .slegend { display: flex; flex-wrap: wrap; gap: 4px 18px; }
 .sl { display: flex; align-items: center; gap: 7px; font: inherit; font-size: 0.82rem; color: var(--fg); background: none; border: 0; padding: 2px 0; cursor: pointer; text-align: left; }
@@ -812,7 +814,7 @@ footer b { color: var(--fg); font-weight: 600; }
         `<p class="hd">Taso <b>${fmtN(cp.l)}</b> ja muutos <b>${fmtN(cp.c)}</b>. ${k === cp.i ? `${PH[q]} ${fmtP(set.periods[cp.i])}` : `${PH[q]} ${since}`} (alustava).</p>`;
     } else $("hlead").innerHTML = "";
     $("summary").innerHTML = `<div class="shead"><span>Kokonaisindikaattorin ${n} sarjaa vaiheittain</span></div>` +
-      `<div class="sbar${qf ? " f" : ""}">${QORDER.filter(q => counts[q]).map(q => `<button type="button" data-q="${q}" class="${qf === q ? "on" : ""}" style="--qc:${qcol(q)};flex-grow:${counts[q]}" title="${Q[q].name}: ${counts[q]}" aria-label="${Q[q].name}: ${counts[q]}"></button>`).join("")}</div>` +
+      `<div class="sbar${qf ? " f" : ""}">${QORDER.filter(q => counts[q]).map(q => `<button type="button" data-q="${q}" class="${qf === q ? "on" : ""}" style="--qc:${qcol(q)};--n:${counts[q]}" title="${Q[q].name}: ${counts[q]}" aria-label="${Q[q].name}: ${counts[q]}">${"<i></i>".repeat(counts[q])}</button>`).join("")}</div>` +   // yksi neliö = yksi sarja
       `<div class="slegend">${QORDER.map(q => `<button type="button" class="sl${qf && qf !== q ? " dim" : ""}" data-q="${q}" aria-pressed="${qf === q}" style="--qc:${qcol(q)}" title="Näytä vain: ${Q[q].name.toLowerCase()}"><i></i><span>${Q[q].short}</span><b>${counts[q]}</b></button>`).join("")}</div>`;
     $("summary").querySelectorAll("[data-q]").forEach(b => b.onclick = () => { qf = qf === b.dataset.q ? null : b.dataset.q; update(); });
     const pass = s => { if (!qf) return true; if (!s.comp && !s.in_composite) return false; const p = at(s, idx); return !!p && quad(p.l, p.c) === qf; };
