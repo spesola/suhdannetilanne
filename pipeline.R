@@ -259,6 +259,24 @@ fetch_gdp_np <- function(s) {
 
 # saumaus: sama sarja useasta taulusta (esim. perusvuoden vaihtuessa), osat jarjestyksessa, myohempi osa voittaa
 # osan from/to rajaa jakson ("YYYY-MM"); tarkoitettu tasosarjoille kuten lukumaarille, ei indekseille
+# kuluttajahintaindeksin (KHI) vuosimuutoksen vaikutukset (%-yks.) hyodykeryhmittain: perusvuosi 2015 (arkisto, -2025M12)
+# ja 2025 (2026M01-) saumattuna; ryhma = hyodykkeiden vaikutusten summa etumerkein (terms), TOT = kokonaisindeksi
+.khi_memo <- new.env()
+fetch_khi_ctrb <- function(s) {
+  get1 <- function(code) {
+    if (is.null(.khi_memo[[code]])) {
+      old <- fetch_statfin(list(id = paste0("khi_old_", code), db = "StatFin_Passiivi", table = "khi/statfinpas_khi_pxt_11xb_2025m12.px",
+                                pick = list(`Hyödyke` = if (code == "TOT") "0" else code, Tiedot = "vuosivaikutus")))
+      new <- fetch_statfin(list(id = paste0("khi_new_", code), table = "khi/15b5.px",
+                                pick = list(coicop_46_20231201 = if (code == "TOT") "SSS" else code, contentscode = "vv_khi")))
+      old <- old[old$date <= "2025-12" & !is.na(old$value), ]; new <- new[new$date >= "2026-01" & !is.na(new$value), ]
+      .khi_memo[[code]] <- setNames(c(old$value, new$value), c(old$date, new$date)) }
+    .khi_memo[[code]] }
+  X <- lapply(names(s$terms), get1); dates <- Reduce(intersect, lapply(X, names))
+  v <- Reduce(`+`, Map(function(x, w) w * x[dates], X, unlist(s$terms)))
+  data.frame(date = dates, value = unname(v))[order(dates), ]
+}
+
 fetch_splice <- function(s) {
   parts <- lapply(seq_along(s$parts), function(k) { p <- modifyList(s$parts[[k]], list(id = paste0(s$id, "_osa", k)))
     x <- fetch_statfin(p)
@@ -274,7 +292,7 @@ fetch_splice <- function(s) {
 }
 
 fetch_series <- function(s) {
-  f <- switch(s$source, statfin = fetch_statfin, splice = fetch_splice, eurostat = fetch_eurostat, hicp_ctrb = fetch_hicp_ctrb, ntp_ctrb = fetch_ntp_ctrb, hhi_ctrb = fetch_hhi_ctrb, gdp_np = fetch_gdp_np,
+  f <- switch(s$source, statfin = fetch_statfin, splice = fetch_splice, eurostat = fetch_eurostat, hicp_ctrb = fetch_hicp_ctrb, ntp_ctrb = fetch_ntp_ctrb, hhi_ctrb = fetch_hhi_ctrb, khi_ctrb = fetch_khi_ctrb, gdp_np = fetch_gdp_np,
               ecb = fetch_ecb, fred = fetch_fred, bof = fetch_bof, wb = fetch_wb, stop("Tuntematon lahde ", s$source))
   # valimuisti: onnistunut haku tallennetaan, epaonnistuessa kaytetaan edellista hakua
   cache <- file.path(CACHE_DIR, paste0(s$id, ".csv"))
@@ -724,6 +742,7 @@ src_walk <- function(x) {
     else if (sc %in% c("bof", "wb")) src_add(sc, "")
     else if (sc == "ntp_ctrb") src_add("statfin", "ntp")
     else if (sc == "hhi_ctrb") src_add("statfin", "ntp")
+    else if (sc == "khi_ctrb") src_add("statfin", "khi")
     else if (sc == "gdp_np") src_add("statfin", "ntp")
     else if (sc == "hicp_ctrb") { src_add("eurostat", "prc_hicp_minr"); src_add("eurostat", "prc_hicp_iw") }
   } else if (!is.null(x$table)) src_add("statfin", sub("/.*", "", x$table))   # splice-osat

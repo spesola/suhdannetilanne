@@ -277,7 +277,7 @@
           }
         },
         {
-          "label": "Inflaatio (HICP), v/v",
+          "label": "Inflaatio (KHI), v/v",
           "series": "inflaatio_yy",
           "dec": 1,
           "unit": "%",
@@ -366,27 +366,28 @@
             },
             "inflaatio": {
               "title": "Inflaatio ja kontribuutiot",
-              "line": "ki_tot",
+              "line": "kk_tot",
               "stack": [
-                "ki_nrg",
-                "ki_food",
-                "ki_igd",
-                "ki_serv"
+                "kk_food",
+                "kk_nrg",
+                "kk_kor",
+                "kk_asu",
+                "kk_muut"
               ],
               "unit": "%",
               "stackUnit": "%-yks.",
               "dec": 1,
-              "note": "Lähteet: Tilastokeskus, Eurostat.",
+              "note": "Kontribuutiot kuluttajahintaindeksin (KHI) vuosimuutokseen. Lähde: Tilastokeskus.",
               "lines": [
-                "ki_ykhi",
-                "ki_khi"
+                "ki_khi",
+                "ki_ykhi"
               ],
               "dash": [
-                "ki_khi"
+                "ki_ykhi"
               ],
               "labels": {
-                "ki_ykhi": "YKHI",
-                "ki_khi": "KHI"
+                "ki_khi": "KHI",
+                "ki_ykhi": "YKHI"
               },
               "colors": {
                 "ki_ykhi": "var(--fg)",
@@ -3089,7 +3090,7 @@
     },
     {
       "id": "inflaatio",
-      "label": "Kuluttajahinnat (HICP)",
+      "label": "Kuluttajahinnat (KHI)",
       "set": "bkt",
       "group": "Hinnat ja palkat",
       "handling": "sa",
@@ -3098,10 +3099,10 @@
       "in_composite": false,
       "neutral": true,
       "source": "statfin",
-      "table": "khi/15b7.px",
+      "table": "khi/15b5.px",
       "pick": {
         "coicop_46_20231201": "SSS",
-        "contentscode": "ip_ykhi"
+        "contentscode": "ip_khi"
       },
       "to_quarter": true,
       "yy_raw": true
@@ -4107,7 +4108,8 @@
       "coicop18": "TOTAL",
       "to_quarter": true,
       "handling": "none",
-      "kind": "level"
+      "kind": "level",
+      "enabled": false
     },
     {
       "id": "ki_nrg",
@@ -4120,7 +4122,8 @@
       "coicop18": "NRG",
       "to_quarter": true,
       "handling": "none",
-      "kind": "level"
+      "kind": "level",
+      "enabled": false
     },
     {
       "id": "ki_food",
@@ -4133,7 +4136,8 @@
       "coicop18": "FOOD",
       "to_quarter": true,
       "handling": "none",
-      "kind": "level"
+      "kind": "level",
+      "enabled": false
     },
     {
       "id": "ki_igd",
@@ -4146,7 +4150,8 @@
       "coicop18": "IGD_NNRG",
       "to_quarter": true,
       "handling": "none",
-      "kind": "level"
+      "kind": "level",
+      "enabled": false
     },
     {
       "id": "ki_serv",
@@ -4157,6 +4162,105 @@
       "contrib_total": false,
       "source": "hicp_ctrb",
       "coicop18": "SERV",
+      "to_quarter": true,
+      "handling": "none",
+      "kind": "level",
+      "enabled": false
+    },
+    {
+      "id": "kk_tot",
+      "label": "KHI v/v",
+      "contrib_total": true,
+      "terms": {
+        "TOT": 1
+      },
+      "set": "bkt",
+      "contrib": true,
+      "contrib_group": "inflaatio",
+      "source": "khi_ctrb",
+      "to_quarter": true,
+      "handling": "none",
+      "kind": "level"
+    },
+    {
+      "id": "kk_food",
+      "label": "Ruoka ja alkoholijuomat",
+      "contrib_total": false,
+      "terms": {
+        "01": 1,
+        "02": 1
+      },
+      "set": "bkt",
+      "contrib": true,
+      "contrib_group": "inflaatio",
+      "source": "khi_ctrb",
+      "to_quarter": true,
+      "handling": "none",
+      "kind": "level"
+    },
+    {
+      "id": "kk_nrg",
+      "label": "Energia",
+      "contrib_total": false,
+      "terms": {
+        "045": 1,
+        "0722": 1
+      },
+      "set": "bkt",
+      "contrib": true,
+      "contrib_group": "inflaatio",
+      "source": "khi_ctrb",
+      "to_quarter": true,
+      "handling": "none",
+      "kind": "level"
+    },
+    {
+      "id": "kk_kor",
+      "label": "Asuntolainojen korot",
+      "contrib_total": false,
+      "terms": {
+        "0463": 1
+      },
+      "set": "bkt",
+      "contrib": true,
+      "contrib_group": "inflaatio",
+      "source": "khi_ctrb",
+      "to_quarter": true,
+      "handling": "none",
+      "kind": "level"
+    },
+    {
+      "id": "kk_asu",
+      "label": "Muu asuminen",
+      "contrib_total": false,
+      "terms": {
+        "04": 1,
+        "045": -1,
+        "0463": -1
+      },
+      "set": "bkt",
+      "contrib": true,
+      "contrib_group": "inflaatio",
+      "source": "khi_ctrb",
+      "to_quarter": true,
+      "handling": "none",
+      "kind": "level"
+    },
+    {
+      "id": "kk_muut",
+      "label": "Muut tavarat ja palvelut",
+      "contrib_total": false,
+      "terms": {
+        "TOT": 1,
+        "01": -1,
+        "02": -1,
+        "04": -1,
+        "0722": -1
+      },
+      "set": "bkt",
+      "contrib": true,
+      "contrib_group": "inflaatio",
+      "source": "khi_ctrb",
       "to_quarter": true,
       "handling": "none",
       "kind": "level"
