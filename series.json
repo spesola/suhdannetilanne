@@ -431,7 +431,7 @@
               "dec": 1
             },
             "__jb": {
-              "title": "Julkisyhteisöjen rahoitusjäämä, % BKT:stä",
+              "title": "Julkisyhteisöjen rahoitusasema, % BKT:stä",
               "line": "x_jb_s13",
               "stack": [
                 "x_jb_s1311",
@@ -1747,26 +1747,30 @@
       "charts": [
         {
           "id": "jt_b9",
-          "section": "Rahoitusjäämä",
-          "title": "Rahoitusjäämä alasektoreittain, % BKT:stä",
+          "section": "Rahoitusasema",
+          "title": "Rahoitusasema alasektoreittain, % BKT:stä",
           "unit": "%",
           "dec": 1,
           "lines": [
-            "jt_b9",
-            "jt_b9_val",
-            "jt_b9_pai",
-            "jt_b9_ssr"
+            "jt_b9"
           ],
           "connect": true,
           "from": 2000,
           "colors": {
-            "jt_b9": "var(--fg)",
-            "jt_b9_val": "var(--accent)",
-            "jt_b9_pai": "var(--q-turn)",
-            "jt_b9_ssr": "var(--g2)"
+            "jt_b9": "var(--fg)"
           },
           "note": "Neljän neljänneksen liukuva summa suhteessa BKT:hen. Paikallishallinto sisältää vuodesta 2023 hyvinvointialueet. Lähde: Tilastokeskus.",
-          "wide": true
+          "wide": true,
+          "stack": [
+            "jt_b9_val",
+            "jt_b9_pai",
+            "jt_b9_ssr"
+          ],
+          "barSpan": 3,
+          "stackUnit": "%",
+          "labels": {
+            "jt_b9": "Julkisyhteisöt yhteensä"
+          }
         },
         {
           "id": "jt_vero",
@@ -1880,7 +1884,7 @@
           "colors": {
             "jt_dd": "var(--fg)"
           },
-          "note": "Muutos vuodentakaisesta. Perusjäämä: rahoitusjäämä ilman korkomenoja (alijäämä kasvattaa velkaa). Kasvu: nimellisen BKT:n kasvun vaikutus. Muut erät: velan ja rahoitusjäämän täsmäytyserä, mm. työeläkelaitosten ylijäämän sijoitukset ja kassavarojen muutos. Lähde: Tilastokeskus, oma laskelma."
+          "note": "Muutos vuodentakaisesta. Perusjäämä: rahoitusasema ilman korkomenoja (alijäämä kasvattaa velkaa). Kasvu: nimellisen BKT:n kasvun vaikutus. Muut erät: velan ja rahoitusaseman täsmäytyserä, mm. työeläkelaitosten ylijäämän sijoitukset ja kassavarojen muutos. Lähde: Tilastokeskus, oma laskelma."
         },
         {
           "id": "jt_korko",

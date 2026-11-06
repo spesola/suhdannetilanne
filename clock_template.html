@@ -1899,8 +1899,10 @@ footer b { color: var(--fg); font-weight: 600; }
       const fP = c.qlab ? (p => "Q" + Math.ceil(+p.slice(5, 7) / 3) + "/" + p.slice(0, 4)) : fmtP;   // kuukausijaksoille neljanneksen merkintä
       const show = h => {
         const iDef = c.defIdx != null && c.defIdx - i0 >= 0 && L[0][Math.min(c.defIdx - i0, lastNN(L[0]))] != null ? Math.min(c.defIdx - i0, lastNN(L[0])) : null;
-        const i = h == null ? (iDef != null ? iDef : L.length > 1 && !B && !S.length ? Math.min(...L.map(lastNN)) : lastNN(B || L[0]))   // oletus: valittu tai viimeisin yhteinen jakso
+        let i = h == null ? (iDef != null ? iDef : L.length > 1 && !B && !S.length ? Math.min(...L.map(lastNN)) : lastNN(B || L[0]))   // oletus: valittu tai viimeisin yhteinen jakso
                          : Math.max(0, Math.min(n - 1, h - i0));
+        if (h != null) { const has = j => L.some(a => a[j] != null) || S.some(s => s[j] != null) || (B && B[j] != null);   // harva (nelj.) sarja: lahin aiempi havainto
+          let j = i; while (j > 0 && i - j < 2 && !has(j)) j--; if (has(j)) i = j; }
         cur.setAttribute("x1", xs(i)); cur.setAttribute("x2", xs(i));
         cur.setAttribute("stroke-dasharray", h == null ? "2 3" : "none"); cur.setAttribute("stroke", h == null ? "var(--muted)" : "var(--fg)"); cur.setAttribute("stroke-opacity", h == null ? 1 : 0.35);
         L.forEach((a, k) => { const ok = a[i] != null; dots[k].setAttribute("visibility", ok ? "visible" : "hidden");
@@ -1940,6 +1942,7 @@ footer b { color: var(--fg); font-weight: 600; }
         }
       };
       show(null); chartHooks.push(show);
+      if (subEl && !subEl.hidden) subEl.style.minHeight = subEl.offsetHeight + "px";   // alaotsikon rivimaaran vaihtelu ei heiluta kuviota
       if (S.length && erit) {                                             // valitun jakson erittely kuvion viereen tai alle
         const side = document.createElement("div"); side.className = "card fcard side";
         const su0 = c.stackUnit != null ? c.stackUnit : "%-yks.";
