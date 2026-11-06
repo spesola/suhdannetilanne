@@ -326,9 +326,10 @@ fetch_vk <- function(s) {
   d[order(d$date), ]
 }
 
-# summa useasta sarjasta (esim. sosiaaliturvarahastot = tyoelakelaitokset + muut)
+# summa useasta sarjasta (esim. sosiaaliturvarahastot = tyoelakelaitokset + muut; nettovelka = velat - varat)
 fetch_sum <- function(s) {
-  ds <- lapply(seq_along(s$parts), function(j) fetch_series(c(s$parts[[j]], list(id = paste0(s$id, "_p", j)))))
+  ds <- lapply(seq_along(s$parts), function(j) { d <- fetch_series(c(s$parts[[j]], list(id = paste0(s$id, "_p", j))))
+    if (isTRUE(s$parts[[j]]$neg)) d$value <- -d$value; d })                    # neg: vahennettava osa (esim. varat nettovelassa)
   Reduce(function(a, b) { m <- merge(a, b, by = "date"); data.frame(date = m$date, value = m$value.x + m$value.y) }, ds)
 }
 
@@ -348,7 +349,7 @@ fetch_jt_decomp <- function(s) {
     Dv <- v(D); Y4 <- r4(v(Y)); B4 <- r4(v(B)); I4 <- r4(v(I1) - v(I2))
     d <- 100 * Dv / Y4; gr <- Y4 / L4(Y4) - 1
     x <- data.frame(date = q, ratio = d, dd = d - L4(d), pb = -100 * (B4 + I4) / Y4, int = 100 * I4 / Y4, growth = -gr / (1 + gr) * L4(d), irate = 100 * I4 / L4(Dv))
-    x$muut <- x$dd - x$pb - x$int - x$growth
+    x$sfa <- x$dd - x$pb - x$int - x$growth   # virta-varantokorjaus
     .dd_memo$x <- x }
   x <- .dd_memo$x; data.frame(date = x$date, value = x[[s$part]])
 }
@@ -797,7 +798,7 @@ for (set in cfg$sets) {
 # Lahdeluettelo generoidaan kaytossa olevista sarjoista: tuntematon koodi -> tarkistushuomio
 # ---------------------------------------------------------------------
 SRC_NAMES <- list(
-  statfin  = list(.n = "Tilastokeskus", ntp = "kansantalouden tilinpito", jtume = "julkisyhteisöjen tulot ja menot", jyev = "julkisyhteisöjen velka",
+  statfin  = list(.n = "Tilastokeskus", ntp = "kansantalouden tilinpito", jtume = "julkisyhteisöjen tulot ja menot", jyev = "julkisyhteisöjen velka", rtp = "rahoitustilinpito",
                   tyti = "työvoimatutkimus", atp = "avoimet työpaikat", tyonv = "työnvälitystilasto", ati = "ansiotasoindeksi",
                   ktps = "palkkasummakuvaajat", khi = "kuluttajahintaindeksi", kbar = "kuluttajabarometri",
                   ashi = "osakeasuntojen hinnat", asvu = "asuntojen vuokrat", raku = "rakennus- ja asuntotuotanto",
@@ -808,7 +809,7 @@ SRC_NAMES <- list(
                   ei_bsrt_m_r2 = "Euroopan komission luottamuskyselyt", ei_bsse_m_r2 = "Euroopan komission luottamuskyselyt",
                   ei_bsin_q_r2 = "kapasiteetin käyttöaste", sts_trtu_m = "vähittäiskaupan liikevaihto", sts_setu_m = "palvelujen liikevaihto",
                   prc_hicp_minr = "YKHI", prc_hicp_iw = "YKHI-painot", namq_10_gdp = "BKT vertailumaissa", namq_10_lp_ulc = "yksikkötyökustannukset",
-                  bop_c6_q = "maksutase", ext_st_27_2020msbec = "tavarakauppa"),
+                  bop_c6_q = "maksutase", ext_st_27_2020msbec = "tavarakauppa", gov_10q_ggnfa = "julkisyhteisöjen verotulot"),
   bof      = list(.n = "Suomen Pankki", .all = "luotonanto ja lainojen korot"),
   ecb      = list(.n = "EKP", FM = "markkinakorot", EST = "€STR", YC = "tuottokäyrä", IRS = "valtionlainojen korot", EXR = "valuuttakurssit",
                   CISS = "rahoitusstressi", CLIFS = "rahoitusstressi", BLS = "pankkien luotonantokysely", SPF = "ammattiennustajien kysely",

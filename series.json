@@ -1773,6 +1773,181 @@
           }
         },
         {
+          "id": "jt_trte",
+          "section": "Rahoitusasema",
+          "title": "Tulot, menot ja veroaste, % BKT:stä",
+          "unit": "%",
+          "dec": 1,
+          "lines": [
+            "jt_te",
+            "jt_tr",
+            "jt_veroaste"
+          ],
+          "connect": true,
+          "from": 2000,
+          "size": "half",
+          "colors": {
+            "jt_te": "var(--q-down)",
+            "jt_tr": "var(--accent)",
+            "jt_veroaste": "var(--g3)"
+          },
+          "dash": [
+            "jt_veroaste"
+          ],
+          "note": "Julkisyhteisöt, neljän neljänneksen liukuva summa. Veroaste: verot ja pakolliset sosiaaliturvamaksut (D2, D5, D91, D611, D613). Lähteet: Tilastokeskus, Eurostat."
+        },
+        {
+          "id": "jt_trteyy",
+          "section": "Rahoitusasema",
+          "title": "Tulot ja menot, vuosimuutos %",
+          "unit": "%",
+          "dec": 1,
+          "lines": [
+            "jt_te_yy",
+            "jt_tr_yy"
+          ],
+          "connect": true,
+          "from": 2000,
+          "size": "half",
+          "colors": {
+            "jt_te_yy": "var(--q-down)",
+            "jt_tr_yy": "var(--accent)"
+          },
+          "note": "Julkisyhteisöjen tulot ja menot käyvin hinnoin, neljän neljänneksen liukuvan summan muutos vuodentakaisesta. Lähde: Tilastokeskus."
+        },
+        {
+          "id": "jt_velka",
+          "section": "Velka",
+          "title": "Julkisyhteisöjen velka, % BKT:stä",
+          "unit": "%",
+          "dec": 1,
+          "lines": [
+            "jt_velka"
+          ],
+          "connect": true,
+          "from": 2000,
+          "size": "half",
+          "note": "EDP-velka (julkisyhteisöjen sulautettu bruttovelka). Lähde: Tilastokeskus."
+        },
+        {
+          "id": "jt_dd",
+          "section": "Velka",
+          "title": "Velkasuhteen muutoksen hajotelma, %-yks.",
+          "unit": "",
+          "dec": 1,
+          "lines": [
+            "jt_dd"
+          ],
+          "stack": [
+            "jt_dd_pb",
+            "jt_dd_int",
+            "jt_dd_gr",
+            "jt_dd_sfa"
+          ],
+          "barSpan": 3,
+          "connect": true,
+          "from": 2012,
+          "size": "half",
+          "stackUnit": "%-yks.",
+          "labels": {
+            "jt_dd": "Velkasuhteen muutos"
+          },
+          "colors": {
+            "jt_dd": "var(--fg)"
+          },
+          "note": "Muutos vuodentakaisesta. Perusjäämä: rahoitusasema ilman korkomenoja (alijäämä kasvattaa velkaa). Kasvu: nimellisen BKT:n kasvun vaikutus. Virta-varantokorjaus: velan muutoksen ja alijäämän erotus, mm. rahoitusvarojen hankinta (työeläkelaitosten ylijäämän sijoitukset, kassavarat). Lähde: Tilastokeskus, oma laskelma."
+        },
+        {
+          "id": "jt_nv",
+          "section": "Velka",
+          "title": "Nettovelka, % BKT:stä",
+          "unit": "%",
+          "dec": 1,
+          "lines": [
+            "jt_velka",
+            "jt_nv",
+            "jt_nv_ptel"
+          ],
+          "connect": true,
+          "from": 2000,
+          "size": "half",
+          "labels": {
+            "jt_velka": "EDP-bruttovelka"
+          },
+          "colors": {
+            "jt_velka": "var(--accent)",
+            "jt_nv": "var(--fg)",
+            "jt_nv_ptel": "var(--q-turn)"
+          },
+          "dash": [
+            "jt_velka"
+          ],
+          "note": "Nettovelka: velat miinus saamiset käteisrahassa ja talletuksissa, velkapapereissa ja lainoissa (F2–F4), rahoitustilinpidon taseet. Negatiivinen arvo on nettosaaminen. Lähde: Tilastokeskus."
+        },
+        {
+          "id": "jt_korkobkt",
+          "section": "Velka",
+          "title": "Korkomenot, % BKT:stä",
+          "unit": "%",
+          "dec": 1,
+          "lines": [
+            "jt_korko_bkt"
+          ],
+          "connect": true,
+          "from": 2000,
+          "size": "half",
+          "note": "Julkisyhteisöjen korkomenot, neljän neljänneksen liukuva summa. Lähde: Tilastokeskus."
+        },
+        {
+          "id": "jt_korko",
+          "section": "Velka",
+          "title": "Velan korko, %",
+          "unit": "%",
+          "dec": 2,
+          "lines": [
+            "jt_irate",
+            "jt_vk_korko",
+            "jt_fi10y"
+          ],
+          "connect": true,
+          "from": 2004,
+          "size": "half",
+          "colors": {
+            "jt_irate": "var(--fg)",
+            "jt_vk_korko": "var(--accent)",
+            "jt_fi10y": "var(--g3)"
+          },
+          "dash": [
+            "jt_fi10y"
+          ],
+          "labels": {
+            "jt_irate": "Julkisyhteisöt, implisiittinen",
+            "jt_vk_korko": "Valtionvelan keskikorko",
+            "jt_fi10y": "10 v valtionlainan korko"
+          },
+          "note": "Implisiittinen korko: korkomenot 4 nelj. / velka vuotta aiemmin. Keskikorko: budjettitalouden velan korkomenot 12 kk / keskimääräinen velka. Lähteet: Tilastokeskus, Valtiokonttori, EKP."
+        },
+        {
+          "id": "jt_mat",
+          "section": "Velka",
+          "title": "Valtionvelan maturiteetti, vuotta",
+          "unit": "",
+          "dec": 1,
+          "lines": [
+            "jt_vk_mat",
+            "jt_vk_dur",
+            "jt_vk_fix"
+          ],
+          "from": 2002,
+          "size": "half",
+          "colors": {
+            "jt_vk_mat": "var(--fg)",
+            "jt_vk_dur": "var(--accent)",
+            "jt_vk_fix": "var(--g2)"
+          },
+          "note": "Keskimaturiteetti: velan keskimääräinen jäljellä oleva laina-aika. Lähde: Valtiokonttori."
+        },
+        {
           "id": "jt_vero",
           "section": "Verotulot",
           "title": "Verokertymät, 12 kk liukuva summa, mrd. €",
@@ -1843,111 +2018,6 @@
             "jt_trt_tt"
           ],
           "note": "3 kk liukuvan summan muutos vuodentakaisesta. Työttömyysetuudet oikealla akselilla. Lähde: Verohallinto (tulorekisteri)."
-        },
-        {
-          "id": "jt_velka",
-          "section": "Velka",
-          "title": "Julkisyhteisöjen velka, % BKT:stä",
-          "unit": "%",
-          "dec": 1,
-          "lines": [
-            "jt_velka"
-          ],
-          "connect": true,
-          "from": 2000,
-          "size": "half",
-          "note": "EDP-velka (julkisyhteisöjen sulautettu bruttovelka). Lähde: Tilastokeskus."
-        },
-        {
-          "id": "jt_dd",
-          "section": "Velka",
-          "title": "Velkasuhteen muutoksen hajotelma, %-yks.",
-          "unit": "",
-          "dec": 1,
-          "lines": [
-            "jt_dd"
-          ],
-          "stack": [
-            "jt_dd_pb",
-            "jt_dd_int",
-            "jt_dd_gr",
-            "jt_dd_muu"
-          ],
-          "barSpan": 3,
-          "connect": true,
-          "from": 2012,
-          "size": "half",
-          "stackUnit": "%-yks.",
-          "labels": {
-            "jt_dd": "Velkasuhteen muutos"
-          },
-          "colors": {
-            "jt_dd": "var(--fg)"
-          },
-          "note": "Muutos vuodentakaisesta. Perusjäämä: rahoitusasema ilman korkomenoja (alijäämä kasvattaa velkaa). Kasvu: nimellisen BKT:n kasvun vaikutus. Muut erät: velan ja rahoitusaseman täsmäytyserä, mm. työeläkelaitosten ylijäämän sijoitukset ja kassavarojen muutos. Lähde: Tilastokeskus, oma laskelma."
-        },
-        {
-          "id": "jt_korko",
-          "section": "Velka",
-          "title": "Velan korko, %",
-          "unit": "%",
-          "dec": 2,
-          "lines": [
-            "jt_irate",
-            "jt_vk_korko",
-            "jt_fi10y"
-          ],
-          "connect": true,
-          "from": 2004,
-          "size": "half",
-          "colors": {
-            "jt_irate": "var(--fg)",
-            "jt_vk_korko": "var(--accent)",
-            "jt_fi10y": "var(--g3)"
-          },
-          "dash": [
-            "jt_fi10y"
-          ],
-          "labels": {
-            "jt_irate": "Julkisyhteisöt, implisiittinen",
-            "jt_vk_korko": "Valtionvelan keskikorko",
-            "jt_fi10y": "10 v valtionlainan korko"
-          },
-          "note": "Implisiittinen korko: korkomenot 4 nelj. / velka vuotta aiemmin. Keskikorko: budjettitalouden velan korkomenot 12 kk / keskimääräinen velka. Lähteet: Tilastokeskus, Valtiokonttori, EKP."
-        },
-        {
-          "id": "jt_korkobkt",
-          "section": "Velka",
-          "title": "Korkomenot, % BKT:stä",
-          "unit": "%",
-          "dec": 1,
-          "lines": [
-            "jt_korko_bkt"
-          ],
-          "connect": true,
-          "from": 2000,
-          "size": "half",
-          "note": "Julkisyhteisöjen korkomenot, neljän neljänneksen liukuva summa. Lähde: Tilastokeskus."
-        },
-        {
-          "id": "jt_mat",
-          "section": "Velka",
-          "title": "Valtionvelan maturiteetti, vuotta",
-          "unit": "",
-          "dec": 1,
-          "lines": [
-            "jt_vk_mat",
-            "jt_vk_dur",
-            "jt_vk_fix"
-          ],
-          "from": 2002,
-          "size": "half",
-          "colors": {
-            "jt_vk_mat": "var(--fg)",
-            "jt_vk_dur": "var(--accent)",
-            "jt_vk_fix": "var(--g2)"
-          },
-          "note": "Keskimaturiteetti: velan keskimääräinen jäljellä oleva laina-aika. Lähde: Valtiokonttori."
         }
       ]
     }
@@ -6879,11 +6949,11 @@
       "kind": "level"
     },
     {
-      "id": "jt_dd_muu",
-      "label": "Muut erät",
+      "id": "jt_dd_sfa",
+      "label": "Virta-varantokorjaus",
       "set": "julkinen",
       "source": "jt_decomp",
-      "part": "muut",
+      "part": "sfa",
       "q_to_m": true,
       "handling": "none",
       "kind": "level"
@@ -6969,6 +7039,400 @@
       "source": "vk",
       "path": "interest-rate-sensitivity",
       "field": "duration",
+      "handling": "none",
+      "kind": "level"
+    },
+    {
+      "id": "jt_nv",
+      "label": "Julkisyhteisöt",
+      "set": "julkinen",
+      "source": "sum",
+      "parts": [
+        {
+          "source": "statfin",
+          "table": "rtp/11n9.px",
+          "pick": {
+            "varojenluokitus_5_20180101": "F2",
+            "sektoriluokitus_7_20230101-rtp-sektori": "S0",
+            "sektoriluokitus_7_20230101-vastinsektori": "S13",
+            "contentscode": "rtp-K"
+          }
+        },
+        {
+          "source": "statfin",
+          "table": "rtp/11n9.px",
+          "pick": {
+            "varojenluokitus_5_20180101": "F2",
+            "sektoriluokitus_7_20230101-rtp-sektori": "S13",
+            "sektoriluokitus_7_20230101-vastinsektori": "S0",
+            "contentscode": "rtp-K"
+          },
+          "neg": true
+        },
+        {
+          "source": "statfin",
+          "table": "rtp/11n9.px",
+          "pick": {
+            "varojenluokitus_5_20180101": "F3",
+            "sektoriluokitus_7_20230101-rtp-sektori": "S0",
+            "sektoriluokitus_7_20230101-vastinsektori": "S13",
+            "contentscode": "rtp-K"
+          }
+        },
+        {
+          "source": "statfin",
+          "table": "rtp/11n9.px",
+          "pick": {
+            "varojenluokitus_5_20180101": "F3",
+            "sektoriluokitus_7_20230101-rtp-sektori": "S13",
+            "sektoriluokitus_7_20230101-vastinsektori": "S0",
+            "contentscode": "rtp-K"
+          },
+          "neg": true
+        },
+        {
+          "source": "statfin",
+          "table": "rtp/11n9.px",
+          "pick": {
+            "varojenluokitus_5_20180101": "F4",
+            "sektoriluokitus_7_20230101-rtp-sektori": "S0",
+            "sektoriluokitus_7_20230101-vastinsektori": "S13",
+            "contentscode": "rtp-K"
+          }
+        },
+        {
+          "source": "statfin",
+          "table": "rtp/11n9.px",
+          "pick": {
+            "varojenluokitus_5_20180101": "F4",
+            "sektoriluokitus_7_20230101-rtp-sektori": "S13",
+            "sektoriluokitus_7_20230101-vastinsektori": "S0",
+            "contentscode": "rtp-K"
+          },
+          "neg": true
+        }
+      ],
+      "q_to_m": true,
+      "div": {
+        "source": "statfin",
+        "table": "ntp/132h.px",
+        "pick": {
+          "taloustoimi_1_20180101": "B1GMH",
+          "contentscode": "tasmcp"
+        },
+        "q_to_m": true,
+        "roll": 4
+      },
+      "handling": "none",
+      "kind": "level"
+    },
+    {
+      "id": "jt_nv_ptel",
+      "label": "Julkisyhteisöt pl. työeläkelaitokset",
+      "set": "julkinen",
+      "source": "sum",
+      "parts": [
+        {
+          "source": "statfin",
+          "table": "rtp/11n9.px",
+          "pick": {
+            "varojenluokitus_5_20180101": "F2",
+            "sektoriluokitus_7_20230101-rtp-sektori": "S0",
+            "sektoriluokitus_7_20230101-vastinsektori": "S13",
+            "contentscode": "rtp-K"
+          }
+        },
+        {
+          "source": "statfin",
+          "table": "rtp/11n9.px",
+          "pick": {
+            "varojenluokitus_5_20180101": "F2",
+            "sektoriluokitus_7_20230101-rtp-sektori": "S13",
+            "sektoriluokitus_7_20230101-vastinsektori": "S0",
+            "contentscode": "rtp-K"
+          },
+          "neg": true
+        },
+        {
+          "source": "statfin",
+          "table": "rtp/11n9.px",
+          "pick": {
+            "varojenluokitus_5_20180101": "F3",
+            "sektoriluokitus_7_20230101-rtp-sektori": "S0",
+            "sektoriluokitus_7_20230101-vastinsektori": "S13",
+            "contentscode": "rtp-K"
+          }
+        },
+        {
+          "source": "statfin",
+          "table": "rtp/11n9.px",
+          "pick": {
+            "varojenluokitus_5_20180101": "F3",
+            "sektoriluokitus_7_20230101-rtp-sektori": "S13",
+            "sektoriluokitus_7_20230101-vastinsektori": "S0",
+            "contentscode": "rtp-K"
+          },
+          "neg": true
+        },
+        {
+          "source": "statfin",
+          "table": "rtp/11n9.px",
+          "pick": {
+            "varojenluokitus_5_20180101": "F4",
+            "sektoriluokitus_7_20230101-rtp-sektori": "S0",
+            "sektoriluokitus_7_20230101-vastinsektori": "S13",
+            "contentscode": "rtp-K"
+          }
+        },
+        {
+          "source": "statfin",
+          "table": "rtp/11n9.px",
+          "pick": {
+            "varojenluokitus_5_20180101": "F4",
+            "sektoriluokitus_7_20230101-rtp-sektori": "S13",
+            "sektoriluokitus_7_20230101-vastinsektori": "S0",
+            "contentscode": "rtp-K"
+          },
+          "neg": true
+        },
+        {
+          "source": "statfin",
+          "table": "rtp/11n9.px",
+          "pick": {
+            "varojenluokitus_5_20180101": "F2",
+            "sektoriluokitus_7_20230101-rtp-sektori": "S0",
+            "sektoriluokitus_7_20230101-vastinsektori": "S13141",
+            "contentscode": "rtp-K"
+          },
+          "neg": true
+        },
+        {
+          "source": "statfin",
+          "table": "rtp/11n9.px",
+          "pick": {
+            "varojenluokitus_5_20180101": "F2",
+            "sektoriluokitus_7_20230101-rtp-sektori": "S13141",
+            "sektoriluokitus_7_20230101-vastinsektori": "S0",
+            "contentscode": "rtp-K"
+          }
+        },
+        {
+          "source": "statfin",
+          "table": "rtp/11n9.px",
+          "pick": {
+            "varojenluokitus_5_20180101": "F3",
+            "sektoriluokitus_7_20230101-rtp-sektori": "S0",
+            "sektoriluokitus_7_20230101-vastinsektori": "S13141",
+            "contentscode": "rtp-K"
+          },
+          "neg": true
+        },
+        {
+          "source": "statfin",
+          "table": "rtp/11n9.px",
+          "pick": {
+            "varojenluokitus_5_20180101": "F3",
+            "sektoriluokitus_7_20230101-rtp-sektori": "S13141",
+            "sektoriluokitus_7_20230101-vastinsektori": "S0",
+            "contentscode": "rtp-K"
+          }
+        },
+        {
+          "source": "statfin",
+          "table": "rtp/11n9.px",
+          "pick": {
+            "varojenluokitus_5_20180101": "F4",
+            "sektoriluokitus_7_20230101-rtp-sektori": "S0",
+            "sektoriluokitus_7_20230101-vastinsektori": "S13141",
+            "contentscode": "rtp-K"
+          },
+          "neg": true
+        },
+        {
+          "source": "statfin",
+          "table": "rtp/11n9.px",
+          "pick": {
+            "varojenluokitus_5_20180101": "F4",
+            "sektoriluokitus_7_20230101-rtp-sektori": "S13141",
+            "sektoriluokitus_7_20230101-vastinsektori": "S0",
+            "contentscode": "rtp-K"
+          }
+        }
+      ],
+      "q_to_m": true,
+      "div": {
+        "source": "statfin",
+        "table": "ntp/132h.px",
+        "pick": {
+          "taloustoimi_1_20180101": "B1GMH",
+          "contentscode": "tasmcp"
+        },
+        "q_to_m": true,
+        "roll": 4
+      },
+      "handling": "none",
+      "kind": "level"
+    },
+    {
+      "id": "jt_tr",
+      "label": "Tulot",
+      "set": "julkinen",
+      "source": "statfin",
+      "table": "jtume/11zf.px",
+      "pick": {
+        "taloustoimi_1_20180101": "OTRS",
+        "sektoriluokitus_7_20230101": "S13",
+        "contentscode": "jtume-TASM"
+      },
+      "q_to_m": true,
+      "roll": 4,
+      "div": {
+        "source": "statfin",
+        "table": "ntp/132h.px",
+        "pick": {
+          "taloustoimi_1_20180101": "B1GMH",
+          "contentscode": "tasmcp"
+        },
+        "q_to_m": true,
+        "roll": 4
+      },
+      "handling": "none",
+      "kind": "level"
+    },
+    {
+      "id": "jt_te",
+      "label": "Menot",
+      "set": "julkinen",
+      "source": "statfin",
+      "table": "jtume/11zf.px",
+      "pick": {
+        "taloustoimi_1_20180101": "OTES",
+        "sektoriluokitus_7_20230101": "S13",
+        "contentscode": "jtume-TASM"
+      },
+      "q_to_m": true,
+      "roll": 4,
+      "div": {
+        "source": "statfin",
+        "table": "ntp/132h.px",
+        "pick": {
+          "taloustoimi_1_20180101": "B1GMH",
+          "contentscode": "tasmcp"
+        },
+        "q_to_m": true,
+        "roll": 4
+      },
+      "handling": "none",
+      "kind": "level"
+    },
+    {
+      "id": "jt_veroaste",
+      "label": "Veroaste",
+      "set": "julkinen",
+      "source": "sum",
+      "parts": [
+        {
+          "source": "eurostat",
+          "ds": "gov_10q_ggnfa",
+          "pick": {
+            "freq": "Q",
+            "unit": "MIO_EUR",
+            "s_adj": "NSA",
+            "sector": "S13",
+            "na_item": "D2REC"
+          }
+        },
+        {
+          "source": "eurostat",
+          "ds": "gov_10q_ggnfa",
+          "pick": {
+            "freq": "Q",
+            "unit": "MIO_EUR",
+            "s_adj": "NSA",
+            "sector": "S13",
+            "na_item": "D5REC"
+          }
+        },
+        {
+          "source": "eurostat",
+          "ds": "gov_10q_ggnfa",
+          "pick": {
+            "freq": "Q",
+            "unit": "MIO_EUR",
+            "s_adj": "NSA",
+            "sector": "S13",
+            "na_item": "D91REC"
+          }
+        },
+        {
+          "source": "eurostat",
+          "ds": "gov_10q_ggnfa",
+          "pick": {
+            "freq": "Q",
+            "unit": "MIO_EUR",
+            "s_adj": "NSA",
+            "sector": "S13",
+            "na_item": "D611REC"
+          }
+        },
+        {
+          "source": "eurostat",
+          "ds": "gov_10q_ggnfa",
+          "pick": {
+            "freq": "Q",
+            "unit": "MIO_EUR",
+            "s_adj": "NSA",
+            "sector": "S13",
+            "na_item": "D613REC"
+          }
+        }
+      ],
+      "q_to_m": true,
+      "roll": 4,
+      "div": {
+        "source": "statfin",
+        "table": "ntp/132h.px",
+        "pick": {
+          "taloustoimi_1_20180101": "B1GMH",
+          "contentscode": "tasmcp"
+        },
+        "q_to_m": true,
+        "roll": 4
+      },
+      "handling": "none",
+      "kind": "level"
+    },
+    {
+      "id": "jt_tr_yy",
+      "label": "Tulot",
+      "set": "julkinen",
+      "source": "statfin",
+      "table": "jtume/11zf.px",
+      "pick": {
+        "taloustoimi_1_20180101": "OTRS",
+        "sektoriluokitus_7_20230101": "S13",
+        "contentscode": "jtume-TASM"
+      },
+      "q_to_m": true,
+      "roll": 4,
+      "pct_lag": 4,
+      "handling": "none",
+      "kind": "level"
+    },
+    {
+      "id": "jt_te_yy",
+      "label": "Menot",
+      "set": "julkinen",
+      "source": "statfin",
+      "table": "jtume/11zf.px",
+      "pick": {
+        "taloustoimi_1_20180101": "OTES",
+        "sektoriluokitus_7_20230101": "S13",
+        "contentscode": "jtume-TASM"
+      },
+      "q_to_m": true,
+      "roll": 4,
+      "pct_lag": 4,
       "handling": "none",
       "kind": "level"
     }
