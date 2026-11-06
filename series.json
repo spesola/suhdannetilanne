@@ -1948,30 +1948,6 @@
           "note": "Keskimaturiteetti: velan keskimääräinen jäljellä oleva laina-aika. Lähde: Valtiokonttori."
         },
         {
-          "id": "jt_vero",
-          "section": "Verotulot",
-          "title": "Verokertymät, 12 kk liukuva summa, mrd. €",
-          "unit": "",
-          "dec": 1,
-          "lines": [
-            "jt_vero",
-            "jt_vero_hlo",
-            "jt_vero_alv",
-            "jt_vero_yht",
-            "jt_vero_valm"
-          ],
-          "from": 2012,
-          "size": "half",
-          "colors": {
-            "jt_vero": "var(--fg)",
-            "jt_vero_hlo": "var(--accent)",
-            "jt_vero_alv": "var(--q-turn)",
-            "jt_vero_yht": "var(--g2)",
-            "jt_vero_valm": "var(--g3)"
-          },
-          "note": "Nettokertymä (bruttokertymä miinus palautukset) kaikille veronsaajille. Lähde: Verohallinto."
-        },
-        {
           "id": "jt_veroyy",
           "section": "Verotulot",
           "title": "Verokertymien vuosimuutos, %",
@@ -6661,96 +6637,6 @@
         "q_to_m": true,
         "roll": 4
       },
-      "handling": "none",
-      "kind": "level"
-    },
-    {
-      "id": "jt_vero",
-      "label": "Yhteensä",
-      "set": "julkinen",
-      "source": "statfin",
-      "px_base": "https://vero2.stat.fi/PXWeb/api/v1/fi/Vero/",
-      "table": "Verotulojen_kehitys/010_verotall_tau_101.px",
-      "pick": {
-        "Verolaji": "0",
-        "Muuttuja": "netto",
-        "Verovuosi (ajanjakso, jolta veron peruste on syntynyt)": "YYYY",
-        "Tiedot": "Arvo"
-      },
-      "roll": 12,
-      "mult": 0.001,
-      "handling": "none",
-      "kind": "level"
-    },
-    {
-      "id": "jt_vero_hlo",
-      "label": "Henkilöasiakkaiden tulovero",
-      "set": "julkinen",
-      "source": "statfin",
-      "px_base": "https://vero2.stat.fi/PXWeb/api/v1/fi/Vero/",
-      "table": "Verotulojen_kehitys/010_verotall_tau_101.px",
-      "pick": {
-        "Verolaji": "100",
-        "Muuttuja": "netto",
-        "Verovuosi (ajanjakso, jolta veron peruste on syntynyt)": "YYYY",
-        "Tiedot": "Arvo"
-      },
-      "roll": 12,
-      "mult": 0.001,
-      "handling": "none",
-      "kind": "level"
-    },
-    {
-      "id": "jt_vero_yht",
-      "label": "Yhteisövero",
-      "set": "julkinen",
-      "source": "statfin",
-      "px_base": "https://vero2.stat.fi/PXWeb/api/v1/fi/Vero/",
-      "table": "Verotulojen_kehitys/010_verotall_tau_101.px",
-      "pick": {
-        "Verolaji": "200",
-        "Muuttuja": "netto",
-        "Verovuosi (ajanjakso, jolta veron peruste on syntynyt)": "YYYY",
-        "Tiedot": "Arvo"
-      },
-      "roll": 12,
-      "mult": 0.001,
-      "handling": "none",
-      "kind": "level"
-    },
-    {
-      "id": "jt_vero_alv",
-      "label": "Arvonlisävero",
-      "set": "julkinen",
-      "source": "statfin",
-      "px_base": "https://vero2.stat.fi/PXWeb/api/v1/fi/Vero/",
-      "table": "Verotulojen_kehitys/010_verotall_tau_101.px",
-      "pick": {
-        "Verolaji": "300",
-        "Muuttuja": "netto",
-        "Verovuosi (ajanjakso, jolta veron peruste on syntynyt)": "YYYY",
-        "Tiedot": "Arvo"
-      },
-      "roll": 12,
-      "mult": 0.001,
-      "handling": "none",
-      "kind": "level"
-    },
-    {
-      "id": "jt_vero_valm",
-      "label": "Valmisteverot",
-      "set": "julkinen",
-      "source": "statfin",
-      "px_base": "https://vero2.stat.fi/PXWeb/api/v1/fi/Vero/",
-      "table": "Verotulojen_kehitys/010_verotall_tau_101.px",
-      "pick": {
-        "Verolaji": "600",
-        "Muuttuja": "netto",
-        "Verovuosi (ajanjakso, jolta veron peruste on syntynyt)": "YYYY",
-        "Tiedot": "Arvo"
-      },
-      "roll": 12,
-      "mult": 0.001,
       "handling": "none",
       "kind": "level"
     },
