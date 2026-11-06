@@ -1,7 +1,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Suhdannetilanne</title>
-<meta name="description" content="Suomen talouden suhdannetilanne avoimista tilastoista: suhdannekartta, reaalitalous ja rahoitusmarkkinat. Päivittyy arkisin.">
+<meta name="description" content="Suomen talouden suhdannetilanne avoimista tilastoista: suhdannekartta, reaalitalous, rahoitusmarkkinat ja julkinen talous. Päivittyy arkisin.">
 <link rel="canonical" href="https://suhdannetilanne.fi/">
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="suhdannetilanne.fi">
@@ -656,7 +656,7 @@ footer b { color: var(--fg); font-weight: 600; }
   }
 
   /* ---------- otsikko ja settivalitsin ---------- */
-  const SHORT = { suhdanne: "Suhdanne", bkt: "Reaalitalous", rahoitus: "Rahoitus" };
+  const SHORT = { suhdanne: "Suhdanne", bkt: "Reaalitalous", rahoitus: "Rahoitus", julkinen: "Julkinen" };
   function renderHeader() {
     const gen = new Date(D.meta.generated.replace(/(\+\d{2})(\d{2})$/, "$1:$2"));
     const c0 = set.view === "charts" ? set.charts.find(c => c.lines && c.lines.length) : null;
@@ -1866,7 +1866,7 @@ footer b { color: var(--fg); font-weight: 600; }
           el("rect", { x: xs(i) - bw / 2, y: Math.min(yl(0), yl(v)), width: bw, height: Math.abs(yl(v) - yl(0)),
             fill: v >= 0 ? "var(--q-up)" : "var(--q-down)", "fill-opacity": 0.55 }, svg); });
       }
-      const ystep = big || c.size === "tt" ? 2 : 5;
+      const ystep = n <= 12 * 7 ? 1 : big || c.size === "tt" ? 2 : 5;   // lyhyt jakso: joka vuosi
       P.forEach((per, i) => { const yr = +per.slice(0, 4);
         if ((per.endsWith("-01") || per.endsWith("-Q1")) && yr % ystep === 0) {
           el("line", { x1: xs(i), x2: xs(i), y1: H2 - mb, y2: H2 - mb + 4, stroke: "var(--muted)" }, svg);
@@ -1879,11 +1879,11 @@ footer b { color: var(--fg); font-weight: 600; }
       if ((c.stack || []).some(isRes)) { const pt = el("pattern", { id: hid, width: 4, height: 4, patternUnits: "userSpaceOnUse", patternTransform: "rotate(45)" }, el("defs", {}, svg));
         el("rect", { width: 4, height: 4, fill: "color-mix(in srgb, var(--muted) 18%, var(--surface))" }, pt);
         el("line", { x1: 0, y1: 0, x2: 0, y2: 4, stroke: "var(--muted)", "stroke-width": 1.5 }, pt); }
-      if (S.length) { const bw = (W2 - ml - mr) / n * 0.78;   // pinotut kontribuutiot: positiiviset ylos, negatiiviset alas
+      if (S.length) { const sp = c.barSpan || 1, bw = (W2 - ml - mr) / n * sp * 0.78;   // pinotut kontribuutiot: positiiviset ylos, negatiiviset alas; barSpan: nelj. kuukausiakselilla
         P.forEach((_, i) => { let up = 0, dn = 0;
           S.forEach((s, k) => { const v = s[i]; if (v == null || v === 0) return;
             const y0 = v > 0 ? up : dn, y1 = y0 + v; if (v > 0) up = y1; else dn = y1;
-            el("rect", { x: xs(i) - bw / 2, y: ys(Math.max(y0, y1)), width: bw, height: Math.abs(ys(y1) - ys(y0)),
+            el("rect", { x: xs(i - (sp - 1) / 2) - bw / 2, y: ys(Math.max(y0, y1)), width: bw, height: Math.abs(ys(y1) - ys(y0)),
               fill: isRes(c.stack[k]) ? `url(#${hid})` : STACK_COLS[k % STACK_COLS.length], "fill-opacity": isRes(c.stack[k]) ? 0.7 : 0.82 }, svg); }); }); }
       const path = (a, step, yf = ys) => { let d = "", pen = false;
         a.forEach((v, i) => { if (v == null) { if (!c.connect) pen = false; return; }   // connect: harva sarja (nelj.) yhtenaisena
@@ -1974,7 +1974,7 @@ footer b { color: var(--fg); font-weight: 600; }
     if (b.id === "grCharts") { clearTimeout(rzT); rzT = setTimeout(() => { drawCharts(); if (set.forecast) renderFc(); }, 150); return; }   // ylapari sovitetaan uudelleen
     if (nw !== lastNarrow) { lastNarrow = nw; renderCharts(b); } });
   function renderAll() { renderHeader(); update(); }
-  const HASH = { suhdanne: "suhdanne", bkt: "reaalitalous", rahoitus: "rahoitus" };
+  const HASH = { suhdanne: "suhdanne", bkt: "reaalitalous", rahoitus: "rahoitus", julkinen: "julkinen-talous" };
   const hashFor = () => "#" + (HASH[set.id] || set.id) + (set.growth && grSel !== "bkt" ? "/" + grSel : "");
   function writeHash() { const h = hashFor(); if (location.hash !== h) history.pushState(null, "", h); }
   function applyHash() {                                               // palauttaa tilan osoitteesta; tuntematon -> oletus

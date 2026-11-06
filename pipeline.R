@@ -63,6 +63,7 @@ is_time_px <- function(vals) any(grepl("^\\d{4}(M\\d{2}|Q\\d)$", vals))   # kk t
 .px_meta <- new.env()
 fetch_statfin <- function(s) {
   base <- if (is.null(s$db)) STATFIN else sub("StatFin/$", paste0(s$db, "/"), STATFIN)   # db: esim. StatFin_Passiivi (arkistotaulut)
+  if (!is.null(s$px_base)) base <- s$px_base                                             # muu PxWeb-palvelu (esim. Verohallinto)
   if (is.null(.px_meta[[s$table]])) {
     Sys.sleep(0.8); .px_meta[[s$table]] <- fromJSON(get_text(paste0(base, s$table)), simplifyVector = FALSE)$variables }
   vars <- .px_meta[[s$table]]
@@ -314,8 +315,46 @@ fetch_stoxx <- function(s) {
   data.frame(date = names(a), value = as.numeric(a))
 }
 
+# Valtiokonttorin avoin rajapinta (valtionvelka): JSON-lista, kentta 'field', suodatus 'filter' (esim. serial)
+VK_API <- "https://api.tutkihallintoa.fi/central-government-debt/v1/"
+.vk_memo <- new.env()
+fetch_vk <- function(s) {
+  if (is.null(.vk_memo[[s$path]])) .vk_memo[[s$path]] <- fromJSON(get_text(paste0(VK_API, s$path)), simplifyVector = FALSE)
+  x <- .vk_memo[[s$path]]
+  for (k in names(s$filter)) x <- Filter(function(r) identical(r[[k]], s$filter[[k]]), x)
+  d <- data.frame(date = vapply(x, function(r) substr(r$date, 1, 7), ""), value = vapply(x, function(r) as.numeric(r[[s$field]]), 0))
+  d[order(d$date), ]
+}
+
+# summa useasta sarjasta (esim. sosiaaliturvarahastot = tyoelakelaitokset + muut)
+fetch_sum <- function(s) {
+  ds <- lapply(seq_along(s$parts), function(j) fetch_series(c(s$parts[[j]], list(id = paste0(s$id, "_p", j)))))
+  Reduce(function(a, b) { m <- merge(a, b, by = "date"); data.frame(date = m$date, value = m$value.x + m$value.y) }, ds)
+}
+
+# julkisyhteisojen velkasuhteen muutoksen hajotelma (4 nelj. liukuvat summat, muutos vuodentakaisesta, %-yks.):
+# d = D / Y, dd = d_t - d_t-4 = -(B9 + INT) / Y + INT / Y - g / (1 + g) * d_t-4 + muut
+# D = EDP-velka (sulautettu), Y = nimellinen BKT, B9 = rahoitusjaama, INT = korkomenot (pl. julkisyhteisojen valiset)
+.dd_memo <- new.env()
+fetch_jt_decomp <- function(s) {
+  if (is.null(.dd_memo$x)) {
+    g <- function(id, tb, pick) fetch_series(list(id = id, source = "statfin", table = tb, pick = pick))
+    jt <- function(code) list(taloustoimi_1_20180101 = code, sektoriluokitus_7_20230101 = "S13", contentscode = "jtume-TASM")
+    D <- g("jt_dd_velka", "jyev/11yv.px", list(sektoriluokitus_7_20230101 = "S13_C", varojenluokitus_5_20180101 = "F2TF4", contentscode = "jyev-K"))
+    Y <- g("jt_dd_bkt", "ntp/132h.px", list(taloustoimi_1_20180101 = "B1GMH", contentscode = "tasmcp"))
+    B <- g("jt_dd_b9", "jtume/11zf.px", jt("B9")); I1 <- g("jt_dd_d41", "jtume/11zf.px", jt("D41K")); I2 <- g("jt_dd_d41s13", "jtume/11zf.px", jt("D411KS13"))
+    q <- sort(Reduce(intersect, list(D$date, Y$date, B$date, I1$date, I2$date)))
+    v <- function(d) d$value[match(q, d$date)]; r4 <- function(x) as.numeric(stats::filter(x, rep(1, 4), sides = 1)); L4 <- function(x) c(rep(NA, 4), head(x, -4))
+    Dv <- v(D); Y4 <- r4(v(Y)); B4 <- r4(v(B)); I4 <- r4(v(I1) - v(I2))
+    d <- 100 * Dv / Y4; gr <- Y4 / L4(Y4) - 1
+    x <- data.frame(date = q, ratio = d, dd = d - L4(d), pb = -100 * (B4 + I4) / Y4, int = 100 * I4 / Y4, growth = -gr / (1 + gr) * L4(d), irate = 100 * I4 / L4(Dv))
+    x$muut <- x$dd - x$pb - x$int - x$growth
+    .dd_memo$x <- x }
+  x <- .dd_memo$x; data.frame(date = x$date, value = x[[s$part]])
+}
+
 fetch_series <- function(s) {
-  f <- switch(s$source, statfin = fetch_statfin, splice = fetch_splice, eurostat = fetch_eurostat, hicp_ctrb = fetch_hicp_ctrb, ntp_ctrb = fetch_ntp_ctrb, hhi_ctrb = fetch_hhi_ctrb, khi_ctrb = fetch_khi_ctrb, xlsx = fetch_xlsx, stoxx = fetch_stoxx, gdp_np = fetch_gdp_np,
+  f <- switch(s$source, statfin = fetch_statfin, splice = fetch_splice, eurostat = fetch_eurostat, hicp_ctrb = fetch_hicp_ctrb, ntp_ctrb = fetch_ntp_ctrb, hhi_ctrb = fetch_hhi_ctrb, khi_ctrb = fetch_khi_ctrb, xlsx = fetch_xlsx, stoxx = fetch_stoxx, vk = fetch_vk, sum = fetch_sum, jt_decomp = fetch_jt_decomp, gdp_np = fetch_gdp_np,
               ecb = fetch_ecb, fred = fetch_fred, bof = fetch_bof, wb = fetch_wb, stop("Tuntematon lahde ", s$source))
   # valimuisti: onnistunut haku tallennetaan, epaonnistuessa kaytetaan edellista hakua
   cache <- file.path(CACHE_DIR, paste0(s$id, ".csv"))
@@ -331,6 +370,10 @@ fetch_series <- function(s) {
     if (difftime(Sys.time(), t0, units = "days") > STALE_DAYS) STALE_OLD <<- c(STALE_OLD, s$id)
     read.csv(cache, colClasses = c("character", "numeric"))
   })
+  if (isTRUE(s$ytd12)) {                           # kumulatiivinen vuoden alusta -> 12 kk liukuva summa: x_m + x_joulu(v-1) - x_m(v-1)
+    d <- d[order(d$date), ]; y <- substr(d$date, 1, 4); mo <- substr(d$date, 6, 7)
+    dec <- d$value[match(paste0(as.integer(y) - 1, "-12"), d$date)]; prev <- d$value[match(paste0(as.integer(y) - 1, "-", mo), d$date)]
+    d$value <- ifelse(mo == "12", d$value, d$value + dec - prev) }
   if (isTRUE(s$sahm)) {                            # Sahmin saanto: 3 kk keskiarvo miinus sen minimi edeltavalta 12 kk:lta (%-yks.)
     d <- d[order(d$date), ]; m3 <- as.numeric(stats::filter(d$value, rep(1 / 3, 3), sides = 1))
     mn <- vapply(seq_along(m3), function(i) if (i <= 12) NA_real_ else suppressWarnings(min(m3[(i - 12):(i - 1)], na.rm = TRUE)), 0)
@@ -754,7 +797,7 @@ for (set in cfg$sets) {
 # Lahdeluettelo generoidaan kaytossa olevista sarjoista: tuntematon koodi -> tarkistushuomio
 # ---------------------------------------------------------------------
 SRC_NAMES <- list(
-  statfin  = list(.n = "Tilastokeskus", ntp = "kansantalouden tilinpito", jtume = "julkisyhteisöjen tulot ja menot",
+  statfin  = list(.n = "Tilastokeskus", ntp = "kansantalouden tilinpito", jtume = "julkisyhteisöjen tulot ja menot", jyev = "julkisyhteisöjen velka",
                   tyti = "työvoimatutkimus", atp = "avoimet työpaikat", tyonv = "työnvälitystilasto", ati = "ansiotasoindeksi",
                   ktps = "palkkasummakuvaajat", khi = "kuluttajahintaindeksi", kbar = "kuluttajabarometri",
                   ashi = "osakeasuntojen hinnat", asvu = "asuntojen vuokrat", raku = "rakennus- ja asuntotuotanto",
@@ -773,6 +816,8 @@ SRC_NAMES <- list(
   wb       = list(.n = "Maailmanpankki", .all = "raaka-aineiden hinnat, Pink Sheet"),
   xlsx     = list(.n = "Caldara, Iacoviello ym.", tpu = "kauppapoliittisen epävarmuuden indeksi", gpr = "geopoliittisen riskin indeksi"),
   stoxx    = list(.n = "STOXX", .all = "VSTOXX-volatiliteetti-indeksi"),
+  vero     = list(.n = "Verohallinto", Verotulojen_kehitys = "verokertymät", Tulorekisteri = "ennakonpidätyksen alaiset ansiotulot (tulorekisteri)"),
+  vk       = list(.n = "Valtiokonttori", .all = "valtionvelka"),
   fred     = list(.n = "FRED", EUEPUINDXM = "talouspoliittisen epävarmuuden indeksi", GS10 = "Yhdysvaltain korot © OECD",
                   FEDFUNDS = "Yhdysvaltain korot © OECD", IRLTLT01JPM156N = "Japanin korot © OECD", IRSTCI01JPM156N = "Japanin korot © OECD",
                   DCOILBRENTEU = "Brent ja WTI © EIA", DCOILWTICO = "Brent ja WTI © EIA", VIXCLS = "VIX-volatiliteetti-indeksi © Cboe"))
@@ -785,11 +830,13 @@ src_walk <- function(x) {
   if (!is.list(x)) return()
   sc <- x$source
   if (!is.null(sc)) {
-    if (sc == "statfin" || (sc == "splice" && !is.null(x$table))) src_add("statfin", sub("/.*", "", x$table))
+    if (sc == "statfin" && !is.null(x$px_base)) src_add("vero", sub("/.*", "", x$table))
+    else if (sc == "statfin" || (sc == "splice" && !is.null(x$table))) src_add("statfin", sub("/.*", "", x$table))
+    else if (sc == "jt_decomp") { src_add("statfin", "jtume"); src_add("statfin", "jyev"); src_add("statfin", "ntp") }
     else if (sc == "eurostat") src_add("eurostat", x$ds)
     else if (sc == "ecb") src_add("ecb", x$flow)
     else if (sc == "fred") src_add("fred", x$fred_id)
-    else if (sc %in% c("bof", "wb", "stoxx")) src_add(sc, "")
+    else if (sc %in% c("bof", "wb", "stoxx", "vk")) src_add(sc, "")
     else if (sc == "ntp_ctrb") src_add("statfin", "ntp")
     else if (sc == "hhi_ctrb") src_add("statfin", "ntp")
     else if (sc == "khi_ctrb") src_add("statfin", "khi")

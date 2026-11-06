@@ -1736,6 +1736,216 @@
         "kanta_yrit": "var(--g2)",
         "kanta_taloy": "var(--g3)"
       }
+    },
+    {
+      "id": "julkinen",
+      "label": "Julkinen talous",
+      "freq": "M",
+      "default": false,
+      "view": "charts",
+      "from": 2000,
+      "charts": [
+        {
+          "id": "jt_b9",
+          "section": "Rahoitusjäämä",
+          "title": "Rahoitusjäämä alasektoreittain, % BKT:stä",
+          "unit": "%",
+          "dec": 1,
+          "lines": [
+            "jt_b9",
+            "jt_b9_val",
+            "jt_b9_pai",
+            "jt_b9_ssr"
+          ],
+          "connect": true,
+          "from": 2000,
+          "colors": {
+            "jt_b9": "var(--fg)",
+            "jt_b9_val": "var(--accent)",
+            "jt_b9_pai": "var(--q-turn)",
+            "jt_b9_ssr": "var(--g2)"
+          },
+          "note": "Neljän neljänneksen liukuva summa suhteessa BKT:hen. Paikallishallinto sisältää vuodesta 2023 hyvinvointialueet. Lähde: Tilastokeskus.",
+          "wide": true
+        },
+        {
+          "id": "jt_vero",
+          "section": "Verotulot",
+          "title": "Verokertymät, 12 kk liukuva summa, mrd. €",
+          "unit": "",
+          "dec": 1,
+          "lines": [
+            "jt_vero",
+            "jt_vero_hlo",
+            "jt_vero_alv",
+            "jt_vero_yht",
+            "jt_vero_valm"
+          ],
+          "from": 2012,
+          "size": "half",
+          "colors": {
+            "jt_vero": "var(--fg)",
+            "jt_vero_hlo": "var(--accent)",
+            "jt_vero_alv": "var(--q-turn)",
+            "jt_vero_yht": "var(--g2)",
+            "jt_vero_valm": "var(--g3)"
+          },
+          "note": "Nettokertymä (bruttokertymä miinus palautukset) kaikille veronsaajille. Lähde: Verohallinto."
+        },
+        {
+          "id": "jt_veroyy",
+          "section": "Verotulot",
+          "title": "Verokertymien vuosimuutos, %",
+          "unit": "%",
+          "dec": 1,
+          "lines": [
+            "jt_veroyy",
+            "jt_veroyy_hlo",
+            "jt_veroyy_alv",
+            "jt_veroyy_yht"
+          ],
+          "from": 2015,
+          "size": "half",
+          "colors": {
+            "jt_veroyy": "var(--fg)",
+            "jt_veroyy_hlo": "var(--accent)",
+            "jt_veroyy_alv": "var(--q-turn)",
+            "jt_veroyy_yht": "var(--g2)"
+          },
+          "y2": [
+            "jt_veroyy_yht"
+          ],
+          "note": "12 kk liukuvan summan muutos vuodentakaisesta. Yhteisövero oikealla akselilla. Lähde: Verohallinto."
+        },
+        {
+          "id": "jt_trt",
+          "section": "Verotulot",
+          "title": "Ennakonpidätyksen alaiset ansiotulot, vuosimuutos %",
+          "unit": "%",
+          "dec": 1,
+          "lines": [
+            "jt_trt_palk",
+            "jt_trt_elak",
+            "jt_trt_tt"
+          ],
+          "from": 2022,
+          "size": "half",
+          "colors": {
+            "jt_trt_palk": "var(--accent)",
+            "jt_trt_elak": "var(--g2)",
+            "jt_trt_tt": "var(--q-down)"
+          },
+          "y2": [
+            "jt_trt_tt"
+          ],
+          "note": "3 kk liukuvan summan muutos vuodentakaisesta. Työttömyysetuudet oikealla akselilla. Lähde: Verohallinto (tulorekisteri)."
+        },
+        {
+          "id": "jt_velka",
+          "section": "Velka",
+          "title": "Julkisyhteisöjen velka, % BKT:stä",
+          "unit": "%",
+          "dec": 1,
+          "lines": [
+            "jt_velka"
+          ],
+          "connect": true,
+          "from": 2000,
+          "size": "half",
+          "note": "EDP-velka (julkisyhteisöjen sulautettu bruttovelka). Lähde: Tilastokeskus."
+        },
+        {
+          "id": "jt_dd",
+          "section": "Velka",
+          "title": "Velkasuhteen muutoksen hajotelma, %-yks.",
+          "unit": "",
+          "dec": 1,
+          "lines": [
+            "jt_dd"
+          ],
+          "stack": [
+            "jt_dd_pb",
+            "jt_dd_int",
+            "jt_dd_gr",
+            "jt_dd_muu"
+          ],
+          "barSpan": 3,
+          "connect": true,
+          "from": 2012,
+          "size": "half",
+          "stackUnit": "%-yks.",
+          "labels": {
+            "jt_dd": "Velkasuhteen muutos"
+          },
+          "colors": {
+            "jt_dd": "var(--fg)"
+          },
+          "note": "Muutos vuodentakaisesta. Perusjäämä: rahoitusjäämä ilman korkomenoja (alijäämä kasvattaa velkaa). Kasvu: nimellisen BKT:n kasvun vaikutus. Muut erät: velan ja rahoitusjäämän täsmäytyserä, mm. työeläkelaitosten ylijäämän sijoitukset ja kassavarojen muutos. Lähde: Tilastokeskus, oma laskelma."
+        },
+        {
+          "id": "jt_korko",
+          "section": "Velka",
+          "title": "Velan korko, %",
+          "unit": "%",
+          "dec": 2,
+          "lines": [
+            "jt_irate",
+            "jt_vk_korko",
+            "jt_fi10y"
+          ],
+          "connect": true,
+          "from": 2004,
+          "size": "half",
+          "colors": {
+            "jt_irate": "var(--fg)",
+            "jt_vk_korko": "var(--accent)",
+            "jt_fi10y": "var(--g3)"
+          },
+          "dash": [
+            "jt_fi10y"
+          ],
+          "labels": {
+            "jt_irate": "Julkisyhteisöt, implisiittinen",
+            "jt_vk_korko": "Valtionvelan keskikorko",
+            "jt_fi10y": "10 v valtionlainan korko"
+          },
+          "note": "Implisiittinen korko: korkomenot 4 nelj. / velka vuotta aiemmin. Keskikorko: budjettitalouden velan korkomenot 12 kk / keskimääräinen velka. Lähteet: Tilastokeskus, Valtiokonttori, EKP."
+        },
+        {
+          "id": "jt_korkobkt",
+          "section": "Velka",
+          "title": "Korkomenot, % BKT:stä",
+          "unit": "%",
+          "dec": 1,
+          "lines": [
+            "jt_korko_bkt"
+          ],
+          "connect": true,
+          "from": 2000,
+          "size": "half",
+          "note": "Julkisyhteisöjen korkomenot, neljän neljänneksen liukuva summa. Lähde: Tilastokeskus."
+        },
+        {
+          "id": "jt_mat",
+          "section": "Velka",
+          "title": "Valtionvelan maturiteetti, vuotta",
+          "unit": "",
+          "dec": 1,
+          "lines": [
+            "jt_vk_mat",
+            "jt_vk_dur",
+            "jt_vk_fix"
+          ],
+          "from": 2002,
+          "size": "half",
+          "colors": {
+            "jt_vk_mat": "var(--fg)",
+            "jt_vk_dur": "var(--accent)",
+            "jt_vk_fix": "var(--g2)"
+          },
+          "note": "Keskimaturiteetti: velan keskimääräinen jäljellä oleva laina-aika. Lähde: Valtiokonttori."
+        }
+      ]
     }
   ],
   "series": [
@@ -6261,6 +6471,502 @@
       "kind": "level",
       "shift_q": -1,
       "ma": 4
+    },
+    {
+      "id": "jt_b9",
+      "label": "Julkisyhteisöt yhteensä",
+      "set": "julkinen",
+      "source": "statfin",
+      "table": "jtume/11zf.px",
+      "pick": {
+        "taloustoimi_1_20180101": "B9",
+        "sektoriluokitus_7_20230101": "S13",
+        "contentscode": "jtume-TASM"
+      },
+      "q_to_m": true,
+      "roll": 4,
+      "div": {
+        "source": "statfin",
+        "table": "ntp/132h.px",
+        "pick": {
+          "taloustoimi_1_20180101": "B1GMH",
+          "contentscode": "tasmcp"
+        },
+        "q_to_m": true,
+        "roll": 4
+      },
+      "handling": "none",
+      "kind": "level"
+    },
+    {
+      "id": "jt_b9_val",
+      "label": "Valtionhallinto",
+      "set": "julkinen",
+      "source": "statfin",
+      "table": "jtume/11zf.px",
+      "pick": {
+        "taloustoimi_1_20180101": "B9",
+        "sektoriluokitus_7_20230101": "S1311",
+        "contentscode": "jtume-TASM"
+      },
+      "q_to_m": true,
+      "roll": 4,
+      "div": {
+        "source": "statfin",
+        "table": "ntp/132h.px",
+        "pick": {
+          "taloustoimi_1_20180101": "B1GMH",
+          "contentscode": "tasmcp"
+        },
+        "q_to_m": true,
+        "roll": 4
+      },
+      "handling": "none",
+      "kind": "level"
+    },
+    {
+      "id": "jt_b9_pai",
+      "label": "Paikallishallinto",
+      "set": "julkinen",
+      "source": "statfin",
+      "table": "jtume/11zf.px",
+      "pick": {
+        "taloustoimi_1_20180101": "B9",
+        "sektoriluokitus_7_20230101": "S1313",
+        "contentscode": "jtume-TASM"
+      },
+      "q_to_m": true,
+      "roll": 4,
+      "div": {
+        "source": "statfin",
+        "table": "ntp/132h.px",
+        "pick": {
+          "taloustoimi_1_20180101": "B1GMH",
+          "contentscode": "tasmcp"
+        },
+        "q_to_m": true,
+        "roll": 4
+      },
+      "handling": "none",
+      "kind": "level"
+    },
+    {
+      "id": "jt_b9_ssr",
+      "label": "Sosiaaliturvarahastot",
+      "set": "julkinen",
+      "source": "sum",
+      "parts": [
+        {
+          "source": "statfin",
+          "table": "jtume/11zf.px",
+          "pick": {
+            "taloustoimi_1_20180101": "B9",
+            "sektoriluokitus_7_20230101": "S13141",
+            "contentscode": "jtume-TASM"
+          }
+        },
+        {
+          "source": "statfin",
+          "table": "jtume/11zf.px",
+          "pick": {
+            "taloustoimi_1_20180101": "B9",
+            "sektoriluokitus_7_20230101": "S13149",
+            "contentscode": "jtume-TASM"
+          }
+        }
+      ],
+      "q_to_m": true,
+      "roll": 4,
+      "div": {
+        "source": "statfin",
+        "table": "ntp/132h.px",
+        "pick": {
+          "taloustoimi_1_20180101": "B1GMH",
+          "contentscode": "tasmcp"
+        },
+        "q_to_m": true,
+        "roll": 4
+      },
+      "handling": "none",
+      "kind": "level"
+    },
+    {
+      "id": "jt_vero",
+      "label": "Yhteensä",
+      "set": "julkinen",
+      "source": "statfin",
+      "px_base": "https://vero2.stat.fi/PXWeb/api/v1/fi/Vero/",
+      "table": "Verotulojen_kehitys/010_verotall_tau_101.px",
+      "pick": {
+        "Verolaji": "0",
+        "Muuttuja": "netto",
+        "Verovuosi (ajanjakso, jolta veron peruste on syntynyt)": "YYYY",
+        "Tiedot": "Arvo"
+      },
+      "roll": 12,
+      "mult": 0.001,
+      "handling": "none",
+      "kind": "level"
+    },
+    {
+      "id": "jt_vero_hlo",
+      "label": "Henkilöasiakkaiden tulovero",
+      "set": "julkinen",
+      "source": "statfin",
+      "px_base": "https://vero2.stat.fi/PXWeb/api/v1/fi/Vero/",
+      "table": "Verotulojen_kehitys/010_verotall_tau_101.px",
+      "pick": {
+        "Verolaji": "100",
+        "Muuttuja": "netto",
+        "Verovuosi (ajanjakso, jolta veron peruste on syntynyt)": "YYYY",
+        "Tiedot": "Arvo"
+      },
+      "roll": 12,
+      "mult": 0.001,
+      "handling": "none",
+      "kind": "level"
+    },
+    {
+      "id": "jt_vero_yht",
+      "label": "Yhteisövero",
+      "set": "julkinen",
+      "source": "statfin",
+      "px_base": "https://vero2.stat.fi/PXWeb/api/v1/fi/Vero/",
+      "table": "Verotulojen_kehitys/010_verotall_tau_101.px",
+      "pick": {
+        "Verolaji": "200",
+        "Muuttuja": "netto",
+        "Verovuosi (ajanjakso, jolta veron peruste on syntynyt)": "YYYY",
+        "Tiedot": "Arvo"
+      },
+      "roll": 12,
+      "mult": 0.001,
+      "handling": "none",
+      "kind": "level"
+    },
+    {
+      "id": "jt_vero_alv",
+      "label": "Arvonlisävero",
+      "set": "julkinen",
+      "source": "statfin",
+      "px_base": "https://vero2.stat.fi/PXWeb/api/v1/fi/Vero/",
+      "table": "Verotulojen_kehitys/010_verotall_tau_101.px",
+      "pick": {
+        "Verolaji": "300",
+        "Muuttuja": "netto",
+        "Verovuosi (ajanjakso, jolta veron peruste on syntynyt)": "YYYY",
+        "Tiedot": "Arvo"
+      },
+      "roll": 12,
+      "mult": 0.001,
+      "handling": "none",
+      "kind": "level"
+    },
+    {
+      "id": "jt_vero_valm",
+      "label": "Valmisteverot",
+      "set": "julkinen",
+      "source": "statfin",
+      "px_base": "https://vero2.stat.fi/PXWeb/api/v1/fi/Vero/",
+      "table": "Verotulojen_kehitys/010_verotall_tau_101.px",
+      "pick": {
+        "Verolaji": "600",
+        "Muuttuja": "netto",
+        "Verovuosi (ajanjakso, jolta veron peruste on syntynyt)": "YYYY",
+        "Tiedot": "Arvo"
+      },
+      "roll": 12,
+      "mult": 0.001,
+      "handling": "none",
+      "kind": "level"
+    },
+    {
+      "id": "jt_veroyy",
+      "label": "Yhteensä",
+      "set": "julkinen",
+      "source": "statfin",
+      "px_base": "https://vero2.stat.fi/PXWeb/api/v1/fi/Vero/",
+      "table": "Verotulojen_kehitys/010_verotall_tau_101.px",
+      "pick": {
+        "Verolaji": "0",
+        "Muuttuja": "netto",
+        "Verovuosi (ajanjakso, jolta veron peruste on syntynyt)": "YYYY",
+        "Tiedot": "Arvo"
+      },
+      "roll": 12,
+      "handling": "none",
+      "kind": "level",
+      "pct_lag": 12
+    },
+    {
+      "id": "jt_veroyy_hlo",
+      "label": "Henkilöasiakkaiden tulovero",
+      "set": "julkinen",
+      "source": "statfin",
+      "px_base": "https://vero2.stat.fi/PXWeb/api/v1/fi/Vero/",
+      "table": "Verotulojen_kehitys/010_verotall_tau_101.px",
+      "pick": {
+        "Verolaji": "100",
+        "Muuttuja": "netto",
+        "Verovuosi (ajanjakso, jolta veron peruste on syntynyt)": "YYYY",
+        "Tiedot": "Arvo"
+      },
+      "roll": 12,
+      "handling": "none",
+      "kind": "level",
+      "pct_lag": 12
+    },
+    {
+      "id": "jt_veroyy_yht",
+      "label": "Yhteisövero",
+      "set": "julkinen",
+      "source": "statfin",
+      "px_base": "https://vero2.stat.fi/PXWeb/api/v1/fi/Vero/",
+      "table": "Verotulojen_kehitys/010_verotall_tau_101.px",
+      "pick": {
+        "Verolaji": "200",
+        "Muuttuja": "netto",
+        "Verovuosi (ajanjakso, jolta veron peruste on syntynyt)": "YYYY",
+        "Tiedot": "Arvo"
+      },
+      "roll": 12,
+      "handling": "none",
+      "kind": "level",
+      "pct_lag": 12
+    },
+    {
+      "id": "jt_veroyy_alv",
+      "label": "Arvonlisävero",
+      "set": "julkinen",
+      "source": "statfin",
+      "px_base": "https://vero2.stat.fi/PXWeb/api/v1/fi/Vero/",
+      "table": "Verotulojen_kehitys/010_verotall_tau_101.px",
+      "pick": {
+        "Verolaji": "300",
+        "Muuttuja": "netto",
+        "Verovuosi (ajanjakso, jolta veron peruste on syntynyt)": "YYYY",
+        "Tiedot": "Arvo"
+      },
+      "roll": 12,
+      "handling": "none",
+      "kind": "level",
+      "pct_lag": 12
+    },
+    {
+      "id": "jt_veroyy_valm",
+      "label": "Valmisteverot",
+      "set": "julkinen",
+      "source": "statfin",
+      "px_base": "https://vero2.stat.fi/PXWeb/api/v1/fi/Vero/",
+      "table": "Verotulojen_kehitys/010_verotall_tau_101.px",
+      "pick": {
+        "Verolaji": "600",
+        "Muuttuja": "netto",
+        "Verovuosi (ajanjakso, jolta veron peruste on syntynyt)": "YYYY",
+        "Tiedot": "Arvo"
+      },
+      "roll": 12,
+      "handling": "none",
+      "kind": "level",
+      "pct_lag": 12
+    },
+    {
+      "id": "jt_trt_palk",
+      "label": "Palkat",
+      "set": "julkinen",
+      "source": "statfin",
+      "px_base": "https://vero2.stat.fi/PXWeb/api/v1/fi/Vero/",
+      "table": "Tulorekisteri/trt_010.px",
+      "pick": {
+        "Verotuskunta": "000",
+        "Erä": "TRT_TULOT_20",
+        "Tunnusluvut": "Arvo_sum"
+      },
+      "roll": 3,
+      "pct_lag": 12,
+      "handling": "none",
+      "kind": "level"
+    },
+    {
+      "id": "jt_trt_elak",
+      "label": "Eläkkeet",
+      "set": "julkinen",
+      "source": "statfin",
+      "px_base": "https://vero2.stat.fi/PXWeb/api/v1/fi/Vero/",
+      "table": "Tulorekisteri/trt_010.px",
+      "pick": {
+        "Verotuskunta": "000",
+        "Erä": "TRT_TULOT_40",
+        "Tunnusluvut": "Arvo_sum"
+      },
+      "roll": 3,
+      "pct_lag": 12,
+      "handling": "none",
+      "kind": "level"
+    },
+    {
+      "id": "jt_trt_tt",
+      "label": "Työttömyysetuudet",
+      "set": "julkinen",
+      "source": "statfin",
+      "px_base": "https://vero2.stat.fi/PXWeb/api/v1/fi/Vero/",
+      "table": "Tulorekisteri/trt_010.px",
+      "pick": {
+        "Verotuskunta": "000",
+        "Erä": "TRT_TULOT_80",
+        "Tunnusluvut": "Arvo_sum"
+      },
+      "roll": 3,
+      "pct_lag": 12,
+      "handling": "none",
+      "kind": "level"
+    },
+    {
+      "id": "jt_velka",
+      "label": "EDP-velka, % BKT:stä",
+      "set": "julkinen",
+      "source": "statfin",
+      "table": "jyev/12sy.px",
+      "pick": {
+        "contentscode": "debt_GDP"
+      },
+      "q_to_m": true,
+      "handling": "none",
+      "kind": "level"
+    },
+    {
+      "id": "jt_dd",
+      "label": "Velkasuhteen muutos",
+      "set": "julkinen",
+      "source": "jt_decomp",
+      "part": "dd",
+      "q_to_m": true,
+      "handling": "none",
+      "kind": "level"
+    },
+    {
+      "id": "jt_dd_pb",
+      "label": "Perusjäämä",
+      "set": "julkinen",
+      "source": "jt_decomp",
+      "part": "pb",
+      "q_to_m": true,
+      "handling": "none",
+      "kind": "level"
+    },
+    {
+      "id": "jt_dd_int",
+      "label": "Korkomenot",
+      "set": "julkinen",
+      "source": "jt_decomp",
+      "part": "int",
+      "q_to_m": true,
+      "handling": "none",
+      "kind": "level"
+    },
+    {
+      "id": "jt_dd_gr",
+      "label": "Nimellisen BKT:n kasvu",
+      "set": "julkinen",
+      "source": "jt_decomp",
+      "part": "growth",
+      "q_to_m": true,
+      "handling": "none",
+      "kind": "level"
+    },
+    {
+      "id": "jt_dd_muu",
+      "label": "Muut erät",
+      "set": "julkinen",
+      "source": "jt_decomp",
+      "part": "muut",
+      "q_to_m": true,
+      "handling": "none",
+      "kind": "level"
+    },
+    {
+      "id": "jt_korko_bkt",
+      "label": "Korkomenot, % BKT:stä",
+      "set": "julkinen",
+      "source": "jt_decomp",
+      "part": "int",
+      "q_to_m": true,
+      "handling": "none",
+      "kind": "level"
+    },
+    {
+      "id": "jt_irate",
+      "label": "Julkisyhteisöjen implisiittinen korko",
+      "set": "julkinen",
+      "source": "jt_decomp",
+      "part": "irate",
+      "q_to_m": true,
+      "handling": "none",
+      "kind": "level"
+    },
+    {
+      "id": "jt_vk_korko",
+      "label": "Valtionvelan keskikorko",
+      "set": "julkinen",
+      "source": "vk",
+      "path": "structure-of-debt",
+      "field": "interest",
+      "handling": "none",
+      "kind": "level",
+      "filter": {
+        "serial": "BUDGETARY DEBT"
+      },
+      "ytd12": true,
+      "div": {
+        "source": "vk",
+        "path": "structure-of-debt",
+        "field": "debtAmount",
+        "filter": {
+          "serial": "BUDGETARY DEBT"
+        },
+        "roll": 12,
+        "mult": 0.08333333333333333
+      }
+    },
+    {
+      "id": "jt_fi10y",
+      "label": "Suomen 10 v korko",
+      "set": "julkinen",
+      "source": "ecb",
+      "flow": "IRS",
+      "key": "M.FI.L.L40.CI.0000.EUR.N.Z",
+      "handling": "none",
+      "kind": "level"
+    },
+    {
+      "id": "jt_vk_mat",
+      "label": "Keskimaturiteetti",
+      "set": "julkinen",
+      "source": "vk",
+      "path": "interest-rate-sensitivity",
+      "field": "averageMaturity",
+      "handling": "none",
+      "kind": "level"
+    },
+    {
+      "id": "jt_vk_fix",
+      "label": "Keskimääräinen korkosidonnaisuus",
+      "set": "julkinen",
+      "source": "vk",
+      "path": "interest-rate-sensitivity",
+      "field": "averageFixing",
+      "handling": "none",
+      "kind": "level"
+    },
+    {
+      "id": "jt_vk_dur",
+      "label": "Duraatio",
+      "set": "julkinen",
+      "source": "vk",
+      "path": "interest-rate-sensitivity",
+      "field": "duration",
+      "handling": "none",
+      "kind": "level"
     }
   ]
 }
