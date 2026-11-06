@@ -1965,10 +1965,10 @@
           ],
           "stackColors": [
             "var(--g1)",
-            "#5b84b8",
-            "#a9c0dc",
+            "color-mix(in srgb, var(--g1) 62%, var(--plot))",
+            "color-mix(in srgb, var(--g1) 32%, var(--plot))",
             "var(--g3)",
-            "#9fcbb9"
+            "color-mix(in srgb, var(--g3) 50%, var(--plot))"
           ],
           "barSpan": 3,
           "connect": true,

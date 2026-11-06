@@ -15,6 +15,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Manrope:wght@300;400;500;600&display=swap">
+<script>try { const t = new URLSearchParams(location.search).get("teema") || localStorage.getItem("teema"); if (t && t !== "nykyinen") document.documentElement.dataset.theme = t; } catch (e) {}</script>
 <style>
 /* Layout: tasainen vaalea pohja, osiot erotettu ohuella ylaviivalla (ei kortteja). Ylapalkki, iso otsikko, kello + luettelo, yksityiskohdat alla. */
 :root {
@@ -27,6 +28,22 @@
   --font-data: "Manrope", system-ui, -apple-system, "Segoe UI", sans-serif;
   color-scheme: light;
 }
+
+/* vaihdettavat vaiteemat (kokeilu): data-theme html-elementissa, valinta tallennetaan selaimeen */
+:root { --dim: #c4c9d0; }
+:root[data-theme="petrooli"] { --bg: #fafaf8; --surface: #fafaf8; --plot: #ffffff; --fg: #1a1d21; --accent: #0e6e6e;
+  --q-up: #2a7f62; --q-turn: #c9862b; --q-down: #b23a3a; --q-rec: #3a6ea5; --g1: #0e6e6e; --g2: #e09f3e; --g3: #335c81; --g4: #6b7280; --g5: #9e2a2b; }
+:root[data-theme="pastelli"] { --bg: #fdfcfb; --surface: #fdfcfb; --plot: #ffffff; --fg: #2b2f36; --muted: #737985; --line: #eceae6; --grid: #f1efec; --accent: #5b7db1;
+  --q-up: #6fb38f; --q-turn: #e3ad5c; --q-down: #e07a7a; --q-rec: #7ba3d9; --g1: #5b7db1; --g2: #e8a87c; --g3: #85c1a8; --g4: #a3a8b3; --g5: #c9a3d1; }
+:root[data-theme="tumma"] { --bg: #0f1216; --surface: #0f1216; --plot: #141920; --fg: #e6e8eb; --muted: #98a1ab; --line: #262c33; --grid: #1d232a; --rule: #c9ced5; --pt: #c0c6cd;
+  --accent: #6aa8ff; --q-up: #4fc58a; --q-turn: #f0a64a; --q-down: #ff6b6b; --q-rec: #6aa8ff; --g1: #6aa8ff; --g2: #c9a0ff; --g3: #4fd1b5; --g4: #8a939d; --g5: #e0a36b;
+  --dim: #4a525c; color-scheme: dark; }
+.thm { display: flex; align-items: center; gap: 7px; padding: 6px 0 14px; }
+.thm button { width: 16px; height: 16px; padding: 0; border-radius: 50%; border: 1px solid var(--line); cursor: pointer; background: linear-gradient(135deg, var(--sb) 50%, var(--sa) 50%); }
+.thm button[aria-pressed="true"] { box-shadow: 0 0 0 2px var(--bg), 0 0 0 3.5px var(--fg); }
+.thm button:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; }
+.topbar .sets { margin-left: auto; }
+@media (max-width: 860px) { .topbar .sets { margin-left: 0; } .thm { padding: 0 0 12px; } }
 
 * { box-sizing: border-box; }
 [hidden] { display: none !important; }
@@ -508,6 +525,12 @@ footer b { color: var(--fg); font-weight: 600; }
   <header class="topbar">
     <a class="brand" href="./"><h1 id="headline">Suhdannetilanne</h1></a>
     <nav class="sets" id="sets" aria-label="Näkymä"></nav>
+    <div class="thm" id="thm" role="group" aria-label="Väriteema">
+      <button type="button" data-t="" title="Väriteema: nykyinen" aria-label="Nykyinen" style="--sb:#fbfbfc;--sa:#1d4f7f"></button>
+      <button type="button" data-t="petrooli" title="Väriteema: petrooli" aria-label="Petrooli" style="--sb:#fafaf8;--sa:#0e6e6e"></button>
+      <button type="button" data-t="pastelli" title="Väriteema: pastelli" aria-label="Pastelli" style="--sb:#fdfcfb;--sa:#e8a87c"></button>
+      <button type="button" data-t="tumma" title="Väriteema: tumma" aria-label="Tumma" style="--sb:#0f1216;--sa:#6aa8ff"></button>
+    </div>
   </header>
 
   <section class="hero">
@@ -735,7 +758,7 @@ footer b { color: var(--fg); font-weight: 600; }
       const p = at(s, idx); if (!p) return;
       // vari: vaihevari, paitsi valintatilassa valitsemattomat neutraalin harmaina; yksittaisen valitun polku sen vaihevarilla
       const single = picked.size <= 4 && !(sel && sel.startsWith("g:"));   // yksitellen valitut (enintaan 4): kullekin oma polku; koko ryhma vain Kulku-kytkimella
-      if (!s.comp) col = !selMode || hi(s) ? qcol(quad(p.l, p.c)) : "#c4c9d0";
+      if (!s.comp) col = !selMode || hi(s) ? qcol(quad(p.l, p.c)) : "var(--dim)";
       const tailCol = s.comp ? col : hi(s) && single ? col : "var(--muted)";
       const off = qf && (quad(p.l, p.c) !== qf || (!s.comp && !s.isGroup && !s.in_composite)) && !hi(s);
       const dim = false;                                                // valitsemattomat neutraalin harmaina (vari yllä), ei himmennysta
@@ -1977,6 +2000,13 @@ footer b { color: var(--fg); font-weight: 600; }
     if (b.id === "grCharts") { clearTimeout(rzT); rzT = setTimeout(() => { drawCharts(); if (set.forecast) renderFc(); }, 150); return; }   // ylapari sovitetaan uudelleen
     if (nw !== lastNarrow) { lastNarrow = nw; renderCharts(b); } });
   function renderAll() { renderHeader(); update(); }
+  (function () {                                                    // vaiteeman valinta
+    const bs = [...document.querySelectorAll("#thm button")], cur = () => document.documentElement.dataset.theme || "";
+    const mark = () => bs.forEach(b => b.setAttribute("aria-pressed", b.dataset.t === cur()));
+    bs.forEach(b => b.onclick = () => { if (b.dataset.t) document.documentElement.dataset.theme = b.dataset.t; else delete document.documentElement.dataset.theme;
+      try { localStorage.setItem("teema", b.dataset.t || "nykyinen"); } catch (e) {} mark(); });
+    mark();
+  })();
   const HASH = { suhdanne: "suhdanne", bkt: "reaalitalous", rahoitus: "rahoitus", julkinen: "julkinen-talous" };
   const hashFor = () => "#" + (HASH[set.id] || set.id) + (set.growth && grSel !== "bkt" ? "/" + grSel : "");
   function writeHash() { const h = hashFor(); if (location.hash !== h) history.pushState(null, "", h); }
