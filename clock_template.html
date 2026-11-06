@@ -1910,7 +1910,7 @@ footer b { color: var(--fg); font-weight: 600; }
           const sgn = v => c.lvl ? "" : v > 0 ? "+" : "";                 // lvl: pinotut tasot, ei etumerkkia
           const yy = c.yy && ser(c.yy) ? ser(c.yy).values[i] : null, yyT = yy != null ? ` (${yy > 0 ? "+" : ""}${fmtV(yy, 1)} % v/v)` : "";
           if (valEl) valEl.innerHTML = `${fP(P[i])}: ` + c.lines.map((id, k) => { const v = L[k][i];   // useampi viiva: esim. YKHI ja KHI
-            return `${c.lines.length > 1 ? lbl(id) + " " : ""}<b>${sgn(v)}${fmtV(v, c.dec)}${u}</b>`; }).join(", ") + yyT;
+            return `${c.lines.length > 1 ? lbl(id) + " " : ""}<b>${sgn(v)}${fmtV(v, (c.decs || {})[id] ?? c.dec)}${u}</b>`; }).join(", ") + yyT;
           const su = c.stackUnit != null ? c.stackUnit : "%-yks.";
           subEl.hidden = erit; if (!erit) subEl.textContent = (c.ts ? `${fP(P[i])}: ${ser(c.lines[0]).label} ${sgn(g)}${fmtV(g, c.dec)}${u}${yyT}. ` : "") +
             c.stack.map((id, k) => `${ser(id).label} ${sgn(+(S[k][i] || 0).toFixed(c.dec))}${fmtV(S[k][i], c.dec)}`).join(", ") + (su ? " " + su : "") + (su && su.endsWith(".") ? "" : ".");
@@ -1925,7 +1925,7 @@ footer b { color: var(--fg); font-weight: 600; }
           if (valEl) valEl.innerHTML = "";                                   // pvm ja arvot otsikon alle, ei alakulmaan
           const sg = v => c.ts && !c.rawv && v > 0 ? "+" : "";
           subEl.textContent = (c.avg ? `${fP(P[j])} keskiarvo: ` : `${fP(P[j])}: `) +   // avg: kuukausisarjat neljanneksen keskiarvona
-            c.lines.map(id => { const v = L[c.lines.indexOf(id)][j]; return `${lbl(id)} ${sg(v)}${fmtV(v, c.dec)}${c.unit === "%" ? " %" : ""}`; }).join(", ") +
+            c.lines.map(id => { const v = L[c.lines.indexOf(id)][j]; return `${lbl(id)} ${sg(v)}${fmtV(v, (c.decs || {})[id] ?? c.dec)}${c.unit === "%" ? " %" : ""}`; }).join(", ") +
             (LW && LW[j] != null ? `, ${c.lower.label} ${LW[j] > 0 ? "+" : ""}${fmtV(LW[j], c.lower.dec != null ? c.lower.dec : 1)}` : "") + ".";
         } else {
           const a = L[0]; let j = i; while (j > 0 && a[j] == null) j--;

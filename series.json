@@ -1681,15 +1681,40 @@
           "size": "half"
         },
         {
-          "id": "cugold",
-          "title": "Kuparin ja kullan hintasuhde",
+          "id": "gpr",
+          "title": "Geopoliittinen riski",
           "unit": "",
-          "dec": 2,
+          "dec": 0,
           "lines": [
-            "cugold"
+            "gpr",
+            "gpr_fin"
+          ],
+          "y2": [
+            "gpr_fin"
+          ],
+          "labels": {
+            "gpr": "Maailma (1985–2019 = 100)",
+            "gpr_fin": "Suomi (% uutisista)"
+          },
+          "from": 2000,
+          "note": "3 kk liukuva keskiarvo. Uutisiin perustuva indeksi; Suomi: Suomen mainitsevien geopoliittisen riskin uutisten osuus kaikista uutisista. Lähde: Caldara ja Iacoviello.",
+          "section": "Riskit ja epävarmuus",
+          "size": "half",
+          "decs": {
+            "gpr_fin": 2
+          }
+        },
+        {
+          "id": "vol",
+          "title": "Osakemarkkinoiden volatiliteetti",
+          "unit": "",
+          "dec": 1,
+          "lines": [
+            "vstoxx",
+            "vix"
           ],
           "from": 2000,
-          "note": "Kupari $/t jaettuna kullalla $/unssi. Lähde: Maailmanpankki (Pink Sheet), CC BY 4.0.",
+          "note": "Optioiden hinnoista johdettu odotettu volatiliteetti, kuukausikeskiarvo. Lähteet: STOXX, Cboe (FRED).",
           "section": "Riskit ja epävarmuus",
           "size": "half"
         }
@@ -4039,15 +4064,50 @@
       "table_only": true
     },
     {
-      "id": "cugold",
-      "label": "Kupari / kulta",
+      "id": "gpr",
+      "label": "Maailma",
       "set": "rahoitus",
-      "source": "wb",
-      "series": "Copper",
-      "per": {
-        "source": "wb",
-        "series": "Gold"
-      },
+      "source": "xlsx",
+      "src_key": "gpr",
+      "url": "https://www.matteoiacoviello.com/gpr_files/data_gpr_export.xls",
+      "date_col": "month",
+      "value_col": "GPR",
+      "ma": 3,
+      "handling": "none",
+      "kind": "level",
+      "optional": true
+    },
+    {
+      "id": "gpr_fin",
+      "label": "Suomi",
+      "set": "rahoitus",
+      "source": "xlsx",
+      "src_key": "gpr",
+      "url": "https://www.matteoiacoviello.com/gpr_files/data_gpr_export.xls",
+      "date_col": "month",
+      "value_col": "GPRC_FIN",
+      "ma": 3,
+      "handling": "none",
+      "kind": "level",
+      "optional": true
+    },
+    {
+      "id": "vstoxx",
+      "label": "VSTOXX (euroalue)",
+      "set": "rahoitus",
+      "source": "stoxx",
+      "url": "https://www.stoxx.com/document/Indices/Current/HistoricalData/h_v2tx.txt",
+      "handling": "none",
+      "kind": "level",
+      "optional": true
+    },
+    {
+      "id": "vix",
+      "label": "VIX (Yhdysvallat)",
+      "set": "rahoitus",
+      "source": "fred",
+      "fred_id": "VIXCLS",
+      "fred_avg": true,
       "handling": "none",
       "kind": "level",
       "optional": true

@@ -158,18 +158,22 @@ fetch_wb <- function(s) {
 }
 
 # Excel-tiedosto verkosta (esim. Caldara ym. kauppapoliittisen epavarmuuden indeksi): valilehti, paivays- ja arvosarake
+.xlsx_memo <- new.env()                          # sama tiedosto useammalle sarjalle (esim. GPR: maailma ja Suomi) haetaan kerran
 fetch_xlsx <- function(s) {
-  f <- tempfile(fileext = ".xlsx"); r <- RETRY("GET", s$url, write_disk(f, overwrite = TRUE), timeout(120), times = 3, quiet = TRUE)
-  stop_for_status(r)
-  x <- as.data.frame(readxl::read_excel(f, sheet = s$sheet))
+  if (is.null(.xlsx_memo[[s$url]])) {
+    f <- tempfile(fileext = paste0(".", tools::file_ext(s$url))); r <- RETRY("GET", s$url, write_disk(f, overwrite = TRUE), timeout(120), times = 3, quiet = TRUE)
+    stop_for_status(r); .xlsx_memo[[s$url]] <- f }
+  x <- as.data.frame(readxl::read_excel(.xlsx_memo[[s$url]], sheet = s$sheet, guess_max = 10000))
   d <- as.Date(x[[s$date_col]]); v <- suppressWarnings(as.numeric(x[[s$value_col]]))
   ok <- !is.na(d) & !is.na(v)
   data.frame(date = format(d[ok], "%Y-%m"), value = v[ok])
 }
 
 fetch_fred <- function(s) {
-  d <- read.csv(text = get_text(paste0(FRED, s$fred_id)))
-  data.frame(date = substr(d[[1]], 1, if (isTRUE(s$daily)) 10 else 7), value = suppressWarnings(as.numeric(d[[2]])))
+  d <- read.csv(text = get_text(paste0(FRED, s$fred_id, if (isTRUE(s$fred_avg)) "&fq=Monthly&fam=avg" else "")))   # fred_avg: paivasarjan kuukausikeskiarvo
+  d <- data.frame(date = substr(d[[1]], 1, if (isTRUE(s$daily)) 10 else 7), value = suppressWarnings(as.numeric(d[[2]])))
+  if (isTRUE(s$fred_avg)) d <- d[!is.na(d$value), ]   # kesken oleva kuukausi tyhja
+  d
 }
 
 fetch_bof <- function(s) {                       # Suomen Pankki, avoin data v4
@@ -302,8 +306,16 @@ fetch_splice <- function(s) {
   d[order(d$date), ]
 }
 
+# STOXX-indeksit (esim. VSTOXX): paivatiedosto "pp.kk.vvvv;tunnus;arvo" -> kuukausikeskiarvo (vain paattyneet kuukaudet)
+fetch_stoxx <- function(s) {
+  x <- read.csv(text = get_text(s$url), sep = ";", colClasses = "character")
+  d <- as.Date(x[[1]], "%d.%m.%Y"); v <- suppressWarnings(as.numeric(x[[3]])); ok <- !is.na(d) & !is.na(v)
+  m <- format(d[ok], "%Y-%m"); a <- tapply(v[ok], m, mean); a <- a[names(a) < format(Sys.Date(), "%Y-%m")]
+  data.frame(date = names(a), value = as.numeric(a))
+}
+
 fetch_series <- function(s) {
-  f <- switch(s$source, statfin = fetch_statfin, splice = fetch_splice, eurostat = fetch_eurostat, hicp_ctrb = fetch_hicp_ctrb, ntp_ctrb = fetch_ntp_ctrb, hhi_ctrb = fetch_hhi_ctrb, khi_ctrb = fetch_khi_ctrb, xlsx = fetch_xlsx, gdp_np = fetch_gdp_np,
+  f <- switch(s$source, statfin = fetch_statfin, splice = fetch_splice, eurostat = fetch_eurostat, hicp_ctrb = fetch_hicp_ctrb, ntp_ctrb = fetch_ntp_ctrb, hhi_ctrb = fetch_hhi_ctrb, khi_ctrb = fetch_khi_ctrb, xlsx = fetch_xlsx, stoxx = fetch_stoxx, gdp_np = fetch_gdp_np,
               ecb = fetch_ecb, fred = fetch_fred, bof = fetch_bof, wb = fetch_wb, stop("Tuntematon lahde ", s$source))
   # valimuisti: onnistunut haku tallennetaan, epaonnistuessa kaytetaan edellista hakua
   cache <- file.path(CACHE_DIR, paste0(s$id, ".csv"))
@@ -759,10 +771,11 @@ SRC_NAMES <- list(
                   CISS = "rahoitusstressi", CLIFS = "rahoitusstressi", BLS = "pankkien luotonantokysely", SPF = "ammattiennustajien kysely",
                   ILM = "Eurojärjestelmän viikkotase", BSI = "rahan määrä ja luotonanto"),
   wb       = list(.n = "Maailmanpankki", .all = "raaka-aineiden hinnat, Pink Sheet"),
-  xlsx     = list(.n = "Caldara, Iacoviello ym.", tpu = "kauppapoliittisen epävarmuuden indeksi"),
+  xlsx     = list(.n = "Caldara, Iacoviello ym.", tpu = "kauppapoliittisen epävarmuuden indeksi", gpr = "geopoliittisen riskin indeksi"),
+  stoxx    = list(.n = "STOXX", .all = "VSTOXX-volatiliteetti-indeksi"),
   fred     = list(.n = "FRED", EUEPUINDXM = "talouspoliittisen epävarmuuden indeksi", GS10 = "Yhdysvaltain korot © OECD",
                   FEDFUNDS = "Yhdysvaltain korot © OECD", IRLTLT01JPM156N = "Japanin korot © OECD", IRSTCI01JPM156N = "Japanin korot © OECD",
-                  DCOILBRENTEU = "Brent ja WTI © EIA", DCOILWTICO = "Brent ja WTI © EIA"))
+                  DCOILBRENTEU = "Brent ja WTI © EIA", DCOILWTICO = "Brent ja WTI © EIA", VIXCLS = "VIX-volatiliteetti-indeksi © Cboe"))
 src_used <- list()
 src_add <- function(p, code) {
   nm <- SRC_NAMES[[p]]; it <- if (!is.null(nm$.all)) nm$.all else nm[[code]]
@@ -776,7 +789,7 @@ src_walk <- function(x) {
     else if (sc == "eurostat") src_add("eurostat", x$ds)
     else if (sc == "ecb") src_add("ecb", x$flow)
     else if (sc == "fred") src_add("fred", x$fred_id)
-    else if (sc %in% c("bof", "wb")) src_add(sc, "")
+    else if (sc %in% c("bof", "wb", "stoxx")) src_add(sc, "")
     else if (sc == "ntp_ctrb") src_add("statfin", "ntp")
     else if (sc == "hhi_ctrb") src_add("statfin", "ntp")
     else if (sc == "khi_ctrb") src_add("statfin", "khi")
