@@ -2001,7 +2001,7 @@
           "colors": {
             "jt_veroyy": "var(--fg)",
             "jt_veroyy_hlo": "var(--accent)",
-            "jt_veroyy_alv": "var(--q-turn)",
+            "jt_veroyy_alv": "var(--g3)",
             "jt_veroyy_yht": "var(--g2)"
           },
           "y2": [
