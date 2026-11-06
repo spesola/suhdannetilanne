@@ -1282,7 +1282,6 @@ footer b { color: var(--fg); font-weight: 600; }
     tc.innerHTML = `<div class="fhead"><h2>Ennustajat</h2></div><table class="snap fct"><thead><tr><th></th><th>Julkaistu</th>${FY.map(y => `<th>${y}</th>`).join("")}</tr></thead><tbody>` +
       inc.map(r => `<tr><th>${nm(r)}</th><td class="d">${dd(r.date)}</td>${r.v.map(v => `<td>${v == null ? "–" : pc(v)}</td>`).join("")}</tr>`).join("") +
       `<tr class="avg"><th>Keskiarvo</th><td></td>${st.map(s => `<td>${s ? pc(s.mean) : "–"}</td>`).join("")}</tr></tbody></table>` +
-      (old.length ? `<p class="fnote">Ei mukana (yli ${Math.round(F.max_age / 30)} kk vanhat): ${old.map(r => `${r.who} ${fmtD(r.date)} (${r.v.map(pc).join(" / ")})`).join(", ")}.</p>` : "") +
       (F.src_url ? `<p class="fnote"><a href="${F.src_url}" target="_blank" rel="noopener">Finanssialan ennustekoonti</a></p>` : "");
     box.appendChild(tc);
     menuize(card);
