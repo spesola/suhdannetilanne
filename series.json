@@ -979,7 +979,171 @@
           ],
           "default": "asuntohinnat"
         }
-      ]
+      ],
+      "forecast": {
+        "title": "BKT:n kasvu: toteutunut ja ennusteet",
+        "years": [
+          2026,
+          2027
+        ],
+        "from": 2019,
+        "max_age": 120,
+        "note": "Volyymin muutos, %. Keskiarvo ja vaihteluväli alle neljä kuukautta vanhoista ennusteista. Lähteet: Tilastokeskus, ennustelaitokset (koonti: Finanssiala).",
+        "src_url": "https://finanssiala.fi/en/publications/latest-forecasts-for-the-finnish-economy",
+        "rows": [
+          {
+            "who": "OP",
+            "date": "2026-10-14",
+            "v": [
+              2.0,
+              2.0
+            ]
+          },
+          {
+            "who": "Säästöpankkiryhmä",
+            "date": "2026-10-14",
+            "v": [
+              1.7,
+              1.8
+            ]
+          },
+          {
+            "who": "IMF",
+            "date": "2026-10-12",
+            "v": [
+              1.7,
+              1.4
+            ]
+          },
+          {
+            "who": "S-Pankki",
+            "date": "2026-10-06",
+            "v": [
+              1.6,
+              2.0
+            ],
+            "url": "https://www.sttinfo.fi/tiedote/72387382/s-pankin-talousennuste-suomen-talouskasvu-kiihtyy-investointien-vauhdittamana?lang=fi"
+          },
+          {
+            "who": "Valtiovarainministeriö",
+            "date": "2026-09-21",
+            "v": [
+              1.6,
+              1.8
+            ]
+          },
+          {
+            "who": "Etla",
+            "date": "2026-09-17",
+            "v": [
+              1.7,
+              1.9
+            ],
+            "url": "https://www.etla.fi/en/latest/etla-forecasts-the-upturn-in-growth-is-strengthening-and-investment-is-picking-up-in-finland/"
+          },
+          {
+            "who": "Labore",
+            "date": "2026-09-17",
+            "v": [
+              1.7,
+              1.6
+            ],
+            "url": "https://www.sttinfo.fi/tiedote/72354096/labores-economic-forecast-2026-2028-growth-gains-promising-momentum-across-the-economy?lang=fi"
+          },
+          {
+            "who": "Suomen Pankki",
+            "date": "2026-09-15",
+            "v": [
+              1.7,
+              1.6
+            ],
+            "url": "https://www.sttinfo.fi/tiedote/72321420/suomen-pankin-valiennuste-suomen-talouden-hyva-vire-jatkuu?lang=fi"
+          },
+          {
+            "who": "Kuntarahoitus",
+            "date": "2026-09-10",
+            "v": [
+              1.8,
+              2.0
+            ]
+          },
+          {
+            "who": "PTT",
+            "date": "2026-09-10",
+            "v": [
+              1.4,
+              1.5
+            ],
+            "url": "https://www.sttinfo.fi/tiedote/72307068/ennuste-suomen-talous-kasvaa-mutta-kasvun-jatkuvuus-on-hataralla-pohjalla?lang=fi"
+          },
+          {
+            "who": "Danske Bank",
+            "date": "2026-09-03",
+            "v": [
+              1.8,
+              1.4
+            ],
+            "url": "https://www.sttinfo.fi/tiedote/72287200/suhdannekatsaus-suomen-talous-tarjosi-kasvuyllatyksen?lang=fi"
+          },
+          {
+            "who": "Nordea",
+            "date": "2026-09-02",
+            "v": [
+              1.7,
+              2.0
+            ],
+            "url": "https://www.nordea.com/fi/media/2026-09-02/nordea-suomen-talouskasvu-vahvistuu-ja-nakymat-kirkastuvat"
+          },
+          {
+            "who": "Swedbank",
+            "date": "2026-08-25",
+            "v": [
+              2.2,
+              1.8
+            ]
+          },
+          {
+            "who": "Aktia",
+            "date": "2026-08-12",
+            "v": [
+              2.1,
+              1.8
+            ]
+          },
+          {
+            "who": "Hypo",
+            "date": "2026-06-30",
+            "v": [
+              1.5,
+              1.7
+            ]
+          },
+          {
+            "who": "POP Pankki",
+            "date": "2026-06-30",
+            "v": [
+              0.9,
+              1.3
+            ]
+          },
+          {
+            "who": "OECD",
+            "date": "2026-06-03",
+            "v": [
+              0.8,
+              1.2
+            ]
+          },
+          {
+            "who": "Euroopan komissio",
+            "date": "2026-05-21",
+            "v": [
+              0.8,
+              1.4
+            ]
+          }
+        ]
+      }
     },
     {
       "id": "rahoitus",

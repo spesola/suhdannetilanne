@@ -614,9 +614,20 @@ for (set in cfg$sets) {
     last_i  <- max(vapply(members, function(s) max(per_idx(raws[[s$id]]$date, freq)), numeric(1)))
     start_i <- per_idx(if (freq == "M") sprintf("%d-01", from_y) else sprintf("%d-Q1", from_y), freq)
     periods <- idx_per(start_i:last_i, freq)
+    fc <- set$forecast                             # BKT-ennusteet (series.json, kasin): toteutunut vuosikasvu alkuperaisesta sarjasta
+    if (!is.null(fc)) {
+      d <- fetch_series(list(id = "bkt_vuosi", source = "statfin", table = "ntp/132h.px",
+                             pick = list(taloustoimi_1_20180101 = "B1GMH", contentscode = "tasmvv2015")))
+      ys <- tapply(d$value, substr(d$date, 1, 4), function(v) if (sum(!is.na(v)) == 4) sum(v) else NA)
+      ys <- ys[!is.na(ys)]; g <- 100 * (ys[-1] / ys[-length(ys)] - 1)
+      g <- g[as.integer(names(g)) >= fc$from]
+      fc$actual <- list(years = as.integer(names(g)), values = round(unname(as.numeric(g)), 2))
+      nd <- max(as.Date(vapply(fc$rows, function(r) r$date, "")))
+      if (as.numeric(Sys.Date() - nd) > 60) CHECKS <- c(CHECKS, sprintf("BKT-ennusteet: uusin ennuste %s, päivitä series.json", format(nd, "%d.%m.%Y")))
+    }
     sets_out[[length(sets_out) + 1]] <- list(
       id = set$id, label = set$label, freq = freq, default = isTRUE(set$default), view = "charts",
-      from = from_y, periods = periods, charts = set$charts, colors = set$colors,
+      from = from_y, periods = periods, charts = set$charts, colors = set$colors, forecast = fc,
       growth = unname(rows), tabs = set$tabs, kpis = set$kpis,   # kasvunakyma: taulukko ja kuviot (ei karttaa), alavalilehdet
       series = unname(lapply(ser, function(x) { r <- raws[[x$id]]
         list(id = x$id, label = x$label, last = r$date[max(which(!is.na(r$value)))], values = r3(r$value[match(periods, r$date)])) })))

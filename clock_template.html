@@ -364,6 +364,18 @@ button.dl:hover { text-decoration-color: var(--fg); }
 .fcard.side .kv .sm b { font-size: 0.86rem; }
 .grcol > .card { grid-column: auto; }
 .grmore { margin-top: 0; }
+/* BKT-ennusteet (sivun loppu) */
+.fcsec .fgrid > .fsec { margin: 0 0 22px; }
+.fcsec .fcard.tt { grid-column: 1 / span 4; }
+.fcsec .tcard { grid-column: 5 / span 2; }
+@media (max-width: 980px) { .fcsec .fcard.tt, .fcsec .tcard { grid-column: 1 / -1; } }
+.snap.fct th, .snap.fct td { padding-top: 4px; padding-bottom: 4px; }
+.snap.fct thead th:nth-child(3), .snap.fct tbody td:nth-child(3) { display: table-cell; }
+.snap.fct tbody th a { color: inherit; text-decoration: none; }
+.snap.fct tbody th a:hover { color: var(--accent); text-decoration: underline; }
+.snap.fct td.d { color: var(--muted); font-size: 0.76rem; }
+.fcsec .fnote a { color: inherit; }
+.snap.fct tr.avg th, .snap.fct tr.avg td { font-weight: 600; border-bottom: 0; border-top: 1px solid var(--fg); }
 .grmore .fhead h2 { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; min-width: 0; flex: 1 1 0; }   /* tasakorkeat kortit */
 .grmore .fsub { display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; min-height: 2.4em; }
 .secnav { grid-column: 1 / -1; position: sticky; top: 0; z-index: 5; background: var(--bg); display: flex; gap: 6px; overflow-x: auto; scrollbar-width: none;
@@ -548,6 +560,7 @@ footer b { color: var(--fg); font-weight: 600; }
     <div class="grrow"><div class="grcol" id="grCharts"></div><div class="grside" id="grSide"></div></div>
   </section>
   <section class="grmore" id="grMore" hidden><div class="fgrid" id="grMoreGrid"></div></section>
+  <section class="fcsec" id="fcSec" hidden><div class="fgrid" id="fcGrid"></div></section>
   <section class="card" id="finSum" hidden></section>
   <section class="fgrid" id="charts" hidden></section>
   <dialog class="zoom" id="zoom" aria-label="Suurennettu kuvio"><div class="zbar"><button type="button" id="zoomClose">Sulje</button></div><div class="fgrid" id="zoomBody"></div></dialog>
@@ -1116,8 +1129,9 @@ footer b { color: var(--fg); font-weight: 600; }
     $("tiles").hidden = !(charts && set.tiles && set.tiles.length);
     $("growthSec").hidden = !(charts && set.growth); $("grMore").hidden = true;
     $("finSum").hidden = !(charts && set.summary && set.summary.length);
+    $("fcSec").hidden = !(charts && set.forecast);
     $("charts").hidden = !charts || !!set.growth;
-    if (charts) { renderTiles(); if (set.growth) renderGrowth(); if (set.summary) renderSummary(); renderKpis(); drawCharts(); return; }
+    if (charts) { renderTiles(); if (set.growth) renderGrowth(); if (set.summary) renderSummary(); renderKpis(); drawCharts(); renderFc(); return; }
     renderKpis();
     renderTS(); renderHM();
   }
@@ -1203,6 +1217,76 @@ footer b { color: var(--fg); font-weight: 600; }
     const sy = set.series.find(x => x.id === "bkt_yy"), sq = set.series.find(x => x.id === "bkt_qq"); if (!sy) { $("summary").innerHTML = ""; return; }
     const j = lastNN(sy.values), sg1 = v => v == null ? "–" : (+v.toFixed(1) > 0 ? "+" : "") + fmtV(v, 1) + " %";
     $("summary").innerHTML = `<p class="gkpi">BKT ${fmtP(set.periods[j])}: <b>${sg1(sy.values[j])}</b> v/v, <b>${sg1(sq.values[j])}</b> q/q</p>`; }
+
+  /* ---------- BKT-ennusteet: toteutunut vuosikasvu, ennusteiden keskiarvo ja vaihteluvali ---------- */
+  function renderFc() {
+    const F = set.forecast, box = $("fcGrid"); box.innerHTML = ""; if (!F) return;
+    const now = new Date(), age = r => (now - new Date(r.date)) / 864e5;
+    const rows = [...F.rows].sort((a, b) => a.date < b.date ? 1 : -1), inc = rows.filter(r => age(r) <= F.max_age), old = rows.filter(r => age(r) > F.max_age);
+    const FY = F.years, A = F.actual || { years: [], values: [] };
+    const st = FY.map((y, k) => { const v = inc.map(r => r.v[k]).filter(x => x != null);
+      return v.length ? { y, mean: v.reduce((s, x) => s + x, 0) / v.length, lo: Math.min(...v), hi: Math.max(...v), v } : null; });
+    const h = document.createElement("h3"); h.className = "fsec"; h.textContent = "Ennusteet"; box.appendChild(h);
+    const narrow = box.clientWidth < 640, pc = v => fmtV(v, 1).replace(/^-/, "−");
+    // kuvio
+    const card = document.createElement("div"); card.className = "card fcard" + (narrow ? "" : " tt");
+    const sub = st.filter(Boolean).map(s => `${s.y} <b>${pc(s.mean)} %</b> (${pc(s.lo)}…${pc(s.hi)})`).join(", ");
+    card.innerHTML = `<div class="fhead"><h2>${F.title}</h2></div><p class="fsub">${sub ? `Keskiarvo ${sub}, ${inc.length} ennustetta.` : "Ei tuoreita ennusteita."}</p>`;
+    const W = narrow ? 420 : 760, H = narrow ? 260 : 320, fs = narrow ? 13 : 11, ml = 44, mr = 34, mt = 14, mb = 30;
+    const Y0 = F.from, Y1 = Math.max(...FY), n = Y1 - Y0 + 1;
+    const vals = [...A.values, ...st.filter(Boolean).flatMap(s => s.v), 0];
+    let lo = Math.min(...vals), hi = Math.max(...vals); const step = niceStep(hi - lo); lo = Math.floor(lo / step) * step; hi = Math.ceil(hi / step) * step;
+    const xs = y => ml + (y - Y0) * (W - ml - mr) / (n - 1), ys = v => mt + (hi - v) / (hi - lo) * (H - mb - mt);
+    const svg = el("svg", { class: "fc", viewBox: `0 0 ${W} ${H}`, role: "img", "aria-label": F.title }, card);
+    const lastA = A.years.length ? A.years[A.years.length - 1] : null, aOf = y => A.values[A.years.indexOf(y)];
+    const fx0 = lastA != null ? (xs(lastA) + xs(lastA + 1)) / 2 : ml;
+    el("rect", { x: fx0, y: mt, width: W - mr - fx0 + mr / 2, height: H - mb - mt, fill: "var(--fg)", "fill-opacity": 0.035 }, svg);
+    el("text", { x: fx0 + 6, y: mt + fs, "font-size": fs, fill: "var(--muted)" }, svg).textContent = "Ennuste";
+    for (let v = lo; v <= hi + step / 2; v += step) { const vv = Math.round(v / step) * step;
+      el("line", { x1: ml, x2: W - mr + mr / 2, y1: ys(vv), y2: ys(vv), stroke: Math.abs(vv) < 1e-9 ? "var(--muted)" : "var(--grid)", "stroke-width": 1 }, svg);
+      el("text", { x: ml - 6, y: ys(vv) + 4, "text-anchor": "end", "font-size": fs, fill: "var(--muted)" }, svg).textContent = fmtV(vv, stepDec(step)); }
+    const every = (W - ml - mr) / (n - 1) < 40 ? 2 : 1;
+    for (let y = Y0; y <= Y1; y++) { if ((Y1 - y) % every) continue;
+      el("line", { x1: xs(y), x2: xs(y), y1: H - mb, y2: H - mb + 4, stroke: "var(--muted)" }, svg);
+      el("text", { x: xs(y), y: H - mb + 8 + fs, "text-anchor": "middle", "font-size": fs, fill: "var(--muted)" }, svg).textContent = y; }
+    const S = st.filter(Boolean), base = lastA != null && S.length && S[0].y === lastA + 1 ? [[xs(lastA), ys(aOf(lastA))]] : [];
+    if (S.length) {                                                     // vaihteluvali: ylin ja alin ennuste
+      const up = S.map(s => [xs(s.y), ys(s.hi)]), dn = S.map(s => [xs(s.y), ys(s.lo)]).reverse();
+      el("path", { d: "M" + [...base, ...up, ...dn].map(q => q.map(z => z.toFixed(1)).join(" ")).join("L") + "Z", fill: "var(--accent)", "fill-opacity": 0.14 }, svg);
+      inc.forEach(r => FY.forEach((y, k) => { if (r.v[k] == null) return;
+        const c = el("circle", { cx: xs(y), cy: ys(r.v[k]), r: 2.6, fill: "var(--accent)", "fill-opacity": 0.4 }, svg);
+        el("title", {}, c).textContent = `${r.who} (${fmtD(r.date)}): ${y} ${pc(r.v[k])} %`; }));
+      const mp = [...base, ...S.map(s => [xs(s.y), ys(s.mean)])];
+      el("path", { d: "M" + mp.map(q => q.map(z => z.toFixed(1)).join(" ")).join("L"), fill: "none", stroke: "var(--accent)", "stroke-width": 2, "stroke-dasharray": "5 4" }, svg);
+      S.forEach(s => { el("circle", { cx: xs(s.y), cy: ys(s.mean), r: 3.6, fill: "var(--accent)" }, svg);
+        el("text", { x: xs(s.y), y: ys(s.hi) - 7, "text-anchor": "middle", "font-size": fs, "font-weight": 600, fill: "var(--accent)", stroke: "var(--surface)", "stroke-width": 3, "paint-order": "stroke" }, svg).textContent = pc(s.mean); });
+    }
+    if (A.years.length) {                                               // toteutunut
+      el("path", { d: "M" + A.years.map((y, i) => `${xs(y).toFixed(1)} ${ys(A.values[i]).toFixed(1)}`).join("L"), fill: "none", stroke: "var(--fg)", "stroke-width": 1.8, "stroke-linejoin": "round" }, svg);
+      A.years.forEach((y, i) => { const c = el("circle", { cx: xs(y), cy: ys(A.values[i]), r: 2.6, fill: "var(--fg)" }, svg);
+        el("title", {}, c).textContent = `${y}: ${pc(A.values[i])} %`; });
+      el("text", { x: xs(lastA), y: ys(aOf(lastA)) + (aOf(lastA) >= 0 ? 16 : -8), "text-anchor": "middle", "font-size": fs, "font-weight": 600, fill: "var(--fg)", stroke: "var(--surface)", "stroke-width": 3, "paint-order": "stroke" }, svg).textContent = pc(aOf(lastA));
+    }
+    const fm = document.createElement("div"); fm.className = "fmeta";
+    fm.innerHTML = `<div class="legend"><span style="--qc:var(--fg)">Toteutunut</span><span class="ds" style="--qc:var(--accent)">Ennusteiden keskiarvo</span><span class="sq" style="--qc:color-mix(in srgb, var(--accent) 30%, var(--surface))">Vaihteluväli</span></div>`;
+    const db = document.createElement("button"); db.type = "button"; db.className = "dl"; db.textContent = "Lataa CSV";
+    db.onclick = () => saveFile(`suhdannetilanne-${slug(F.title)}.csv`, toCSV([["Ennustaja", "Julkaistu", ...FY.map(String), "Keskiarvossa"],
+      ...rows.map(r => [r.who, r.date, ...r.v, inc.includes(r) ? "kyllä" : "ei"]), [], ["Toteutunut", "", "Vuosi", "Muutos %"], ...A.years.map((y, i) => ["", "", y, A.values[i]])]));
+    fm.appendChild(db); addPng(db, card); card.appendChild(fm);
+    const nt = document.createElement("p"); nt.className = "fnote"; nt.textContent = F.note; card.appendChild(nt);
+    box.appendChild(card);
+    // taulukko: mukana olevat ennusteet uusimmasta alkaen, vanhat alaviitteeseen
+    const tc = document.createElement("div"); tc.className = "card fcard tcard";
+    const nm = r => r.url ? `<a href="${r.url}" target="_blank" rel="noopener">${r.who}</a>` : r.who;
+    const dd = d => +d.slice(0, 4) === now.getFullYear() ? `${+d.slice(8, 10)}.${+d.slice(5, 7)}.` : fmtD(d);
+    tc.innerHTML = `<div class="fhead"><h2>Ennustajat</h2></div><table class="snap fct"><thead><tr><th></th><th>Julkaistu</th>${FY.map(y => `<th>${y}</th>`).join("")}</tr></thead><tbody>` +
+      inc.map(r => `<tr><th>${nm(r)}</th><td class="d">${dd(r.date)}</td>${r.v.map(v => `<td>${v == null ? "–" : pc(v)}</td>`).join("")}</tr>`).join("") +
+      `<tr class="avg"><th>Keskiarvo</th><td></td>${st.map(s => `<td>${s ? pc(s.mean) : "–"}</td>`).join("")}</tr></tbody></table>` +
+      (old.length ? `<p class="fnote">Ei mukana (yli ${Math.round(F.max_age / 30)} kk vanhat): ${old.map(r => `${r.who} ${fmtD(r.date)} (${r.v.map(pc).join(" / ")})`).join(", ")}.</p>` : "") +
+      (F.src_url ? `<p class="fnote"><a href="${F.src_url}" target="_blank" rel="noopener">Finanssialan ennustekoonti</a></p>` : "");
+    box.appendChild(tc);
+    menuize(card);
+  }
 
   /* ---------- markkinaruudut: paivittaiset sarjat ---------- */
   const fmtNum = (v, dec) => (v < 0 ? "−" : "") + thou(Math.abs(v).toFixed(dec).replace(".", ","));
@@ -1887,7 +1971,7 @@ footer b { color: var(--fg); font-weight: 600; }
     const k = c.clientWidth < 420; if (k !== lastK) { lastK = k; renderClock(); } });
   addEventListener("resize", () => { if (set.view !== "charts" || $("zoom").open) return;
     const b = chartBox(), nw = b.clientWidth < (b.id === "grCharts" ? 420 : 640);
-    if (b.id === "grCharts") { clearTimeout(rzT); rzT = setTimeout(drawCharts, 150); return; }   // ylapari sovitetaan uudelleen
+    if (b.id === "grCharts") { clearTimeout(rzT); rzT = setTimeout(() => { drawCharts(); if (set.forecast) renderFc(); }, 150); return; }   // ylapari sovitetaan uudelleen
     if (nw !== lastNarrow) { lastNarrow = nw; renderCharts(b); } });
   function renderAll() { renderHeader(); update(); }
   const HASH = { suhdanne: "suhdanne", bkt: "reaalitalous", rahoitus: "rahoitus" };
