@@ -1948,6 +1948,43 @@
           "note": "Keskimaturiteetti: velan keskimääräinen jäljellä oleva laina-aika. Lähde: Valtiokonttori."
         },
         {
+          "id": "jt_va",
+          "section": "Verotulot",
+          "title": "Veroaste ja sen rakenne, % BKT:stä",
+          "unit": "",
+          "dec": 1,
+          "lines": [
+            "jt_veroaste"
+          ],
+          "stack": [
+            "jt_va_d5",
+            "jt_va_alv",
+            "jt_va_overo",
+            "jt_va_ta",
+            "jt_va_vak"
+          ],
+          "stackColors": [
+            "var(--g1)",
+            "#5b84b8",
+            "#a9c0dc",
+            "var(--g3)",
+            "#9fcbb9"
+          ],
+          "barSpan": 3,
+          "connect": true,
+          "from": 2000,
+          "wide": true,
+          "stackUnit": "%",
+          "labels": {
+            "jt_veroaste": "Veroaste"
+          },
+          "colors": {
+            "jt_veroaste": "var(--fg)"
+          },
+          "note": "Neljän neljänneksen liukuva summa suhteessa BKT:hen. Muut verot: tuotanto- ja tuontiverot pl. arvonlisävero (mm. valmisteverot, kiinteistövero) sekä pääomaverot. Sosiaaliturvamaksut: todelliset maksut, pl. laskennalliset. Lähteet: Eurostat, Tilastokeskus.",
+          "lvl": true
+        },
+        {
           "id": "jt_veroyy",
           "section": "Verotulot",
           "title": "Verokertymien vuosimuutos, %",
@@ -7319,6 +7356,174 @@
       "q_to_m": true,
       "roll": 4,
       "pct_lag": 4,
+      "handling": "none",
+      "kind": "level"
+    },
+    {
+      "id": "jt_va_d5",
+      "label": "Tulo- ja varallisuusverot",
+      "set": "julkinen",
+      "source": "eurostat",
+      "ds": "gov_10q_ggnfa",
+      "pick": {
+        "freq": "Q",
+        "unit": "MIO_EUR",
+        "s_adj": "NSA",
+        "sector": "S13",
+        "na_item": "D5REC"
+      },
+      "q_to_m": true,
+      "roll": 4,
+      "div": {
+        "source": "statfin",
+        "table": "ntp/132h.px",
+        "pick": {
+          "taloustoimi_1_20180101": "B1GMH",
+          "contentscode": "tasmcp"
+        },
+        "q_to_m": true,
+        "roll": 4
+      },
+      "handling": "none",
+      "kind": "level"
+    },
+    {
+      "id": "jt_va_alv",
+      "label": "Arvonlisävero",
+      "set": "julkinen",
+      "source": "eurostat",
+      "ds": "gov_10q_ggnfa",
+      "pick": {
+        "freq": "Q",
+        "unit": "MIO_EUR",
+        "s_adj": "NSA",
+        "sector": "S13",
+        "na_item": "D211REC"
+      },
+      "q_to_m": true,
+      "roll": 4,
+      "div": {
+        "source": "statfin",
+        "table": "ntp/132h.px",
+        "pick": {
+          "taloustoimi_1_20180101": "B1GMH",
+          "contentscode": "tasmcp"
+        },
+        "q_to_m": true,
+        "roll": 4
+      },
+      "handling": "none",
+      "kind": "level"
+    },
+    {
+      "id": "jt_va_overo",
+      "label": "Muut verot",
+      "set": "julkinen",
+      "source": "sum",
+      "parts": [
+        {
+          "source": "eurostat",
+          "ds": "gov_10q_ggnfa",
+          "pick": {
+            "freq": "Q",
+            "unit": "MIO_EUR",
+            "s_adj": "NSA",
+            "sector": "S13",
+            "na_item": "D2REC"
+          }
+        },
+        {
+          "source": "eurostat",
+          "ds": "gov_10q_ggnfa",
+          "pick": {
+            "freq": "Q",
+            "unit": "MIO_EUR",
+            "s_adj": "NSA",
+            "sector": "S13",
+            "na_item": "D211REC"
+          },
+          "neg": true
+        },
+        {
+          "source": "eurostat",
+          "ds": "gov_10q_ggnfa",
+          "pick": {
+            "freq": "Q",
+            "unit": "MIO_EUR",
+            "s_adj": "NSA",
+            "sector": "S13",
+            "na_item": "D91REC"
+          }
+        }
+      ],
+      "q_to_m": true,
+      "roll": 4,
+      "div": {
+        "source": "statfin",
+        "table": "ntp/132h.px",
+        "pick": {
+          "taloustoimi_1_20180101": "B1GMH",
+          "contentscode": "tasmcp"
+        },
+        "q_to_m": true,
+        "roll": 4
+      },
+      "handling": "none",
+      "kind": "level"
+    },
+    {
+      "id": "jt_va_ta",
+      "label": "Työnantajien sosiaaliturvamaksut",
+      "set": "julkinen",
+      "source": "eurostat",
+      "ds": "gov_10q_ggnfa",
+      "pick": {
+        "freq": "Q",
+        "unit": "MIO_EUR",
+        "s_adj": "NSA",
+        "sector": "S13",
+        "na_item": "D611REC"
+      },
+      "q_to_m": true,
+      "roll": 4,
+      "div": {
+        "source": "statfin",
+        "table": "ntp/132h.px",
+        "pick": {
+          "taloustoimi_1_20180101": "B1GMH",
+          "contentscode": "tasmcp"
+        },
+        "q_to_m": true,
+        "roll": 4
+      },
+      "handling": "none",
+      "kind": "level"
+    },
+    {
+      "id": "jt_va_vak",
+      "label": "Vakuutettujen sosiaaliturvamaksut",
+      "set": "julkinen",
+      "source": "eurostat",
+      "ds": "gov_10q_ggnfa",
+      "pick": {
+        "freq": "Q",
+        "unit": "MIO_EUR",
+        "s_adj": "NSA",
+        "sector": "S13",
+        "na_item": "D613REC"
+      },
+      "q_to_m": true,
+      "roll": 4,
+      "div": {
+        "source": "statfin",
+        "table": "ntp/132h.px",
+        "pick": {
+          "taloustoimi_1_20180101": "B1GMH",
+          "contentscode": "tasmcp"
+        },
+        "q_to_m": true,
+        "roll": 4
+      },
       "handling": "none",
       "kind": "level"
     }

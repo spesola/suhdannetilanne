@@ -1328,6 +1328,7 @@ footer b { color: var(--fg); font-weight: 600; }
   /* ---------- kuvionakyma: rahoitusmarkkinat ---------- */
   const LINE_COLS = ["var(--accent)", "var(--g2)", "var(--fg)", "var(--q-turn)"];
   const STACK_COLS = ["var(--g1)", "var(--g2)", "var(--g3)", "#c9a56b", "var(--g5)", "#c07a9b", "#8fb0a6"];
+  const stCol = (c, k) => (c.stackColors && c.stackColors[k]) || STACK_COLS[k % STACK_COLS.length];   // stackColors: kuviokohtaiset pinovarit
   const fmtV = (v, dec) => { if (v == null) return "–"; const r = +v.toFixed(dec), a = Math.abs(r);
     return (r < 0 ? "−" : "") + thou(a.toFixed(dec).replace(".", ",")); };
   const withU = (v, c) => fmtV(v, c.dec) + (c.unit ? (c.unit === "%" ? " %" : " " + c.unit) : "");
@@ -1808,7 +1809,7 @@ footer b { color: var(--fg); font-weight: 600; }
         // erittelyn rinnalla pinon selite piilotetaan (erittely toimii selitteena), mutta se pysyy PNG-kuvaa varten
         const lg = document.createElement("div"); lg.className = "legend" + (erit && col ? (c.lines.length < 2 ? " hide" : " nostack") : "");
         lg.innerHTML = c.lines.map(id => `<span${(c.dash || []).includes(id) ? ' class="ds"' : ""} style="--qc:${colOf[id]}">${lbl(id)}${(c.y2 || []).includes(id) ? " (oikea akseli)" : ""}</span>`).join("") +
-          (c.stack || []).map((id, k) => `<span class="sq st${isRes(id) ? " hx" : ""}" style="--qc:${STACK_COLS[k % STACK_COLS.length]}">${ser(id).label}</span>`).join("") +
+          (c.stack || []).map((id, k) => `<span class="sq st${isRes(id) ? " hx" : ""}" style="--qc:${stCol(c, k)}">${ser(id).label}</span>`).join("") +
           (!c.bars ? "" : c.barsNeutral ? `<span style="--qc:var(--g3)">${ser(c.bars).label} (palkit)</span>`
             : `<span style="--qc:var(--q-up)">${(c.barsLegend || [])[0] || "Normaali käyrä"}</span><span style="--qc:var(--q-down)">${(c.barsLegend || [])[1] || "Käänteinen käyrä"}</span>`);
         fm.appendChild(lg);
@@ -1883,7 +1884,7 @@ footer b { color: var(--fg); font-weight: 600; }
           S.forEach((s, k) => { const v = s[i]; if (v == null || v === 0) return;
             const y0 = v > 0 ? up : dn, y1 = y0 + v; if (v > 0) up = y1; else dn = y1;
             el("rect", { x: xs(i - (sp - 1) / 2) - bw / 2, y: ys(Math.max(y0, y1)), width: bw, height: Math.abs(ys(y1) - ys(y0)),
-              fill: isRes(c.stack[k]) ? `url(#${hid})` : STACK_COLS[k % STACK_COLS.length], "fill-opacity": isRes(c.stack[k]) ? 0.7 : 0.82 }, svg); }); }); }
+              fill: isRes(c.stack[k]) ? `url(#${hid})` : stCol(c, k), "fill-opacity": isRes(c.stack[k]) ? 0.7 : 0.82 }, svg); }); }); }
       const path = (a, step, yf = ys) => { let d = "", pen = false;
         a.forEach((v, i) => { if (v == null) { if (!c.connect) pen = false; return; }   // connect: harva sarja (nelj.) yhtenaisena
           d += pen ? (step ? `H${xs(i).toFixed(1)}V${yf(v).toFixed(1)}` : `L${xs(i).toFixed(1)} ${yf(v).toFixed(1)}`) : `M${xs(i).toFixed(1)} ${yf(v).toFixed(1)}`; pen = true; }); return d; };
@@ -1948,7 +1949,7 @@ footer b { color: var(--fg); font-weight: 600; }
         side.innerHTML = `<div class="fhead"><h2>Erittely</h2><span class="fval"></span></div><div class="brk"></div>`;
         (sideLeft ? $("grSide") : tgt).appendChild(side);
         const bx = side.querySelector(".brk"), sv = side.querySelector(".fval"), u = c.unit === "%" ? " %" : c.unit ? " " + c.unit : "";
-        const sg = (v, d) => (v == null ? "–" : (+v.toFixed(d) > 0 ? "+" : "") + fmtV(v, d));
+        const sg = (v, d) => (v == null ? "–" : (!c.lvl && +v.toFixed(d) > 0 ? "+" : "") + fmtV(v, d));
         const draw = h => {
           const i = h == null ? lastNN(L[0]) : Math.max(0, Math.min(n - 1, h - i0)), g = L[0][i];
           const vals = S.map(s => s[i]), mx = Math.max(Math.abs(g || 0), ...vals.map(v => Math.abs(v || 0)), 0.1);
@@ -1956,7 +1957,7 @@ footer b { color: var(--fg); font-weight: 600; }
             return `<span class="bb"><i class="${cls || ""}" style="--qc:${col};left:${v >= 0 ? 50 : 50 - w}%;width:${Math.max(w, 0.6)}%"></i></span>`; };
           sv.textContent = fmtP(P[i]) + (su0 ? ", " + su0 : "");
           bx.innerHTML = `<span class="bl bt">${lbl(c.lines[0])}</span>${bar(g, "var(--fg)")}<span class="bv bt">${sg(g, c.dec)}${u}</span><span class="sep"></span>` +
-            c.stack.map((id, k) => `<span class="bl">${ser(id).label}</span>${bar(vals[k], STACK_COLS[k % STACK_COLS.length], isRes(id) ? "hx" : "")}<span class="bv">${sg(vals[k], c.dec)}</span>`).join(""); };
+            c.stack.map((id, k) => `<span class="bl">${ser(id).label}</span>${bar(vals[k], stCol(c, k), isRes(id) ? "hx" : "")}<span class="bv">${sg(vals[k], c.dec)}</span>`).join(""); };
         draw(null); chartHooks.push(draw);
       }
       const hit = el("rect", { x: ml, y: mt, width: W2 - ml - mr, height: H2 - mt - mb, fill: "transparent" }, svg);
