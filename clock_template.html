@@ -1141,7 +1141,7 @@ footer b { color: var(--fg); font-weight: 600; }
     $("tiles").hidden = !(charts && set.tiles && set.tiles.length);
     $("growthSec").hidden = !(charts && set.growth); $("grMore").hidden = true;
     $("finSum").hidden = !(charts && set.summary && set.summary.length);
-    $("fcSec").hidden = !(charts && set.forecast);
+    $("fcSec").hidden = !(charts && set.forecast && grSel === "bkt");   // ennusteet vain BKT-rivilla
     $("charts").hidden = !charts || !!set.growth;
     if (charts) { renderTiles(); if (set.growth) renderGrowth(); if (set.summary) renderSummary(); renderKpis(); drawCharts(); renderFc(); return; }
     renderKpis();
@@ -1181,7 +1181,7 @@ footer b { color: var(--fg); font-weight: 600; }
     $("grTable").innerHTML = h + "</tbody>";
     const wr = $("grTable").parentElement; wr.scrollLeft = wr.scrollWidth;   // kapealla uusimmat neljannekset nakyviin
     $("grTable").querySelectorAll("tr.pick").forEach(tr => {
-      const go = kb => { grSel = tr.dataset.id; renderGrowth(); drawCharts(); if (location.hash !== hashFor()) history.pushState(null, "", hashFor());   // rivin vaihto historiaan: takaisin palaa edelliseen
+      const go = kb => { grSel = tr.dataset.id; renderGrowth(); drawCharts(); $("fcSec").hidden = !(set.forecast && grSel === "bkt"); if (location.hash !== hashFor()) history.pushState(null, "", hashFor());   // rivin vaihto historiaan: takaisin palaa edelliseen
         if (kb) { const f = $("grTable").querySelector(`tr[data-id="${grSel}"]`); if (f) f.focus(); return; }   // nappaimisto: kohdistus pysyy rivilla
         const col = $("grCharts"), r = col.getBoundingClientRect();     // kuvio taulukon alla: vieritetaan nakyviin, taulukon loppu jaa nakyviin
         if (r.top > innerHeight * 0.7) scrollBy({ top: r.top - innerHeight * 0.4, behavior: "smooth" }); };
