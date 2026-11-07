@@ -369,7 +369,9 @@ button.dl:hover { text-decoration-color: var(--fg); }
 .grcol > .card { grid-column: auto; }
 .grmore { margin-top: 0; }
 /* BKT-ennusteet (sivun loppu) */
-.fcsec .fgrid > .fsec { margin: 0 0 22px; }
+.rfold { margin: 0; }
+.rfold + .fgrid { margin-top: 26px; }
+.grmore.folded > .fgrid, .fcsec.folded > .fgrid { display: none; }
 .fcsec .fcard.tt { grid-column: 1 / span 4; }
 .fcsec .tcard { grid-column: 5 / span 2; }
 @media (max-width: 980px) { .fcsec .fcard.tt, .fcsec .tcard { grid-column: 1 / -1; } }
@@ -569,8 +571,8 @@ footer b { color: var(--fg); font-weight: 600; }
     </div></div>
     <div class="grrow"><div class="grcol" id="grCharts"></div><div class="grside" id="grSide"></div></div>
   </section>
-  <section class="grmore" id="grMore" hidden><div class="fgrid" id="grMoreGrid"></div></section>
-  <section class="fcsec" id="fcSec" hidden><div class="fgrid" id="fcGrid"></div></section>
+  <section class="grmore" id="grMore" hidden><h3 class="fsec rfold" data-k="more" role="button" tabindex="0" aria-expanded="false"><span class="chev" aria-hidden="true"><svg viewBox="0 0 12 12" width="14" height="14"><path d="M4 2.5 7.5 6 4 9.5"/></svg></span>Vertailu ja rahoitusjäämät</h3><div class="fgrid" id="grMoreGrid"></div></section>
+  <section class="fcsec" id="fcSec" hidden><h3 class="fsec rfold" data-k="fc" role="button" tabindex="0" aria-expanded="false"><span class="chev" aria-hidden="true"><svg viewBox="0 0 12 12" width="14" height="14"><path d="M4 2.5 7.5 6 4 9.5"/></svg></span>Ennusteet</h3><div class="fgrid" id="fcGrid"></div></section>
   <section class="card" id="finSum" hidden></section>
   <section class="fgrid" id="charts" hidden></section>
   <dialog class="zoom" id="zoom" aria-label="Suurennettu kuvio"><div class="zbar"><button type="button" id="zoomClose">Sulje</button></div><div class="fgrid" id="zoomBody"></div></dialog>
@@ -1236,7 +1238,6 @@ footer b { color: var(--fg); font-weight: 600; }
     const FY = F.years, A = F.actual || { years: [], values: [] };
     const st = FY.map((y, k) => { const v = inc.map(r => r.v[k]).filter(x => x != null);
       return v.length ? { y, mean: v.reduce((s, x) => s + x, 0) / v.length, lo: Math.min(...v), hi: Math.max(...v), v } : null; });
-    const h = document.createElement("h3"); h.className = "fsec"; h.textContent = "Ennusteet"; box.appendChild(h);
     const narrow = box.clientWidth < 640, pc = v => fmtV(v, 1).replace(/^-/, "−");
     // kuvio
     const card = document.createElement("div"); card.className = "card fcard" + (narrow ? "" : " tt");
@@ -1999,6 +2000,14 @@ footer b { color: var(--fg); font-weight: 600; }
     if (b.id === "grCharts") { clearTimeout(rzT); rzT = setTimeout(() => { drawCharts(); if (set.forecast) renderFc(); }, 150); return; }   // ylapari sovitetaan uudelleen
     if (nw !== lastNarrow) { lastNarrow = nw; renderCharts(b); } });
   function renderAll() { renderHeader(); update(); }
+  (function () {                                                    // Reaalitalous: lisakuviot ja ennusteet taittuvina osioina (oletuksena kiinni)
+    const open = new Set(), hs = [...document.querySelectorAll(".rfold")];
+    const sync = () => hs.forEach(h => { const on = open.has(h.dataset.k); h.parentElement.classList.toggle("folded", !on); h.setAttribute("aria-expanded", on); });
+    hs.forEach(h => { const tog = () => { const k = h.dataset.k; open.has(k) ? open.delete(k) : open.add(k); sync();
+        if (open.has(k)) { if (k === "fc") renderFc(); else drawCharts(); } };   // piilossa piirretyt kuviot uudelleen oikeaan leveyteen
+      h.onclick = tog; h.onkeydown = e => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); tog(); } }; });
+    sync();
+  })();
   const HASH = { suhdanne: "suhdanne", bkt: "reaalitalous", rahoitus: "rahoitus", julkinen: "julkinen-talous" };
   const hashFor = () => "#" + (HASH[set.id] || set.id) + (set.growth && grSel !== "bkt" ? "/" + grSel : "");
   function writeHash() { const h = hashFor(); if (location.hash !== h) history.pushState(null, "", h); }
