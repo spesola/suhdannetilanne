@@ -405,7 +405,7 @@ button.dl:hover { text-decoration-color: var(--fg); }
 .fmeta > .fnote { margin: 0; flex: 1 1 260px; }
 /* erittely ja tunnusluvut: tiivis tukikortti, paakuvio saa tilan */
 .fcard.side { padding-top: 10px; }
-.fcard.side .fhead h2 { font-size: 0.875rem; }
+.fcard.side .fhead h3 { font-size: 0.875rem; }
 .fcard.side .fval { font-size: 0.78rem; }
 .fcard.side .brk { margin-top: 10px; gap: 6px 12px; font-size: 0.875rem; grid-template-columns: minmax(0, 1fr) 34% auto; }   /* kapea palsta: nimille enemman tilaa */
 .fcard.side .brk .bb { height: 12px; }
@@ -430,7 +430,7 @@ button.dl:hover { text-decoration-color: var(--fg); }
 .snap.fct td.d { color: var(--muted); font-size: 0.78rem; }
 .fcsec .fnote a { color: inherit; }
 .snap.fct tr.avg th, .snap.fct tr.avg td { font-weight: 600; border-bottom: 0; border-top: 1px solid var(--fg); }
-.grmore .fhead h2 { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; min-width: 0; flex: 1 1 0; }   /* tasakorkeat kortit */
+.grmore .fhead h3 { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; min-width: 0; flex: 1 1 0; }   /* tasakorkeat kortit */
 .grmore .fsub { display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; min-height: 2.4em; }
 .secnav { grid-column: 1 / -1; position: sticky; top: 0; z-index: 5; background: var(--bg); display: flex; gap: 6px; overflow-x: auto; scrollbar-width: none;
   padding: 10px 0; margin: -10px 0 -30px; border-bottom: 1px solid var(--line); min-width: 0; box-shadow: 0 0 0 100vmax var(--bg); clip-path: inset(0 -100vmax); }
@@ -480,7 +480,7 @@ table.snap { width: 100%; border-collapse: collapse; font-size: 0.875rem; font-v
 .tcard .snap tr.on th { color: var(--accent); font-weight: 600; box-shadow: inset 2px 0 0 var(--accent); padding-left: 8px; }
 @media (max-width: 560px) { .snap { font-size: 0.78rem; } .snap th, .snap td { padding: 6px 3px; } .snap thead th { white-space: normal; } .snap .dt { display: block; margin-left: 0; }
   .snap tbody th { overflow-wrap: anywhere; } .snap thead th:nth-child(3), .snap tbody td:nth-child(3) { display: none; } }
-.fhead h2 { font-family: var(--font-body); font-weight: 600; font-size: 1rem; margin: 0; text-wrap: balance; }
+.fhead h3 { font-family: var(--font-body); font-weight: 600; font-size: 1rem; margin: 0; text-wrap: balance; }
 .fval { font-family: var(--font-data); font-size: 0.875rem; color: var(--muted); font-variant-numeric: tabular-nums; }
 .fval b { font-weight: 500; font-size: 1rem; color: var(--fg); }
 .fsub { color: var(--muted); font-size: 0.78rem; margin: 2px 0 0; min-height: 1.2em; }
@@ -624,8 +624,8 @@ footer b { color: var(--fg); font-weight: 600; }
     </div></div>
     <div class="grrow"><div class="grcol" id="grCharts"></div><div class="grside" id="grSide"></div></div>
   </section>
-  <section class="grmore" id="grMore" hidden><h3 class="fsec rfold" data-k="more" role="button" tabindex="0" aria-expanded="false"><span class="chev" aria-hidden="true"><svg viewBox="0 0 12 12" width="14" height="14"><path d="M4 2.5 7.5 6 4 9.5"/></svg></span>Vertailu ja rahoitusjäämät</h3><div class="fgrid" id="grMoreGrid"></div></section>
-  <section class="fcsec" id="fcSec" hidden><h3 class="fsec rfold" data-k="fc" role="button" tabindex="0" aria-expanded="false"><span class="chev" aria-hidden="true"><svg viewBox="0 0 12 12" width="14" height="14"><path d="M4 2.5 7.5 6 4 9.5"/></svg></span>Ennusteet</h3><div class="fgrid" id="fcGrid"></div></section>
+  <section class="grmore" id="grMore" hidden><h2 class="fsec rfold" data-k="more" role="button" tabindex="0" aria-expanded="false"><span class="chev" aria-hidden="true"><svg viewBox="0 0 12 12" width="14" height="14"><path d="M4 2.5 7.5 6 4 9.5"/></svg></span>Vertailu ja rahoitusjäämät</h2><div class="fgrid" id="grMoreGrid"></div></section>
+  <section class="fcsec" id="fcSec" hidden><h2 class="fsec rfold" data-k="fc" role="button" tabindex="0" aria-expanded="false"><span class="chev" aria-hidden="true"><svg viewBox="0 0 12 12" width="14" height="14"><path d="M4 2.5 7.5 6 4 9.5"/></svg></span>Ennusteet</h2><div class="fgrid" id="fcGrid"></div></section>
   <section class="card" id="finSum" hidden></section>
   <section class="fgrid" id="charts" hidden></section>
   <dialog class="zoom" id="zoom" aria-label="Suurennettu kuvio"><div class="zbar"><button type="button" id="zoomClose">Sulje</button></div><div class="fgrid" id="zoomBody"></div></dialog>
@@ -724,10 +724,8 @@ footer b { color: var(--fg); font-weight: 600; }
   const SHORT = { suhdanne: "Suhdanne", bkt: "Reaalitalous", rahoitus: "Rahoitus", julkinen: "Julkinen" };
   function renderHeader() {
     const gen = new Date(D.meta.generated.replace(/(\+\d{2})(\d{2})$/, "$1:$2"));
-    const c0 = set.view === "charts" ? set.charts.find(c => c.lines && c.lines.length) : null;
-    const lastAll = c0 ? set.periods[lastNN(set.series.find(x => x.id === (c0.bars || c0.lines[0])).values)] : set.periods[set.periods.length - 1];
     $("headline").textContent = "Suhdannetilanne";   // sivuston nimi pysyy, valilehti kertoo osion
-    $("sub").textContent = `Päivitetty ${gen.toLocaleDateString("fi-FI")}. Viimeisin havainto ${fmtP(lastAll)}.`;
+    $("sub").textContent = `Päivitetty ${gen.toLocaleDateString("fi-FI")}.`;
     const box = $("sets"); box.innerHTML = "";
     D.sets.forEach(s => { const b = document.createElement("button"); b.type = "button"; b.innerHTML = `<span class="lg">${s.label}</span><span class="sh">${SHORT[s.id] || s.label}</span>`;
       b.setAttribute("aria-pressed", s.id === set.id); b.onclick = () => { if (s.id === set.id) return;
@@ -892,8 +890,7 @@ footer b { color: var(--fg); font-weight: 600; }
     if (cp) { const q = quad(cp.l, cp.c), C = comp(); let k = cp.i;
       while (k > 0 && C.level[k - 1] != null && C.change[k - 1] != null && quad(C.level[k - 1], C.change[k - 1]) === q) k--;
       const PH = { up: "Nousuvaiheessa", turn: "Hidastumisvaiheessa", down: "Laskuvaiheessa", rec: "Elpymisvaiheessa" };
-      const KK = ["tammikuusta", "helmikuusta", "maaliskuusta", "huhtikuusta", "toukokuusta", "kesäkuusta", "heinäkuusta", "elokuusta", "syyskuusta", "lokakuusta", "marraskuusta", "joulukuusta"];
-      const p0 = set.periods[k], since = set.freq === "M" ? `${KK[+p0.slice(5, 7) - 1]} ${p0.slice(0, 4)} alkaen` : `${fmtP(p0)} alkaen`;
+      const p0 = set.periods[k], since = `${fmtP(p0)} alkaen`;
       $("hlead").innerHTML = `<p class="hl">Kokonaisindikaattori ${fmtP(set.periods[cp.i])}</p><p class="hp" style="--qc:${qcol(q)}"><i></i>${Q[q].short}</p>` +
         `<p class="hd">Taso <b>${fmtN(cp.l)}</b> ja muutos <b>${fmtN(cp.c)}</b>. ${k === cp.i ? `${PH[q]} ${fmtP(set.periods[cp.i])}` : `${PH[q]} ${since}`} (alustava).</p>`;
     } else $("hlead").innerHTML = "";
@@ -973,10 +970,8 @@ footer b { color: var(--fg); font-weight: 600; }
       list.appendChild(box);
     });
     if (list.children.length === 1) list.insertAdjacentHTML("beforeend", `<div class="empty">Ei indikaattoreita vaiheessa ${Q[qf].name.toLowerCase()}.</div>`);
-    const KE = ["tammikuusta", "helmikuusta", "maaliskuusta", "huhtikuusta", "toukokuusta", "kesäkuusta", "heinäkuusta", "elokuusta", "syyskuusta", "lokakuusta", "marraskuusta", "joulukuusta"];
-    const KI = ["tammikuuhun", "helmikuuhun", "maaliskuuhun", "huhtikuuhun", "toukokuuhun", "kesäkuuhun", "heinäkuuhun", "elokuuhun", "syyskuuhun", "lokakuuhun", "marraskuuhun", "joulukuuhun"];
     const pa = set.periods[k0], pb = set.periods[idx];
-    const span = set.freq === "M" ? `${KE[+pa.slice(5, 7) - 1]} ${pa.slice(0, 4)} ${KI[+pb.slice(5, 7) - 1]} ${pb.slice(0, 4)}` : `${fmtP(pa)}–${fmtP(pb)}`;
+    const span = `${fmtP(pa)}–${fmtP(pb)}`;
     const notes = [`Viimeisin ${set.freq === "M" ? "kuukausi" : "neljännes"} isompana. Värit kuten yläosan palkissa.`];
     { const th = list.querySelector(".lhead span:nth-child(2)"); if (th) th.title = `Kunkin ${set.freq === "M" ? "kuukauden" : "neljänneksen"} vaihe ${span}`; }
     if (notes.length) list.insertAdjacentHTML("beforeend", `<p class="lnote">${notes.join(" ")}</p>`);
@@ -1295,7 +1290,7 @@ footer b { color: var(--fg); font-weight: 600; }
     // kuvio
     const card = document.createElement("div"); card.className = "card fcard" + (narrow ? "" : " tt");
     const sub = st.filter(Boolean).map(s => `${s.y} <b>${pc(s.mean)} %</b> (${pc(s.lo)}…${pc(s.hi)})`).join(", ");
-    card.innerHTML = `<div class="fhead"><h2>${F.title}</h2></div><p class="fsub">${sub ? `Keskiarvo ${sub}, ${inc.length} ennustetta.` : "Ei tuoreita ennusteita."}</p>`;
+    card.innerHTML = `<div class="fhead"><h3>${F.title}</h3></div><p class="fsub">${sub ? `Keskiarvo ${sub}, ${inc.length} ennustetta.` : "Ei tuoreita ennusteita."}</p>`;
     const W = narrow ? 420 : 760, H = narrow ? 260 : 320, fs = narrow ? 13 : 11, ml = 44, mr = 34, mt = 14, mb = 30;
     const Y0 = F.from, Y1 = Math.max(...FY), n = Y1 - Y0 + 1;
     const vals = [...A.values, ...st.filter(Boolean).flatMap(s => s.v), 0];
@@ -1343,7 +1338,7 @@ footer b { color: var(--fg); font-weight: 600; }
     const tc = document.createElement("div"); tc.className = "card fcard tcard";
     const nm = r => r.url ? `<a href="${r.url}" target="_blank" rel="noopener">${r.who}</a>` : r.who;
     const dd = d => +d.slice(0, 4) === now.getFullYear() ? `${+d.slice(8, 10)}.${+d.slice(5, 7)}.` : fmtD(d);
-    tc.innerHTML = `<div class="fhead"><h2>Ennustajat</h2></div><table class="snap fct"><thead><tr><th></th><th>Julkaistu</th>${FY.map(y => `<th>${y}</th>`).join("")}</tr></thead><tbody>` +
+    tc.innerHTML = `<div class="fhead"><h3>Ennustajat</h3></div><table class="snap fct"><thead><tr><th></th><th>Julkaistu</th>${FY.map(y => `<th>${y}</th>`).join("")}</tr></thead><tbody>` +
       inc.map(r => `<tr><th>${nm(r)}</th><td class="d">${dd(r.date)}</td>${r.v.map(v => `<td>${v == null ? "–" : pc(v)}</td>`).join("")}</tr>`).join("") +
       `<tr class="avg"><th>Keskiarvo</th><td></td>${st.map(s => `<td>${s ? pc(s.mean) : "–"}</td>`).join("")}</tr></tbody></table>` +
       (F.src_url ? `<p class="fnote"><a href="${F.src_url}" target="_blank" rel="noopener">Finanssialan ennustekoonti</a></p>` : "");
@@ -1470,7 +1465,7 @@ footer b { color: var(--fg); font-weight: 600; }
     await img.decode();
     // asettelu
     const pad = 24, W = Math.round(R.width + 2 * pad), sc2 = 2, F = "Manrope, system-ui, sans-serif";
-    const title = card.querySelector(".fhead h2").textContent, val = (card.querySelector(".fval") || {}).textContent || "";
+    const title = card.querySelector(".fhead h3").textContent, val = (card.querySelector(".fval") || {}).textContent || "";
     const subEl = card.querySelector(".fsub"), sub = subEl && !subEl.hidden ? subEl.textContent : "";
     const leg = [...card.querySelectorAll(".legend span")].map(s => ({ t: s.textContent, c: getComputedStyle(s).getPropertyValue("--qc").trim() || col("--fg"),
       k: s.classList.contains("hx") ? "hx" : s.classList.contains("sq") ? "sq" : s.classList.contains("ds") ? "ds" : "ln" }));
@@ -1591,7 +1586,7 @@ footer b { color: var(--fg); font-weight: 600; }
     const cols = c.cols || ["d1", "w1", "ytd"];   // kuukausitaulukoissa esim. m1, y1, ytd
     const cnt = {}; c.rows.forEach(r => { cnt[r.date] = (cnt[r.date] || 0) + 1; });   // taulukon paiva = yleisin havaintopaiva
     const maxD = Object.keys(cnt).sort((a, b) => cnt[b] - cnt[a] || (a < b ? 1 : -1))[0] || "";
-    let h = `<div class="fhead"><h2>${c.title}</h2><span class="fval">${maxD ? fmtD(maxD) : ""}</span></div>
+    let h = `<div class="fhead"><h3>${c.title}</h3><span class="fval">${maxD ? fmtD(maxD) : ""}</span></div>
       <table class="snap${cols[0] === "d1" ? " daily" : ""}"><thead><tr><th></th><th>Viimeisin</th>${cols.map(k => `<th>${COLH[k]}</th>`).join("")}</tr></thead><tbody>`;
     c.rows.forEach(r => {
       if (r.group) h += `<tr class="g"><th colspan="${cols.length + 2}">${r.group}</th></tr>`;
@@ -1616,7 +1611,7 @@ footer b { color: var(--fg); font-weight: 600; }
   function scatterCard(c, narrow) {
     const ser = id => set.series.find(x => x.id === id), X = ser(c.x).values, Y = ser(c.y).values;
     const card = document.createElement("div"); card.className = "card fcard" + (narrow ? "" : " half"); card._zc = c;
-    card.innerHTML = `<div class="fhead"><h2>${c.title}</h2><span class="fval"></span></div><p class="fsub"></p>`;
+    card.innerHTML = `<div class="fhead"><h3>${c.title}</h3><span class="fval"></span></div><p class="fsub"></p>`;
     const W2 = c.w || (narrow ? 420 : 560), H2 = c.height || (narrow ? 300 : 260), fs = c.w ? 12 : narrow ? 13 : 12, ml = 44, mr = 14, mt = 10, mb = 40;
     const i0 = c.from ? Math.max(0, set.periods.findIndex(p => p >= String(c.from))) : 0;
     const pts = []; for (let i = i0; i < set.periods.length; i++) if (X[i] != null && Y[i] != null) pts.push(i);
@@ -1662,7 +1657,7 @@ footer b { color: var(--fg); font-weight: 600; }
   }
   function curveCard(c, narrow) {
     const K = c.curve, card = document.createElement("div"); card.className = "card fcard" + (narrow ? "" : " half"); card._zc = c;
-    card.innerHTML = `<div class="fhead"><h2>${c.title}</h2><span class="fval"></span></div><p class="fsub"></p>`;
+    card.innerHTML = `<div class="fhead"><h3>${c.title}</h3><span class="fval"></span></div><p class="fsub"></p>`;
     const W2 = c.w || (narrow ? 420 : 560), H2 = c.height || 300, fs = c.w ? 12 : narrow ? 13 : 12, ml = 44, mr = 14, mt = 10, mb = 30, n = K.maturities.length;
     const svg = el("svg", { class: "fc", viewBox: `0 0 ${W2} ${H2}`, role: "img", "aria-label": c.title }, card);
     const all = K.lines.flatMap(l => l.values).filter(v => v != null);
@@ -1758,7 +1753,7 @@ footer b { color: var(--fg); font-weight: 600; }
     const btns = [...card.querySelectorAll(":scope > .fhead > button.dl, :scope > .fmeta > button.dl")]; if (!btns.length) return;
     card._menu = true; card.classList.add("hasmenu");
     const mb = document.createElement("button"); mb.type = "button"; mb.className = "more"; mb.innerHTML = DOTS; mb.title = "Lataa tai suurenna";
-    mb.setAttribute("aria-label", "Toiminnot: " + ((card.querySelector(".fhead h2") || {}).textContent || "kuvio")); mb.setAttribute("aria-haspopup", "true"); mb.setAttribute("aria-expanded", "false");
+    mb.setAttribute("aria-label", "Toiminnot: " + ((card.querySelector(".fhead h3") || {}).textContent || "kuvio")); mb.setAttribute("aria-haspopup", "true"); mb.setAttribute("aria-expanded", "false");
     const m = document.createElement("div"); m.className = "cmenu"; m.hidden = true; btns.forEach(b => m.appendChild(b));
     card.append(mb, m);
     card.querySelectorAll(":scope > .fmeta").forEach(f => { if (!f.children.length) f.remove(); });
@@ -1767,7 +1762,7 @@ footer b { color: var(--fg); font-weight: 600; }
     const svg = card.querySelector(":scope > svg.fc");
     if (card._zc && svg && !zoomRendering) {                          // suurennuspainike kolmen pisteen viereen
       const zb = document.createElement("button"); zb.type = "button"; zb.className = "more zb"; zb.title = "Suurenna";
-      zb.setAttribute("aria-label", "Suurenna: " + ((card.querySelector(".fhead h2") || {}).textContent || "kuvio"));
+      zb.setAttribute("aria-label", "Suurenna: " + ((card.querySelector(".fhead h3") || {}).textContent || "kuvio"));
       zb.innerHTML = '<svg viewBox="0 0 16 16" width="15" height="15" aria-hidden="true"><path d="M9.5 2.5h4v4M13.5 2.5 9 7M6.5 13.5h-4v-4M2.5 13.5 7 9"/></svg>';
       zb.onclick = e => { e.stopPropagation(); closeMenus(); openZoom(card._zc); }; mb.after(zb); card.classList.add("haszoom"); }
   }
@@ -1857,7 +1852,7 @@ footer b { color: var(--fg); font-weight: 600; }
     charts.forEach(c0 => {
       if (col && nth > 0) tgt = more;                                    // valitun rivin lisakuviot ylaparin alle
       if (c0.section && c0.section !== lastSec) {                        // valiotsikko osioiden valiin
-        const h = document.createElement("h3"); h.className = "fsec"; h.textContent = c0.section; box.appendChild(h); lastSec = c0.section; }
+        const h = document.createElement("h2"); h.className = "fsec"; h.textContent = c0.section; box.appendChild(h); lastSec = c0.section; }
       if (c0.type === "table") { tgt.appendChild(tableCard(c0, narrow)); return; }
       if (c0.type === "curve") { tgt.appendChild(curveCard(c0, narrow)); return; }
       if (c0.type === "scatter") { if (col && nth++ === 0) tgt = box; tgt.appendChild(scatterCard(c0, narrow)); return; }
@@ -1873,7 +1868,7 @@ footer b { color: var(--fg); font-weight: 600; }
       if (c.bars && !ser(c.bars)) delete c.bars;
       if (!c.lines.length) return;
       const card = document.createElement("div"); card.className = "card fcard" + (c.size === "tt" && !narrow ? " tt" : c.wide ? " wide" : c.size === "half" ? " half" : "");
-      card.innerHTML = `<div class="fhead"><h2>${c.title}</h2>${c.ts ? "" : `<span class="fval"></span>`}</div><p class="fsub"></p>`;
+      card.innerHTML = `<div class="fhead"><h3>${c.title}</h3>${c.ts ? "" : `<span class="fval"></span>`}</div><p class="fsub"></p>`;
       const big = c.wide && !narrow && !c.w, half = c.size === "half" && !narrow;
       if (c.size === "tt" && !narrow) { c.w = c.w || 760; c.height = c.height || 300; }   // kaksi kolmasosaa leveydesta
       const W2 = c.w || (big ? 960 : half ? 560 : 420), H2 = c.height || (big ? 300 : half ? 270 : (c.wide ? 270 : 230)), fs = c.w ? 11 : big ? 11 : half ? 12 : 13;
@@ -1972,7 +1967,9 @@ footer b { color: var(--fg); font-weight: 600; }
       const dots = L.map((a, k) => el("circle", { r: big ? 3.5 : 4, fill: colOf[c.lines[k]], stroke: "var(--surface)", "stroke-width": 1.5 }, svg));
 
       const valEl = card.querySelector(".fval"), subEl = card.querySelector(".fsub");
-      const fP = c.qlab ? (p => "Q" + Math.ceil(+p.slice(5, 7) / 3) + "/" + p.slice(0, 4)) : fmtP;   // kuukausijaksoille neljanneksen merkintä
+      const qOnly = set.freq === "M" && [...c.lines, ...(c.stack || [])].every(id => { const v = ser(id) && ser(id).values;   // vain neljannesten viimeisilla kuukausilla havaintoja
+        return v && v.every((x, j) => x == null || +set.periods[j].slice(5, 7) % 3 === 0); });
+      const fP = c.qlab || qOnly ? (p => "Q" + Math.ceil(+p.slice(5, 7) / 3) + "/" + p.slice(0, 4)) : fmtP;   // kuukausiakselin neljannessarjoille Q-merkintä
       const show = h => {
         const iDef = c.defIdx != null && c.defIdx - i0 >= 0 && L[0][Math.min(c.defIdx - i0, lastNN(L[0]))] != null ? Math.min(c.defIdx - i0, lastNN(L[0])) : null;
         let i = h == null ? (iDef != null ? iDef : L.length > 1 && !B && !S.length ? Math.min(...L.map(lastNN)) : lastNN(B || L[0]))   // oletus: valittu tai viimeisin yhteinen jakso
@@ -2022,7 +2019,7 @@ footer b { color: var(--fg); font-weight: 600; }
       if (S.length && erit) {                                             // valitun jakson erittely kuvion viereen tai alle
         const side = document.createElement("div"); side.className = "card fcard side";
         const su0 = c.stackUnit != null ? c.stackUnit : "%-yks.";
-        side.innerHTML = `<div class="fhead"><h2>Erittely</h2><span class="fval"></span></div><div class="brk"></div>`;
+        side.innerHTML = `<div class="fhead"><h3>Erittely</h3><span class="fval"></span></div><div class="brk"></div>`;
         (sideLeft ? $("grSide") : tgt).appendChild(side);
         const bx = side.querySelector(".brk"), sv = side.querySelector(".fval"), u = c.unit === "%" ? " %" : c.unit ? " " + c.unit : "";
         const sg = (v, d) => (v == null ? "–" : (!c.lvl && +v.toFixed(d) > 0 ? "+" : "") + fmtV(v, d));
