@@ -34,8 +34,8 @@ if (document.documentElement.dataset.theme === "vapor") vaporFont();</script>
 
 :root { --dim: #c4c9d0; --g6: #7d7aa8; --g7: #c07a9b; --g8: #8fb0a6; --hatch: var(--muted);
   --hover-line: color-mix(in srgb, var(--fg) 35%, transparent); --fc-zone: color-mix(in srgb, var(--fg) 3.5%, transparent); }
-/* lampokartat: kaikki solut taytettyna ja kehystettyna, voimakkuus poikkeaman mukaan (kaikki teemat) */
-.hm td.hc { background: color-mix(in srgb, var(--hc) var(--hp), var(--surface)); box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--hc) 55%, transparent); font-weight: 500; }
+/* lampokartat: vaaleissa teemoissa pelkka taytto, vaporwavessa taytto ja kehys */
+.hm td.hc { background: color-mix(in srgb, var(--hc) var(--hp), var(--surface)); }
 tr.pick:hover > td.hc, tr.pick:hover > td { filter: brightness(0.94); }
 tr.pick:hover > th { color: var(--accent); }
 /* Selkea-teema (valinnainen): korallinpunainen, kuninkaansininen ja petrooli, keltainen ennallaan */
