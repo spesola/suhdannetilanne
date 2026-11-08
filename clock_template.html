@@ -15,7 +15,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Manrope:wght@300;400;500;600&display=swap">
-<script>try { const t = new URLSearchParams(location.search).get("teema") || localStorage.getItem("teema"); if (t === "vapor") document.documentElement.dataset.theme = t; } catch (e) {}
+<script>try { const t = new URLSearchParams(location.search).get("teema") || localStorage.getItem("teema"); if (t === "vapor" || t === "selkea") document.documentElement.dataset.theme = t; } catch (e) {}
 function vaporFont() { if (document.getElementById("vfont")) return; const l = document.createElement("link"); l.id = "vfont"; l.rel = "stylesheet"; l.href = "https://fonts.googleapis.com/css2?family=Orbitron:wght@500&display=swap"; document.head.appendChild(l); }
 if (document.documentElement.dataset.theme === "vapor") vaporFont();</script>
 <style>
@@ -37,6 +37,9 @@ if (document.documentElement.dataset.theme === "vapor") vaporFont();</script>
 .hm td.hc { background: color-mix(in srgb, var(--hc) var(--hp), var(--surface)); }
 tr.pick:hover > td.hc, tr.pick:hover > td { filter: brightness(0.94); }
 tr.pick:hover > th { color: var(--accent); }
+/* Selkea-teema (valinnainen): korallinpunainen, kuninkaansininen ja petrooli, keltainen ennallaan */
+:root[data-theme="selkea"] { --fg: #1f2430; --accent: #4f5fc6; --q-up: #2a8a85; --q-down: #c4554a; --q-rec: #4f5fc6;
+  --g1: #4f5fc6; --g3: #2a8a85; --g4: #8a8f98; --g5: #a65fa8; --g6: #d0675a; --g7: #9a7a20; --g8: #7fb3ae; }
 /* Vaporwave-teema (valinnainen): musta tausta, auringonlasku-neonvarit */
 :root[data-theme="vapor"] { --bg: #07050d; --surface: #07050d; --plot: #0c0816; --fg: #ece4f7; --muted: #a892c9; --line: #2a1c42; --grid: #191029; --rule: #e7d6ff; --pt: #d8c4f6;
   --accent: #b68cff; --q-up: #2de2e6; --q-turn: #ffa23d; --q-down: #ff3d7f; --q-rec: #6f86ff;
@@ -567,6 +570,7 @@ footer b { color: var(--fg); font-weight: 600; }
     <nav class="sets" id="sets" aria-label="Näkymä"></nav>
     <div class="thm" id="thm" role="group" aria-label="Väriteema">
       <button type="button" data-t="" title="Vaalea" aria-label="Vaalea teema" style="--sw:linear-gradient(135deg, #fbfbfc 50%, #1d4f7f 50%)"></button>
+      <button type="button" data-t="selkea" title="Selkeä" aria-label="Selkeä teema" style="--sw:conic-gradient(#d0675a 0 33%, #4f5fc6 0 66%, #2a8a85 0)"></button>
       <button type="button" data-t="vapor" title="Vaporwave" aria-label="Vaporwave-teema" style="--sw:linear-gradient(180deg, #ffb347 0%, #ff4fd8 50%, #2b0a4d 100%)"></button>
     </div>
   </header>
@@ -2052,7 +2056,7 @@ footer b { color: var(--fg); font-weight: 600; }
   (function () {                                                    // teeman valinta: vaalea tai vaporwave, muistetaan selaimessa
     const bs = [...document.querySelectorAll("#thm button")], cur = () => document.documentElement.dataset.theme || "";
     const mark = () => bs.forEach(b => b.setAttribute("aria-pressed", b.dataset.t === cur()));
-    bs.forEach(b => b.onclick = () => { if (b.dataset.t) { document.documentElement.dataset.theme = b.dataset.t; vaporFont(); } else delete document.documentElement.dataset.theme;
+    bs.forEach(b => b.onclick = () => { if (b.dataset.t) { document.documentElement.dataset.theme = b.dataset.t; if (b.dataset.t === "vapor") vaporFont(); } else delete document.documentElement.dataset.theme;
       try { localStorage.setItem("teema", b.dataset.t || "vaalea"); } catch (e) {} mark(); });
     mark();
   })();
