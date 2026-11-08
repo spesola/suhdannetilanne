@@ -109,6 +109,8 @@ body { font-variant-numeric: tabular-nums; background: var(--bg); min-height: 10
 .hlead .hd { font-size: 0.875rem; margin: 0; }
 .hlead .hd b { font-weight: 600; color: var(--fg); }
 @media (max-width: 860px) { .hero { grid-template-columns: minmax(0, 1fr); } }
+@media (min-width: 861px) { .hero:not(.haskpi):has(.hlead:not(:empty)) { display: flex; align-items: center; gap: 48px; }   /* vaihe ja jakauma samalla rivilla */
+  .hero:not(.haskpi):has(.hlead:not(:empty)) .hsum { border-left: 1px solid var(--line); padding-left: 48px; } }
 /* avainluvut (reaalitalous, rahoitus) */
 .hero.haskpi { display: block; }
 .hero:not(.haskpi) .kpirow { display: none; }
