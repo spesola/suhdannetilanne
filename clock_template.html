@@ -34,9 +34,8 @@ if (document.documentElement.dataset.theme === "vapor") vaporFont();</script>
 
 :root { --dim: #c4c9d0; --g6: #7d7aa8; --g7: #c07a9b; --g8: #8fb0a6; --hatch: var(--muted);
   --hover-line: color-mix(in srgb, var(--fg) 35%, transparent); --fc-zone: color-mix(in srgb, var(--fg) 3.5%, transparent); }
-/* lampokartat: pienet arvot varillisena tekstina, isot taytettyna ja kehystettyna (kaikki teemat) */
+/* lampokartat: kaikki solut taytettyna ja kehystettyna, voimakkuus poikkeaman mukaan (kaikki teemat) */
 .hm td.hc { background: color-mix(in srgb, var(--hc) var(--hp), var(--surface)); box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--hc) 55%, transparent); font-weight: 500; }
-.hm td.hc.lo { background: none; box-shadow: none; color: color-mix(in srgb, var(--hc) 82%, #000); }
 tr.pick:hover > td.hc, tr.pick:hover > td { filter: brightness(0.94); }
 tr.pick:hover > th { color: var(--accent); }
 /* Selkea-teema (valinnainen): korallinpunainen, kuninkaansininen ja petrooli, keltainen ennallaan */
@@ -50,9 +49,8 @@ tr.pick:hover > th { color: var(--accent); }
   --vgrad: linear-gradient(90deg, #ffb347 0%, #ff4fd8 55%, #8f7dff 100%); --font-head: "Orbitron", "Manrope", system-ui, sans-serif;
   color-scheme: dark; scrollbar-color: #4a2f75 #07050d; }
 :root[data-theme="vapor"] ::selection { background: #ff4fd8; color: #07050d; }
-/* lampokartat: pienet arvot varillisena tekstina, isot neonkehyksena */
+/* lampokartat vaporwavessa: lapikuultava taytto ja neonkehys */
 :root[data-theme="vapor"] .hm td.hc { background: color-mix(in srgb, var(--hc) var(--hv), transparent); box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--hc) 70%, transparent); color: #fff; }
-:root[data-theme="vapor"] .hm td.hc.lo { background: none; box-shadow: none; color: var(--hc); }
 :root[data-theme="vapor"] tr.pick:hover > td.hc, :root[data-theme="vapor"] tr.pick:hover > td { filter: brightness(1.3); }
 :root[data-theme="vapor"] .strip i { background: color-mix(in srgb, var(--qc) 62%, var(--surface)); }
 /* aurinko yläpalkin takana */
