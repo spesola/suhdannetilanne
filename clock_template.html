@@ -15,7 +15,9 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Manrope:wght@300;400;500;600&display=swap">
-<script>try { const t = new URLSearchParams(location.search).get("teema") || localStorage.getItem("teema"); if (t === "vapor") document.documentElement.dataset.theme = t; } catch (e) {}</script>
+<script>try { const t = new URLSearchParams(location.search).get("teema") || localStorage.getItem("teema"); if (t === "vapor") document.documentElement.dataset.theme = t; } catch (e) {}
+function vaporFont() { if (document.getElementById("vfont")) return; const l = document.createElement("link"); l.id = "vfont"; l.rel = "stylesheet"; l.href = "https://fonts.googleapis.com/css2?family=Orbitron:wght@500&display=swap"; document.head.appendChild(l); }
+if (document.documentElement.dataset.theme === "vapor") vaporFont();</script>
 <style>
 /* Layout: tasainen vaalea pohja, osiot erotettu ohuella ylaviivalla (ei kortteja). Ylapalkki, iso otsikko, kello + luettelo, yksityiskohdat alla. */
 :root {
@@ -30,11 +32,38 @@
 }
 
 
-:root { --dim: #c4c9d0; }
+:root { --dim: #c4c9d0; --g6: #7d7aa8; --g7: #c07a9b; --g8: #8fb0a6; --hatch: var(--muted);
+  --hover-line: color-mix(in srgb, var(--fg) 35%, transparent); --fc-zone: color-mix(in srgb, var(--fg) 3.5%, transparent); }
+.hm td.hc { background: color-mix(in srgb, var(--hc) var(--hp), var(--surface)); }
+tr.pick:hover > td.hc, tr.pick:hover > td { filter: brightness(0.94); }
+tr.pick:hover > th { color: var(--accent); }
 /* Vaporwave-teema (valinnainen): musta tausta, auringonlasku-neonvarit */
-:root[data-theme="vapor"] { --bg: #07050d; --surface: #07050d; --plot: #0c0816; --fg: #f4ecff; --muted: #a892c9; --line: #2a1c42; --grid: #191029; --rule: #e7d6ff; --pt: #d8c4f6;
+:root[data-theme="vapor"] { --bg: #07050d; --surface: #07050d; --plot: #0c0816; --fg: #ece4f7; --muted: #a892c9; --line: #2a1c42; --grid: #191029; --rule: #e7d6ff; --pt: #d8c4f6;
   --accent: #b68cff; --q-up: #2de2e6; --q-turn: #ffa23d; --q-down: #ff3d7f; --q-rec: #6f86ff;
-  --g1: #ff4fd8; --g2: #ffb347; --g3: #2de2e6; --g4: #9d8bd1; --g5: #f9e14f; --dim: #3b2d55; color-scheme: dark; }
+  --g1: #ff4fd8; --g2: #ffb347; --g3: #2de2e6; --g4: #9d8bd1; --g5: #f9e14f; --g6: #6f86ff; --g7: #ff8fab; --g8: #7fe0c3; --dim: #3b2d55;
+  --hatch: #c9b6ea; --hover-line: color-mix(in srgb, #2de2e6 70%, transparent); --fc-zone: color-mix(in srgb, #8f3dff 14%, transparent);
+  --vgrad: linear-gradient(90deg, #ffb347 0%, #ff4fd8 55%, #8f7dff 100%); --font-head: "Orbitron", "Manrope", system-ui, sans-serif;
+  color-scheme: dark; scrollbar-color: #4a2f75 #07050d; }
+:root[data-theme="vapor"] ::selection { background: #ff4fd8; color: #07050d; }
+/* lampokartat: pienet arvot varillisena tekstina, isot neonkehyksena */
+:root[data-theme="vapor"] .hm td.hc { background: color-mix(in srgb, var(--hc) var(--hv), transparent); box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--hc) 70%, transparent); color: #fff; }
+:root[data-theme="vapor"] .hm td.hc.lo { background: none; box-shadow: none; color: var(--hc); }
+:root[data-theme="vapor"] tr.pick:hover > td.hc, :root[data-theme="vapor"] tr.pick:hover > td { filter: brightness(1.3); }
+:root[data-theme="vapor"] .strip i { background: color-mix(in srgb, var(--qc) 62%, var(--surface)); }
+/* aurinko yläpalkin takana */
+:root[data-theme="vapor"] body::before { content: ""; position: absolute; left: 50%; top: -60px; width: 300px; height: 150px; transform: translateX(-50%); border-radius: 150px 150px 0 0;
+  background: linear-gradient(180deg, #ffb347 0%, #ff4fd8 75%, #8f3dff 100%); opacity: 0.16; pointer-events: none; z-index: 0;
+  -webkit-mask: repeating-linear-gradient(180deg, #000 0 11px, transparent 11px 16px); mask: repeating-linear-gradient(180deg, #000 0 11px, transparent 11px 16px); }
+:root[data-theme="vapor"] .wrap { position: relative; z-index: 1; }
+/* liukuvariaksentit */
+:root[data-theme="vapor"] .sets button[aria-pressed="true"] { border-bottom-color: transparent; border-image: var(--vgrad) 1; }
+:root[data-theme="vapor"] .card, :root[data-theme="vapor"] .tiles { border-image: linear-gradient(90deg, rgba(255,179,71,.65), rgba(255,79,216,.65) 55%, rgba(143,125,255,.65)) 1; }
+:root[data-theme="vapor"] .hp i { box-shadow: 0 0 14px 2px var(--qc); }
+/* hehku pisteisiin */
+:root[data-theme="vapor"] svg.fc circle, :root[data-theme="vapor"] #clock circle { filter: drop-shadow(0 0 3px color-mix(in srgb, var(--accent) 60%, transparent)); }
+/* retrofontti otsikoihin */
+:root[data-theme="vapor"] .brand h1 { font-family: var(--font-head); font-weight: 500; letter-spacing: 0.02em; font-size: 1.45rem; }
+:root[data-theme="vapor"] .fsec, :root[data-theme="vapor"] .hp { font-family: var(--font-head); font-weight: 500; letter-spacing: 0.02em; }
 :root[data-theme="vapor"] body { background: radial-gradient(1100px 520px at 50% -140px, rgba(150, 40, 220, 0.32), transparent 70%), var(--bg); background-repeat: no-repeat; }
 :root[data-theme="vapor"] .brand h1 { background: linear-gradient(90deg, #ffb347 0%, #ff4fd8 55%, #8f7dff 100%); -webkit-background-clip: text; background-clip: text; color: transparent; }
 :root[data-theme="vapor"] .topbar { border-image: linear-gradient(90deg, #ffb347, #ff4fd8 50%, #8f7dff) 1; }
@@ -1116,7 +1145,7 @@ footer b { color: var(--fg); font-weight: 600; }
       if (v == null) return `<td class="na">–</td>`;
       const t = Math.min(1, Math.abs(v) / 2.5), base = v >= 0 ? "var(--q-up)" : "var(--q-down)";
       const ar = !lvl || c == null ? "" : `<span class="ar">${c >= 0 ? "▲" : "▼"}</span>`;
-      return `<td style="background:color-mix(in srgb, ${base} ${Math.round(8 + 52 * t)}%, var(--surface))" title="taso ${l == null ? "–" : fmtN(l)}, muutos ${c == null ? "–" : fmtN(c)}">${fmtN(v)}${ar}</td>`;
+      return `<td class="hc${t < 0.35 ? " lo" : ""}" style="--hc:${base};--hp:${Math.round(8 + 52 * t)}%;--hv:${Math.round(22 + 48 * t)}%" title="taso ${l == null ? "–" : fmtN(l)}, muutos ${c == null ? "–" : fmtN(c)}">${fmtN(v)}${ar}</td>`;
     };
     let h = `<thead><tr><th></th>${cols.map(p => `<th>${fmtP(p)}</th>`).join("")}</tr></thead><tbody>`;
     const nm = s => s.comp ? s.label : (s.list || s.label);
@@ -1195,7 +1224,7 @@ footer b { color: var(--fg); font-weight: 600; }
       h += `<tr data-id="${r.id}" class="pick${r.id === "bkt" ? " tot" : ""}${r.id === grSel ? " on" : ""}" tabindex="0"${r.id === grSel ? ' aria-current="true"' : ""} title="Näytä kuvassa"><th class="rl${r.sub ? " sub" : ""}">${r.label}</th>` + a.map(v => {
         if (v == null) return `<td class="na"></td>`;
         const t = Math.min(1, Math.abs(v) / (2 * sd)), base = r.neutral ? "var(--accent)" : (v >= 0) !== !!r.invert ? "var(--q-up)" : "var(--q-down)";
-        return `<td style="background:color-mix(in srgb, ${base} ${Math.round(6 + (r.neutral ? 34 : 46) * t)}%, var(--surface))">${+v.toFixed(1) > 0 ? "+" : ""}${fmtV(v, 1)}</td>`;
+        return `<td class="hc${t < 0.35 ? " lo" : ""}" style="--hc:${base};--hp:${Math.round(6 + (r.neutral ? 34 : 46) * t)}%;--hv:${Math.round(22 + 48 * t)}%">${+v.toFixed(1) > 0 ? "+" : ""}${fmtV(v, 1)}</td>`;
       }).join("") + "</tr>" + (r.gap_after && r !== rows[rows.length - 1] ? `<tr class="gap" aria-hidden="true"><td colspan="${cols.length + 1}"></td></tr>` : "");
     });
     $("grTable").innerHTML = h + "</tbody>";
@@ -1271,7 +1300,7 @@ footer b { color: var(--fg); font-weight: 600; }
     const svg = el("svg", { class: "fc", viewBox: `0 0 ${W} ${H}`, role: "img", "aria-label": F.title }, card);
     const lastA = A.years.length ? A.years[A.years.length - 1] : null, aOf = y => A.values[A.years.indexOf(y)];
     const fx0 = lastA != null ? (xs(lastA) + xs(lastA + 1)) / 2 : ml;
-    el("rect", { x: fx0, y: mt, width: W - mr - fx0 + mr / 2, height: H - mb - mt, fill: "var(--fg)", "fill-opacity": 0.035 }, svg);
+    el("rect", { x: fx0, y: mt, width: W - mr - fx0 + mr / 2, height: H - mb - mt, fill: "var(--fc-zone)" }, svg);
     el("text", { x: fx0 + 6, y: mt + fs, "font-size": fs, fill: "var(--muted)" }, svg).textContent = "Ennuste";
     for (let v = lo; v <= hi + step / 2; v += step) { const vv = Math.round(v / step) * step;
       el("line", { x1: ml, x2: W - mr + mr / 2, y1: ys(vv), y2: ys(vv), stroke: Math.abs(vv) < 1e-9 ? "var(--muted)" : "var(--grid)", "stroke-width": 1 }, svg);
@@ -1358,7 +1387,7 @@ footer b { color: var(--fg); font-weight: 600; }
 
   /* ---------- kuvionakyma: rahoitusmarkkinat ---------- */
   const LINE_COLS = ["var(--accent)", "var(--g2)", "var(--fg)", "var(--g3)"];
-  const STACK_COLS = ["var(--g1)", "var(--g2)", "var(--g3)", "#7d7aa8", "var(--g5)", "#c07a9b", "#8fb0a6"];
+  const STACK_COLS = ["var(--g1)", "var(--g2)", "var(--g3)", "var(--g6)", "var(--g5)", "var(--g7)", "var(--g8)"];
   const stCol = (c, k) => (c.stackColors && c.stackColors[k]) || STACK_COLS[k % STACK_COLS.length];   // stackColors: kuviokohtaiset pinovarit
   const fmtV = (v, dec) => { if (v == null) return "–"; const r = +v.toFixed(dec), a = Math.abs(r);
     return (r < 0 ? "−" : "") + thou(a.toFixed(dec).replace(".", ",")); };
@@ -1920,8 +1949,8 @@ footer b { color: var(--fg); font-weight: 600; }
             fill: c.barsNeutral ? "var(--g3)" : v >= 0 ? "var(--q-up)" : "var(--q-down)", "fill-opacity": c.barsNeutral ? 0.22 : 0.26 }, svg); }); }
       const hid = `hx-${c.id}`;
       if ((c.stack || []).some(isRes)) { const pt = el("pattern", { id: hid, width: 4, height: 4, patternUnits: "userSpaceOnUse", patternTransform: "rotate(45)" }, el("defs", {}, svg));
-        el("rect", { width: 4, height: 4, fill: "color-mix(in srgb, var(--muted) 18%, var(--surface))" }, pt);
-        el("line", { x1: 0, y1: 0, x2: 0, y2: 4, stroke: "var(--muted)", "stroke-width": 1.5 }, pt); }
+        el("rect", { width: 4, height: 4, fill: "color-mix(in srgb, var(--hatch) 18%, var(--surface))" }, pt);
+        el("line", { x1: 0, y1: 0, x2: 0, y2: 4, stroke: "var(--hatch)", "stroke-width": 1.5 }, pt); }
       if (S.length) { const sp = c.barSpan || 1, bw = (W2 - ml - mr) / n * sp * 0.78;   // pinotut kontribuutiot: positiiviset ylos, negatiiviset alas; barSpan: nelj. kuukausiakselilla
         P.forEach((_, i) => { let up = 0, dn = 0;
           S.forEach((s, k) => { const v = s[i]; if (v == null || v === 0) return;
@@ -1947,7 +1976,7 @@ footer b { color: var(--fg); font-weight: 600; }
         if (h != null) { const has = j => L.some(a => a[j] != null) || S.some(s => s[j] != null) || (B && B[j] != null);   // harva (nelj.) sarja: lahin aiempi havainto
           let j = i; while (j > 0 && i - j < 2 && !has(j)) j--; if (has(j)) i = j; }
         cur.setAttribute("x1", xs(i)); cur.setAttribute("x2", xs(i));
-        cur.setAttribute("visibility", h == null ? "hidden" : "visible"); cur.setAttribute("stroke", "var(--fg)"); cur.setAttribute("stroke-opacity", 0.35);   // ei viimeisen havainnon pisteviivaa
+        cur.setAttribute("visibility", h == null ? "hidden" : "visible"); cur.setAttribute("stroke", "var(--hover-line)"); cur.setAttribute("stroke-opacity", 1);   // ei viimeisen havainnon pisteviivaa
         L.forEach((a, k) => { const ok = a[i] != null; dots[k].setAttribute("visibility", ok ? "visible" : "hidden");
           if (ok) { dots[k].setAttribute("cx", xs(i)); dots[k].setAttribute("cy", (isY2(k) ? ys2 : ys)(a[i])); } });
         if (S.length) {
@@ -2023,7 +2052,7 @@ footer b { color: var(--fg); font-weight: 600; }
   (function () {                                                    // teeman valinta: vaalea tai vaporwave, muistetaan selaimessa
     const bs = [...document.querySelectorAll("#thm button")], cur = () => document.documentElement.dataset.theme || "";
     const mark = () => bs.forEach(b => b.setAttribute("aria-pressed", b.dataset.t === cur()));
-    bs.forEach(b => b.onclick = () => { if (b.dataset.t) document.documentElement.dataset.theme = b.dataset.t; else delete document.documentElement.dataset.theme;
+    bs.forEach(b => b.onclick = () => { if (b.dataset.t) { document.documentElement.dataset.theme = b.dataset.t; vaporFont(); } else delete document.documentElement.dataset.theme;
       try { localStorage.setItem("teema", b.dataset.t || "vaalea"); } catch (e) {} mark(); });
     mark();
   })();
