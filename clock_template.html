@@ -15,6 +15,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Manrope:wght@300;400;500;600&display=swap">
+<script>try { const t = new URLSearchParams(location.search).get("teema") || localStorage.getItem("teema"); if (t === "vapor") document.documentElement.dataset.theme = t; } catch (e) {}</script>
 <style>
 /* Layout: tasainen vaalea pohja, osiot erotettu ohuella ylaviivalla (ei kortteja). Ylapalkki, iso otsikko, kello + luettelo, yksityiskohdat alla. */
 :root {
@@ -30,6 +31,21 @@
 
 
 :root { --dim: #c4c9d0; }
+/* Vaporwave-teema (valinnainen): musta tausta, auringonlasku-neonvarit */
+:root[data-theme="vapor"] { --bg: #07050d; --surface: #07050d; --plot: #0c0816; --fg: #f4ecff; --muted: #a892c9; --line: #2a1c42; --grid: #191029; --rule: #e7d6ff; --pt: #d8c4f6;
+  --accent: #b68cff; --q-up: #2de2e6; --q-turn: #ffa23d; --q-down: #ff3d7f; --q-rec: #6f86ff;
+  --g1: #ff4fd8; --g2: #ffb347; --g3: #2de2e6; --g4: #9d8bd1; --g5: #f9e14f; --dim: #3b2d55; color-scheme: dark; }
+:root[data-theme="vapor"] body { background: radial-gradient(1100px 520px at 50% -140px, rgba(150, 40, 220, 0.32), transparent 70%), var(--bg); background-repeat: no-repeat; }
+:root[data-theme="vapor"] .brand h1 { background: linear-gradient(90deg, #ffb347 0%, #ff4fd8 55%, #8f7dff 100%); -webkit-background-clip: text; background-clip: text; color: transparent; }
+:root[data-theme="vapor"] .topbar { border-image: linear-gradient(90deg, #ffb347, #ff4fd8 50%, #8f7dff) 1; }
+:root[data-theme="vapor"] svg.fc path[fill="none"] { filter: drop-shadow(0 0 2.5px color-mix(in srgb, var(--accent) 45%, transparent)); }
+.thm { display: flex; align-items: center; gap: 7px; padding: 6px 0 14px; }
+.thm button { width: 16px; height: 16px; padding: 0; border-radius: 50%; border: 1px solid var(--line); cursor: pointer; background: var(--sw); }
+.thm button[aria-pressed="true"] { box-shadow: 0 0 0 2px var(--bg), 0 0 0 3.5px var(--fg); }
+.thm button:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; }
+.topbar .sets { margin-left: auto; }
+@media (max-width: 860px) { .topbar .sets { margin-left: 0; } .thm { padding: 0 0 12px; } }
+
 
 * { box-sizing: border-box; }
 [hidden] { display: none !important; }
@@ -520,6 +536,10 @@ footer b { color: var(--fg); font-weight: 600; }
   <header class="topbar">
     <a class="brand" href="./"><h1 id="headline">Suhdannetilanne</h1></a>
     <nav class="sets" id="sets" aria-label="Näkymä"></nav>
+    <div class="thm" id="thm" role="group" aria-label="Väriteema">
+      <button type="button" data-t="" title="Vaalea" aria-label="Vaalea teema" style="--sw:linear-gradient(135deg, #fbfbfc 50%, #1d4f7f 50%)"></button>
+      <button type="button" data-t="vapor" title="Vaporwave" aria-label="Vaporwave-teema" style="--sw:linear-gradient(180deg, #ffb347 0%, #ff4fd8 50%, #2b0a4d 100%)"></button>
+    </div>
   </header>
 
   <section class="hero">
@@ -2000,6 +2020,13 @@ footer b { color: var(--fg); font-weight: 600; }
     if (b.id === "grCharts") { clearTimeout(rzT); rzT = setTimeout(() => { drawCharts(); if (set.forecast) renderFc(); }, 150); return; }   // ylapari sovitetaan uudelleen
     if (nw !== lastNarrow) { lastNarrow = nw; renderCharts(b); } });
   function renderAll() { renderHeader(); update(); }
+  (function () {                                                    // teeman valinta: vaalea tai vaporwave, muistetaan selaimessa
+    const bs = [...document.querySelectorAll("#thm button")], cur = () => document.documentElement.dataset.theme || "";
+    const mark = () => bs.forEach(b => b.setAttribute("aria-pressed", b.dataset.t === cur()));
+    bs.forEach(b => b.onclick = () => { if (b.dataset.t) document.documentElement.dataset.theme = b.dataset.t; else delete document.documentElement.dataset.theme;
+      try { localStorage.setItem("teema", b.dataset.t || "vaalea"); } catch (e) {} mark(); });
+    mark();
+  })();
   (function () {                                                    // Reaalitalous: lisakuviot ja ennusteet taittuvina osioina (oletuksena kiinni)
     const open = new Set(), hs = [...document.querySelectorAll(".rfold")];
     const sync = () => hs.forEach(h => { const on = open.has(h.dataset.k); h.parentElement.classList.toggle("folded", !on); h.setAttribute("aria-expanded", on); });
