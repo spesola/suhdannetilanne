@@ -156,6 +156,11 @@ body { font-variant-numeric: tabular-nums; background: var(--bg); min-height: 10
 .phead { display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: 4px 12px; margin-bottom: 14px; }
 .phead h2 { font-family: var(--font-body); font-weight: 600; font-size: 1rem; margin: 0; }
 .cdesc { font-size: 0.875rem; color: var(--muted); margin: -8px 0 8px; }
+.ph2 { display: inline-flex; align-items: center; gap: 2px; }
+.xbtn { display: inline-grid; place-items: center; width: 26px; height: 26px; border: 0; border-radius: 6px; background: none; color: var(--muted); cursor: pointer; padding: 0; }
+.xbtn svg { fill: currentColor; }
+.xbtn:hover, .xbtn[aria-expanded="true"] { color: var(--fg); background: color-mix(in srgb, var(--fg) 7%, transparent); }
+.xbtn:focus-visible { outline: 2px solid var(--accent); outline-offset: 1px; }
 .clegend:empty { display: none; }
 .clegend { display: flex; flex-wrap: wrap; gap: 6px 18px; font-size: 0.78rem; color: var(--muted); margin-bottom: 6px; align-items: center; }
 .clegend span { display: inline-flex; align-items: center; gap: 6px; }
@@ -583,8 +588,8 @@ footer b { color: var(--fg); font-weight: 600; }
 
   <section class="top" id="topSec">
     <div class="card">
-      <div class="phead"><h2 id="clockTitle">Suhdannekartta</h2><label class="tg" id="tailsTg"><input type="checkbox" id="tails"> <span id="tailsLbl">Kulku</span></label></div>
-      <p class="cdesc" id="clockDesc"></p>
+      <div class="phead"><span class="ph2"><h2 id="clockTitle">Suhdannekartta</h2><button type="button" class="xbtn" data-x="clockDesc" aria-expanded="false" aria-label="Näytä selite" title="Näytä selite"><svg viewBox="0 0 16 16" width="16" height="16" aria-hidden="true"><circle cx="3" cy="8" r="1.5"/><circle cx="8" cy="8" r="1.5"/><circle cx="13" cy="8" r="1.5"/></svg></button></span><label class="tg" id="tailsTg"><input type="checkbox" id="tails"> <span id="tailsLbl">Kulku</span></label></div>
+      <p class="cdesc" id="clockDesc" hidden></p>
       <div class="clegend" id="clockLegend"></div>
       <svg id="clock" viewBox="12 22 548 578" role="img" aria-label="Suhdannekartta"></svg>
       <div class="timebar">
@@ -597,16 +602,16 @@ footer b { color: var(--fg); font-weight: 600; }
       </div>
     </div>
     <div class="card">
-      <div class="phead"><h2>Indikaattorit</h2><span class="pmeta"><button type="button" class="chip" id="clrSel" hidden></button><span class="meta" id="listMeta"></span></span></div>
+      <div class="phead"><span class="ph2"><h2>Indikaattorit</h2><button type="button" class="xbtn" data-x="listNote" aria-expanded="false" aria-label="Näytä selite" title="Näytä selite"><svg viewBox="0 0 16 16" width="16" height="16" aria-hidden="true"><circle cx="3" cy="8" r="1.5"/><circle cx="8" cy="8" r="1.5"/><circle cx="13" cy="8" r="1.5"/></svg></button></span><span class="pmeta"><button type="button" class="chip" id="clrSel" hidden></button><span class="meta" id="listMeta"></span></span></div>
+      <p class="cdesc" id="listNote" hidden></p>
       <div class="list" id="list"></div>
       <div class="tsside" id="tsSide">
       <div class="tsgrid" id="tsGrid">
         <div class="tsmain">
-          <div class="viewhead"><h2 id="tsTitle"></h2></div>
+          <div class="viewhead"><span class="ph2"><h2 id="tsTitle"></h2><button type="button" class="xbtn" data-x="tsSub" aria-expanded="false" aria-label="Näytä selite" title="Näytä selite"><svg viewBox="0 0 16 16" width="16" height="16" aria-hidden="true"><circle cx="3" cy="8" r="1.5"/><circle cx="8" cy="8" r="1.5"/><circle cx="13" cy="8" r="1.5"/></svg></button></span></div>
           <p class="tsnow" id="tsNow"></p>
           <svg id="ts" viewBox="0 0 560 300" role="img" aria-label="Poikkeama trendistä ajassa"></svg>
-          <div class="legend dots" id="tsLegend"></div>
-          <p class="fnote" id="tsSub"></p>
+                    <p class="fnote" id="tsSub" hidden></p>
         </div>
         <div class="fgrid" id="tsContrib"></div>
       </div>
@@ -779,11 +784,6 @@ footer b { color: var(--fg); font-weight: 600; }
       const x0 = a === "start" ? x : x - t.getComputedTextLength() - 2 * dr - 5 * pxu;
       el("circle", { cx: x0 + dr, cy: y - 4, r: dr, fill: qcol(q) }, svg); });
     const growthClock = set.indicators.every(x => x.kind === "growth");
-    const T = growthClock ? ["Keskimääräistä nopeampi kasvu", "Keskimääräistä hitaampi kasvu", "Kasvu hidastuu", "Kasvu kiihtyy"]
-                          : ["Trendin yläpuolella", "Trendin alapuolella", "Heikentynyt", "Vahvistunut"];
-    const axl = (t, x, y, a, cls = "") => { el("text", { class: "axl " + cls, x, y, "text-anchor": a, "font-size": 11, fill: "var(--muted)" }, svg).textContent = t; };
-    axl(T[0], mid + 8, M + 20, "start", "top"); axl(T[1], mid + 8, W - M - 12, "start", "bot");
-    axl(T[2], M + 10, mid + 18, "start"); axl(T[3], W - M - 10, mid + 18, "end");
 
     const items = [];
     set.groups.forEach(g => {
@@ -877,6 +877,8 @@ footer b { color: var(--fg); font-weight: 600; }
   }
   $("tails").addEventListener("change", e => { showTails = e.target.checked; update(); });
   $("per").addEventListener("input", e => { stopPlay(); idx = +e.target.value; update(); });
+  document.querySelectorAll(".xbtn[data-x]").forEach(b => b.onclick = () => { const p = $(b.dataset.x); p.hidden = !p.hidden;
+    b.setAttribute("aria-expanded", String(!p.hidden)); b.title = p.hidden ? "Näytä selite" : "Piilota selite"; b.setAttribute("aria-label", b.title); });
   $("prev").onclick = () => { stopPlay(); if (idx > 0) { idx--; update(); } };
   $("next").onclick = () => { stopPlay(); if (idx < set.periods.length - 1) { idx++; update(); } };
 
@@ -889,13 +891,11 @@ footer b { color: var(--fg); font-weight: 600; }
     const cp = at(comp(), idx);
     if (cp) { const q = quad(cp.l, cp.c), C = comp(); let k = cp.i;
       while (k > 0 && C.level[k - 1] != null && C.change[k - 1] != null && quad(C.level[k - 1], C.change[k - 1]) === q) k--;
-      const PH = { up: "Nousuvaiheessa", turn: "Hidastumisvaiheessa", down: "Laskuvaiheessa", rec: "Elpymisvaiheessa" };
-      const p0 = set.periods[k], since = `${fmtP(p0)} alkaen`;
+      const since = fmtP(set.periods[k]);
       $("hlead").innerHTML = `<p class="hl">Kokonaisindikaattori ${fmtP(set.periods[cp.i])}</p><p class="hp" style="--qc:${qcol(q)}"><i></i>${Q[q].short}</p>` +
-        `<p class="hd">Taso <b>${fmtN(cp.l)}</b> ja muutos <b>${fmtN(cp.c)}</b>. ${k === cp.i ? `${PH[q]} ${fmtP(set.periods[cp.i])}` : `${PH[q]} ${since}`} (alustava).</p>`;
+        `<p class="hd">${k === cp.i ? fmtP(set.periods[cp.i]) : since} alkaen (alustava)</p>`;
     } else $("hlead").innerHTML = "";
-    $("summary").innerHTML = `<div class="shead"><span>Kokonaisindikaattorin ${n} sarjaa vaiheittain</span></div>` +
-      `<div class="sbar${qf ? " f" : ""}">${QORDER.filter(q => counts[q]).map(q => `<button type="button" data-q="${q}" class="${qf === q ? "on" : ""}" style="--qc:${qcol(q)};--n:${counts[q]}" title="${Q[q].name}: ${counts[q]}" aria-label="${Q[q].name}: ${counts[q]}">${"<i></i>".repeat(counts[q])}</button>`).join("")}</div>` +   // yksi neliö = yksi sarja
+    $("summary").innerHTML = `<div class="sbar${qf ? " f" : ""}">${QORDER.filter(q => counts[q]).map(q => `<button type="button" data-q="${q}" class="${qf === q ? "on" : ""}" style="--qc:${qcol(q)};--n:${counts[q]}" title="${Q[q].name}: ${counts[q]}" aria-label="${Q[q].name}: ${counts[q]}">${"<i></i>".repeat(counts[q])}</button>`).join("")}</div>` +   // yksi neliö = yksi sarja
       `<div class="slegend">${QORDER.map(q => `<button type="button" class="sl${qf && qf !== q ? " dim" : ""}" data-q="${q}" aria-pressed="${qf === q}" style="--qc:${qcol(q)}" title="Näytä vain: ${Q[q].name.toLowerCase()}"><i></i><span>${Q[q].short}</span><b>${counts[q]}</b></button>`).join("")}</div>`;
     $("summary").querySelectorAll("[data-q]").forEach(b => b.onclick = () => { qf = qf === b.dataset.q ? null : b.dataset.q; update(); });
     const pass = s => { if (!qf) return true; if (!s.comp && !s.in_composite) return false; const p = at(s, idx); return !!p && quad(p.l, p.c) === qf; };
@@ -913,7 +913,7 @@ footer b { color: var(--fg); font-weight: 600; }
       chip.setAttribute("aria-label", `Poista valinta: ${nm}`); chip.title = "Poista valinta"; chip.onclick = clearPicks; }
     const NS = 12, k0 = Math.max(0, idx - NS + 1);
     const fullG = set.groups.filter(g => { const m = set.indicators.filter(v => v.group === g); return m.length > 1 && m.every(v => picked.has(v.id)); });   // kokonaan valitut ryhmat
-    const list = $("list"); list.innerHTML = `<div class="lhead"><span>Sarja</span><span>Vaihe ${NS} ${set.freq === "M" ? "kk" : "nelj."}</span></div>`;
+    const list = $("list"); list.innerHTML = "";
     // vaihenauha: jokaisen jakson vaihe, viimeisin (uusin saatavilla oleva) isompana
     const strip = s => { let h = ""; for (let k = k0; k <= idx; k++) {
         const pp = k === idx ? at(s, idx) : (s.level[k] != null && s.change[k] != null ? { i: k, l: s.level[k], c: s.change[k] } : null);
@@ -969,12 +969,10 @@ footer b { color: var(--fg); font-weight: 600; }
       if (open) { const body = document.createElement("div"); body.className = "gbody"; mem.forEach(s => body.appendChild(mk(s))); box.appendChild(body); }
       list.appendChild(box);
     });
-    if (list.children.length === 1) list.insertAdjacentHTML("beforeend", `<div class="empty">Ei indikaattoreita vaiheessa ${Q[qf].name.toLowerCase()}.</div>`);
+    if (!list.children.length) list.insertAdjacentHTML("beforeend", `<div class="empty">Ei indikaattoreita vaiheessa ${Q[qf].name.toLowerCase()}.</div>`);
     const pa = set.periods[k0], pb = set.periods[idx];
     const span = `${fmtP(pa)}–${fmtP(pb)}`;
-    const notes = [`Viimeisin ${set.freq === "M" ? "kuukausi" : "neljännes"} isompana. Värit kuten yläosan palkissa.`];
-    { const th = list.querySelector(".lhead span:nth-child(2)"); if (th) th.title = `Kunkin ${set.freq === "M" ? "kuukauden" : "neljänneksen"} vaihe ${span}`; }
-    if (notes.length) list.insertAdjacentHTML("beforeend", `<p class="lnote">${notes.join(" ")}</p>`);
+    $("listNote").textContent = `Kunkin sarjan vaihe ${NS} viimeisimmältä ${set.freq === "M" ? "kuukaudelta" : "neljännekseltä"} (${span}), uusin isompana. Värit kuten yläosan palkissa.`;
     if (gAnim && !REDUCED.matches) {                                     // avaus: rivit liukuvat auki, nuoli kaantyy
       const box = [...list.querySelectorAll(".grp")].find(b => b.dataset.g === gAnim.g), body = box && box.querySelector(".gbody");
       const ch = box && box.querySelector(".chev svg");
@@ -1031,7 +1029,7 @@ footer b { color: var(--fg); font-weight: 600; }
     $("tsTitle").textContent = s.label;
     $("tsSub").textContent = (lvlKind ? "Taso suhteessa omaan historiaan vuodesta 2010 keskihajontoina."
       : growthTS ? "Kasvun ero omaan keskiarvoonsa keskihajontoina." : "Poikkeama pitkän aikavälin trendistä keskihajontoina.") +
-      " Harmaa vyöhyke on tavanomainen vaihtelu, −1…+1. Klikkaa kuvaa vaihtaaksesi ajankohtaa.";
+      " Harmaa vyöhyke on tavanomainen vaihtelu, −1…+1. Viivan väri kertoo vaiheen, värit kuten yläosan palkissa. Klikkaa kuvaa vaihtaaksesi ajankohtaa.";
     // oikea puoli: osatekijat (luottamus ym.), BKT-vertailu (kokonaisindikaattori) tai lahteen julkaisema arvo
     let cc = set.contribs && set.contribs[sel || "comp"];
     if (!cc && s.isGroup) {               // ryhma = sarjojen poikkeamien keskiarvo, joten osuus = poikkeama / n (tasmalleen)
@@ -1066,7 +1064,7 @@ footer b { color: var(--fg); font-weight: 600; }
     $("tsGrid").classList.toggle("solo", !cc);
     if (cc) renderCharts($("tsContrib"), [{ ...cc, wide: true, w: 560, height: 300, defIdx: idx, ts: true, rawv: cc.id.startsWith("raw_") }]); else $("tsContrib").innerHTML = "";
     const p = at(s, idx);
-    $("tsNow").innerHTML = p ? `<i style="--qc:${qcol(quad(p.l, p.c))}"></i>${Q[quad(p.l, p.c)].name} ${fmtP(set.periods[p.i])}. Taso ${fmtN(p.l)}, muutos ${fmtN(p.c)}.` : "";
+    $("tsNow").innerHTML = p && !s.comp ? `<i style="--qc:${qcol(quad(p.l, p.c))}"></i>${Q[quad(p.l, p.c)].name} ${fmtP(set.periods[p.i])}. Taso ${fmtN(p.l)}, muutos ${fmtN(p.c)}.` : "";
     const svg = $("ts"); svg.innerHTML = "";
     const solo = false, W2 = 560, H2 = 300,   // aina kapeassa sarakkeessa listan alla
     ml = 40, mr = 14, mt = 12, mb = 28;
@@ -1117,7 +1115,6 @@ footer b { color: var(--fg); font-weight: 600; }
     hit.addEventListener("click", e => { const box = svg.getBoundingClientRect();
       const i = Math.round(((e.clientX - box.left) / box.width * W2 - ml) / (W2 - ml - mr) * (n - 1));
       if (i >= 0 && i < n) { idx = i; update(); } });
-    $("tsLegend").innerHTML = QORDER.map(q => `<span style="--qc:${qcol(q)}">${Q[q].name}</span>`).join("");
   }
 
   /* ---------- heatmap ---------- */
@@ -1175,8 +1172,8 @@ footer b { color: var(--fg); font-weight: 600; }
     const growthClock = set.indicators.every(x => x.kind === "growth"), M_ = set.freq === "M";
     $("clockTitle").textContent = growthClock ? "Kasvukartta" : "Suhdannekartta";
     $("clockDesc").textContent = growthClock
-      ? `Kasvun ero keskiarvoon ja muutos edellisestä ${M_ ? "kuukaudesta" : "neljänneksestä"}`
-      : `Sarjan poikkeama trendistä ja muutos edellisestä ${M_ ? "kuukaudesta" : "neljänneksestä"}`;
+      ? `Pystyakseli: kasvun ero keskiarvoon. Vaaka-akseli: muutos edellisestä ${M_ ? "kuukaudesta" : "neljänneksestä"}. Keskihajontoina.`
+      : `Pystyakseli: sarjan poikkeama pitkän aikavälin trendistä. Vaaka-akseli: muutos edellisestä ${M_ ? "kuukaudesta" : "neljänneksestä"}. Keskihajontoina. Suurin piste on kokonaisindikaattori.`;
     const pathIc = `<svg width="22" height="10" viewBox="0 0 22 10" aria-hidden="true"><polyline points="1,8 6,7 11,5 17,3" fill="none" stroke="var(--fg)" stroke-opacity="0.45" stroke-width="1.2"/><circle cx="6" cy="7" r="1.2" fill="var(--fg)" fill-opacity="0.4"/><circle cx="11" cy="5" r="1.2" fill="var(--fg)" fill-opacity="0.5"/><circle cx="17.5" cy="3.5" r="3.2" fill="var(--fg)"/></svg>`;
     $("clockLegend").innerHTML = "";   // selitteet pois: polku ja ontot pisteet selitetty menetelmissa
     $("listMeta").textContent = `Tilanne ${fmtP(set.periods[idx])}`;
