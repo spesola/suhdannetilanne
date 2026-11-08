@@ -486,6 +486,22 @@
               "stackUnit": "%-yks.",
               "dec": 1,
               "note": "Vuosimuutos, työpäiväkorjattu. Lähde: Tilastokeskus."
+            },
+            "__jk": {
+              "title": "Julkisten kulutusmenojen muutos menolajeittain",
+              "line": "x_jk_tot",
+              "stack": [
+                "x_jk_d1",
+                "x_jk_p2",
+                "x_jk_d632",
+                "x_jk_p51c",
+                "x_jk_sales",
+                "x_jk_muu"
+              ],
+              "unit": "%",
+              "stackUnit": "%-yks.",
+              "dec": 1,
+              "note": "Käyvin hinnoin, neljän neljänneksen liukuvan summan muutos vuodentakaisesta. Ostopalvelut: ostettuna markkinatuotantona annetut luontoisetuudet (esim. palvelusetelit, yksityiset hoivapalvelut). Myyntitulot vähennetään kulutusmenoista. Muut erät: mm. tuotantoverot. Lähde: Tilastokeskus, oma laskelma."
             }
           },
           "views": {
@@ -763,6 +779,9 @@
             "bkt_julk": [
               {
                 "growth": true
+              },
+              {
+                "contrib": "__jk"
               },
               {
                 "contrib": "__jb"
@@ -5618,6 +5637,62 @@
       "chart_only": true,
       "source": "hhi_ctrb",
       "part": "price"
+    },
+    {
+      "id": "x_jk_tot",
+      "label": "Julkiset kulutusmenot",
+      "set": "bkt",
+      "chart_only": true,
+      "source": "jk_decomp",
+      "part": "tot"
+    },
+    {
+      "id": "x_jk_d1",
+      "label": "Palkansaajakorvaukset",
+      "set": "bkt",
+      "chart_only": true,
+      "source": "jk_decomp",
+      "part": "d1"
+    },
+    {
+      "id": "x_jk_p2",
+      "label": "Välituotekäyttö",
+      "set": "bkt",
+      "chart_only": true,
+      "source": "jk_decomp",
+      "part": "p2"
+    },
+    {
+      "id": "x_jk_d632",
+      "label": "Ostopalvelut (luontoisetuudet)",
+      "set": "bkt",
+      "chart_only": true,
+      "source": "jk_decomp",
+      "part": "d632"
+    },
+    {
+      "id": "x_jk_p51c",
+      "label": "Kiinteän pääoman kuluminen",
+      "set": "bkt",
+      "chart_only": true,
+      "source": "jk_decomp",
+      "part": "p51c"
+    },
+    {
+      "id": "x_jk_sales",
+      "label": "Myyntitulot (vähennys)",
+      "set": "bkt",
+      "chart_only": true,
+      "source": "jk_decomp",
+      "part": "sales"
+    },
+    {
+      "id": "x_jk_muu",
+      "label": "Muut erät",
+      "set": "bkt",
+      "chart_only": true,
+      "source": "jk_decomp",
+      "part": "muu"
     },
     {
       "id": "x_jb_s13",

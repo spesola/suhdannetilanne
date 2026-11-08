@@ -354,8 +354,27 @@ fetch_jt_decomp <- function(s) {
   x <- .dd_memo$x; data.frame(date = x$date, value = x[[s$part]])
 }
 
+# julkisten kulutusmenojen (P3, S13, kayvin hinnoin) vuosimuutoksen hajotelma menolajeittain, 4 nelj. liukuvat summat, %-yks.:
+# P3 = palkansaajakorvaukset + valituotekaytto + kiinteän paaoman kuluminen + ostopalvelut (D632) - myyntitulot (P11 + P131 + P12) + muut (tuotantoverot ym.)
+.jk_memo <- new.env()
+fetch_jk_decomp <- function(s) {
+  if (is.null(.jk_memo$x)) {
+    g <- function(code) fetch_series(list(id = paste0("jk_", code), source = "statfin", table = "jtume/11zf.px",
+                                          pick = list(taloustoimi_1_20180101 = code, sektoriluokitus_7_20230101 = "S13", contentscode = "jtume-TASM")))
+    codes <- c("P3K", "D1K", "P2K", "P51CR", "D632K", "P11R", "P131R", "P12R"); X <- lapply(codes, g); names(X) <- codes
+    q <- sort(Reduce(intersect, lapply(X, function(d) d$date)))
+    r4 <- function(x) as.numeric(stats::filter(x, rep(1, 4), sides = 1)); L4 <- function(x) c(rep(NA, 4), head(x, -4))
+    v <- lapply(X, function(d) r4(d$value[match(q, d$date)]))
+    T0 <- L4(v$P3K); ct <- function(x) 100 * (x - L4(x)) / T0
+    x <- data.frame(date = q, tot = 100 * (v$P3K / T0 - 1), d1 = ct(v$D1K), p2 = ct(v$P2K), p51c = ct(v$P51CR), d632 = ct(v$D632K),
+                    sales = -ct(v$P11R + v$P131R + v$P12R))
+    x$muu <- x$tot - x$d1 - x$p2 - x$p51c - x$d632 - x$sales
+    .jk_memo$x <- x }
+  x <- .jk_memo$x; data.frame(date = x$date, value = x[[s$part]])
+}
+
 fetch_series <- function(s) {
-  f <- switch(s$source, statfin = fetch_statfin, splice = fetch_splice, eurostat = fetch_eurostat, hicp_ctrb = fetch_hicp_ctrb, ntp_ctrb = fetch_ntp_ctrb, hhi_ctrb = fetch_hhi_ctrb, khi_ctrb = fetch_khi_ctrb, xlsx = fetch_xlsx, stoxx = fetch_stoxx, vk = fetch_vk, sum = fetch_sum, jt_decomp = fetch_jt_decomp, gdp_np = fetch_gdp_np,
+  f <- switch(s$source, statfin = fetch_statfin, splice = fetch_splice, eurostat = fetch_eurostat, hicp_ctrb = fetch_hicp_ctrb, ntp_ctrb = fetch_ntp_ctrb, hhi_ctrb = fetch_hhi_ctrb, khi_ctrb = fetch_khi_ctrb, xlsx = fetch_xlsx, stoxx = fetch_stoxx, vk = fetch_vk, sum = fetch_sum, jt_decomp = fetch_jt_decomp, jk_decomp = fetch_jk_decomp, gdp_np = fetch_gdp_np,
               ecb = fetch_ecb, fred = fetch_fred, bof = fetch_bof, wb = fetch_wb, stop("Tuntematon lahde ", s$source))
   # valimuisti: onnistunut haku tallennetaan, epaonnistuessa kaytetaan edellista hakua
   cache <- file.path(CACHE_DIR, paste0(s$id, ".csv"))
@@ -834,6 +853,7 @@ src_walk <- function(x) {
     if (sc == "statfin" && !is.null(x$px_base)) src_add("vero", sub("/.*", "", x$table))
     else if (sc == "statfin" || (sc == "splice" && !is.null(x$table))) src_add("statfin", sub("/.*", "", x$table))
     else if (sc == "jt_decomp") { src_add("statfin", "jtume"); src_add("statfin", "jyev"); src_add("statfin", "ntp") }
+    else if (sc == "jk_decomp") src_add("statfin", "jtume")
     else if (sc == "eurostat") src_add("eurostat", x$ds)
     else if (sc == "ecb") src_add("ecb", x$flow)
     else if (sc == "fred") src_add("fred", x$fred_id)
