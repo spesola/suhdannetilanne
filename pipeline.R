@@ -1039,6 +1039,19 @@ out$meta$upcoming <- tryCatch({
   lapply(x, function(r) list(date = r$plannedReleaseDate, title = trimws(r$workingTitle),
                               url = paste0("https://stat.fi/tilasto/", r$statisticalPrograms[[1]]$statisticalProgramSlug)))
 }, error = function(e) { message("  VAROITUS julkaisukalenteri: ", conditionMessage(e)); list() })
+# Euroopan komission yritys- ja kuluttajabarometrit (EK:n luottamusindikaattorit Eurostatin kautta), klo 11 Brysselin aikaa.
+# Lahde: komission julkaisukalenteri (Publication dates 2026.pdf); paivitettava vuosittain, tarkistus muistuttaa.
+BCS_DATES <- c("2026-01-29", "2026-02-26", "2026-03-30", "2026-04-29", "2026-05-28", "2026-06-29", "2026-07-30", "2026-08-28",
+               "2026-09-29", "2026-10-29", "2026-11-27", "2027-01-07")
+KK_NIMI <- c("tammikuu", "helmikuu", "maaliskuu", "huhtikuu", "toukokuu", "kesäkuu", "heinäkuu", "elokuu", "syyskuu", "lokakuu", "marraskuu", "joulukuu")
+bcs_up <- Filter(function(d) d >= Sys.Date() && d <= Sys.Date() + 35, as.Date(BCS_DATES))
+out$meta$upcoming <- c(out$meta$upcoming, lapply(bcs_up, function(d) {
+  m <- if (format(d, "%m") == "01" && format(d, "%d") < "15") 12 else as.integer(format(d, "%m"))   # joulukuun tulokset tammikuussa
+  list(date = format(as.POSIXct(paste(d, "11:00"), tz = "Europe/Brussels"), "%Y-%m-%dT%H:%M:%SZ", tz = "UTC"),
+       title = paste0("Luottamusindikaattorit (EK, Euroopan komissio), ", KK_NIMI[m]),
+       url = "https://economy-finance.ec.europa.eu/economic-forecast-and-surveys/business-and-consumer-surveys_en") }))
+if (length(out$meta$upcoming)) out$meta$upcoming <- out$meta$upcoming[order(vapply(out$meta$upcoming, function(r) r$date, ""))]
+if (max(as.Date(BCS_DATES)) < Sys.Date() + 20) { CHECKS <- c(CHECKS, "BCS_DATES: päivitä komission julkaisukalenteri (pipeline.R)"); out$meta$checks <- CHECKS }
 
 writeLines(toJSON(out, auto_unbox = TRUE, na = "null", null = "null", digits = NA), OUT_PATH)
 message("Kirjoitettu ", OUT_PATH)
