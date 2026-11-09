@@ -2,7 +2,7 @@ name: Paivitys
 
 on:
   schedule:
-    - cron: "17 7 * * 1-5"   # arkisin 07:17 UTC (9:17 talviaikaan)
+    - cron: "17 7 * * 1-5"   # varmistus: paaajastus Cloudflare Workerissa (src/worker.js)
   workflow_dispatch:
 
 concurrency: { group: paivitys, cancel-in-progress: false }

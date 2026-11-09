@@ -1,7 +1,10 @@
 {
   "name": "suhdannetilanne",
+  "main": "src/worker.js",
   "compatibility_date": "2026-10-01",
   "workers_dev": false,
   "preview_urls": false,
-  "assets": { "directory": "./public" }
+  "assets": { "directory": "./public", "binding": "ASSETS" },
+  // arkisin (UTC): 6.05 = 8.05 talviaikaan Tilastokeskuksen julkaisujen jalkeen, 10.35 = 12.35 Eurostatin ja EKP:n julkaisujen jalkeen
+  "triggers": { "crons": ["5 6 * * 1-5", "35 10 * * 1-5"] }
 }
