@@ -2336,6 +2336,23 @@
       "kname": "Suhdannekuvaaja"
     },
     {
+      "id": "raskasliik",
+      "label": "Raskas liikenne",
+      "set": "suhdanne",
+      "group": "Tuotanto",
+      "source": "lam",
+      "sets": ["2066", "2067", "2068", "2069", "2070", "2071", "2072", "2073", "2074", "2075"],
+      "group_code": "(2,3,4,5,9):raskaat",
+      "from": "2010-01",
+      "handling": "sa",
+      "kind": "volume",
+      "invert": false,
+      "in_composite": false,
+      "unit": "ind. 1/2010=100",
+      "raw_desc": "Raskaiden ajoneuvojen määrä LAM-pisteillä, kalenterikorjattu, kausitasoitettu, samojen pisteiden muutoksista ketjutettu",
+      "kname": "Raskas liikenne"
+    },
+    {
       "id": "palv_vol",
       "label": "Palvelualojen liikevaihdon volyymi",
       "set": "suhdanne",

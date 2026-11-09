@@ -326,6 +326,44 @@ fetch_vk <- function(s) {
   d[order(d$date), ]
 }
 
+# Fintraffic LAM (Digitraffic): raskaan liikenteen kuukausisummat asemittain. Taso ketjutetaan kuukausimuutoksista
+# samoilta asemilta (asemien lisaykset eivat vaikuta), summat jaetaan painotetulla kalenteripaivien maaralla
+# (ma-to 1,0, pe 0,93, la 0,26, su ja arkipyhat 0,23; estimoitu Uudenmaan paivadatasta 2025). Kuluva kuukausi pois.
+LAM_API <- "https://tie.digitraffic.fi/api/tms/v1/history"
+easter_date <- function(y) {
+  a <- y %% 19; b <- y %/% 100; c <- y %% 100; d <- b %/% 4; e <- b %% 4; f <- (b + 8) %/% 25; g <- (b - f + 1) %/% 3
+  h <- (19 * a + b - d - g + 15) %% 30; i <- c %/% 4; k <- c %% 4; l <- (32 + 2 * e + 2 * i - h - k) %% 7; m <- (a + 11 * h + 22 * l) %/% 451
+  as.Date(sprintf("%d-%02d-%02d", y, (h + l - 7 * m + 114) %/% 31, ((h + l - 7 * m + 114) %% 31) + 1))
+}
+lam_days <- function(ym) {
+  y <- as.integer(substr(ym, 1, 4)); d0 <- as.Date(paste0(ym, "-01")); d <- seq(d0, seq(d0, by = "month", length.out = 2)[2] - 1, by = "day")
+  e <- easter_date(y); mid <- as.Date(sprintf("%d-06-%02d", y, 19:25)); mid <- mid[as.integer(format(mid, "%u")) == 5]
+  hol <- c(as.Date(sprintf("%d-%s", y, c("01-01", "01-06", "05-01", "12-06", "12-24", "12-25", "12-26"))), e - 2, e + 1, e + 39, mid, mid + 1)
+  w <- c(1.01, 1.022, 1.025, 1.015, 0.927, 0.262, 0.226)[as.integer(format(d, "%u"))]
+  sum(ifelse(d %in% hol, 0.226, w))
+}
+fetch_lam <- function(s) {
+  last <- format(seq(as.Date(format(Sys.Date(), "%Y-%m-01")), by = "-1 month", length.out = 2)[2], "%Y-%m")
+  x <- do.call(rbind, lapply(s$sets, function(p) {
+    u <- paste0(LAM_API, "?api=liikennemaara&tyyppi=kk&pvm=", s$from, "&loppu=", last, "&lam_type=option2&pistejoukko=", p,
+                "&ryhma=", URLencode(s$group_code, reserved = TRUE), "&suunta=&sisallytakaistat=0")
+    r <- RETRY("GET", u, timeout(600), add_headers(`Digitraffic-User` = "suhdannetilanne.fi"), times = 3, pause_base = 5, quiet = TRUE)
+    stop_for_status(r)
+    y <- read.csv(text = content(r, "text", encoding = "UTF-8"), sep = ";", colClasses = "character", check.names = FALSE)
+    data.frame(st = y[[1]], date = paste0(y$vuosi, "-", y$kuukausi), v = suppressWarnings(as.numeric(y[[ncol(y)]])))
+  }))
+  x <- x[!is.na(x$v) & x$v > 0 & x$date <= last, ]; x <- x[!duplicated(x[c("st", "date")]), ]
+  ms <- sort(unique(x$date)); x$a <- x$v / vapply(ms, lam_days, 0)[match(x$date, ms)]
+  w <- lapply(split(x, x$date), function(z) setNames(z$a, z$st))
+  lev <- numeric(length(ms)); lev[1] <- 100
+  for (i in seq_along(ms)[-1]) {
+    a <- w[[ms[i]]]; b <- w[[ms[i - 1]]]; k <- intersect(names(a), names(b))
+    k <- k[abs(log(a[k] / b[k])) < 0.4]            # mittauskatkot pois
+    lev[i] <- lev[i - 1] * sum(a[k]) / sum(b[k])
+  }
+  data.frame(date = ms, value = lev)
+}
+
 # summa useasta sarjasta (esim. sosiaaliturvarahastot = tyoelakelaitokset + muut; nettovelka = velat - varat)
 fetch_sum <- function(s) {
   ds <- lapply(seq_along(s$parts), function(j) { d <- fetch_series(c(s$parts[[j]], list(id = paste0(s$id, "_p", j))))
@@ -374,7 +412,7 @@ fetch_jk_decomp <- function(s) {
 }
 
 fetch_series <- function(s) {
-  f <- switch(s$source, statfin = fetch_statfin, splice = fetch_splice, eurostat = fetch_eurostat, hicp_ctrb = fetch_hicp_ctrb, ntp_ctrb = fetch_ntp_ctrb, hhi_ctrb = fetch_hhi_ctrb, khi_ctrb = fetch_khi_ctrb, xlsx = fetch_xlsx, stoxx = fetch_stoxx, vk = fetch_vk, sum = fetch_sum, jt_decomp = fetch_jt_decomp, jk_decomp = fetch_jk_decomp, gdp_np = fetch_gdp_np,
+  f <- switch(s$source, statfin = fetch_statfin, splice = fetch_splice, eurostat = fetch_eurostat, hicp_ctrb = fetch_hicp_ctrb, ntp_ctrb = fetch_ntp_ctrb, hhi_ctrb = fetch_hhi_ctrb, khi_ctrb = fetch_khi_ctrb, xlsx = fetch_xlsx, stoxx = fetch_stoxx, lam = fetch_lam, vk = fetch_vk, sum = fetch_sum, jt_decomp = fetch_jt_decomp, jk_decomp = fetch_jk_decomp, gdp_np = fetch_gdp_np,
               ecb = fetch_ecb, fred = fetch_fred, bof = fetch_bof, wb = fetch_wb, stop("Tuntematon lahde ", s$source))
   # valimuisti: onnistunut haku tallennetaan, epaonnistuessa kaytetaan edellista hakua
   cache <- file.path(CACHE_DIR, paste0(s$id, ".csv"))
@@ -838,6 +876,7 @@ SRC_NAMES <- list(
   stoxx    = list(.n = "STOXX", .all = "VSTOXX-volatiliteetti-indeksi"),
   vero     = list(.n = "Verohallinto", Verotulojen_kehitys = "verokertymät", Tulorekisteri = "ennakonpidätyksen alaiset ansiotulot (tulorekisteri)"),
   vk       = list(.n = "Valtiokonttori", .all = "valtionvelka"),
+  lam      = list(.n = "Fintraffic", .all = "LAM-liikennemäärät, Digitraffic"),
   fred     = list(.n = "FRED", EUEPUINDXM = "talouspoliittisen epävarmuuden indeksi", GS10 = "Yhdysvaltain korot © OECD",
                   FEDFUNDS = "Yhdysvaltain korot © OECD", IRLTLT01JPM156N = "Japanin korot © OECD", IRSTCI01JPM156N = "Japanin korot © OECD",
                   DCOILBRENTEU = "Brent ja WTI © EIA", DCOILWTICO = "Brent ja WTI © EIA", VIXCLS = "VIX-volatiliteetti-indeksi © Cboe"))
@@ -857,7 +896,7 @@ src_walk <- function(x) {
     else if (sc == "eurostat") src_add("eurostat", x$ds)
     else if (sc == "ecb") src_add("ecb", x$flow)
     else if (sc == "fred") src_add("fred", x$fred_id)
-    else if (sc %in% c("bof", "wb", "stoxx", "vk")) src_add(sc, "")
+    else if (sc %in% c("bof", "wb", "stoxx", "vk", "lam")) src_add(sc, "")
     else if (sc == "ntp_ctrb") src_add("statfin", "ntp")
     else if (sc == "hhi_ctrb") src_add("statfin", "ntp")
     else if (sc == "khi_ctrb") src_add("statfin", "khi")
