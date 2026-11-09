@@ -543,7 +543,7 @@
             ],
             "asuntohinnat": [
               {
-                "title": "Vanhojen osakeasuntojen reaalihinnat (2022=100)",
+                "title": "Vanhojen osakeasuntojen reaalihinnat (2015=100)",
                 "lines": [
                   "as_hinta_kok",
                   "as_hinta_pks",
@@ -580,7 +580,7 @@
                 "note": "Kiinteistönvälittäjien kautta tehdyt kaupat. Lähde: Tilastokeskus."
               },
               {
-                "title": "Asuntojen hinnat suhteessa tuloihin ja vuokriin, 2015 = 100",
+                "title": "Asuntojen hinnat suhteessa tuloihin ja vuokriin (2015=100)",
                 "lines": [
                   "x_as_pti",
                   "x_as_ptr"
@@ -687,7 +687,7 @@
                 "contrib": "__gnp"
               },
               {
-                "title": "BKT:n volyymi, 2019 = 100",
+                "title": "BKT:n volyymi (2019=100)",
                 "lines": [
                   "x_gdp_fi",
                   "x_gdp_se",
@@ -829,7 +829,7 @@
                 "contrib": "bkt_vienti"
               },
               {
-                "title": "Vienti- ja tuontihinnat, 2015 = 100",
+                "title": "Vienti- ja tuontihinnat (2015=100)",
                 "lines": [
                   "x_px",
                   "x_pm",
@@ -872,7 +872,7 @@
                 "contrib": "bkt_tuonti"
               },
               {
-                "title": "Vienti- ja tuontihinnat, 2015 = 100",
+                "title": "Vienti- ja tuontihinnat (2015=100)",
                 "lines": [
                   "x_px",
                   "x_pm",
@@ -912,7 +912,7 @@
                 "growth": true
               },
               {
-                "title": "Työlliset, työtunnit ja tuottavuus, 2019 = 100",
+                "title": "Työlliset, työtunnit ja tuottavuus (2019=100)",
                 "lines": [
                   "x_e1",
                   "x_e2",
@@ -2341,7 +2341,18 @@
       "set": "suhdanne",
       "group": "Tuotanto",
       "source": "lam",
-      "sets": ["2066", "2067", "2068", "2069", "2070", "2071", "2072", "2073", "2074", "2075"],
+      "sets": [
+        "2066",
+        "2067",
+        "2068",
+        "2069",
+        "2070",
+        "2071",
+        "2072",
+        "2073",
+        "2074",
+        "2075"
+      ],
       "group_code": "(2,3,4,5,9):raskaat",
       "from": "2010-01",
       "handling": "sa",
@@ -2437,13 +2448,16 @@
       "source": "statfin",
       "table": "tyti/135z.px",
       "pick": {
-        "contentscode": "Tyollaste_15_64_kausi"
+        "contentscode": "tyollaste_15_64_trendi"
       },
       "handling": "none",
       "kind": "balance",
       "invert": false,
       "unit": "%",
-      "raw_desc": "Kausitasoitettu sarja, 15–64-vuotiaat"
+      "raw_desc": "Trendisarja, 15–64-vuotiaat",
+      "nosmooth": true,
+      "lambda": 1000000,
+      "dlag": 3
     },
     {
       "id": "tyottom",
@@ -2453,13 +2467,22 @@
       "source": "statfin",
       "table": "tyti/135z.px",
       "pick": {
-        "contentscode": "Tyottaste_kausi"
+        "contentscode": "tyottaste_trendi"
       },
       "handling": "none",
       "kind": "balance",
       "invert": true,
       "unit": "%",
-      "raw_desc": "Kausitasoitettu sarja"
+      "raw_desc": "Trendisarja",
+      "bench": {
+        "source": "ameco",
+        "ds": "AMECO_CHAPTER01-03",
+        "item": "ZNAWRU"
+      },
+      "trend_label": "Rakenteellinen työttömyys (NAWRU)",
+      "trend_note": "Kartta vertaa komission arvioon rakenteellisesta työttömyydestä (NAWRU, vuosiarvot interpoloitu), ei keskiarvoon.",
+      "nosmooth": true,
+      "dlag": 3
     },
     {
       "id": "avoimet",
@@ -3496,8 +3519,7 @@
         "talotyyppi_5_20111209": "0",
         "huoneluku_1_20111212": "00",
         "contentscode": "ashivq_realindeksi_2015"
-      },
-      "rebase": 2022
+      }
     },
     {
       "id": "as_hinta_pks",
@@ -3511,8 +3533,7 @@
         "talotyyppi_5_20111209": "0",
         "huoneluku_1_20111212": "00",
         "contentscode": "ashivq_realindeksi_2015"
-      },
-      "rebase": 2022
+      }
     },
     {
       "id": "as_hinta_msu",
@@ -3526,8 +3547,7 @@
         "talotyyppi_5_20111209": "0",
         "huoneluku_1_20111212": "00",
         "contentscode": "ashivq_realindeksi_2015"
-      },
-      "rebase": 2022
+      }
     },
     {
       "id": "as_kaupat_kok",

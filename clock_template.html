@@ -1069,13 +1069,13 @@ footer b { color: var(--fg); font-weight: 600; }
       const hasSa = s.sa && s.sa.some(v => v != null);   // kausitasoittamaton lahde: oma STL-kausitasoitus paaviivaksi
       set.series = (set.series || []).filter(x => !["__raw", "__sa", "__trend", "__avg"].includes(x.id))
         .concat(hasSa ? [{ id: "__sa", label: "Kausitasoitettu", values: s.sa }] : [],
-                [{ id: "__raw", label: hasSa ? "Alkuperäinen" : "Julkaistu arvo", values: s.raw }], hasTr ? [{ id: "__trend", label: "Pitkän aikavälin trendi", values: s.trend }] : [],
+                [{ id: "__raw", label: hasSa ? "Alkuperäinen" : "Julkaistu arvo", values: s.raw }], hasTr ? [{ id: "__trend", label: s.trend_label || "Pitkän aikavälin trendi", values: s.trend }] : [],
                 [{ id: "__avg", label: "Keskiarvo 2010–", values: avgVals }]);
       const big = Math.max(...s.raw.filter(v => v != null).map(Math.abs)) >= 1000;
       cc = { id: "raw_" + s.id, title: `${s.label}: ${hasSa ? "kausitasoitettu" : "julkaistu arvo"}`,
              lines: ["__raw", ...(hasSa ? ["__sa"] : []), ...(hasTr ? ["__trend"] : []), "__avg"], dash: ["__trend"], dot: ["__avg"], thin: hasSa ? ["__raw"] : [],
              unit: "", dec: big ? 0 : 1, from: 2010,
-             note: [hasSa ? "Kausitasoitus oma laskelma" : s.raw_desc, s.unit].filter(Boolean).join(", ") + (hasTr ? ". Kartta vertaa trendiin, ei keskiarvoon." : ".") };
+             note: [hasSa ? "Kausitasoitus oma laskelma" : s.raw_desc, s.unit].filter(Boolean).join(", ") + (hasTr ? ". " + (s.trend_note || "Kartta vertaa trendiin, ei keskiarvoon.") : ".") };
       set.colors = { ...(set.colors || {}), __sa: "var(--accent)", __raw: hasSa ? "var(--line)" : "var(--accent)", __trend: "var(--muted)", __avg: "var(--q-turn)" };
     }
     if (cc) [...cc.lines, ...(cc.stack || [])].filter(id => id.startsWith("raw:")).forEach(id => {   // raw:<sarja> = julkaistu arvo

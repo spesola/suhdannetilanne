@@ -364,6 +364,20 @@ fetch_lam <- function(s) {
   data.frame(date = ms, value = lev)
 }
 
+# Euroopan komission AMECO (Redisstat): vuosisarja, esim. NAWRU (rakenteellinen tyottomyys), mukana ennustevuodet
+AMECO_API <- "https://webgate.ec.europa.eu/ecfin/redisstat/api/dissemination/statistics/1.0/data/"
+fetch_ameco <- function(s) {
+  x <- fromJSON(get_text(paste0(AMECO_API, s$ds, "?lang=EN&ref_area=", if (is.null(s$geo)) "FIN" else s$geo, "&item=", s$item)), simplifyVector = FALSE)
+  tp <- names(x$dimension$TIME_PERIOD$category$index); ix <- unlist(x$dimension$TIME_PERIOD$category$index)
+  v <- vapply(seq_along(tp), function(j) { z <- x$value[[as.character(ix[j])]]; if (is.null(z)) NA_real_ else as.numeric(z) }, 0)
+  d <- data.frame(date = tp, value = v); d <- d[!is.na(d$value), ]; d[order(d$date), ]
+}
+# vertailutaso trendin tilalle (bench): vuosiarvot vuoden puolivaliin ja lineaarinen interpolointi kuukausille
+bench_path <- function(s, dates) {
+  b <- fetch_series(c(s$bench, list(id = paste0(s$id, "__bench"))))
+  approx(as.numeric(b$date) + 0.5, b$value, xout = as.integer(substr(dates, 1, 4)) + (as.integer(substr(dates, 6, 7)) - 0.5) / 12, rule = 2)$y
+}
+
 # summa useasta sarjasta (esim. sosiaaliturvarahastot = tyoelakelaitokset + muut; nettovelka = velat - varat)
 fetch_sum <- function(s) {
   ds <- lapply(seq_along(s$parts), function(j) { d <- fetch_series(c(s$parts[[j]], list(id = paste0(s$id, "_p", j))))
@@ -412,7 +426,7 @@ fetch_jk_decomp <- function(s) {
 }
 
 fetch_series <- function(s) {
-  f <- switch(s$source, statfin = fetch_statfin, splice = fetch_splice, eurostat = fetch_eurostat, hicp_ctrb = fetch_hicp_ctrb, ntp_ctrb = fetch_ntp_ctrb, hhi_ctrb = fetch_hhi_ctrb, khi_ctrb = fetch_khi_ctrb, xlsx = fetch_xlsx, stoxx = fetch_stoxx, lam = fetch_lam, vk = fetch_vk, sum = fetch_sum, jt_decomp = fetch_jt_decomp, jk_decomp = fetch_jk_decomp, gdp_np = fetch_gdp_np,
+  f <- switch(s$source, statfin = fetch_statfin, splice = fetch_splice, eurostat = fetch_eurostat, hicp_ctrb = fetch_hicp_ctrb, ntp_ctrb = fetch_ntp_ctrb, hhi_ctrb = fetch_hhi_ctrb, khi_ctrb = fetch_khi_ctrb, xlsx = fetch_xlsx, stoxx = fetch_stoxx, lam = fetch_lam, ameco = fetch_ameco, vk = fetch_vk, sum = fetch_sum, jt_decomp = fetch_jt_decomp, jk_decomp = fetch_jk_decomp, gdp_np = fetch_gdp_np,
               ecb = fetch_ecb, fred = fetch_fred, bof = fetch_bof, wb = fetch_wb, stop("Tuntematon lahde ", s$source))
   # valimuisti: onnistunut haku tallennetaan, epaonnistuessa kaytetaan edellista hakua
   cache <- file.path(CACHE_DIR, paste0(s$id, ".csv"))
@@ -547,17 +561,18 @@ clock_series <- function(d, s, freq) {
   y <- if (s$kind == "volume") 100 * log(d$value) else d$value
   n <- length(y); ye <- ext_ar(y, EXT_H[[freq]], freq, s$kind)
   lam <- if (is.null(s$lambda)) LAMBDA[[freq]] else s$lambda          # tyomarkkina-asteille jaykempi trendi
-  sm <- hp_trend(ye, LAMBDA_S[[freq]])[1:n]                            # kohinasuodin
+  sm <- if (isTRUE(s$nosmooth)) y else hp_trend(ye, LAMBDA_S[[freq]])[1:n]   # kohinasuodin (ei valmiille trendisarjoille)
   # volume/balance: poikkeama pitkan aikavalin trendista (HP-kaistanpaasto)
   # level (korot, stressi, epavarmuus): taso suhteessa omaan historiaan, ei trendia
-  tr  <- if (s$kind == "level") rep(NA_real_, n) else hp_trend(ye, lam)[1:n]
+  tr  <- if (s$kind == "level") rep(NA_real_, n) else if (!is.null(s$bench)) bench_path(s, d$date) else hp_trend(ye, lam)[1:n]   # bench: esim. NAWRU
   gap <- if (s$kind == "level") sm else sm - tr
   keep <- as.integer(substr(d$date, 1, 4)) >= Z_FROM
   lvl <- (gap - mean(gap[keep])) / sd(gap[keep])
   if (isTRUE(s$invert)) lvl <- -lvl
   # muutos: volyymeilla poikkeaman muutos; saldoluvuilla ja asteilla (ei kasvutrendia) tasoitetun sarjan oma muutos,
   # jotta trendin liike ei nay muutoksena (paikallaan pysyva aste = nollamuutos)
-  dl  <- if (s$kind == "balance") (if (isTRUE(s$invert)) -1 else 1) * c(NA, diff(sm)) else c(NA, diff(lvl))
+  kl  <- if (is.null(s$dlag)) 1 else s$dlag                     # dlag: muutos k kuukauden keskiarvona (pyoristetyt trendisarjat)
+  dl  <- if (s$kind == "balance") (if (isTRUE(s$invert)) -1 else 1) * c(rep(NA, kl), diff(sm, lag = kl)) / kl else c(NA, diff(lvl))
   chg <- dl / sd(dl[keep], na.rm = TRUE)          # ei keskistysta: etumerkki sailyy
   # trendi sarjan omassa yksikossa (volyymit log-muodosta takaisin), naytetaan julkaistun arvon kuvassa
   trend <- if (s$kind == "volume") exp(tr / 100) else tr
@@ -762,7 +777,7 @@ for (set in cfg$sets) {
     list(id = s$id, label = s$label, list = if (is.null(s$list)) s$label else s$list,   # list: lyhyt nimi ryhman sisalla
          map = s$kname,                                                          # map: kartan lyhyt nimi useaa valittaessa
          group = s$group, kind = s$kind, unit = s$unit, raw_desc = s$raw_desc,
-         invert = isTRUE(s$invert), in_composite = !isFALSE(s$in_composite),
+         invert = isTRUE(s$invert), in_composite = !isFALSE(s$in_composite), trend_label = s$trend_label, trend_note = s$trend_note,
          last = lp, last_raw = round(r$raw[nrow(r)], 2),
          level = align(r, "level"), change = align(r, "change"), raw = r3((if (is.null(s$raw_scale)) 1 else s$raw_scale) * rw$value[match(periods, rw$date)]),
          trend = r3((if (is.null(s$raw_scale)) 1 else s$raw_scale) * r$trend[match(periods, r$date)]),
@@ -877,6 +892,7 @@ SRC_NAMES <- list(
   vero     = list(.n = "Verohallinto", Verotulojen_kehitys = "verokertymät", Tulorekisteri = "ennakonpidätyksen alaiset ansiotulot (tulorekisteri)"),
   vk       = list(.n = "Valtiokonttori", .all = "valtionvelka"),
   lam      = list(.n = "Fintraffic", .all = "LAM-liikennemäärät, Digitraffic"),
+  ameco    = list(.n = "Euroopan komissio", .all = "AMECO, rakenteellinen työttömyys (NAWRU)"),
   fred     = list(.n = "FRED", EUEPUINDXM = "talouspoliittisen epävarmuuden indeksi", GS10 = "Yhdysvaltain korot © OECD",
                   FEDFUNDS = "Yhdysvaltain korot © OECD", IRLTLT01JPM156N = "Japanin korot © OECD", IRSTCI01JPM156N = "Japanin korot © OECD",
                   DCOILBRENTEU = "Brent ja WTI © EIA", DCOILWTICO = "Brent ja WTI © EIA", VIXCLS = "VIX-volatiliteetti-indeksi © Cboe"))
@@ -896,7 +912,7 @@ src_walk <- function(x) {
     else if (sc == "eurostat") src_add("eurostat", x$ds)
     else if (sc == "ecb") src_add("ecb", x$flow)
     else if (sc == "fred") src_add("fred", x$fred_id)
-    else if (sc %in% c("bof", "wb", "stoxx", "vk", "lam")) src_add(sc, "")
+    else if (sc %in% c("bof", "wb", "stoxx", "vk", "lam", "ameco")) src_add(sc, "")
     else if (sc == "ntp_ctrb") src_add("statfin", "ntp")
     else if (sc == "hhi_ctrb") src_add("statfin", "ntp")
     else if (sc == "khi_ctrb") src_add("statfin", "khi")
