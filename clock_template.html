@@ -369,6 +369,7 @@ body { font-variant-numeric: tabular-nums; background: var(--bg); min-height: 10
 .updg h2 { font-size: 1rem; font-weight: 600; margin: 0 0 4px; padding-bottom: 8px; border-bottom: 1px solid var(--rule); }
 .updg .ud { font-size: 0.78rem; color: var(--muted); margin: 14px 0 2px; }
 .updg .ud.now { color: var(--fg); font-weight: 600; }
+.updg .us { font-size: 0.78rem; font-weight: 600; margin: 8px 0 0; }
 .updg .ui { display: flex; justify-content: space-between; gap: 12px; font-size: 0.875rem; padding: 3px 0; border-bottom: 1px solid var(--grid); }
 .updg .ui a { color: inherit; text-decoration: none; } .updg .ui a:hover { text-decoration: underline; }
 .updg .ui span:last-child { color: var(--muted); white-space: nowrap; font-family: var(--font-data); }
@@ -1560,9 +1561,12 @@ footer b { color: var(--fg); font-weight: 600; }
       : `<p class="none">Ei tiedossa olevia julkaisuja.</p>`;
     const L = D.meta.log || [], qn = q => `<i style="--qc:${qcol(q)}"></i>${Q[q].short}`;
     $("updLog").innerHTML = L.length ? L.map(e => { const d = new Date(e.date + "T12:00:00");
+      const sets = D.sets.map(s => s.label).filter(l => (e.upd || []).some(u => u.set === l) || (e.phase || []).some(p => p.set === l));   // valilehtien jarjestyksessa
+      (e.upd || []).forEach(u => { if (!sets.includes(u.set)) sets.push(u.set); });
       return `<p class="ud">${d.toLocaleDateString("fi-FI", { weekday: "short", day: "numeric", month: "numeric", year: "numeric" })}</p>` +
-        (e.upd || []).map(u => `<div class="ui"><span>${escH(u.src)}</span><span>${u.period}</span></div>`).join("") +
-        (e.phase || []).map(p => `<div class="ui"><span>${escH(p.label)}</span><span>${qn(p.from)} → ${qn(p.to)}</span></div>`).join(""); }).join("")
+        sets.map(l => `<p class="us">${escH(l || "Muut")}</p>` +
+          (e.upd || []).filter(u => u.set === l).map(u => `<div class="ui"><span>${escH(u.src)}</span><span>${u.period}</span></div>`).join("") +
+          (e.phase || []).filter(p => p.set === l).map(p => `<div class="ui"><span>${escH(p.label)}</span><span>${qn(p.from)} → ${qn(p.to)}</span></div>`).join("")).join(""); }).join("")
       : `<p class="none">Loki täyttyy seuraavista päivityksistä alkaen.</p>`;
     $("upd").showModal(); $("updClose").focus();
   }
