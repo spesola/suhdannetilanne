@@ -536,8 +536,6 @@ table.hm { border-collapse: separate; border-spacing: 2px; font-variant-numeric:
 .hm tr.tot td { font-weight: 600; }
 .hm td .ar { font-size: 0.55rem; margin-left: 3px; opacity: 0.55; vertical-align: 1px; }
 
-.tip { position: fixed; pointer-events: none; background: var(--fg); color: var(--bg); font-size: 0.78rem; padding: 6px 9px;
-  border-radius: 3px; font-family: var(--font-data); white-space: nowrap; z-index: 20; }
 
 footer { color: var(--muted); font-size: 0.78rem; display: flex; flex-wrap: wrap; justify-content: space-between; align-items: baseline; gap: 10px 24px; border-top: 1px solid var(--line); padding-top: 20px; margin-top: 24px; }
 footer { position: relative; }
@@ -649,7 +647,6 @@ footer b { color: var(--fg); font-weight: 600; }
 
   <footer id="foot"></footer>
 </div>
-<div class="tip" id="tip" hidden></div>
 
 <script id="data" type="application/json">__DATA__</script>
 <script>
@@ -1024,6 +1021,27 @@ footer b { color: var(--fg); font-weight: 600; }
   }
 
   /* ---------- aikasarja ---------- */
+  // yhteinen hover kaikille kuvioille: arvot pisteiden viereen (porrastettuna), ajankohta x-akselille
+  function hoverMarks(svg, o) {
+    const fs = o.fs || 11, lab = el("g", { "pointer-events": "none" }, svg), chip = el("g", { "pointer-events": "none", visibility: "hidden" }, svg);
+    const cr = el("rect", { y: o.ay + 3, height: fs + 7, rx: 4, fill: "var(--fg)" }, chip);
+    const ct = el("text", { y: o.ay + 3 + fs + 2, "text-anchor": "middle", "font-size": fs, "font-weight": 600, fill: "var(--surface)" }, chip);
+    return {
+      show(x, items, date) {
+        lab.replaceChildren(); chip.setAttribute("visibility", date ? "visible" : "hidden");
+        if (date) { ct.textContent = date; const w = ct.getComputedTextLength() + 12, cx = Math.max(o.x0 + w / 2 - 6, Math.min(o.x1 - w / 2 + 6, x));
+          ct.setAttribute("x", cx); cr.setAttribute("x", cx - w / 2); cr.setAttribute("width", w); }
+        const it = (items || []).filter(Boolean).map(d => ({ ...d })).sort((a, b) => a.y - b.y), gap = fs + 3;
+        for (let k = 1; k < it.length; k++) if (it[k].y - it[k - 1].y < gap) it[k].y = it[k - 1].y + gap;
+        const over = it.length ? it[it.length - 1].y - (o.yb - 4) : 0; if (over > 0) it.forEach(d => d.y -= over);
+        const under = it.length ? (o.yt || 0) + fs - it[0].y : 0; if (under > 0) it.forEach(d => d.y += under);
+        const right = x > o.x1 - (o.flip || 90), tx = x + (right ? -9 : 9);
+        it.forEach(d => el("text", { x: tx, y: d.y + fs * 0.35, "text-anchor": right ? "end" : "start", "font-size": fs, "font-weight": d.w || 600, fill: d.col,
+          stroke: "var(--surface)", "stroke-width": 4, "stroke-linejoin": "round", "paint-order": "stroke" }, lab).textContent = d.t);
+      },
+      hide() { lab.replaceChildren(); chip.setAttribute("visibility", "hidden"); }
+    };
+  }
   function renderTS() {
     const s = (sel && findItem(sel)) || comp();
     const lvlKind = s.kind === "level";   // esim. konkurssit: taso suhteessa omaan historiaan, ei trendia
@@ -1097,23 +1115,21 @@ footer b { color: var(--fg); font-weight: 600; }
     // hover-viiva seuraa hiirta ja on synkassa viereisen kuvan kanssa (chartHooks)
     const hov = el("line", { y1: mt, y2: H2 - mb, stroke: "var(--fg)", "stroke-opacity": 0.35, "stroke-width": 1, visibility: "hidden" }, svg);
     const hovDot = el("circle", { r: 4, fill: "var(--surface)", stroke: "var(--fg)", "stroke-width": 1.5, visibility: "hidden" }, svg);
-    const moveHov = i => { if (i == null || i < 0 || i >= n) { hov.setAttribute("visibility", "hidden"); hovDot.setAttribute("visibility", "hidden"); return; }
+    const hmT = hoverMarks(svg, { fs: 11, ay: H2 - mb, x0: ml, x1: W2 - mr, yt: mt, yb: H2 - mb });
+    const moveHov = i => { if (i == null || i < 0 || i >= n) { hov.setAttribute("visibility", "hidden"); hovDot.setAttribute("visibility", "hidden"); hmT.hide(); return; }
       hov.setAttribute("x1", xs(i)); hov.setAttribute("x2", xs(i)); hov.setAttribute("visibility", "visible");
-      if (s.level[i] != null) { hovDot.setAttribute("cx", xs(i)); hovDot.setAttribute("cy", ys(s.level[i])); hovDot.setAttribute("visibility", "visible"); }
-      else hovDot.setAttribute("visibility", "hidden"); };
+      const l = s.level[i], q = l == null || s.change[i] == null ? null : quad(l, s.change[i]);
+      if (l != null) { hovDot.setAttribute("cx", xs(i)); hovDot.setAttribute("cy", ys(l)); hovDot.setAttribute("visibility", "visible"); }
+      else hovDot.setAttribute("visibility", "hidden");
+      hmT.show(xs(i), l == null ? [] : [{ y: ys(l), col: q ? qcol(q) : "var(--fg)", t: `${fmtN(l)}${q ? " " + Q[q].name.toLowerCase() : ""}` }], fmtP(set.periods[i])); };
     const sideHooks = chartHooks.slice(); chartHooks.push(moveHov);
     const hit = el("rect", { x: ml, y: mt, width: W2 - ml - mr, height: H2 - mt - mb, fill: "transparent" }, svg);
-    const tip = $("tip");
-    hit.addEventListener("mousemove", e => {
+    hit.addEventListener("pointermove", e => {
       const box = svg.getBoundingClientRect(); const fx = (e.clientX - box.left) / box.width * W2;
-      const i = Math.round((fx - ml) / (W2 - ml - mr) * (n - 1));
+      const i = Math.max(0, Math.min(n - 1, Math.round((fx - ml) / (W2 - ml - mr) * (n - 1))));
       moveHov(i); sideHooks.forEach(fn => fn(i));
-      if (i < 0 || i >= n || s.level[i] == null) { tip.hidden = true; return; }
-      const q = s.change[i] == null ? null : quad(s.level[i], s.change[i]);
-      tip.textContent = `${fmtP(set.periods[i])}  taso ${fmtN(s.level[i])}${q ? "  " + Q[q].name : ""}`;
-      tip.hidden = false; tip.style.left = Math.min(e.clientX + 12, innerWidth - tip.offsetWidth - 8) + "px"; tip.style.top = (e.clientY - 34) + "px";
     });
-    hit.addEventListener("mouseleave", () => { tip.hidden = true; moveHov(null); sideHooks.forEach(fn => fn(null)); });
+    hit.addEventListener("pointerleave", () => { moveHov(null); sideHooks.forEach(fn => fn(null)); });
     hit.addEventListener("click", e => { const box = svg.getBoundingClientRect();
       const i = Math.round(((e.clientX - box.left) / box.width * W2 - ml) / (W2 - ml - mr) * (n - 1));
       if (i >= 0 && i < n) { idx = i; update(); } });
@@ -1324,6 +1340,18 @@ footer b { color: var(--fg); font-weight: 600; }
       A.years.forEach((y, i) => { const c = el("circle", { cx: xs(y), cy: ys(A.values[i]), r: 2.6, fill: "var(--fg)" }, svg);
         el("title", {}, c).textContent = `${y}: ${pc(A.values[i])} %`; });
       el("text", { x: xs(lastA), y: ys(aOf(lastA)) + (aOf(lastA) >= 0 ? 16 : -8), "text-anchor": "middle", "font-size": fs, "font-weight": 600, fill: "var(--fg)", stroke: "var(--surface)", "stroke-width": 3, "paint-order": "stroke" }, svg).textContent = pc(aOf(lastA));
+    }
+    {                                                                   // hover: vuoden toteutunut tai ennusteiden keskiarvo ja vaihteluväli
+      const cur = el("line", { y1: mt, y2: H - mb, stroke: "var(--hover-line)", "stroke-width": 1, "stroke-dasharray": "2 3", visibility: "hidden" }, svg);
+      const hmF = hoverMarks(svg, { fs, ay: H - mb, x0: ml, x1: W - mr, yt: mt, yb: H - mb });
+      const hit = el("rect", { x: ml - 10, y: mt, width: W - ml - mr + 20, height: H - mt - mb, fill: "transparent" }, svg);
+      hit.addEventListener("pointermove", e => { const r = svg.getBoundingClientRect();
+        const y = Math.max(Y0, Math.min(Y1, Math.round(Y0 + ((e.clientX - r.left) / r.width * W - ml) / (W - ml - mr) * (n - 1))));
+        const a = aOf(y), f = S.find(s => s.y === y), it = [];
+        if (a != null && y !== lastA) it.push({ y: ys(a), col: "var(--fg)", t: `${pc(a)} %` });   // viimeisin ja keskiarvot on jo merkitty kuvioon
+        if (f) it.push({ y: ys(f.mean), col: "var(--accent)", w: 500, t: `vaihteluväli ${pc(f.lo)}…${pc(f.hi)} %` });
+        cur.setAttribute("x1", xs(y)); cur.setAttribute("x2", xs(y)); cur.setAttribute("visibility", "visible"); hmF.show(xs(y), it, String(y)); });
+      hit.addEventListener("pointerleave", () => { cur.setAttribute("visibility", "hidden"); hmF.hide(); });
     }
     const fm = document.createElement("div"); fm.className = "fmeta";
     fm.innerHTML = `<div class="legend"><span style="--qc:var(--fg)">Toteutunut</span><span class="ds" style="--qc:var(--accent)">Ennusteiden keskiarvo</span><span class="sq" style="--qc:color-mix(in srgb, var(--accent) 30%, var(--surface))">Vaihteluväli</span></div>`;
@@ -1636,11 +1664,15 @@ footer b { color: var(--fg); font-weight: 600; }
     const lr = AX.f(X[last]) > W2 - 80;                                 // oikeassa reunassa nimi pisteen vasemmalle
     el("text", { x: AX.f(X[last]) + (lr ? -8 : 8), y: AY.f(Y[last]) + (lr ? -8 : 4), "text-anchor": lr ? "end" : "start", "font-size": fs, "font-weight": 600, fill: "var(--fg)", stroke: "var(--surface)", "stroke-width": 3, "paint-order": "stroke" }, svg).textContent = fmtP(set.periods[last]);
     const dot = el("circle", { r: 5, fill: "var(--fg)", stroke: "var(--surface)", "stroke-width": 1.5 }, svg);
+    const hmS = hoverMarks(svg, { fs, ay: H2 - mb, x0: ml, x1: W2 - mr, yt: mt, yb: H2 - mb, flip: 130 });
     const valEl = card.querySelector(".fval"), subEl = card.querySelector(".fsub");
+    valEl.textContent = fmtP(set.periods[last]);                        // otsikkorivi pysyy viimeisimmässä
+    subEl.textContent = `${c.xlab.replace(/, %$/, "")} ${fmtV(X[last], c.dec)} %, ${c.ylab.replace(/, %$/, "").toLowerCase()} ${fmtV(Y[last], c.dec)} %.`;
     const show = h => { let i = h == null ? last : h; if (!pts.includes(i)) i = pts.filter(j => j <= i).pop() ?? last;
       dot.setAttribute("cx", AX.f(X[i])); dot.setAttribute("cy", AY.f(Y[i]));
-      valEl.textContent = fmtP(set.periods[i]);
-      subEl.textContent = `${c.xlab.replace(/, %$/, "")} ${fmtV(X[i], c.dec)} %, ${c.ylab.replace(/, %$/, "").toLowerCase()} ${fmtV(Y[i], c.dec)} %.`; };
+      if (h == null) { hmS.hide(); return; }
+      const y = AY.f(Y[i]);
+      hmS.show(AX.f(X[i]), [{ y: y - 7, col: "var(--fg)", t: fmtP(set.periods[i]) }, { y: y + 8, col: "var(--muted)", w: 500, t: `${fmtV(X[i], c.dec)} % / ${fmtV(Y[i], c.dec)} %` }]); };
     show(null); chartHooks.push(show);
     const hit = el("rect", { x: ml, y: mt, width: W2 - ml - mr, height: H2 - mt - mb, fill: "transparent" }, svg);
     hit.addEventListener("pointermove", e => { const r = svg.getBoundingClientRect(), sx = (e.clientX - r.left) / r.width * W2, sy = (e.clientY - r.top) / r.height * H2;
@@ -1675,9 +1707,14 @@ footer b { color: var(--fg); font-weight: 600; }
       l.values.forEach((v, i) => el("circle", { cx: xs(i), cy: ys(v), r: k ? 2 : 2.6, fill: st.col }, svg)); });
     const cur = el("line", { y1: mt, y2: H2 - mb, stroke: "var(--muted)", "stroke-width": 1, "stroke-dasharray": "2 3" }, svg);
     const fv = card.querySelector(".fval"), sub = card.querySelector(".fsub");
-    const show = i => { const j = i == null ? K.maturities.indexOf("10Y") : i;
-      cur.setAttribute("x1", xs(j)); cur.setAttribute("x2", xs(j)); fv.textContent = fmtD(K.lines[0].date);
-      sub.textContent = `${K.labels[j]}: ` + K.lines.map(l => `${l.label.charAt(0).toLowerCase() + l.label.slice(1)} ${fmtV(l.values[j], 2)} %`).join(", ") + "."; };
+    const hmC = hoverMarks(svg, { fs, ay: H2 - mb, x0: ml, x1: W2 - mr, yt: mt, yb: H2 - mb });
+    const j0 = K.maturities.indexOf("10Y");                             // otsikkorivi pysyy 10 vuoden kohdassa
+    fv.textContent = fmtD(K.lines[0].date);
+    sub.textContent = `${K.labels[j0]}: ` + K.lines.map(l => `${l.label.charAt(0).toLowerCase() + l.label.slice(1)} ${fmtV(l.values[j0], 2)} %`).join(", ") + ".";
+    const show = i => { const j = i == null ? j0 : i;
+      cur.setAttribute("x1", xs(j)); cur.setAttribute("x2", xs(j)); cur.setAttribute("visibility", i == null ? "hidden" : "visible");
+      if (i == null) { hmC.hide(); return; }
+      hmC.show(xs(j), K.lines.map((l, k) => l.values[j] == null ? null : { y: ys(l.values[j]), col: ST[k % ST.length].col, t: `${fmtV(l.values[j], 2)} %` }), K.labels[j]); };
     show(null);
     const hit = el("rect", { x: ml - 10, y: mt, width: W2 - ml - mr + 20, height: H2 - mt - mb, fill: "transparent" }, svg);
     hit.addEventListener("pointermove", e => { const r = svg.getBoundingClientRect();
@@ -1964,10 +2001,7 @@ footer b { color: var(--fg); font-weight: 600; }
           "stroke-linecap": (c.dot || []).includes(id) ? "round" : "butt", "stroke-linejoin": "round" }, svg); });
       const cur = el("line", { y1: mt, y2: H2 - mb, stroke: "var(--muted)", "stroke-width": 1, "stroke-dasharray": "2 3" }, svg);
       const dots = L.map((a, k) => el("circle", { r: big ? 3.5 : 4, fill: colOf[c.lines[k]], stroke: "var(--surface)", "stroke-width": 1.5 }, svg));
-      const hlab = el("g", { "pointer-events": "none" }, svg);           // hover: arvot pisteiden viereen, ajankohta x-akselille
-      const chip = el("g", { "pointer-events": "none", visibility: "hidden" }, svg);
-      const chipR = el("rect", { y: H2 - mb + 3, height: fs + 7, rx: 4, fill: "var(--fg)" }, chip);
-      const chipT = el("text", { y: H2 - mb + 3 + fs + 2, "text-anchor": "middle", "font-size": fs, "font-weight": 600, fill: "var(--surface)" }, chip);
+      const hm = hoverMarks(svg, { fs, ay: H2 - mb, x0: ml, x1: W2 - mr, yt: mt, yb: pb });
 
       const valEl = card.querySelector(".fval"), subEl = card.querySelector(".fsub");
       const qOnly = set.freq === "M" && [...c.lines, ...(c.stack || [])].every(id => { const v = ser(id) && ser(id).values;   // vain neljannesten viimeisilla kuukausilla havaintoja
@@ -1979,32 +2013,26 @@ footer b { color: var(--fg); font-weight: 600; }
                          : Math.max(0, Math.min(n - 1, h - i0));
         if (h != null) { const has = j => L.some(a => a[j] != null) || S.some(s => s[j] != null) || (B && B[j] != null);   // harva (nelj.) sarja: lahin aiempi havainto
           let j = i; while (j > 0 && i - j < 2 && !has(j)) j--; if (has(j)) i = j; }
-        const iD = i;                                                     // hover-kohta; otsikon tekstit pysyvät viimeisimmässä (pinotuissa erittely alaotsikossa)
-        const lab = h != null && !S.length;
-        if (lab) { i = iDef != null ? iDef : L.length > 1 && !B ? Math.min(...L.map(lastNN)) : lastNN(B || L[0]); h = null; }
+        const iD = i;                                                     // hover-kohta; otsikon tekstit pysyvät viimeisimmässä
+        const lab = h != null;
+        if (lab) { i = iDef != null ? iDef : L.length > 1 && !B && !S.length ? Math.min(...L.map(lastNN)) : lastNN(B || L[0]); h = null; }
         const hov = h != null || lab;
         cur.setAttribute("x1", xs(iD)); cur.setAttribute("x2", xs(iD));
         cur.setAttribute("visibility", hov ? "visible" : "hidden"); cur.setAttribute("stroke", "var(--hover-line)"); cur.setAttribute("stroke-opacity", 1);   // ei viimeisen havainnon pisteviivaa
         L.forEach((a, k) => { const ok = a[iD] != null; dots[k].setAttribute("visibility", ok ? "visible" : "hidden");
           if (ok) { dots[k].setAttribute("cx", xs(iD)); dots[k].setAttribute("cy", (isY2(k) ? ys2 : ys)(a[iD])); } });
-        hlab.replaceChildren(); chip.setAttribute("visibility", hov ? "visible" : "hidden");
-        if (hov) {
-          chipT.textContent = fP(P[iD]); const cw = chipT.getComputedTextLength() + 12, cx = Math.max(ml + cw / 2 - 6, Math.min(W2 - mr - cw / 2 + 6, xs(iD)));
-          chipT.setAttribute("x", cx); chipR.setAttribute("x", cx - cw / 2); chipR.setAttribute("width", cw);
-        }
-        if (lab) {
-          const sgL = v => c.ts && !c.rawv && v > 0 ? "+" : "";
+        if (!lab) hm.hide(); else {
+          const sgL = v => (c.ts && !c.rawv && v > 0) || (S.length && !c.lvl && v > 0) ? "+" : "";
           const it = [];
           L.forEach((a, k) => { const v = a[iD], id = c.lines[k]; if (v == null) return;
-            it.push({ y: (isY2(k) ? ys2 : ys)(v), col: colOf[id], t: L.length > 1 && !B ? `${sgL(v)}${fmtV(v, (c.decs || {})[id] ?? c.dec)}${c.unit === "%" ? " %" : ""}` : withU(v, c) }); });
+            it.push({ y: (isY2(k) ? ys2 : ys)(v), col: colOf[id], w: S.length ? 700 : 600,
+              t: (L.length > 1 && !B) || S.length ? `${sgL(v)}${fmtV(v, (c.decs || {})[id] ?? c.dec)}${c.unit === "%" ? " %" : c.unit ? " " + c.unit : ""}` : withU(v, c) }); });
           if (B && B[iD] != null) { const d = B[iD];
             it.push({ y: ys(d), col: c.barsNeutral ? "var(--fg)" : d >= 0 ? "var(--q-up)" : "var(--q-down)", t: `${c.barsName || "ero"} ${d > 0 ? "+" : ""}${fmtV(d, c.dec)} ${c.barsUnit || "%-yks."}` }); }
-          it.sort((a, b) => a.y - b.y); const gap = fs + 3;
-          for (let k = 1; k < it.length; k++) if (it[k].y - it[k - 1].y < gap) it[k].y = it[k - 1].y + gap;   // porrastus, ettei luvut mene paallekkain
-          const over = it.length ? it[it.length - 1].y - (pb - 4) : 0; if (over > 0) it.forEach(o => o.y -= over);
-          const right = xs(iD) > W2 - mr - 90, x = xs(iD) + (right ? -9 : 9);
-          it.forEach(o => el("text", { x, y: o.y + fs * 0.35, "text-anchor": right ? "end" : "start", "font-size": fs, "font-weight": 600, fill: o.col,
-            stroke: "var(--surface)", "stroke-width": 4, "stroke-linejoin": "round", "paint-order": "stroke" }, hlab).textContent = o.t);
+          if (S.length && !erit) { let up = 0, dn = 0;                    // pinotut: osien arvot palojen kohdalle (erittelypaneelissa jo erikseen)
+            S.forEach((s, k) => { const v = s[iD]; if (v == null || v === 0) return; const y0 = v > 0 ? up : dn, y1 = y0 + v; if (v > 0) up = y1; else dn = y1;
+              it.push({ y: ys((y0 + y1) / 2), col: isRes(c.stack[k]) ? "var(--muted)" : stCol(c, k), w: 500, t: `${sgL(v)}${fmtV(v, c.dec)}` }); }); }
+          hm.show(xs(iD), it, fP(P[iD]));
         }
         if (S.length) {
           const g = L[0][i], u = c.unit === "%" ? " %" : c.unit ? " " + c.unit : "";
