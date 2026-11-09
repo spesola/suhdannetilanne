@@ -1557,7 +1557,7 @@ footer b { color: var(--fg); font-weight: 600; }
     const up = (D.meta.upcoming || []).filter(r => new Date(r.date).getTime() >= now), byDay = new Map();
     up.forEach(r => { const d = new Date(r.date), k = d.toDateString(); if (!byDay.has(k)) byDay.set(k, { d, items: [] }); byDay.get(k).items.push(r); });
     $("updNext").innerHTML = up.length ? [...byDay.values()].map(g => `<p class="ud${g.d.toDateString() === today ? " now" : ""}">${g.d.toDateString() === today ? "Tänään, " : ""}${dd(g.d)}</p>` +
-      g.items.map(r => `<div class="ui"><a href="${r.url}" target="_blank" rel="noopener">${escH(r.title.replace(/\s\d{4},/, ","))}</a><span>${g.d.toLocaleTimeString("fi-FI", { hour: "2-digit", minute: "2-digit" })}</span></div>`).join("")).join("")
+      g.items.map(r => `<div class="ui"><a href="${r.url}" target="_blank" rel="noopener">${escH(r.title.replace(/\s\d{4},/, ","))}</a><span>${new Date(r.date).toLocaleTimeString("fi-FI", { hour: "2-digit", minute: "2-digit" })}</span></div>`).join("")).join("")
       : `<p class="none">Ei tiedossa olevia julkaisuja.</p>`;
     const L = D.meta.log || [], qn = q => `<i style="--qc:${qcol(q)}"></i>${Q[q].short}`;
     $("updLog").innerHTML = L.length ? L.map(e => { const d = new Date(e.date + "T12:00:00");
