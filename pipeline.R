@@ -981,6 +981,63 @@ CHECKS <- unique(CHECKS)
 if (length(CHECKS)) message("TARKISTUS: ", length(CHECKS), " huomiota\n  ", paste(CHECKS, collapse = "\n  ")) else message("TARKISTUS: ok")
 out$meta$checks <- CHECKS
 
+# ---------------------------------------------------------------------
+# Loki: uudet havainnot ja vaihemuutokset verrattuna edelliseen ajoon (tila valimuistissa).
+# Tulevat julkaisut: Tilastokeskuksen julkaisukalenteri, rajattuna sivun kayttamiin tilastoihin.
+# ---------------------------------------------------------------------
+src_of <- function(s) { keep <- src_used; src_used <<- list(); src_walk(s); r <- src_used; src_used <<- keep
+  if (!length(r)) return(NA_character_); p <- names(r)[1]; paste0(SRC_NAMES[[p]]$.n, ": ", r[[p]][1]) }
+quad_of <- function(l, c) if (is.na(l) || is.na(c)) NA_character_ else if (l >= 0) (if (c >= 0) "up" else "turn") else (if (c < 0) "down" else "rec")
+base_id <- function(id) sub("_(qq|yy)$", "", sub("^h_", "", id))
+fmt_per <- function(p) if (grepl("-Q", p)) paste0("Q", substr(p, 7, 7), "/", substr(p, 1, 4)) else paste0(as.integer(substr(p, 6, 7)), "/", substr(p, 1, 4))
+log_state <- list()
+for (st in sets_out) {
+  for (x in c(lapply(st$indicators, function(x) c(x, list(clock = TRUE))), st$series)) {
+    if (is.null(x$last) || !length(x$last) || is.na(x$last)) next
+    s <- tryCatch(ser_cfg(base_id(x$id)), error = function(e) NULL); if (is.null(s) || isTRUE(s$tile)) next
+    k <- paste(st$id, base_id(x$id), sep = "/"); if (!is.null(log_state[[k]])) next
+    q <- NA_character_; if (isTRUE(x$clock)) { i <- match(x$last, st$periods); if (!is.na(i)) q <- quad_of(x$level[i], x$change[i]) }
+    log_state[[k]] <- list(last = x$last, src = src_of(s), label = s$label, set = st$label, q = q)
+  }
+}
+LOG_STATE <- file.path(CACHE_DIR, "loki_tila.json"); LOG_FILE <- file.path(CACHE_DIR, "loki.json")
+prev <- if (file.exists(LOG_STATE)) tryCatch(fromJSON(LOG_STATE, simplifyVector = FALSE), error = function(e) NULL) else NULL
+log <- if (file.exists(LOG_FILE)) tryCatch(fromJSON(LOG_FILE, simplifyVector = FALSE), error = function(e) list()) else list()
+today <- format(Sys.time(), "%Y-%m-%d", tz = "Europe/Helsinki")
+if (!is.null(prev)) {
+  upd <- list(); ph <- list()
+  for (k in names(log_state)) { a <- log_state[[k]]; b <- prev[[k]]; if (is.null(b)) next
+    if (!is.na(a$src) && a$last > b$last) { u <- upd[[a$src]]
+      if (is.null(u) || a$last > u$last) upd[[a$src]] <- list(src = a$src, last = a$last, period = fmt_per(a$last)) }
+    qb <- if (is.null(b$q)) NA_character_ else b$q
+    if (!is.na(a$q) && !is.na(qb) && a$q != qb) ph[[length(ph) + 1]] <- list(label = a$label, set = a$set, from = qb, to = a$q) }
+  if (length(upd) || length(ph)) {
+    e <- if (length(log) && identical(log[[1]]$date, today)) log[[1]] else list(date = today, upd = list(), phase = list())
+    old <- Filter(function(u) !(u$src %in% names(upd)), e$upd)
+    e$upd <- c(unname(upd), old); e$phase <- c(ph, Filter(function(p) !any(vapply(ph, function(q) identical(q$label, p$label) && identical(q$set, p$set), TRUE)), e$phase))
+    if (length(log) && identical(log[[1]]$date, today)) log[[1]] <- e else log <- c(list(e), log)
+  }
+}
+log <- Filter(function(e) as.Date(e$date) >= as.Date(today) - 60, log)
+dir.create(CACHE_DIR, showWarnings = FALSE)
+writeLines(toJSON(log_state, auto_unbox = TRUE, na = "null", null = "null"), LOG_STATE)
+writeLines(toJSON(log, auto_unbox = TRUE, na = "null", null = "null"), LOG_FILE)
+out$meta$log <- log
+
+tk_tabs <- function(x) { if (!is.list(x)) return(character(0)); r <- character(0)
+  if (!is.null(x$table) && is.null(x$px_base) && is.character(x$table)) r <- sub("/.*", "", x$table)
+  c(r, unlist(lapply(x, tk_tabs))) }
+tk_progs <- unique(unlist(lapply(Filter(function(s) !isFALSE(s$enabled), cfg$series), tk_tabs)))
+out$meta$upcoming <- tryCatch({
+  u <- paste0("https://api.stat.fi/content/calendar?startDate=", format(Sys.time(), "%Y-%m-%dT00:00:00"),
+              "&endDate=", format(Sys.Date() + 35, "%Y-%m-%dT23:59:59"), "&start=0&rows=500&lang=fi")
+  x <- fromJSON(get_text(u), simplifyVector = FALSE)$calendarPublications
+  x <- Filter(function(r) !isTRUE(r$cancelledPublication) && !isTRUE(r$published) &&
+                any(vapply(r$statisticalPrograms, function(p) isTRUE(p$statisticalProgramId %in% tk_progs), TRUE)), x)
+  lapply(x, function(r) list(date = r$plannedReleaseDate, title = trimws(r$workingTitle),
+                              url = paste0("https://stat.fi/tilasto/", r$statisticalPrograms[[1]]$statisticalProgramSlug)))
+}, error = function(e) { message("  VAROITUS julkaisukalenteri: ", conditionMessage(e)); list() })
+
 writeLines(toJSON(out, auto_unbox = TRUE, na = "null", null = "null", digits = NA), OUT_PATH)
 message("Kirjoitettu ", OUT_PATH)
 

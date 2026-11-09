@@ -363,6 +363,19 @@ body { font-variant-numeric: tabular-nums; background: var(--bg); min-height: 10
 @keyframes zfade { from { opacity: 0; } }
 @media (prefers-reduced-motion: reduce) { .zoom[open], .zoom[open]::backdrop { animation: none; } }
 .zoom .zbar { display: flex; justify-content: flex-end; margin-bottom: 2px; }
+.updd { width: min(940px, calc(100vw - 24px)); }
+.updg { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 16px 48px; padding: 0 4px 6px; }
+@media (max-width: 700px) { .updg { grid-template-columns: minmax(0, 1fr); } }
+.updg h2 { font-size: 1rem; font-weight: 600; margin: 0 0 4px; padding-bottom: 8px; border-bottom: 1px solid var(--rule); }
+.updg .ud { font-size: 0.78rem; color: var(--muted); margin: 14px 0 2px; }
+.updg .ud.now { color: var(--fg); font-weight: 600; }
+.updg .ui { display: flex; justify-content: space-between; gap: 12px; font-size: 0.875rem; padding: 3px 0; border-bottom: 1px solid var(--grid); }
+.updg .ui a { color: inherit; text-decoration: none; } .updg .ui a:hover { text-decoration: underline; }
+.updg .ui span:last-child { color: var(--muted); white-space: nowrap; font-family: var(--font-data); }
+.updg .ui i { display: inline-block; width: 8px; height: 8px; border-radius: 50%; background: var(--qc); margin: 0 4px 0 2px; }
+.updg .none { font-size: 0.875rem; color: var(--muted); margin: 10px 0; }
+.upd .lnk { font: inherit; color: inherit; background: none; border: 0; padding: 0; text-decoration: underline; text-underline-offset: 2px; cursor: pointer; }
+.upd .lnk:hover { color: var(--fg); }
 .zoom .zbar button { font: inherit; font-size: 0.875rem; color: var(--fg); background: none; border: 1px solid var(--line); border-radius: 6px; padding: 3px 10px; cursor: pointer; }
 .zoom .zbar button:hover { border-color: var(--fg); }
 .zoom .fgrid { grid-template-columns: minmax(0, 1fr); }
@@ -633,6 +646,8 @@ footer b { color: var(--fg); font-weight: 600; }
   <section class="fcsec" id="fcSec" hidden><h2 class="fsec rfold" data-k="fc" role="button" tabindex="0" aria-expanded="false"><span class="chev" aria-hidden="true"><svg viewBox="0 0 12 12" width="14" height="14"><path d="M4 2.5 7.5 6 4 9.5"/></svg></span>Ennusteet</h2><div class="fgrid" id="fcGrid"></div></section>
   <section class="card" id="finSum" hidden></section>
   <section class="fgrid" id="charts" hidden></section>
+  <dialog class="zoom updd" id="upd" aria-label="Loki ja tulevat julkaisut"><div class="zbar"><button type="button" id="updClose">Sulje</button></div>
+    <div class="updg"><section><h2>Tulevat julkaisut</h2><div id="updNext"></div></section><section><h2>Loki</h2><div id="updLog"></div></section></div></dialog>
   <dialog class="zoom" id="zoom" aria-label="Suurennettu kuvio"><div class="zbar"><button type="button" id="zoomClose">Sulje</button></div><div class="fgrid" id="zoomBody"></div></dialog>
 
   <section class="card" id="detail">
@@ -729,7 +744,8 @@ footer b { color: var(--fg); font-weight: 600; }
   function renderHeader() {
     const gen = new Date(D.meta.generated.replace(/(\+\d{2})(\d{2})$/, "$1:$2"));
     $("headline").textContent = "Suhdannetilanne";   // sivuston nimi pysyy, valilehti kertoo osion
-    $("sub").textContent = `Päivitetty ${gen.toLocaleDateString("fi-FI")}.`;
+    $("sub").innerHTML = `Päivitetty ${gen.toLocaleDateString("fi-FI")}. <button type="button" class="lnk" id="updOpen">Loki ja tulevat julkaisut</button>`;
+    $("updOpen").onclick = openUpd;
     const box = $("sets"); box.innerHTML = "";
     D.sets.forEach(s => { const b = document.createElement("button"); b.type = "button"; b.innerHTML = `<span class="lg">${s.label}</span><span class="sh">${SHORT[s.id] || s.label}</span>`;
       b.setAttribute("aria-pressed", s.id === set.id); b.onclick = () => { if (s.id === set.id) return;
@@ -1533,6 +1549,25 @@ footer b { color: var(--fg); font-weight: 600; }
     b.onclick = () => chartPNG(card).catch(e => console.warn("PNG", e)); db.after(b);
     return b; }
   // suurennus: kuvio piirretaan uudelleen isompana dialogiin (tekstit pysyvat normaalikokoisina, hover toimii)
+  // loki (uudet havainnot ja vaihemuutokset) ja Tilastokeskuksen tulevat julkaisut
+  function openUpd() {
+    const dd = d => d.toLocaleDateString("fi-FI", { weekday: "short", day: "numeric", month: "numeric" });
+    const today = new Date().toDateString(), now = Date.now() - 6 * 36e5;
+    const up = (D.meta.upcoming || []).filter(r => new Date(r.date).getTime() >= now), byDay = new Map();
+    up.forEach(r => { const d = new Date(r.date), k = d.toDateString(); if (!byDay.has(k)) byDay.set(k, { d, items: [] }); byDay.get(k).items.push(r); });
+    $("updNext").innerHTML = up.length ? [...byDay.values()].map(g => `<p class="ud${g.d.toDateString() === today ? " now" : ""}">${g.d.toDateString() === today ? "Tänään, " : ""}${dd(g.d)}</p>` +
+      g.items.map(r => `<div class="ui"><a href="${r.url}" target="_blank" rel="noopener">${escH(r.title.replace(/\s\d{4},/, ","))}</a><span>${g.d.toLocaleTimeString("fi-FI", { hour: "2-digit", minute: "2-digit" })}</span></div>`).join("")).join("")
+      : `<p class="none">Ei tiedossa olevia julkaisuja.</p>`;
+    const L = D.meta.log || [], qn = q => `<i style="--qc:${qcol(q)}"></i>${Q[q].short}`;
+    $("updLog").innerHTML = L.length ? L.map(e => { const d = new Date(e.date + "T12:00:00");
+      return `<p class="ud">${d.toLocaleDateString("fi-FI", { weekday: "short", day: "numeric", month: "numeric", year: "numeric" })}</p>` +
+        (e.upd || []).map(u => `<div class="ui"><span>${escH(u.src)}</span><span>${u.period}</span></div>`).join("") +
+        (e.phase || []).map(p => `<div class="ui"><span>${escH(p.label)}</span><span>${qn(p.from)} → ${qn(p.to)}</span></div>`).join(""); }).join("")
+      : `<p class="none">Loki täyttyy seuraavista päivityksistä alkaen.</p>`;
+    $("upd").showModal(); $("updClose").focus();
+  }
+  $("updClose").onclick = () => $("upd").close();
+  $("upd").addEventListener("click", e => { if (e.target === $("upd")) $("upd").close(); });
   let zoomHooks = null, zoomRendering = false;
   function openZoom(cfg) {
     const d = $("zoom"), b = $("zoomBody"); zoomHooks = chartHooks; b.innerHTML = "";
