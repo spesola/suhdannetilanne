@@ -215,14 +215,18 @@ fetch_hicp_ctrb <- function(s) {
 # Vuosiketjutus: erat edellisen vuoden hinnoin = viitevuoden volyymi * edellisen vuoden implisiittinen hinta.
 # c_i = 100 * (X_i,t - X_i,t-4) * P_i,y-1 / (Y_t-4 * P_Y,y-1); tasmaa Eurostatin kontribuutioihin ~0,01 %-yks.
 .ntp_memo <- new.env()
+# ctr_table/ctr_dim/ctr_fix: muu taulu ja eriteltava ulottuvuus (esim. toimialat taulusta 132g, arvonlisays B1GPH),
+# ctr_tot: kokonaiseran valinta (oletus BKT taulusta 132h). Osien summa + jaannos = kokonaiseran kasvu.
 fetch_ntp_ctrb <- function(s) {
-  get <- function(i, cc) { key <- paste(i, cc)
-    if (is.null(.ntp_memo[[key]])) .ntp_memo[[key]] <- fetch_statfin(list(table = "ntp/132h.px",
-      pick = list(taloustoimi_1_20180101 = i, contentscode = cc)))
+  tb <- if (is.null(s$ctr_table)) "ntp/132h.px" else s$ctr_table; dim <- if (is.null(s$ctr_dim)) "taloustoimi_1_20180101" else s$ctr_dim
+  getp <- function(pk, cc) { key <- paste(tb, paste(names(pk), unlist(pk), collapse = ","), cc)
+    if (is.null(.ntp_memo[[key]])) .ntp_memo[[key]] <- fetch_statfin(list(table = tb, pick = c(pk, list(contentscode = cc))))
     d <- .ntp_memo[[key]]; setNames(d$value, d$date) }
+  get <- function(i, cc) if (identical(i, "__tot") && !is.null(s$ctr_tot)) getp(s$ctr_tot, cc) else
+    getp(c(s$ctr_fix, setNames(list(i), dim)), cc)
   pbar <- function(i) { c1 <- get(i, "tyopcp"); v1 <- get(i, "tyopvv2015")[names(c1)]; yy <- substr(names(c1), 1, 4)
     p <- tapply(c1, yy, sum) / tapply(v1, yy, sum); p[tapply(!is.na(c1), yy, sum) < 4] <- NA; p }
-  tot <- if (is.null(s$total)) "B1GMH" else s$total   # kokonaiserä: BKT tai kysyntäerä (esim. vienti), jonka kasvua osat selittävät
+  tot <- if (!is.null(s$ctr_tot)) "__tot" else if (is.null(s$total)) "B1GMH" else s$total   # kokonaiserä: BKT tai kysyntäerä (esim. vienti), jonka kasvua osat selittävät
   Y <- get(tot, "tyopvv2015"); dates <- names(Y); y <- as.integer(substr(dates, 1, 4))
   t0 <- sprintf("%d%s", y - 1, substr(dates, 5, 7)); py <- as.character(y - 1)
   if (isTRUE(s$contrib_total)) return(data.frame(date = dates, value = unname(100 * (Y[dates] / Y[t0] - 1))))
@@ -400,7 +404,8 @@ fetch_jt_decomp <- function(s) {
     v <- function(d) d$value[match(q, d$date)]; r4 <- function(x) as.numeric(stats::filter(x, rep(1, 4), sides = 1)); L4 <- function(x) c(rep(NA, 4), head(x, -4))
     Dv <- v(D); Y4 <- r4(v(Y)); B4 <- r4(v(B)); I4 <- r4(v(I1) - v(I2))
     d <- 100 * Dv / Y4; gr <- Y4 / L4(Y4) - 1
-    x <- data.frame(date = q, ratio = d, dd = d - L4(d), pb = -100 * (B4 + I4) / Y4, int = 100 * I4 / Y4, growth = -gr / (1 + gr) * L4(d), irate = 100 * I4 / L4(Dv))
+    x <- data.frame(date = q, ratio = d, dd = d - L4(d), pb = -100 * (B4 + I4) / Y4, int = 100 * I4 / Y4, growth = -gr / (1 + gr) * L4(d), irate = 100 * I4 / L4(Dv), ngr = 100 * gr)
+    x$rg <- x$irate - x$ngr                     # korko-kasvuero r - g
     x$sfa <- x$dd - x$pb - x$int - x$growth   # virta-varantokorjaus
     .dd_memo$x <- x }
   x <- .dd_memo$x; data.frame(date = x$date, value = x[[s$part]])
@@ -626,6 +631,16 @@ snap_row <- function(id, raws) {
        unit = s$unit, dec = s$dec, d1 = d1, w1 = w1, m1 = m1, y1 = y1, ytd = dif(ytd_ref))
 }
 # tuottokayra: viimeisin, kuukausi sitten ja edellisen vuoden lopussa
+# valtionvelan eraantymisprofiili (Valtiokonttori): nykyisen budjettitalouden velan kuoletukset vuosittain velkalajeittain, mrd. euroa
+profile_data <- function(c) tryCatch({
+  x <- fromJSON(get_text(paste0(VK_API, "redemptions")), simplifyVector = TRUE)
+  yrs <- sort(unique(x$year)); yrs <- yrs[yrs <= max(x$year[x$redemptions > 0])]
+  list(years = yrs, updated = max(x$lastUpdated), groups = lapply(c$products, function(p) {
+    a <- tapply(x$redemptions[x$product == p$id], x$year[x$product == p$id], sum) / 1e9
+    list(label = p$label, values = round(unname(ifelse(is.na(a[as.character(yrs)]), 0, a[as.character(yrs)])), 3)) }) |>
+    Filter(f = function(g) sum(g$values) > 0))                               # velkalajit ilman kuoletuksia pois
+}, error = function(e) { message("  VAROITUS eraantymisprofiili: ", conditionMessage(e)); NULL })
+
 curve_data <- function(c) {
   m <- lapply(c$maturities, function(k) { s <- list(id = paste0("kayra_", k), source = "ecb", flow = c$flow, key = sprintf(c$key, k),
     daily = TRUE, start = TABLE_START); message("  kayra ", k); x <- fetch_series(s); setNames(x, c("date", k)) })
@@ -667,6 +682,7 @@ for (set in cfg$sets) {
     charts_out <- lapply(set$charts, function(c) {
       if (identical(c$type, "table")) c$rows <- lapply(c$rows, function(r) c(r, snap_row(r$id, raws)))
       if (identical(c$type, "curve")) c$curve <- curve_data(c)
+      if (identical(c$type, "profile")) c$profile <- profile_data(c)
       c })
     # taulukkorivien historia kuukausisarjoina (paivadata: kuukauden viimeinen havainto) rivin valintaa varten
     tbl_ids <- unique(unlist(lapply(Filter(function(c) identical(c$type, "table"), set$charts), function(c) vapply(c$rows, function(r) r$id, ""))))

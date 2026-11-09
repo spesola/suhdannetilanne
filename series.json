@@ -502,6 +502,26 @@
               "stackUnit": "%-yks.",
               "dec": 1,
               "note": "Käyvin hinnoin, neljän neljänneksen liukuvan summan muutos vuodentakaisesta. Ostopalvelut: ostettuna markkinatuotantona annetut luontoisetuudet (esim. palvelusetelit, yksityiset hoivapalvelut). Myyntitulot vähennetään kulutusmenoista. Muut erät: mm. tuotantoverot. Lähde: Tilastokeskus, oma laskelma."
+            },
+            "bkt_toim": {
+              "title": "BKT:n kasvu toimialoittain",
+              "line": "kt_bkt",
+              "stack": [
+                "kt_teol",
+                "kt_rak",
+                "kt_kauppa",
+                "kt_kiint",
+                "kt_julk",
+                "kt_muut",
+                "k_muu_bkt_toim"
+              ],
+              "resid": [
+                "k_muu_bkt_toim"
+              ],
+              "unit": "%",
+              "stackUnit": "%-yks.",
+              "dec": 1,
+              "note": "Toimialojen arvonlisäyksen kontribuutiot BKT:n vuosikasvuun edellisen vuoden hinnoin, työpäiväkorjattu. Muut toimialat: maatalous, informaatio ja viestintä, rahoitus, liike-elämän palvelut ja muut palvelut. Jäännös sisältää tuoteverot miinus tukipalkkiot. Lähde: Tilastokeskus, oma laskelma."
             }
           },
           "views": {
@@ -684,6 +704,9 @@
                 "contrib": "bkt"
               },
               {
+                "contrib": "bkt_toim"
+              },
+              {
                 "contrib": "__gnp"
               },
               {
@@ -721,6 +744,20 @@
                 "unit": "%",
                 "dec": 1,
                 "note": "Nettoluotonanto, neljän neljänneksen summa. Lähde: Tilastokeskus."
+              },
+              {
+                "title": "Funktionaalinen tulonjako, yrityssektori, %",
+                "lines": [
+                  "x_tj_palkka",
+                  "x_tj_voitto"
+                ],
+                "colors": {
+                  "x_tj_palkka": "var(--fg)",
+                  "x_tj_voitto": "var(--accent)"
+                },
+                "unit": "%",
+                "dec": 1,
+                "note": "Yrityssektorin (S11) palkansaajakorvaukset ja bruttotoimintaylijäämä suhteessa bruttoarvonlisäykseen, neljän neljänneksen liukuvat summat. Osuuksien erotus sadasta on muut tuotantoverot miinus tukipalkkiot. Lähde: Tilastokeskus, sektoritilit."
               }
             ],
             "bkt_kulutus": [
@@ -1947,6 +1984,34 @@
           "note": "Implisiittinen korko: korkomenot 4 nelj. / velka vuotta aiemmin. Keskikorko: budjettitalouden velan korkomenot 12 kk / keskimääräinen velka. Lähteet: Tilastokeskus, Valtiokonttori, EKP."
         },
         {
+          "id": "jt_rg",
+          "section": "Velka",
+          "title": "Korko-kasvuero (r − g), %",
+          "unit": "%",
+          "dec": 1,
+          "lines": [
+            "jt_irate",
+            "jt_ngdp"
+          ],
+          "bars": "jt_rg",
+          "barsNeutral": true,
+          "barsName": "r − g",
+          "barsUnit": "%-yks.",
+          "barSpan": 3,
+          "connect": true,
+          "from": 2004,
+          "size": "half",
+          "colors": {
+            "jt_irate": "var(--fg)",
+            "jt_ngdp": "var(--accent)"
+          },
+          "labels": {
+            "jt_irate": "Implisiittinen korko (r)",
+            "jt_ngdp": "Nimellisen BKT:n kasvu (g)"
+          },
+          "note": "r: julkisyhteisöjen korkomenot neljältä neljännekseltä suhteessa velkaan vuotta aiemmin. g: nimellisen BKT:n vuosimuutos, neljän neljänneksen summat. Kun r − g on positiivinen, velkasuhde kasvaa ilman perusylijäämää. Lähde: Tilastokeskus."
+        },
+        {
           "id": "jt_mat",
           "section": "Velka",
           "title": "Valtionvelan maturiteetti, vuotta",
@@ -1965,6 +2030,28 @@
             "jt_vk_fix": "var(--g2)"
           },
           "note": "Keskimaturiteetti: velan keskimääräinen jäljellä oleva laina-aika. Lähde: Valtiokonttori."
+        },
+        {
+          "id": "jt_eraant",
+          "type": "profile",
+          "section": "Velka",
+          "title": "Valtionvelan erääntymisprofiili, mrd. €",
+          "size": "half",
+          "products": [
+            {
+              "id": "Serial bonds",
+              "label": "Sarjaobligaatiot"
+            },
+            {
+              "id": "Treasury bills",
+              "label": "Velkasitoumukset"
+            },
+            {
+              "id": "Other debt",
+              "label": "Muu velka"
+            }
+          ],
+          "note": "Budjettitalouden nykyisen velan kuoletukset vuosittain ilman uutta lainanottoa. Kuluvan vuoden luku sisältää vain jäljellä olevat kuoletukset. Lähde: Valtiokonttori."
         },
         {
           "id": "jt_va",
@@ -5246,6 +5333,215 @@
       "kind": "level"
     },
     {
+      "set": "bkt",
+      "contrib": true,
+      "handling": "none",
+      "kind": "level",
+      "source": "ntp_ctrb",
+      "contrib_group": "bkt_toim",
+      "ctr_table": "ntp/132g.px",
+      "ctr_dim": "toimiala_79_20180101",
+      "ctr_fix": {
+        "taloustoimi_1_20180101": "B1GPH"
+      },
+      "ctr_tot": {
+        "taloustoimi_1_20180101": "B1GMH",
+        "toimiala_79_20180101": "SSS"
+      },
+      "id": "kt_bkt",
+      "label": "BKT v/v",
+      "contrib_total": true,
+      "residual": "Tuoteverot (netto) ja tilastollinen ero"
+    },
+    {
+      "set": "bkt",
+      "contrib": true,
+      "handling": "none",
+      "kind": "level",
+      "source": "ntp_ctrb",
+      "contrib_group": "bkt_toim",
+      "ctr_table": "ntp/132g.px",
+      "ctr_dim": "toimiala_79_20180101",
+      "ctr_fix": {
+        "taloustoimi_1_20180101": "B1GPH"
+      },
+      "ctr_tot": {
+        "taloustoimi_1_20180101": "B1GMH",
+        "toimiala_79_20180101": "SSS"
+      },
+      "id": "kt_teol",
+      "label": "Teollisuus ja energia",
+      "items": [
+        "BTE"
+      ]
+    },
+    {
+      "set": "bkt",
+      "contrib": true,
+      "handling": "none",
+      "kind": "level",
+      "source": "ntp_ctrb",
+      "contrib_group": "bkt_toim",
+      "ctr_table": "ntp/132g.px",
+      "ctr_dim": "toimiala_79_20180101",
+      "ctr_fix": {
+        "taloustoimi_1_20180101": "B1GPH"
+      },
+      "ctr_tot": {
+        "taloustoimi_1_20180101": "B1GMH",
+        "toimiala_79_20180101": "SSS"
+      },
+      "id": "kt_rak",
+      "label": "Rakentaminen",
+      "items": [
+        "F"
+      ]
+    },
+    {
+      "set": "bkt",
+      "contrib": true,
+      "handling": "none",
+      "kind": "level",
+      "source": "ntp_ctrb",
+      "contrib_group": "bkt_toim",
+      "ctr_table": "ntp/132g.px",
+      "ctr_dim": "toimiala_79_20180101",
+      "ctr_fix": {
+        "taloustoimi_1_20180101": "B1GPH"
+      },
+      "ctr_tot": {
+        "taloustoimi_1_20180101": "B1GMH",
+        "toimiala_79_20180101": "SSS"
+      },
+      "id": "kt_kauppa",
+      "label": "Kauppa, kuljetus ja majoitus",
+      "items": [
+        "GTI"
+      ]
+    },
+    {
+      "set": "bkt",
+      "contrib": true,
+      "handling": "none",
+      "kind": "level",
+      "source": "ntp_ctrb",
+      "contrib_group": "bkt_toim",
+      "ctr_table": "ntp/132g.px",
+      "ctr_dim": "toimiala_79_20180101",
+      "ctr_fix": {
+        "taloustoimi_1_20180101": "B1GPH"
+      },
+      "ctr_tot": {
+        "taloustoimi_1_20180101": "B1GMH",
+        "toimiala_79_20180101": "SSS"
+      },
+      "id": "kt_kiint",
+      "label": "Kiinteistöala",
+      "items": [
+        "L"
+      ]
+    },
+    {
+      "set": "bkt",
+      "contrib": true,
+      "handling": "none",
+      "kind": "level",
+      "source": "ntp_ctrb",
+      "contrib_group": "bkt_toim",
+      "ctr_table": "ntp/132g.px",
+      "ctr_dim": "toimiala_79_20180101",
+      "ctr_fix": {
+        "taloustoimi_1_20180101": "B1GPH"
+      },
+      "ctr_tot": {
+        "taloustoimi_1_20180101": "B1GMH",
+        "toimiala_79_20180101": "SSS"
+      },
+      "id": "kt_julk",
+      "label": "Julkiset palvelut",
+      "items": [
+        "OTQ"
+      ]
+    },
+    {
+      "set": "bkt",
+      "contrib": true,
+      "handling": "none",
+      "kind": "level",
+      "source": "ntp_ctrb",
+      "contrib_group": "bkt_toim",
+      "ctr_table": "ntp/132g.px",
+      "ctr_dim": "toimiala_79_20180101",
+      "ctr_fix": {
+        "taloustoimi_1_20180101": "B1GPH"
+      },
+      "ctr_tot": {
+        "taloustoimi_1_20180101": "B1GMH",
+        "toimiala_79_20180101": "SSS"
+      },
+      "id": "kt_muut",
+      "label": "Muut toimialat",
+      "items": [
+        "A",
+        "J",
+        "K",
+        "M_N",
+        "RTU"
+      ]
+    },
+    {
+      "id": "x_tj_palkka",
+      "label": "Palkkaosuus",
+      "set": "bkt",
+      "chart_only": true,
+      "handling": "none",
+      "kind": "level",
+      "source": "statfin",
+      "table": "ntp/15a6.px",
+      "pick": {
+        "sektoriluokitus_7_20230101": "S11",
+        "taloustoimi_1_20180101": "D1K",
+        "contentscode": "ntp-TASM"
+      },
+      "roll": 4,
+      "div": {
+        "source": "statfin",
+        "table": "ntp/15a6.px",
+        "pick": {
+          "sektoriluokitus_7_20230101": "S11",
+          "taloustoimi_1_20180101": "B1GPH",
+          "contentscode": "ntp-TASM"
+        },
+        "roll": 4
+      }
+    },
+    {
+      "id": "x_tj_voitto",
+      "label": "Voitto-osuus",
+      "set": "bkt",
+      "chart_only": true,
+      "handling": "none",
+      "kind": "level",
+      "source": "statfin",
+      "table": "ntp/15a6.px",
+      "pick": {
+        "sektoriluokitus_7_20230101": "S11",
+        "taloustoimi_1_20180101": "B2G",
+        "contentscode": "ntp-TASM"
+      },
+      "roll": 4,
+      "div": {
+        "source": "statfin",
+        "table": "ntp/15a6.px",
+        "pick": {
+          "sektoriluokitus_7_20230101": "S11",
+          "taloustoimi_1_20180101": "B1GPH",
+          "contentscode": "ntp-TASM"
+        },
+        "roll": 4
+      }
+    },
+    {
       "id": "tm_tyoll",
       "label": "Työllisyysaste, 15–64-v.",
       "set": "bkt",
@@ -7636,6 +7932,26 @@
         "q_to_m": true,
         "roll": 4
       },
+      "handling": "none",
+      "kind": "level"
+    },
+    {
+      "id": "jt_ngdp",
+      "label": "Nimellisen BKT:n kasvu",
+      "set": "julkinen",
+      "source": "jt_decomp",
+      "part": "ngr",
+      "q_to_m": true,
+      "handling": "none",
+      "kind": "level"
+    },
+    {
+      "id": "jt_rg",
+      "label": "Korko-kasvuero",
+      "set": "julkinen",
+      "source": "jt_decomp",
+      "part": "rg",
+      "q_to_m": true,
       "handling": "none",
       "kind": "level"
     }
