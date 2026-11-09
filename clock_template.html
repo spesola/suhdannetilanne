@@ -83,13 +83,17 @@ tr.pick:hover > th { color: var(--accent); }
 [hidden] { display: none !important; }
 html { background: var(--bg); }
 body { font-variant-numeric: tabular-nums; background: var(--bg); min-height: 100%; color: var(--fg); font-family: var(--font-body); font-size: 15px; line-height: 1.5;
-  padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px));
-  padding-block: 22px 56px; }
+  margin: 0; padding-left: max(24px, env(safe-area-inset-left, 0px)); padding-right: max(24px, env(safe-area-inset-right, 0px));
+  padding-block: 30px 64px; }
 .wrap { max-width: 1180px; margin: 0 auto; display: flex; flex-direction: column; gap: 72px; }
 .wrap > .topbar { margin-bottom: -36px; }
 
 .topbar { display: flex; justify-content: space-between; align-items: stretch; gap: 10px 24px; flex-wrap: wrap; border-bottom: 1px solid var(--line); }
 .topbar .brand { padding: 6px 0 14px; }
+:root:not([data-theme="vapor"]) .topbar { position: relative; z-index: 0; }   /* valkoinen yläpalkki koko leveydeltä */
+:root:not([data-theme="vapor"]) .topbar::before, :root:not([data-theme="vapor"]) .topbar::after { content: ""; position: absolute; z-index: -1; left: 0; right: 0; clip-path: inset(0 -100vmax); }
+:root:not([data-theme="vapor"]) .topbar::before { top: -30px; bottom: 0; background: #fff; box-shadow: 0 0 0 100vmax #fff; }
+:root:not([data-theme="vapor"]) .topbar::after { bottom: -1px; height: 1px; background: var(--line); box-shadow: 0 0 0 100vmax var(--line); }
 .brand { display: inline-flex; align-items: center; gap: 9px; color: var(--fg); text-decoration: none; font-weight: 500; font-size: 1rem; letter-spacing: -0.01em; }
 .brand svg { width: 22px; height: 22px; flex: none; }
 .brand .tld { color: var(--muted); font-weight: 400; }
