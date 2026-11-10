@@ -1454,16 +1454,18 @@
         {
           "id": "ea_m2c",
           "section": "Korot ja rahapolitiikka",
-          "title": "M2 euroalueella, vuosimuutos %",
+          "title": "M2 ja M3 euroalueella, vuosimuutos %",
           "size": "half",
           "lines": [
-            "ea_m2"
+            "ea_m2",
+            "ea_m3"
           ],
           "unit": "%",
           "dec": 1,
           "from": 2007,
           "colors": {
-            "ea_m2": "var(--fg)"
+            "ea_m2": "var(--fg)",
+            "ea_m3": "var(--accent)"
           },
           "note": "Kausitasoitettu. Lähde: EKP."
         },
@@ -4689,6 +4691,16 @@
       "source": "ecb",
       "flow": "BSI",
       "key": "M.U2.Y.V.M20.X.I.U2.2300.Z01.A",
+      "handling": "none",
+      "kind": "level"
+    },
+    {
+      "id": "ea_m3",
+      "label": "M3",
+      "set": "rahoitus",
+      "source": "ecb",
+      "flow": "BSI",
+      "key": "M.U2.Y.V.M30.X.I.U2.2300.Z01.A",
       "handling": "none",
       "kind": "level"
     },
