@@ -1037,6 +1037,15 @@ if (!is.null(prev)) {
   }
 }
 log <- Filter(function(e) as.Date(e$date) >= as.Date(today) - 60, log)
+# since: paiva, jolloin sarjan viimeisin havainto ilmestyi (sivun "paivittynyt"-merkki); ensimmaisella kerralla lokista
+for (k in names(log_state)) {
+  a <- log_state[[k]]; b <- if (is.null(prev)) NULL else prev[[k]]
+  sn <- if (!is.null(b) && a$last > b$last) today else if (!is.null(b) && !is.null(b$since)) b$since else NA_character_
+  if (is.na(sn)) for (e in log) { hit <- any(vapply(e$upd, function(u) identical(u$src, a$src) && identical(u$set, a$set) && identical(u$last, a$last), TRUE))
+    if (hit) { sn <- e$date; break } }
+  log_state[[k]]$since <- sn
+}
+out$meta$seen <- lapply(Filter(function(a) !is.na(a$since), log_state), function(a) a$since)
 dir.create(CACHE_DIR, showWarnings = FALSE)
 writeLines(toJSON(log_state, auto_unbox = TRUE, na = "null", null = "null"), LOG_STATE)
 writeLines(toJSON(log, auto_unbox = TRUE, na = "null", null = "null"), LOG_FILE)

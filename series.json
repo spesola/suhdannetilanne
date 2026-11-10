@@ -10,7 +10,8 @@
         "Tilaukset ja luvat",
         "Kulutus",
         "Tuotanto",
-        "Työmarkkinat"
+        "Työmarkkinat",
+        "Kokeelliset"
       ],
       "contribs": {
         "ek_teol": {
@@ -2426,7 +2427,7 @@
       "id": "raskasliik",
       "label": "Raskas liikenne",
       "set": "suhdanne",
-      "group": "Tuotanto",
+      "group": "Kokeelliset",
       "source": "lam",
       "sets": [
         "2066",

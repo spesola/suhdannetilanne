@@ -369,6 +369,8 @@ body { font-variant-numeric: tabular-nums; background: var(--bg); min-height: 10
 .updg h2 { font-size: 1rem; font-weight: 600; margin: 0 0 4px; padding-bottom: 8px; border-bottom: 1px solid var(--rule); }
 .updg .ud { font-size: 0.78rem; color: var(--muted); margin: 14px 0 2px; }
 .updg .ud.now { color: var(--fg); font-weight: 600; }
+.list .fresh { display: inline-block; width: 7px; height: 7px; border-radius: 50%; background: #3b82f6; margin-left: 6px; vertical-align: 1px; box-shadow: 0 0 0 2px color-mix(in srgb, #3b82f6 22%, transparent); }
+:root[data-theme="vapor"] .list .fresh { background: #4dc9ff; box-shadow: 0 0 6px #4dc9ff; }
 .updg .us { font-size: 0.78rem; font-weight: 600; margin: 8px 0 0; }
 .updg .ui { display: flex; justify-content: space-between; gap: 12px; font-size: 0.875rem; padding: 3px 0; border-bottom: 1px solid var(--grid); }
 .updg .ui a { color: inherit; text-decoration: none; } .updg .ui a:hover { text-decoration: underline; }
@@ -684,7 +686,7 @@ footer b { color: var(--fg); font-weight: 600; }
     rec:  { name: "Elpyminen",     short: "Elpyminen", v: "--q-rec" }
   };
   const QORDER = ["up", "turn", "down", "rec"];
-  const GVARS = ["--g1", "--g2", "--g3", "--g4", "--g5"];
+  const GVARS = ["--g1", "--g2", "--g3", "--g4", "--g5", "--g6"];
   const LIM = 2.5;
 
   D.sets.forEach(s => (s.tabs || []).forEach(tb => { tb.rows = [].concat(tb.rows); }));   // yhden rivin lista voi tulla merkkijonona
@@ -936,6 +938,9 @@ footer b { color: var(--fg); font-weight: 600; }
         if (!pp) { h += `<i class="na${k === idx ? " last" : ""}"></i>`; continue; }
         const q = quad(pp.l, pp.c); h += `<i class="${k === idx ? "last" : ""}" style="--qc:${qcol(q)}" title="${fmtP(set.periods[pp.i])}: ${Q[q].name}"></i>`; }
       return `<span class="strip" aria-hidden="true">${h}</span>`; };
+    // uusi havainto viimeisen 7 paivan aikana: merkki sarjan nimen perään (meta.seen: set/sarja -> paiva)
+    const seenD = s => { const d = (D.meta.seen || {})[set.id + "/" + s.id]; return d && (Date.now() - new Date(d + "T12:00:00")) / 864e5 < 7 ? d : null; };
+    const dotFor = (d, what) => d ? ` <span class="fresh" title="${what} ${new Date(d + "T12:00:00").toLocaleDateString("fi-FI", { weekday: "short", day: "numeric", month: "numeric" })}"></span>` : "";
     const mk = (s, extraCls) => {
       const p = at(s, idx); const b = document.createElement("button"); b.type = "button";
       b.className = "ind" + (extraCls || ""); b.setAttribute("aria-pressed", s.comp ? sel === s.id : picked.has(s.id) && !fullG.includes(s.group));
@@ -943,7 +948,7 @@ footer b { color: var(--fg); font-weight: 600; }
       const out = !s.comp && !s.in_composite;
       b.dataset.id = s.id;
       b.setAttribute("aria-label", `${s.label}${q ? ", " + Q[q].name : ""}${p ? `, taso ${fmtN(p.l)}, muutos ${fmtN(p.c)}` : ""}`);
-      b.innerHTML = `<span class="nm" title="${s.label}">${s.list || s.label}${s.invert ? ` <span class="inv" title="Käännetty sarja: nousu näkyy negatiivisena">käänt.</span>` : ""}${out ? `<sup title="Ei mukana kokonaisindikaattorissa">*</sup>` : ""}</span>` +
+      b.innerHTML = `<span class="nm" title="${s.label}">${s.list || s.label}${s.invert ? ` <span class="inv" title="Käännetty sarja: nousu näkyy negatiivisena">käänt.</span>` : ""}${out ? `<sup title="Ei mukana kokonaisindikaattorissa">*</sup>` : ""}${s.comp ? "" : dotFor(seenD(s), "Uusi havainto")}</span>` +
         strip(s);
       b.onclick = () => s.comp ? select(s.id) : pick(s.id);
       b.onmouseenter = () => hlPoints([s.id]); b.onmouseleave = () => hlPoints([]);
@@ -964,7 +969,7 @@ footer b { color: var(--fg); font-weight: 600; }
       // ryhma auki: kayttaja avasi, vaihesuodatin paalla tai ryhman sarja valittuna
       const open = openG.has(g) || !!qf || all.some(x => x.id === sel || picked.has(x.id));
       h.setAttribute("aria-pressed", fullG.includes(g)); h.setAttribute("aria-expanded", open);
-      h.innerHTML = `<span class="gn"><span class="chev" aria-hidden="true"><svg viewBox="0 0 12 12" width="11" height="11"><path d="M4 2.5 7.5 6 4 9.5"/></svg></span>${g}<span class="cnt">${all.length}</span></span>` +
+      h.innerHTML = `<span class="gn"><span class="chev" aria-hidden="true"><svg viewBox="0 0 12 12" width="11" height="11"><path d="M4 2.5 7.5 6 4 9.5"/></svg></span>${g}<span class="cnt">${all.length}</span>${dotFor(all.map(seenD).filter(Boolean).sort().pop(), "Uusi havainto ryhmässä")}</span>` +
         (all.length > 1 ? strip(grp(g)) : `<span></span>`);
 
       if (gq) h.setAttribute("aria-label", `${g}, ${all.length} sarjaa, ryhmän keskiarvo: ${Q[gq].name}`);
@@ -988,7 +993,8 @@ footer b { color: var(--fg); font-weight: 600; }
     if (!list.children.length) list.insertAdjacentHTML("beforeend", `<div class="empty">Ei indikaattoreita vaiheessa ${Q[qf].name.toLowerCase()}.</div>`);
     const pa = set.periods[k0], pb = set.periods[idx];
     const span = `${fmtP(pa)}–${fmtP(pb)}`;
-    $("listNote").textContent = `Kunkin sarjan vaihe ${NS} viimeisimmältä ${set.freq === "M" ? "kuukaudelta" : "neljännekseltä"} (${span}), uusin isompana. Värit kuten yläosan palkissa.`;
+    $("listNote").textContent = `Kunkin sarjan vaihe ${NS} viimeisimmältä ${set.freq === "M" ? "kuukaudelta" : "neljännekseltä"} (${span}), uusin isompana. Värit kuten yläosan palkissa. Sininen piste: sarjaan tullut uusi havainto viimeisen viikon aikana.` +
+      (set.groups.includes("Kokeelliset") ? " Kokeelliset: uusia, epävirallisia aineistoja, eivät mukana kokonaisindikaattorissa." : "");
     if (gAnim && !REDUCED.matches) {                                     // avaus: rivit liukuvat auki, nuoli kaantyy
       const box = [...list.querySelectorAll(".grp")].find(b => b.dataset.g === gAnim.g), body = box && box.querySelector(".gbody");
       const ch = box && box.querySelector(".chev svg");
