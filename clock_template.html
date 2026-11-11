@@ -533,7 +533,8 @@ table.snap { width: 100%; border-collapse: collapse; font-size: 0.875rem; font-v
 .hmhead .chev svg { fill: none; stroke: currentColor; stroke-width: 1.6; stroke-linecap: round; stroke-linejoin: round; transition: transform .2s; }
 .hmhead[aria-expanded="true"] .chev svg { transform: rotate(90deg); }
 .hmhead:hover .chev { color: var(--fg); }
-#detail.hmfold #hmBody, #detail.hmfold .hmctl { display: none; }
+.hmsub { font-weight: 400; color: var(--muted); margin-left: 4px; }
+#detail.hmfold #hmBody, #detail.hmfold .hmctl, #detail.hmfold .hmsub { display: none; }
 #detail.hmfold .viewhead { margin-bottom: 0; }
 .mini { display: inline-flex; gap: 14px; }
 .mini button { font: inherit; font-size: 0.875rem; color: var(--muted); background: none; border: 0; padding: 1px 0; cursor: pointer; border-bottom: 1.5px solid transparent; }
@@ -663,7 +664,7 @@ footer b { color: var(--fg); font-weight: 600; }
 
   <section class="card" id="detail">
     <div id="view-hm">
-      <div class="viewhead"><h2 class="hmhead" id="hmHead" role="button" tabindex="0" aria-expanded="false" aria-controls="hmBody"><span class="chev" aria-hidden="true"><svg viewBox="0 0 12 12" width="14" height="14"><path d="M4 2.5 7.5 6 4 9.5"/></svg></span><span id="hmTitle">Poikkeama trendistä</span></h2>
+      <div class="viewhead"><h2 class="hmhead" id="hmHead" role="button" tabindex="0" aria-expanded="false" aria-controls="hmBody"><span class="chev" aria-hidden="true"><svg viewBox="0 0 12 12" width="14" height="14"><path d="M4 2.5 7.5 6 4 9.5"/></svg></span>Taulukko<span class="hmsub" id="hmTitle">Poikkeama trendistä</span></h2>
         <div class="hmctl">
           <div class="mini" role="group" aria-label="Taulukon arvo"><button type="button" id="hm-chg" aria-pressed="true">Muutos</button><button type="button" id="hm-lvl" aria-pressed="false">Taso</button><button type="button" id="hm-raw" aria-pressed="false">Arvo</button></div><button type="button" class="dl" id="hm-dl">Lataa CSV</button></div></div>
       <div id="hmBody"><div class="hmwrap"><table class="hm" id="hm"></table></div>
