@@ -528,6 +528,13 @@ table.snap { width: 100%; border-collapse: collapse; font-size: 0.875rem; font-v
 .fc text { font-family: var(--font-body); }
 .hmwrap { overflow-x: auto; }
 .hmctl { display: flex; align-items: baseline; gap: 16px; flex-wrap: wrap; }
+.hmhead { cursor: pointer; display: flex; align-items: center; gap: 8px; user-select: none; }
+.hmhead .chev { color: var(--muted); display: flex; }
+.hmhead .chev svg { fill: none; stroke: currentColor; stroke-width: 1.6; stroke-linecap: round; stroke-linejoin: round; transition: transform .2s; }
+.hmhead[aria-expanded="true"] .chev svg { transform: rotate(90deg); }
+.hmhead:hover .chev { color: var(--fg); }
+#detail.hmfold #hmBody, #detail.hmfold .hmctl { display: none; }
+#detail.hmfold .viewhead { margin-bottom: 0; }
 .mini { display: inline-flex; gap: 14px; }
 .mini button { font: inherit; font-size: 0.875rem; color: var(--muted); background: none; border: 0; padding: 1px 0; cursor: pointer; border-bottom: 1.5px solid transparent; }
 .mini button[aria-pressed="true"] { color: var(--fg); border-bottom-color: var(--fg); }
@@ -656,11 +663,11 @@ footer b { color: var(--fg); font-weight: 600; }
 
   <section class="card" id="detail">
     <div id="view-hm">
-      <div class="viewhead"><h2 id="hmTitle">Poikkeama trendistä</h2>
+      <div class="viewhead"><h2 class="hmhead" id="hmHead" role="button" tabindex="0" aria-expanded="false" aria-controls="hmBody"><span class="chev" aria-hidden="true"><svg viewBox="0 0 12 12" width="14" height="14"><path d="M4 2.5 7.5 6 4 9.5"/></svg></span><span id="hmTitle">Poikkeama trendistä</span></h2>
         <div class="hmctl">
           <div class="mini" role="group" aria-label="Taulukon arvo"><button type="button" id="hm-chg" aria-pressed="true">Muutos</button><button type="button" id="hm-lvl" aria-pressed="false">Taso</button><button type="button" id="hm-raw" aria-pressed="false">Arvo</button></div><button type="button" class="dl" id="hm-dl">Lataa CSV</button></div></div>
-      <div class="hmwrap"><table class="hm" id="hm"></table></div>
-      <p class="fnote" id="hmNote"></p>
+      <div id="hmBody"><div class="hmwrap"><table class="hm" id="hm"></table></div>
+      <p class="fnote" id="hmNote"></p></div>
     </div>
   </section>
 
@@ -2199,6 +2206,14 @@ footer b { color: var(--fg); font-weight: 600; }
     bs.forEach(b => b.onclick = () => { if (b.dataset.t) { document.documentElement.dataset.theme = b.dataset.t; if (b.dataset.t === "vapor") vaporFont(); } else delete document.documentElement.dataset.theme;
       try { localStorage.setItem("teema", b.dataset.t || "vaalea"); } catch (e) {} mark(); });
     mark();
+  })();
+  (function () {                                                    // suhdannetaulukko taittuvana, oletuksena kiinni; tila muistetaan selaimessa
+    const h = $("hmHead"), d = $("detail"); let on = false;
+    try { on = localStorage.getItem("taulukko") === "auki"; } catch (e) {}
+    const sync = () => { d.classList.toggle("hmfold", !on); h.setAttribute("aria-expanded", on); };
+    const tog = () => { on = !on; sync(); try { localStorage.setItem("taulukko", on ? "auki" : "kiinni"); } catch (e) {} };
+    h.onclick = tog; h.onkeydown = e => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); tog(); } };
+    sync();
   })();
   (function () {                                                    // Reaalitalous: lisakuviot ja ennusteet taittuvina osioina (oletuksena kiinni)
     const open = new Set(), hs = [...document.querySelectorAll(".rfold")];
