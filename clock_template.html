@@ -562,19 +562,21 @@ table.hm { border-collapse: separate; border-spacing: 2px; font-variant-numeric:
 .hm td .ar { font-size: 0.55rem; margin-left: 3px; opacity: 0.55; vertical-align: 1px; }
 
 
-footer { color: var(--muted); font-size: 0.78rem; display: flex; flex-wrap: wrap; justify-content: space-between; align-items: baseline; gap: 10px 24px; border-top: 1px solid var(--line); padding-top: 20px; margin-top: 24px; }
-footer { position: relative; }
-footer > p { max-width: calc(70ch + 180px); padding-right: 180px; }
-footer details { flex-basis: 100%; }
-footer summary { list-style: none; position: absolute; right: 0; top: 20px; }
-footer summary::-webkit-details-marker { display: none; }
-footer summary::after { content: ""; display: inline-block; width: 6px; height: 6px; border-right: 1.5px solid currentColor; border-bottom: 1.5px solid currentColor; transform: translateY(-3px) rotate(45deg); margin-left: 9px; }
-footer details[open] summary::after { transform: translateY(1px) rotate(-135deg); }
-footer .fbody { max-width: 78ch; }
+footer { color: var(--muted); font-size: 0.875rem; border-top: 1px solid var(--rule); padding: 26px 0 8px; margin-top: 24px; }
 footer p { margin: 0; }
-footer summary { cursor: pointer; color: var(--fg); font-weight: 600; font-size: 0.875rem; }
-footer .fbody { display: grid; gap: 6px; margin-top: 10px; }
-footer b { color: var(--fg); font-weight: 600; }
+footer .frow { display: flex; justify-content: space-between; align-items: flex-start; gap: 20px 40px; flex-wrap: wrap; }
+footer .fbrand { color: var(--fg); font-weight: 600; font-size: 1rem; margin-bottom: 6px; }
+footer .flead { max-width: 46ch; line-height: 1.55; }
+footer .flinks { display: flex; flex-direction: column; align-items: flex-start; gap: 8px; }
+footer .flinks .lnk { font: inherit; color: var(--fg); background: none; border: 0; padding: 0; cursor: pointer; text-decoration: none; }
+footer .flinks .lnk:hover { text-decoration: underline; text-underline-offset: 3px; }
+footer .ffine { margin-top: 22px; padding-top: 12px; border-top: 1px solid var(--line); font-size: 0.78rem; }
+.infod { width: min(760px, calc(100vw - 24px)); }
+.infod h2 { font-size: 1.1rem; font-weight: 600; margin: 0 4px 10px; padding-bottom: 8px; border-bottom: 1px solid var(--rule); }
+.infod .ibody { padding: 0 4px 6px; font-size: 0.9rem; line-height: 1.6; max-width: 72ch; }
+.infod .ibody p { margin: 0 0 12px; }
+.infod b { font-weight: 600; }
+.srcl { margin: 0 0 16px; } .srcl dt { font-weight: 600; margin-top: 10px; } .srcl dd { margin: 2px 0 0; color: var(--muted); }
 @media (max-width: 560px) {
   .sets { gap: 4px 18px; flex-wrap: nowrap; }
   .sets .lg { display: none; }
@@ -585,8 +587,6 @@ footer b { color: var(--fg); font-weight: 600; }
   .timebar input[type=range] { flex-basis: 120px; }
   #clock text { font-size: 17px; }
   #tsContrib .fc text { font-size: 17px; }
-  footer > p { padding-right: 0; }
-  footer summary { position: static; }
   #clock .axl.top, #clock .axl.bot { display: none; }
   #ts text { font-size: 18px; }
 }
@@ -664,6 +664,7 @@ footer b { color: var(--fg); font-weight: 600; }
   <section class="fgrid" id="charts" hidden></section>
   <dialog class="zoom updd" id="upd" aria-label="Loki ja tulevat julkaisut"><div class="zbar"><button type="button" id="updClose">Sulje</button></div>
     <div class="updg"><section><h2>Tulevat julkaisut</h2><div id="updNext"></div></section><section><h2>Loki</h2><div id="updLog"></div></section></div></dialog>
+  <dialog class="zoom infod" id="info" aria-labelledby="infoT"><div class="zbar"><button type="button" id="infoClose">Sulje</button></div><h2 id="infoT"></h2><div class="ibody" id="infoB"></div></dialog>
   <dialog class="zoom" id="zoom" aria-label="Suurennettu kuvio"><div class="zbar"><button type="button" id="zoomClose">Sulje</button></div><div class="fgrid" id="zoomBody"></div></dialog>
 
   <section class="card" id="detail">
@@ -700,6 +701,7 @@ footer b { color: var(--fg); font-weight: 600; }
   };
   const QORDER = ["up", "turn", "down", "rec"];
   const GVARS = ["--g1", "--g2", "--g3", "--g4", "--g5", "--g6"];
+  const INFO = {};                                                  // alapalkin tietoikkunat (menetelma, lahteet)
   const LIM = 2.5;
 
   D.sets.forEach(s => (s.tabs || []).forEach(tb => { tb.rows = [].concat(tb.rows); }));   // yhden rivin lista voi tulla merkkijonona
@@ -1228,11 +1230,15 @@ footer b { color: var(--fg); font-weight: 600; }
   }   // aikasarjat ja taulukko omina taittuvina osioinaan kartan alla
 
   function renderFoot() {
-    $("foot").innerHTML = `<p>Suomen talouden suhdannetilanne avoimista tilastoista. Päivittyy arkisin.</p><details><summary>Menetelmä ja lähteet</summary><div class="fbody"><p><b>Menetelmä.</b> ${D.meta.method}</p><p>${D.meta.composite}</p><p>${D.meta.growth || ""}</p><p>${D.meta.charts || ""}</p>
-      <p><b>Huomio.</b> ${D.meta.caveat} Kartan suurin piste on kokonaisindikaattori, ja viiva näyttää sen kulun kuuden kuukauden ajalta. Haaleat pisteet: sarjan viimeisin havainto on valittua ajankohtaa vanhempi. Ontot pisteet eivät ole mukana kokonaisindikaattorissa.</p>
-      <p><b>Lähteet.</b> ${(D.meta.sources || []).map(x => `${x.name} (${[].concat(x.items).join(", ")})`).join(", ")}.</p>
+    $("foot").innerHTML = `<div class="frow"><div><p class="fbrand">Suhdannetilanne</p><p class="flead">Suomen talouden suhdannetilanne avoimista tilastoista. Päivittyy arkisin lähteiden julkaisujen mukaan.</p></div>
+      <nav class="flinks" aria-label="Sivuston tiedot"><button type="button" class="lnk" data-info="met">Menetelmä</button><button type="button" class="lnk" data-info="src">Lähteet</button><button type="button" class="lnk" id="updOpen2">Loki ja tulevat julkaisut</button></nav></div>
+      <p class="ffine">Riippumaton projekti, ei virallinen tilasto. Tietoja ei ole tarkoitettu sijoitusneuvoiksi.</p>`;
+    INFO.met = { t: "Menetelmä", h: `<p>${D.meta.method}</p><p>${D.meta.composite}</p><p>${D.meta.growth || ""}</p><p>${D.meta.charts || ""}</p>
+      <p><b>Huomio.</b> ${D.meta.caveat} Kartan suurin piste on kokonaisindikaattori, ja viiva näyttää sen kulun kuuden kuukauden ajalta. Haaleat pisteet: sarjan viimeisin havainto on valittua ajankohtaa vanhempi. Ontot pisteet eivät ole mukana kokonaisindikaattorissa.</p>` };
+    INFO.src = { t: "Lähteet", h: `<dl class="srcl">${(D.meta.sources || []).map(x => `<dt>${x.name}</dt><dd>${[].concat(x.items).join(", ")}</dd>`).join("")}</dl>
       <p><b>Käyttöehdot.</b> Tilastokeskuksen ja Maailmanpankin aineistot CC BY 4.0. Muut aineistot lähteiden käyttöehtojen mukaisesti, lähde mainiten. Epävarmuusindeksi: Baker, Bloom ja Davis, policyuncertainty.com. Laskelmat ja esitystapa ovat omia.</p>
-      <p><b>Vastuuvapaus.</b> Sivuston tiedot perustuvat avoimiin lähteisiin. Tietoja ei ole tarkoitettu sijoitusneuvoiksi.</p></div></details>`;
+      <p><b>Vastuuvapaus.</b> Sivuston tiedot perustuvat avoimiin lähteisiin. Tietoja ei ole tarkoitettu sijoitusneuvoiksi.</p>` };
+    $("foot").querySelectorAll("[data-info]").forEach(b => b.onclick = () => openInfo(b.dataset.info)); $("updOpen2").onclick = openUpd;
   }
 
   function renderMeta() {
@@ -1606,6 +1612,9 @@ footer b { color: var(--fg); font-weight: 600; }
       : `<p class="none">Loki täyttyy seuraavista päivityksistä alkaen.</p>`;
     $("upd").showModal(); $("updClose").focus();
   }
+  function openInfo(k) { $("infoT").textContent = INFO[k].t; $("infoB").innerHTML = INFO[k].h; $("info").showModal(); $("infoClose").focus(); }
+  $("infoClose").onclick = () => $("info").close();
+  $("info").addEventListener("click", e => { if (e.target === $("info")) $("info").close(); });
   $("updClose").onclick = () => $("upd").close();
   $("upd").addEventListener("click", e => { if (e.target === $("upd")) $("upd").close(); });
   let zoomHooks = null, zoomRendering = false;

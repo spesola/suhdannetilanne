@@ -430,8 +430,26 @@ fetch_jk_decomp <- function(s) {
   x <- .jk_memo$x; data.frame(date = x$date, value = x[[s$part]])
 }
 
+# tyoelakelaitosten (S13141) sijoitustuoton arvio neljannesvuosittain, % edellisen neljanneksen rahoitusvaroista:
+# arvonmuutokset = varojen muutos - rahoitustaloustoimet (sis. muut volyymimuutokset), omaisuustulot = D.4 tuloina (korot, osingot ym.)
+# julkaistaan neljan neljanneksen summina; ei ole sama kuin Telan julkaisema tuotto (kattavuus, arvostus, rahavirtojen painotus)
+.tel_memo <- new.env()
+fetch_tel_ret <- function(s) {
+  if (is.null(.tel_memo$x)) {
+    g <- function(id, tb, pick) fetch_series(list(id = id, source = "statfin", table = tb, pick = pick))
+    rp <- function(cc) list(varojenluokitus_5_20180101 = "F0", `sektoriluokitus_7_20230101-rtp-sektori` = "S13141",
+                            `sektoriluokitus_7_20230101-vastinsektori` = "S0", contentscode = cc)
+    A <- g("tel_varat", "rtp/11n9.px", rp("rtp-K")); Tr <- g("tel_tt", "rtp/11n9.px", rp("V"))
+    D4 <- g("tel_d4", "jtume/11zf.px", list(taloustoimi_1_20180101 = "D4RU", sektoriluokitus_7_20230101 = "S13141", contentscode = "jtume-TASM"))
+    q <- sort(Reduce(intersect, list(A$date, Tr$date, D4$date)))
+    v <- function(d) d$value[match(q, d$date)]; L1 <- function(x) c(NA, head(x, -1)); r4 <- function(x) as.numeric(stats::filter(x, rep(1, 4), sides = 1))
+    a <- v(A); hg <- 100 * (a - L1(a) - v(Tr)) / L1(a); inc <- 100 * v(D4) / L1(a)
+    .tel_memo$x <- data.frame(date = q, hg = r4(hg), inc = r4(inc), ret = r4(hg + inc)) }
+  x <- .tel_memo$x; data.frame(date = x$date, value = x[[s$part]])
+}
+
 fetch_series <- function(s) {
-  f <- switch(s$source, statfin = fetch_statfin, splice = fetch_splice, eurostat = fetch_eurostat, hicp_ctrb = fetch_hicp_ctrb, ntp_ctrb = fetch_ntp_ctrb, hhi_ctrb = fetch_hhi_ctrb, khi_ctrb = fetch_khi_ctrb, xlsx = fetch_xlsx, stoxx = fetch_stoxx, lam = fetch_lam, ameco = fetch_ameco, vk = fetch_vk, sum = fetch_sum, jt_decomp = fetch_jt_decomp, jk_decomp = fetch_jk_decomp, gdp_np = fetch_gdp_np,
+  f <- switch(s$source, statfin = fetch_statfin, splice = fetch_splice, eurostat = fetch_eurostat, hicp_ctrb = fetch_hicp_ctrb, ntp_ctrb = fetch_ntp_ctrb, hhi_ctrb = fetch_hhi_ctrb, khi_ctrb = fetch_khi_ctrb, xlsx = fetch_xlsx, stoxx = fetch_stoxx, lam = fetch_lam, ameco = fetch_ameco, vk = fetch_vk, sum = fetch_sum, jt_decomp = fetch_jt_decomp, jk_decomp = fetch_jk_decomp, tel_ret = fetch_tel_ret, gdp_np = fetch_gdp_np,
               ecb = fetch_ecb, fred = fetch_fred, bof = fetch_bof, wb = fetch_wb, stop("Tuntematon lahde ", s$source))
   # valimuisti: onnistunut haku tallennetaan, epaonnistuessa kaytetaan edellista hakua
   cache <- file.path(CACHE_DIR, paste0(s$id, ".csv"))
@@ -924,6 +942,7 @@ src_walk <- function(x) {
     if (sc == "statfin" && !is.null(x$px_base)) src_add("vero", sub("/.*", "", x$table))
     else if (sc == "statfin" || (sc == "splice" && !is.null(x$table))) src_add("statfin", sub("/.*", "", x$table))
     else if (sc == "jt_decomp") { src_add("statfin", "jtume"); src_add("statfin", "jyev"); src_add("statfin", "ntp") }
+    else if (sc == "tel_ret") { src_add("statfin", "rtp"); src_add("statfin", "jtume") }
     else if (sc == "jk_decomp") src_add("statfin", "jtume")
     else if (sc == "eurostat") src_add("eurostat", x$ds)
     else if (sc == "ecb") src_add("ecb", x$flow)

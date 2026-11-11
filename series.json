@@ -1875,6 +1875,29 @@
           "note": "Julkisyhteisöjen tulot ja menot käyvin hinnoin, neljän neljänneksen liukuvan summan muutos vuodentakaisesta. Lähde: Tilastokeskus."
         },
         {
+          "id": "jt_tel",
+          "section": "Rahoitusasema",
+          "title": "Työeläkelaitosten sijoitustuotto, arvio, %",
+          "unit": "",
+          "dec": 1,
+          "lines": [
+            "jt_tel_ret"
+          ],
+          "stack": [
+            "jt_tel_hg",
+            "jt_tel_inc"
+          ],
+          "barSpan": 3,
+          "connect": true,
+          "from": 2005,
+          "size": "half",
+          "stackUnit": "%",
+          "colors": {
+            "jt_tel_ret": "var(--fg)"
+          },
+          "note": "Neljän neljänneksen summa, % edellisen neljänneksen rahoitusvaroista. Arvonmuutokset: rahoitusvarojen muutos vähennettynä nettosijoituksilla. Omaisuustulot: korot, osingot ja muut omaisuustulot (D.4). Kansantalouden tilinpitoon perustuva arvio, joka poikkeaa Telan julkaisemasta tuotosta kattavuuden ja laskentatavan vuoksi (esim. 2025: arvio 5,5 %, Tela 7,4 %). Lähde: Tilastokeskus, oma laskelma."
+        },
+        {
           "id": "jt_velka",
           "section": "Velka",
           "title": "Julkisyhteisöjen velka, % BKT:stä",
@@ -7964,6 +7987,36 @@
       "set": "julkinen",
       "source": "jt_decomp",
       "part": "rg",
+      "q_to_m": true,
+      "handling": "none",
+      "kind": "level"
+    },
+    {
+      "id": "jt_tel_ret",
+      "label": "Sijoitustuotto, arvio",
+      "part": "ret",
+      "set": "julkinen",
+      "source": "tel_ret",
+      "q_to_m": true,
+      "handling": "none",
+      "kind": "level"
+    },
+    {
+      "id": "jt_tel_hg",
+      "label": "Arvonmuutokset",
+      "part": "hg",
+      "set": "julkinen",
+      "source": "tel_ret",
+      "q_to_m": true,
+      "handling": "none",
+      "kind": "level"
+    },
+    {
+      "id": "jt_tel_inc",
+      "label": "Omaisuustulot",
+      "part": "inc",
+      "set": "julkinen",
+      "source": "tel_ret",
       "q_to_m": true,
       "handling": "none",
       "kind": "level"
