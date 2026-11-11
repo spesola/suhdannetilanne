@@ -274,15 +274,13 @@ body { font-variant-numeric: tabular-nums; background: var(--bg); min-height: 10
 .grp.gtop .ind:last-child { border-bottom: 1px solid color-mix(in srgb, var(--fg) 35%, transparent); }
 
 .tabs { display: flex; gap: 22px; margin: 0 0 22px; flex-wrap: wrap; border-bottom: 1px solid var(--line); }
-/* valitun sarjan aikasarjat listan alla oikeassa sarakkeessa, kartta pysyy kiinni vieressa */
-.tsside { margin-top: 40px; }
+/* valitun sarjan aikasarjat omana taittuvana osionaan kartan alla, kaksi kuviota vierekkain */
+#tsBody { margin-top: 14px; }
+.tsgrid.solo .tsmain { max-width: calc(50% - 24px); }
+@media (max-width: 860px) { .tsgrid.solo .tsmain { max-width: none; } }
 .grrow.noside { grid-template-columns: minmax(0, 1fr) !important; }
 .grrow.noside.pair { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) !important; }
 @media (max-width: 860px) { .grrow.noside.pair { grid-template-columns: minmax(0, 1fr) !important; } }
-.tsside .tsgrid, .tsside .tsgrid.solo { grid-template-columns: minmax(0, 1fr); gap: 40px; }
-.tsside .tsmain, .tsside #tsContrib .card { border-top: 1px solid var(--rule); padding-top: 14px; }
-.tsside #tsContrib .card > .more { top: 10px; }
-.tsside #tsContrib .card > .cmenu { top: 40px; }
 .tabs button { font: inherit; font-size: 0.875rem; font-weight: 500; color: var(--muted); background: none; border: 0;
   border-bottom: 2px solid transparent; padding: 4px 0 10px; margin-bottom: -1px; cursor: pointer; }
 .tabs button[aria-selected="true"] { color: var(--fg); border-bottom-color: var(--fg); font-weight: 600; }
@@ -534,8 +532,8 @@ table.snap { width: 100%; border-collapse: collapse; font-size: 0.875rem; font-v
 .hmhead[aria-expanded="true"] .chev svg { transform: rotate(90deg); }
 .hmhead:hover .chev { color: var(--fg); }
 .hmsub { font-weight: 400; color: var(--muted); margin-left: 4px; }
-#detail.hmfold #hmBody, #detail.hmfold .hmctl, #detail.hmfold .hmsub { display: none; }
-#detail.hmfold .viewhead { margin-bottom: 0; }
+#detail.hmfold #hmBody, #detail.hmfold .hmctl, #detail.hmfold .hmsub, #tsSec.hmfold #tsBody { display: none; }
+#detail.hmfold .viewhead, #tsSec.hmfold .viewhead { margin-bottom: 0; }
 .mini { display: inline-flex; gap: 14px; }
 .mini button { font: inherit; font-size: 0.875rem; color: var(--muted); background: none; border: 0; padding: 1px 0; cursor: pointer; border-bottom: 1.5px solid transparent; }
 .mini button[aria-pressed="true"] { color: var(--fg); border-bottom-color: var(--fg); }
@@ -630,7 +628,12 @@ footer b { color: var(--fg); font-weight: 600; }
       <div class="phead"><span class="ph2"><h2>Indikaattorit</h2><button type="button" class="xbtn" data-x="listNote" aria-expanded="false" aria-label="Näytä selite" title="Näytä selite"><svg viewBox="0 0 16 16" width="16" height="16" aria-hidden="true"><circle cx="3" cy="8" r="1.5"/><circle cx="8" cy="8" r="1.5"/><circle cx="13" cy="8" r="1.5"/></svg></button></span><span class="pmeta"><button type="button" class="chip" id="clrSel" hidden></button><span class="meta" id="listMeta"></span></span></div>
       <p class="cdesc" id="listNote" hidden></p>
       <div class="list" id="list"></div>
-      <div class="tsside" id="tsSide">
+    </div>
+  </section>
+
+  <section class="card" id="tsSec">
+    <div class="viewhead"><h2 class="hmhead" id="tsHead" role="button" tabindex="0" aria-expanded="true" aria-controls="tsBody"><span class="chev" aria-hidden="true"><svg viewBox="0 0 12 12" width="14" height="14"><path d="M4 2.5 7.5 6 4 9.5"/></svg></span>Aikasarjat</h2></div>
+    <div id="tsBody">
       <div class="tsgrid" id="tsGrid">
         <div class="tsmain">
           <div class="viewhead"><span class="ph2"><h2 id="tsTitle"></h2><button type="button" class="xbtn" data-x="tsSub" aria-expanded="false" aria-label="Näytä selite" title="Näytä selite"><svg viewBox="0 0 16 16" width="16" height="16" aria-hidden="true"><circle cx="3" cy="8" r="1.5"/><circle cx="8" cy="8" r="1.5"/><circle cx="13" cy="8" r="1.5"/></svg></button></span></div>
@@ -639,7 +642,6 @@ footer b { color: var(--fg); font-weight: 600; }
                     <p class="fnote" id="tsSub" hidden></p>
         </div>
         <div class="fgrid" id="tsContrib"></div>
-      </div>
       </div>
     </div>
   </section>
@@ -1093,6 +1095,15 @@ footer b { color: var(--fg); font-weight: 600; }
              unit: "", stackUnit: "", dec: 2, from: 2010, lineColor: "var(--fg)",
              note: `Ryhmän poikkeama on sarjojen keskiarvo; palkki = sarjan poikkeama / ${n0}.` };
     }
+    if (!cc && s.comp) {                  // kokonaisindikaattori = sarjojen keskiarvo, joten ryhman osuus = ryhman sarjojen summa / n (tasmalleen)
+      const mem = set.indicators.filter(x => x.in_composite), n0 = mem.length, gs = set.groups.filter(g => mem.some(x => x.group === g));
+      set.series = (set.series || []).filter(x => !x.id.startsWith("__c"))
+        .concat([{ id: "__cline", label: s.label, values: s.level }],
+                gs.map(g => ({ id: "__c_" + g, label: g, values: s.level.map((v, k) => v == null ? null : mem.filter(x => x.group === g).reduce((a, x) => a + (x.level[k] || 0), 0) / n0) })));
+      cc = { id: "comp_grp", title: "Kokonaisindikaattori: ryhmien osuudet", lines: ["__cline"], stack: gs.map(g => "__c_" + g), stackColors: gs.map(gcol),
+             unit: "", stackUnit: "", dec: 2, from: 2010, lineColor: "var(--fg)",
+             note: `Kokonaisindikaattori on sarjojen keskiarvo; palkki = ryhmän sarjojen poikkeamien summa / ${n0}.` };
+    }
     if (!cc && s.raw && s.raw.some(v => v != null)) {
       const hasTr = s.trend && s.trend.some(v => v != null);
       // keskiarvo vuodesta 2010: tasovertailu trendin rinnalle (kartta vertaa trendiin, ei keskiarvoon)
@@ -1118,7 +1129,7 @@ footer b { color: var(--fg); font-weight: 600; }
     const p = at(s, idx);
     $("tsNow").innerHTML = p && !s.comp ? `<i style="--qc:${qcol(quad(p.l, p.c))}"></i>${Q[quad(p.l, p.c)].name} ${fmtP(set.periods[p.i])}. Taso ${fmtN(p.l)}, muutos ${fmtN(p.c)}.` : "";
     const svg = $("ts"); svg.innerHTML = "";
-    const solo = false, W2 = 560, H2 = 300,   // aina kapeassa sarakkeessa listan alla
+    const solo = false, W2 = 560, H2 = 300,   // puolen leveyden sarake kartan alla
     ml = 40, mr = 14, mt = 12, mb = 28;
     svg.setAttribute("viewBox", `0 0 ${W2} ${H2}`);
     const n = set.periods.length, xs = i => ml + i * (W2 - ml - mr) / (n - 1);
@@ -1207,7 +1218,7 @@ footer b { color: var(--fg); font-weight: 600; }
   }
 
   function setTab(t) { tab = t;
-  }   // aikasarja ja taulukko molemmat aina nakyvissa (aikasarja listan alla)
+  }   // aikasarjat ja taulukko omina taittuvina osioinaan kartan alla
 
   function renderFoot() {
     $("foot").innerHTML = `<p>Suomen talouden suhdannetilanne avoimista tilastoista. Päivittyy arkisin.</p><details><summary>Menetelmä ja lähteet</summary><div class="fbody"><p><b>Menetelmä.</b> ${D.meta.method}</p><p>${D.meta.composite}</p><p>${D.meta.growth || ""}</p><p>${D.meta.charts || ""}</p>
@@ -1231,7 +1242,7 @@ footer b { color: var(--fg); font-weight: 600; }
 
   function update() {
     const charts = set.view === "charts", clock = !!(set.indicators && set.indicators.length) && !set.growth;   // kasvunakyma: taulukko ja kuviot kartan sijaan
-    $("topSec").hidden = !clock; $("detail").hidden = charts; $("charts").hidden = !charts;
+    $("topSec").hidden = !clock; $("tsSec").hidden = !clock; $("detail").hidden = charts; $("charts").hidden = !charts;
     if (clock) { renderMeta(); renderTime(); renderClock(); renderPanel(); } else { $("summary").innerHTML = ""; $("hlead").innerHTML = ""; }
     $("tiles").hidden = !(charts && set.tiles && set.tiles.length);
     $("growthSec").hidden = !(charts && set.growth); $("grMore").hidden = true;
@@ -2208,14 +2219,14 @@ footer b { color: var(--fg); font-weight: 600; }
       try { localStorage.setItem("teema", b.dataset.t || "vaalea"); } catch (e) {} mark(); });
     mark();
   })();
-  (function () {                                                    // suhdannetaulukko taittuvana, oletuksena kiinni; tila muistetaan selaimessa
-    const h = $("hmHead"), d = $("detail"); let on = false;
-    try { on = localStorage.getItem("taulukko") === "auki"; } catch (e) {}
+  [["tsHead", "tsSec", "aikasarjat", true, () => renderTS()], ["hmHead", "detail", "taulukko", false, null]].forEach(([hid, sid, key, def, onOpen]) => {
+    const h = $(hid), d = $(sid); let on = def;                     // taittuvat osiot: aikasarjat oletuksena auki, taulukko kiinni; tila muistetaan selaimessa
+    try { const v = localStorage.getItem(key); if (v) on = v === "auki"; } catch (e) {}
     const sync = () => { d.classList.toggle("hmfold", !on); h.setAttribute("aria-expanded", on); };
-    const tog = () => { on = !on; sync(); try { localStorage.setItem("taulukko", on ? "auki" : "kiinni"); } catch (e) {} };
+    const tog = () => { on = !on; sync(); try { localStorage.setItem(key, on ? "auki" : "kiinni"); } catch (e) {} if (on && onOpen) onOpen(); };
     h.onclick = tog; h.onkeydown = e => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); tog(); } };
     sync();
-  })();
+  });
   (function () {                                                    // Reaalitalous: lisakuviot ja ennusteet taittuvina osioina (oletuksena kiinni)
     const open = new Set(), hs = [...document.querySelectorAll(".rfold")];
     const sync = () => hs.forEach(h => { const on = open.has(h.dataset.k); h.parentElement.classList.toggle("folded", !on); h.setAttribute("aria-expanded", on); });
