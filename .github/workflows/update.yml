@@ -14,6 +14,15 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      # jos ubuntu.com-nimet eivat ratkea ajokoneella (toistuva katko), apt kayttaa kernel.org-peilia
+      - name: Apt-peili
+        run: |
+          if ! getent hosts archive.ubuntu.com >/dev/null || ! getent hosts azure.archive.ubuntu.com >/dev/null; then
+            echo "ubuntu.com ei ratkea, vaihdetaan peili"
+            echo "http://mirrors.edge.kernel.org/ubuntu/	priority:1" | sudo tee /etc/apt/apt-mirrors.txt
+            sudo sed -i -E 's#https?://(azure\.)?(archive|security)\.ubuntu\.com/ubuntu/?#http://mirrors.edge.kernel.org/ubuntu/#g' /etc/apt/sources.list.d/*.sources /etc/apt/sources.list 2>/dev/null || true
+          fi
+
       # R:n asennus kayttaa apt-peileja, jotka ovat ajoittain jumittuneet (DNS-virheet); aikaraja ja yksi uusi yritys
       - id: r1
         uses: r-lib/actions/setup-r@v2
