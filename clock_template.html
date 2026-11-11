@@ -507,6 +507,7 @@ table.snap { width: 100%; border-collapse: collapse; font-size: 0.875rem; font-v
 .fval b { font-weight: 500; font-size: 1rem; color: var(--fg); }
 .fsub { color: var(--muted); font-size: 0.78rem; margin: 2px 0 0; min-height: 1.2em; }
 .fsub .si { white-space: nowrap; }
+.fsub.lgd .si { margin-right: 10px; } .fsub .sunit { color: var(--muted); }
 .fsub .si::before { content: ""; display: inline-block; width: 10px; height: 2.5px; border-radius: 2px; background: var(--qc); vertical-align: middle; margin-right: 5px; }
 .fsub .si.ds::before { background: repeating-linear-gradient(90deg, var(--qc) 0 3px, transparent 3px 5px); }
 .fsub .si.sq::before { width: 8px; height: 8px; border-radius: 2px; vertical-align: 0; }
@@ -1069,9 +1070,14 @@ footer b { color: var(--fg); font-weight: 600; }
         for (let k = 1; k < it.length; k++) if (it[k].y - it[k - 1].y < gap) it[k].y = it[k - 1].y + gap;
         const over = it.length ? it[it.length - 1].y - (o.yb - 4) : 0; if (over > 0) it.forEach(d => d.y -= over);
         const under = it.length ? (o.yt || 0) + fs - it[0].y : 0; if (under > 0) it.forEach(d => d.y += under);
-        const right = x > o.x1 - (o.flip || 90), tx = x + (right ? -9 : 9);
-        it.forEach(d => el("text", { x: tx, y: d.y + fs * 0.35, "text-anchor": right ? "end" : "start", "font-size": fs, "font-weight": d.w || 600, fill: d.col,
-          stroke: "var(--surface)", "stroke-width": 4, "stroke-linejoin": "round", "paint-order": "stroke" }, lab).textContent = d.t);
+        const ts = it.map(d => { const e = el("text", { y: d.y + fs * 0.35, "font-size": fs, "font-weight": d.w || 600, fill: d.sq ? "var(--fg)" : d.col,
+          stroke: d.sq ? "none" : "var(--surface)", "stroke-width": 4, "stroke-linejoin": "round", "paint-order": "stroke" }, lab);
+          if (d.sq) { el("tspan", { fill: d.sq }, e).textContent = "\u25A0 "; el("tspan", {}, e).textContent = d.t; } else e.textContent = d.t; return e; });   // sq: varineliö nimen edessä
+        const mw = Math.max(0, ...ts.map(e => e.getComputedTextLength()));
+        const right = x > o.x1 - (o.flip || 90) || x + 9 + mw > o.x1 + 4, tx = x + (right ? -9 : 9);   // oikealle, jos teksti ei mahdu
+        ts.forEach(e => { e.setAttribute("x", tx); e.setAttribute("text-anchor", right ? "end" : "start"); });
+        if (it.some(d => d.sq)) { const bb = lab.getBBox();                // erittelysarake: vaalea tausta luettavuuden vuoksi
+          lab.insertBefore(el("rect", { x: bb.x - 5, y: bb.y - 3, width: bb.width + 10, height: bb.height + 6, rx: 4, fill: "var(--surface)", "fill-opacity": 0.9 }), lab.firstChild); }
       },
       hide() { lab.replaceChildren(); chip.setAttribute("visibility", "hidden"); }
     };
@@ -2094,7 +2100,7 @@ footer b { color: var(--fg); font-weight: 600; }
       if ((c.stack || []).some(isRes)) { const pt = el("pattern", { id: hid, width: 4, height: 4, patternUnits: "userSpaceOnUse", patternTransform: "rotate(45)" }, el("defs", {}, svg));
         el("rect", { width: 4, height: 4, fill: "color-mix(in srgb, var(--hatch) 18%, var(--surface))" }, pt);
         el("line", { x1: 0, y1: 0, x2: 0, y2: 4, stroke: "var(--hatch)", "stroke-width": 1.5 }, pt); }
-      if (S.length) { const sp = c.barSpan || 1, bw = (W2 - ml - mr) / n * sp * 0.78;   // pinotut kontribuutiot: positiiviset ylos, negatiiviset alas; barSpan: nelj. kuukausiakselilla
+      if (S.length) { const sp = c.barSpan || 1, bw0 = (W2 - ml - mr) / n * sp, bw = bw0 < 4 ? bw0 + 0.3 : bw0 * 0.78;   // kapeat palkit ilman välejä   // pinotut kontribuutiot: positiiviset ylos, negatiiviset alas; barSpan: nelj. kuukausiakselilla
         P.forEach((_, i) => { let up = 0, dn = 0;
           S.forEach((s, k) => { const v = s[i]; if (v == null || v === 0) return;
             const y0 = v > 0 ? up : dn, y1 = y0 + v; if (v > 0) up = y1; else dn = y1;
@@ -2137,9 +2143,9 @@ footer b { color: var(--fg); font-weight: 600; }
               t: (L.length > 1 && !B) || S.length ? `${sgL(v)}${fmtV(v, (c.decs || {})[id] ?? c.dec)}${c.unit === "%" ? " %" : c.unit ? " " + c.unit : ""}` : withU(v, c) }); });
           if (B && B[iD] != null) { const d = B[iD];
             it.push({ y: ys(d), col: c.barsNeutral ? "var(--fg)" : d >= 0 ? "var(--q-up)" : "var(--q-down)", t: `${c.barsName || "ero"} ${d > 0 ? "+" : ""}${fmtV(d, c.dec)} ${c.barsUnit || "%-yks."}` }); }
-          if (S.length && !erit) { let up = 0, dn = 0;                    // pinotut: osien arvot palojen kohdalle (erittelypaneelissa jo erikseen)
-            S.forEach((s, k) => { const v = s[iD]; if (v == null || v === 0) return; const y0 = v > 0 ? up : dn, y1 = y0 + v; if (v > 0) up = y1; else dn = y1;
-              it.push({ y: ys((y0 + y1) / 2), col: isRes(c.stack[k]) ? "var(--muted)" : stCol(c, k), w: 500, t: `${sgL(v)}${fmtV(v, c.dec)}` }); }); }
+          if (S.length && !erit) { let y = (it.length ? Math.max(...it.map(d => d.y)) : ys(0)) + fs + 3;   // pinotut: osat nimineen sarakkeena kokonaisarvon alle
+            S.forEach((s, k) => { const v = s[iD]; if (v == null) return;
+              it.push({ y, sq: isRes(c.stack[k]) ? "var(--muted)" : stCol(c, k), w: 500, t: `${ser(c.stack[k]).label} ${sgL(v)}${fmtV(v, c.dec)}` }); y += fs + 3; }); }
           hm.show(xs(iD), it, fP(P[iD]));
         }
         if (S.length) {
@@ -2149,9 +2155,11 @@ footer b { color: var(--fg); font-weight: 600; }
           if (valEl) valEl.innerHTML = `${fP(P[i])}: ` + c.lines.map((id, k) => { const v = L[k][i];   // useampi viiva: esim. YKHI ja KHI
             return `${c.lines.length > 1 ? siTag(lbl(id), colOf[id], (c.dash || []).includes(id) ? "ds" : "") + " " : ""}<b>${sgn(v)}${fmtV(v, (c.decs || {})[id] ?? c.dec)}${u}</b>`; }).join(", ") + yyT;
           const su = c.stackUnit != null ? c.stackUnit : "%-yks.";
-          subEl.hidden = erit; if (!erit) subEl.innerHTML = (c.ts ? `${fP(P[i])}: ${escH(ser(c.lines[0]).label)} ${sgn(g)}${fmtV(g, c.dec)}${u}${yyT}. ` : "") +
-            c.stack.map((id, k) => `${siTag(ser(id).label, stCol(c, k), isRes(id) ? "hx" : "sq")} ${sgn(+(S[k][i] || 0).toFixed(c.dec))}${fmtV(S[k][i], c.dec)}`).join(", ") + (su ? " " + escH(su) : "") + (su && su.endsWith(".") ? "" : ".");
-          if (!erit && valEl && valEl.innerHTML) { subEl.innerHTML = valEl.innerHTML + ". " + subEl.innerHTML; valEl.innerHTML = ""; }   // arvo otsikon alle
+          subEl.classList.toggle("lgd", !erit);
+          subEl.hidden = erit; if (!erit) {                                 // pelkka selite: nimet ja varit; arvot nakyvat hoverissa kuvion sisalla
+            subEl.innerHTML = [...c.lines.map(id => siTag(lbl(id), colOf[id], (c.dash || []).includes(id) ? "ds" : "")),
+              ...c.stack.map((id, k) => siTag(ser(id).label, stCol(c, k), isRes(id) ? "hx" : "sq"))].join(" ") + (su ? ` <span class="sunit">(${escH(su.replace(/\.$/, ""))})</span>` : "");
+            if (valEl) valEl.innerHTML = ""; }
         } else if (c.bars) {
           const d = B[i]; if (valEl) valEl.innerHTML = `${fP(P[i])}: ${c.barsName || "ero"} <b style="color:${c.barsNeutral ? "var(--fg)" : d >= 0 ? "var(--q-up)" : "var(--q-down)"}">${d > 0 ? "+" : ""}${fmtV(d, c.dec)} ${c.barsUnit || "%-yks."}</b>`;
           subEl.hidden = !!c.hdr;                                          // otsakkeessa jo v/v ja q/q
