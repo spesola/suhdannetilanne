@@ -440,6 +440,7 @@ button.dl:hover { text-decoration-color: var(--fg); }
 .grmore { margin-top: 0; }
 /* BKT-ennusteet (sivun loppu) */
 .rfold { margin: 0; }
+.fsec .fcnt { font-size: 0.875rem; font-weight: 400; color: var(--muted); margin-left: 2px; }
 .rfold + .fgrid { margin-top: 26px; }
 .grmore.folded > .fgrid, .fcsec.folded > .fgrid { display: none; }
 .fcsec .fcard.tt { grid-column: 1 / span 4; }
@@ -657,7 +658,7 @@ footer b { color: var(--fg); font-weight: 600; }
     </div></div>
     <div class="grrow"><div class="grcol" id="grCharts"></div><div class="grside" id="grSide"></div></div>
   </section>
-  <section class="grmore" id="grMore" hidden><h2 class="fsec rfold" data-k="more" role="button" tabindex="0" aria-expanded="false"><span class="chev" aria-hidden="true"><svg viewBox="0 0 12 12" width="14" height="14"><path d="M4 2.5 7.5 6 4 9.5"/></svg></span>Vertailu ja rahoitusjäämät</h2><div class="fgrid" id="grMoreGrid"></div></section>
+  <section class="grmore" id="grMore" hidden><h2 class="fsec rfold" data-k="more" role="button" tabindex="0" aria-expanded="false"><span class="chev" aria-hidden="true"><svg viewBox="0 0 12 12" width="14" height="14"><path d="M4 2.5 7.5 6 4 9.5"/></svg></span>Lisäkuviot<span class="fcnt" id="grMoreN"></span></h2><div class="fgrid" id="grMoreGrid"></div></section>
   <section class="fcsec" id="fcSec" hidden><h2 class="fsec rfold" data-k="fc" role="button" tabindex="0" aria-expanded="false"><span class="chev" aria-hidden="true"><svg viewBox="0 0 12 12" width="14" height="14"><path d="M4 2.5 7.5 6 4 9.5"/></svg></span>Ennusteet</h2><div class="fgrid" id="fcGrid"></div></section>
   <section class="card" id="finSum" hidden></section>
   <section class="fgrid" id="charts" hidden></section>
@@ -1864,7 +1865,7 @@ footer b { color: var(--fg); font-weight: 600; }
     // ei erittelya mutta lisakuvioita: paakuvio ja ensimmainen lisakuvio rinnakkain puolikkaina
     const hasMore = () => !!$("grMoreGrid").querySelector(":scope > .fcard"), pr = ns && hasMore();
     if (pr !== gr.classList.contains("pair")) { gr.classList.toggle("pair", pr); $("grSide").innerHTML = ""; renderCharts($("grCharts")); }
-    if (pr && hasMore()) { $("grSide").appendChild($("grMoreGrid").querySelector(":scope > .fcard")); pairRows($("grMoreGrid")); $("grMore").hidden = !hasMore(); }
+    if (pr && hasMore()) { $("grSide").appendChild($("grMoreGrid").querySelector(":scope > .fcard")); pairRows($("grMoreGrid")); $("grMore").hidden = !hasMore(); $("grMoreN").textContent = $("grMoreGrid").querySelectorAll(".fcard:not(.side)").length || ""; }
     if (false && two && lastMainH) {
       const diff = $("growthSec").querySelector(".grleft").offsetHeight - $("grCharts").offsetHeight;
       if (Math.abs(diff) > 1) { colMainH = Math.max(lastLower ? 200 : 190, Math.min(560, lastMainH + diff)); $("grSide").innerHTML = ""; renderCharts($("grCharts")); colMainH = null; }
@@ -2209,7 +2210,7 @@ footer b { color: var(--fg); font-weight: 600; }
         chartHooks.forEach(fn => fn(i + i0)); });
       hit.addEventListener("pointerleave", () => chartHooks.forEach(fn => fn(null)));
     });
-    if (more) $("grMore").hidden = !more.children.length;
+    if (more) { $("grMore").hidden = !more.children.length; $("grMoreN").textContent = more.querySelectorAll(".fcard:not(.side)").length || ""; }
   }
 
   let lastNarrow = null, lastK = null, rzT = null;
