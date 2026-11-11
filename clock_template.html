@@ -565,8 +565,6 @@ table.hm { border-collapse: separate; border-spacing: 2px; font-variant-numeric:
 footer { color: var(--muted); font-size: 0.875rem; border-top: 1px solid var(--rule); padding: 26px 0 8px; margin-top: 24px; }
 footer p { margin: 0; }
 footer .frow { display: flex; justify-content: space-between; align-items: flex-start; gap: 20px 40px; flex-wrap: wrap; }
-footer .fbrand { color: var(--fg); font-weight: 600; font-size: 1rem; margin-bottom: 6px; }
-footer .flead { max-width: 46ch; line-height: 1.55; }
 footer .flinks { display: flex; flex-direction: column; align-items: flex-start; gap: 8px; }
 footer .flinks .lnk { font: inherit; color: var(--fg); background: none; border: 0; padding: 0; cursor: pointer; text-decoration: none; }
 footer .flinks .lnk:hover { text-decoration: underline; text-underline-offset: 3px; }
@@ -1230,9 +1228,8 @@ footer .ffine { margin-top: 22px; padding-top: 12px; border-top: 1px solid var(-
   }   // aikasarjat ja taulukko omina taittuvina osioinaan kartan alla
 
   function renderFoot() {
-    $("foot").innerHTML = `<div class="frow"><div><p class="fbrand">Suhdannetilanne</p><p class="flead">Suomen talouden suhdannetilanne avoimista tilastoista. Päivittyy arkisin lähteiden julkaisujen mukaan.</p></div>
-      <nav class="flinks" aria-label="Sivuston tiedot"><button type="button" class="lnk" data-info="met">Menetelmä</button><button type="button" class="lnk" data-info="src">Lähteet</button><button type="button" class="lnk" id="updOpen2">Loki ja tulevat julkaisut</button></nav></div>
-      <p class="ffine">Riippumaton projekti, ei virallinen tilasto. Tietoja ei ole tarkoitettu sijoitusneuvoiksi.</p>`;
+    $("foot").innerHTML = `<div class="frow"><nav class="flinks" aria-label="Sivuston tiedot"><button type="button" class="lnk" data-info="met">Menetelmä</button><button type="button" class="lnk" data-info="src">Lähteet</button><button type="button" class="lnk" id="updOpen2">Loki ja tulevat julkaisut</button></nav></div>
+      <p class="ffine">Suomen talouden suhdannetilanne avoimista tilastoista. Päivittyy arkisin.</p>`;
     INFO.met = { t: "Menetelmä", h: `<p>${D.meta.method}</p><p>${D.meta.composite}</p><p>${D.meta.growth || ""}</p><p>${D.meta.charts || ""}</p>
       <p><b>Huomio.</b> ${D.meta.caveat} Kartan suurin piste on kokonaisindikaattori, ja viiva näyttää sen kulun kuuden kuukauden ajalta. Haaleat pisteet: sarjan viimeisin havainto on valittua ajankohtaa vanhempi. Ontot pisteet eivät ole mukana kokonaisindikaattorissa.</p>` };
     INFO.src = { t: "Lähteet", h: `<dl class="srcl">${(D.meta.sources || []).map(x => `<dt>${x.name}</dt><dd>${[].concat(x.items).join(", ")}</dd>`).join("")}</dl>
