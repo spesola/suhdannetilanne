@@ -218,6 +218,9 @@ body { font-variant-numeric: tabular-nums; background: var(--bg); min-height: 10
 .phr .sq { display: grid; grid-template-columns: repeat(var(--N), minmax(0, 16px)); gap: 4px; }
 .phr .sq i { aspect-ratio: 1; border-radius: 3px; background: var(--qc); }
 .phr:not(.cur) .sq i { opacity: .45; }
+.phr .sq i { cursor: pointer; transition: transform .1s; }
+.phr .sq i:hover { transform: scale(1.18); }
+.phr .sq i.pk { outline: 2px solid var(--qc); outline-offset: 2px; opacity: 1; }
 .phr .sq i.new { box-shadow: 0 0 0 1.5px var(--bg), 0 0 0 3px var(--fg); opacity: 1; }
 .phr:not(.cur) .sq i.new { background: color-mix(in srgb, var(--qc) 45%, var(--bg)); }
 .phr .n { font-variant-numeric: tabular-nums; color: var(--muted); } .phr.cur .n { color: var(--fg); font-weight: 600; }
@@ -1075,8 +1078,11 @@ footer .flinks .lnk:hover { text-decoration-color: currentColor; }
       hdr = `<p class="phl">Suhdannevaihe</p><p class="phb" style="--qc:${qcol(cq)}"><b>${Q[cq].short}</b><em>${fmtP(set.periods[k])} alkaen</em></p>`; }
     $("hlead").innerHTML = "";
     const anyMv = QORDER.some(q => mv[q].length);
-    $("summary").innerHTML = `<div class="phx${qf ? " f" : ""}">${hdr}<div class="phrs">${QORDER.map(q => `<button type="button" class="phr${q === cq ? " cur" : ""}${qf === q ? " on" : ""}" data-q="${q}" style="--qc:${qcol(q)};--N:${Math.max(1, ...Object.values(counts))}" aria-pressed="${qf === q}" aria-label="${Q[q].name}: ${counts[q]}. Klikkaa suodattaaksesi."><span class="nm">${Q[q].short}</span><span class="sq">${stay[q].map(x => `<i data-tip="${escH(x.s.label)}"></i>`).join("")}${mv[q].map(x => `<i class="new" data-tip="${escH(x.s.label)}" data-sub="${Q[x.q0].short} → ${Q[q].short.toLowerCase()} ${fmtP(set.periods[idx])}"></i>`).join("")}</span><span class="n">${counts[q]}</span></button>`).join("")}</div>${anyMv ? `<p class="phn"><i></i>siirtyi vaiheeseen ${fmtP(set.periods[idx])}</p>` : ""}</div>`;   // yksi neliö = yksi sarja
-    $("summary").querySelectorAll("[data-q]").forEach(b => b.onclick = () => { qf = qf === b.dataset.q ? null : b.dataset.q; update(); });
+    $("summary").innerHTML = `<div class="phx${qf ? " f" : ""}">${hdr}<div class="phrs">${QORDER.map(q => `<button type="button" class="phr${q === cq ? " cur" : ""}${qf === q ? " on" : ""}" data-q="${q}" style="--qc:${qcol(q)};--N:${Math.max(1, ...Object.values(counts))}" aria-pressed="${qf === q}" aria-label="${Q[q].name}: ${counts[q]}. Klikkaa suodattaaksesi."><span class="nm">${Q[q].short}</span><span class="sq">${stay[q].map(x => `<i data-id="${x.s.id}" data-tip="${escH(x.s.label)}"${picked.has(x.s.id) ? ' class="pk"' : ""}></i>`).join("")}${mv[q].map(x => `<i class="new${picked.has(x.s.id) ? " pk" : ""}" data-id="${x.s.id}" data-tip="${escH(x.s.label)}" data-sub="${Q[x.q0].short} → ${Q[q].short.toLowerCase()} ${fmtP(set.periods[idx])}"></i>`).join("")}</span><span class="n">${counts[q]}</span></button>`).join("")}</div>${anyMv ? `<p class="phn"><i></i>siirtyi vaiheeseen ${fmtP(set.periods[idx])}</p>` : ""}</div>`;   // yksi neliö = yksi sarja
+    $("summary").querySelectorAll("[data-q]").forEach(b => b.onclick = e => {
+      const sq = e.target.closest("i[data-id]");                       // yksittainen neliö: vain se sarja valituksi
+      if (sq) { const id = sq.dataset.id; if (sel === id && picked.size === 1) { clearPicks(); return; } qf = null; picked.clear(); sel = null; pick(id); return; }
+      qf = qf === b.dataset.q ? null : b.dataset.q; update(); });   // muu rivi: vaiheen suodatus
     const pass = s => { if (!qf) return true; if (!s.comp && !s.in_composite) return false; const p = at(s, idx); return !!p && quad(p.l, p.c) === qf; };
 
     { const chip = $("clrSel"), on = picked.size || (sel && sel !== "comp");   // valinta sirulla otsikkorivilla
