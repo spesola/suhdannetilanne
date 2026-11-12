@@ -109,10 +109,10 @@ body { font-variant-numeric: tabular-nums; background: var(--bg); min-height: 10
   padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px));
   padding-block: 0 56px; }
 .wrap { max-width: 1180px; margin: 0 auto; display: flex; flex-direction: column; gap: 72px; }
-/* ylapalkki: koko levea, pysyy ylhaalla, lapikuultava ja sumentava; nimi hieman sisaltopalstan ulkopuolella */
+/* ylapalkki: koko levea, pysyy ylhaalla, lapikuultava ja sumentava */
 .topbar { position: sticky; top: 0; z-index: 50; display: flex; align-items: stretch; gap: 0 28px; min-height: 60px;
   margin: 0 calc(-1 * max(16px, env(safe-area-inset-right, 0px))) 36px calc(-1 * max(16px, env(safe-area-inset-left, 0px)));
-  padding-inline: max(16px, calc((100% - 1180px) / 2 - 40px)); }
+  padding-inline: calc(max(0px, (100% - 1180px) / 2) + max(16px, env(safe-area-inset-left, 0px))); }   /* nimi ja valikko sisaltopalstan reunoihin */
 .topbar::before { content: ""; position: absolute; inset: 0 0 -24px; z-index: -1; pointer-events: none;
   background: linear-gradient(color-mix(in srgb, var(--bg) 88%, transparent), color-mix(in srgb, var(--bg) 82%, transparent) calc(100% - 24px), color-mix(in srgb, var(--bg) 40%, transparent));
   -webkit-backdrop-filter: blur(22px) saturate(1.6); backdrop-filter: blur(22px) saturate(1.6);
