@@ -593,13 +593,13 @@ table.hm { border-collapse: separate; border-spacing: 2px; font-variant-numeric:
 .hm td .ar { font-size: 0.55rem; margin-left: 3px; opacity: 0.55; vertical-align: 1px; }
 
 
-footer { color: var(--muted); font-size: 0.875rem; border-top: 1px solid var(--rule); padding: 26px 0 8px; margin-top: 24px; }
+footer { color: var(--muted); font-size: 0.875rem; border-top: 1px solid var(--line); padding: 18px 0 8px; margin-top: 48px; }
 footer p { margin: 0; }
-footer .frow { display: flex; justify-content: space-between; align-items: flex-start; gap: 20px 40px; flex-wrap: wrap; }
-footer .flinks { display: flex; flex-direction: column; align-items: flex-start; gap: 8px; }
+footer .frow { display: flex; justify-content: space-between; align-items: baseline; gap: 10px 40px; flex-wrap: wrap; }
+footer .flinks { display: flex; flex-wrap: wrap; gap: 6px 24px; }
 footer .flinks .lnk { font: inherit; color: var(--fg); background: none; border: 0; padding: 0; cursor: pointer; text-decoration: none; }
 footer .flinks .lnk:hover { text-decoration: underline; text-underline-offset: 3px; }
-footer .ffine { margin-top: 22px; padding-top: 12px; border-top: 1px solid var(--line); font-size: 0.78rem; }
+footer .ffine { font-size: 0.78rem; }
 .infod { width: min(760px, calc(100vw - 24px)); }
 .infod h2 { font-size: 1.1rem; font-weight: 600; margin: 0 4px 10px; padding-bottom: 8px; border-bottom: 1px solid var(--rule); }
 .infod .ibody { padding: 0 4px 6px; font-size: 0.9rem; line-height: 1.6; max-width: 72ch; }
@@ -1271,8 +1271,8 @@ footer .ffine { margin-top: 22px; padding-top: 12px; border-top: 1px solid var(-
   }   // aikasarjat ja taulukko omina taittuvina osioinaan kartan alla
 
   function renderFoot() {
-    $("foot").innerHTML = `<div class="frow"><nav class="flinks" aria-label="Sivuston tiedot"><button type="button" class="lnk" data-info="met">Menetelmä</button><button type="button" class="lnk" data-info="src">Lähteet</button><button type="button" class="lnk" id="updOpen2">Loki ja tulevat julkaisut</button></nav></div>
-      <p class="ffine">Suomen talouden suhdannetilanne avoimista tilastoista. Päivittyy arkisin.</p>`;
+    $("foot").innerHTML = `<div class="frow"><nav class="flinks" aria-label="Sivuston tiedot"><button type="button" class="lnk" data-info="met">Menetelmä</button><button type="button" class="lnk" data-info="src">Lähteet</button><button type="button" class="lnk" id="updOpen2">Loki ja tulevat julkaisut</button></nav>
+      <p class="ffine">Suomen talouden suhdannetilanne avoimista tilastoista. Päivittyy arkisin.</p></div>`;
     INFO.met = { t: "Menetelmä", h: `<p>${D.meta.method}</p><p>${D.meta.composite}</p><p>${D.meta.growth || ""}</p><p>${D.meta.charts || ""}</p>
       <p><b>Huomio.</b> ${D.meta.caveat} Kartan suurin piste on kokonaisindikaattori, ja viiva näyttää sen kulun kuuden kuukauden ajalta. Haaleat pisteet: sarjan viimeisin havainto on valittua ajankohtaa vanhempi. Ontot pisteet eivät ole mukana kokonaisindikaattorissa.</p>` };
     INFO.src = { t: "Lähteet", h: `<dl class="srcl">${(D.meta.sources || []).map(x => `<dt>${x.name}</dt><dd>${[].concat(x.items).join(", ")}</dd>`).join("")}</dl>
