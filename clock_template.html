@@ -200,8 +200,7 @@ body { font-variant-numeric: tabular-nums; background: var(--bg); min-height: 10
 .phh em { font-style: normal; font-size: 0.78rem; color: var(--muted); }
 #toast { position: fixed; left: 50%; bottom: 24px; transform: translate(-50%, 12px); z-index: 100; background: var(--fg); color: var(--bg); font-size: 0.84rem; padding: 8px 14px; border-radius: 8px; opacity: 0; pointer-events: none; transition: opacity .18s, transform .18s; }
 #toast.on { opacity: 1; transform: translate(-50%, 0); }
-.prenote { text-decoration: underline dotted color-mix(in srgb, var(--muted) 80%, transparent); text-underline-offset: 3px; cursor: help; }
-#perOut.pre { text-decoration: underline dotted color-mix(in srgb, var(--muted) 80%, transparent); text-underline-offset: 4px; cursor: help; }
+.ind .cnt { font-size: 0.78rem; font-weight: 400; color: var(--muted); margin-left: 6px; cursor: help; }
 .phrs { display: flex; flex-direction: column; gap: 10px; }
 .phr { display: grid; grid-template-columns: minmax(0, 1fr) 26px; align-items: center; gap: 16px; width: 100%; font: inherit; color: var(--fg); background: none; border: 0; padding: 0; cursor: pointer; text-align: left; }
 .phr .trk { position: relative; display: grid; grid-template-columns: repeat(var(--N), minmax(0, 18px)); align-items: center; gap: 3px; height: 28px; padding: 5px; box-sizing: border-box; border-radius: 7px; background: color-mix(in srgb, var(--line) 60%, transparent); }
@@ -842,6 +841,8 @@ footer .flinks .lnk:hover { text-decoration-color: currentColor; }
   const prelimIdx = () => new Set([].concat((set.composite && set.composite.prelim) || []).map(r => set.periods.indexOf(r.period)));
   const preInfo = k => { const r = [].concat((set.composite && set.composite.prelim) || []).find(x => set.periods.indexOf(x.period) === k); if (!r) return null;   // ennakkoluvun selite
     const m = [].concat(r.missing || []); return `Ennakkoluku: ${r.avail}/${r.n} sarjaa saatavilla.${m.length ? " Puuttuu: " + m.join(", ") + "." : ""} Puuttuvan sarjan tilalla on sen viimeisin arvo.`; };
+  const compCnt = () => { const p = at(comp(), idx); if (!p) return ""; const r = [].concat((set.composite && set.composite.prelim) || []).find(x => set.periods.indexOf(x.period) === p.i);   // ennakkoluku: saatavilla olevat sarjat
+    return r ? `<span class="cnt" title="${preInfo(p.i)}">${r.avail}/${r.n}</span>` : ""; };
   const lvlCF = (x, k) => { if (x.level[k] != null) return x.level[k]; const j = lastNN(x.level); return prelimIdx().has(k) && j >= 0 && j < k ? x.level[j] : 0; };
   // ryhmapiste: ryhman sarjojen tasojen keskiarvo (vain jaksot, joilla kaikki sarjat ovat saatavilla)
   // ryhman jasenet keskiarvoon: kokonaisindikaattorin sarjat (ei *-merkittyja), jos niita on
@@ -1019,7 +1020,6 @@ footer .flinks .lnk:hover { text-decoration-color: currentColor; }
     $("tailsLbl").textContent = `Kulku ${set.tail} ${set.freq === "M" ? "kk" : "nelj."}`;
     const r = $("per"); r.max = set.periods.length - 1; r.value = idx;
     $("perOut").textContent = fmtP(set.periods[idx]);
-    const pi = preInfo(idx), po = $("perOut"); po.classList.toggle("pre", !!pi); po.title = pi || "";
   }
   $("tails").addEventListener("change", e => { showTails = e.target.checked; update(); });
   $("per").addEventListener("input", e => { stopPlay(); idx = +e.target.value; update(); });
@@ -1037,7 +1037,7 @@ footer .flinks .lnk:hover { text-decoration-color: currentColor; }
     const cp = at(comp(), idx); let cq = null, hdr = "";            // ylaosa: kokonaisindikaattorin vaihe otsikkona, vaiheiden jakauma lokeropalkkeina
     if (cp) { cq = quad(cp.l, cp.c); const C = comp(); let k = cp.i;
       while (k > 0 && C.level[k - 1] != null && C.change[k - 1] != null && quad(C.level[k - 1], C.change[k - 1]) === cq) k--;
-      hdr = `<p class="phh" style="--qc:${qcol(cq)}"><span>${Q[cq].short}</span><em>${fmtP(set.periods[k])} alkaen${preInfo(cp.i) ? `, <abbr class="prenote" title="${preInfo(cp.i)}">${fmtP(set.periods[cp.i])} ennakkotieto</abbr>` : ""}</em></p>`; }
+      hdr = `<p class="phh" style="--qc:${qcol(cq)}"><span>${Q[cq].short}</span><em>${fmtP(set.periods[k])} alkaen</em></p>`; }
     $("hlead").innerHTML = "";
     $("summary").innerHTML = `<div class="phx${qf ? " f" : ""}">${hdr}<div class="phrs">${QORDER.map(q => `<button type="button" class="phr${q === cq ? " cur" : ""}${qf === q ? " on" : ""}" data-q="${q}" style="--qc:${qcol(q)};--N:${Math.max(n, 1)}" aria-pressed="${qf === q}" title="${Q[q].name}: ${counts[q]}/${n}. Klikkaa suodattaaksesi." aria-label="${Q[q].name}: ${counts[q]}"><span class="trk">${"<i></i>".repeat(counts[q])}<span class="nm"${counts[q] > n - 5 ? " hidden" : ""}>${Q[q].short}</span></span><b>${counts[q]}</b></button>`).join("")}</div></div>`;   // yksi lokero = yksi sarja
     $("summary").querySelectorAll("[data-q]").forEach(b => b.onclick = () => { qf = qf === b.dataset.q ? null : b.dataset.q; update(); });
@@ -1072,7 +1072,7 @@ footer .flinks .lnk:hover { text-decoration-color: currentColor; }
       const out = !s.comp && !s.in_composite;
       b.dataset.id = s.id;
       b.setAttribute("aria-label", `${s.label}${q ? ", " + Q[q].name : ""}${p ? `, taso ${fmtN(p.l)}, muutos ${fmtN(p.c)}` : ""}`);
-      b.innerHTML = `<span class="nm" title="${s.label}">${s.list || s.label}${s.invert ? ` <span class="inv" title="Käännetty sarja: nousu näkyy negatiivisena">käänt.</span>` : ""}${out ? `<sup title="Ei mukana kokonaisindikaattorissa">*</sup>` : ""}${s.comp ? "" : dotFor(seenD(s), "Uusi havainto")}</span>` +
+      b.innerHTML = `<span class="nm" title="${s.label}">${s.list || s.label}${s.invert ? ` <span class="inv" title="Käännetty sarja: nousu näkyy negatiivisena">käänt.</span>` : ""}${out ? `<sup title="Ei mukana kokonaisindikaattorissa">*</sup>` : ""}${s.comp ? compCnt() : dotFor(seenD(s), "Uusi havainto")}</span>` +
         strip(s);
       b.onclick = () => s.comp ? select(s.id) : pick(s.id);
       b.onmouseenter = () => hlPoints([s.id]); b.onmouseleave = () => hlPoints([]);
