@@ -4,8 +4,15 @@ on:
   schedule:
     - cron: "17 7 * * 1-5"   # varmistus: paaajastus Cloudflare Workerissa (src/worker.js)
   workflow_dispatch:
+    inputs:
+      pika:
+        description: "Pikajulkaisu: vain ulkoasu (clock_template.html), data edellisestä julkaisusta"
+        type: boolean
+        default: false
 
-concurrency: { group: paivitys, cancel-in-progress: false }
+# pikajulkaisu omassa jonossaan, jotta se ei odota eika korvaa jonossa olevaa taysajoa;
+# taysajo kokoaa sivun julkaisuhetken uusimmalla pohjalla, joten se ei palauta vanhaa ulkoasua
+concurrency: { group: "paivitys-${{ inputs.pika && 'pika' || 'taysi' }}", cancel-in-progress: false }
 
 jobs:
   build:
@@ -16,6 +23,7 @@ jobs:
 
       # jos ubuntu.com-nimet eivat ratkea ajokoneella (toistuva katko), apt kayttaa kernel.org-peilia
       - name: Apt-peili
+        if: ${{ !inputs.pika }}
         run: |
           if ! getent hosts archive.ubuntu.com >/dev/null || ! getent hosts azure.archive.ubuntu.com >/dev/null; then
             echo "ubuntu.com ei ratkea, vaihdetaan peili"
@@ -25,21 +33,24 @@ jobs:
 
       # R:n asennus kayttaa apt-peileja, jotka ovat ajoittain jumittuneet (DNS-virheet); aikaraja ja yksi uusi yritys
       - id: r1
+        if: ${{ !inputs.pika }}
         uses: r-lib/actions/setup-r@v2
         timeout-minutes: 8
         continue-on-error: true
         with: { use-public-rspm: true }
 
       - name: R (uusi yritys)
-        if: steps.r1.outcome != 'success'
+        if: ${{ !inputs.pika && steps.r1.outcome != 'success' }}
         uses: r-lib/actions/setup-r@v2
         timeout-minutes: 10
         with: { use-public-rspm: true }
 
       - name: R-paketit
+        if: ${{ !inputs.pika }}
         run: Rscript -e 'install.packages(c("httr", "jsonlite", "readxl"))'
 
       - name: Valimuisti (edelliset onnistuneet haut)
+        if: ${{ !inputs.pika }}
         uses: actions/cache@v4
         with:
           path: cache
@@ -48,9 +59,22 @@ jobs:
 
       - name: Aja putki
         id: run
+        if: ${{ !inputs.pika }}
         continue-on-error: true
         env: { LANG: C.UTF-8, STRICT: "1" }
         run: Rscript pipeline.R
+
+      - name: Pikajulkaisu (data edellisestä julkaisusta)
+        if: ${{ inputs.pika }}
+        run: |
+          curl -fsS --retry 3 -o clock.json https://suhdannetilanne.fi/clock.json
+          python3 tools/kokoa_sivu.py
+
+      - name: Uusin sivupohja (ajon aikana tehdyt ulkoasumuutokset)
+        if: ${{ !inputs.pika && hashFiles('clock.json') != '' }}
+        run: |
+          if git fetch -q --depth 1 origin main && git show origin/main:clock_template.html > /tmp/pohja.html; then mv /tmp/pohja.html clock_template.html; fi
+          python3 tools/kokoa_sivu.py
 
       - name: Kokoa julkaisu
         if: hashFiles('suhdannetilanne.html') != ''
