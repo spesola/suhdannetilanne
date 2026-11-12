@@ -914,7 +914,7 @@ for (set in cfg$sets) {
 # Lahdeluettelo generoidaan kaytossa olevista sarjoista: tuntematon koodi -> tarkistushuomio
 # ---------------------------------------------------------------------
 SRC_NAMES <- list(
-  statfin  = list(.n = "Tilastokeskus", ntp = "kansantalouden tilinpito", jtume = "julkisyhteisöjen tulot ja menot", jyev = "julkisyhteisöjen velka", rtp = "rahoitustilinpito",
+  statfin  = list(.n = "Tilastokeskus", ntp = "kansantalouden tilinpito", tpulk = "tavaroiden ja palveluiden ulkomaankauppa", jtume = "julkisyhteisöjen tulot ja menot", jyev = "julkisyhteisöjen velka", rtp = "rahoitustilinpito",
                   tyti = "työvoimatutkimus", atp = "avoimet työpaikat", tyonv = "työnvälitystilasto", ati = "ansiotasoindeksi",
                   ktps = "palkkasummakuvaajat", khi = "kuluttajahintaindeksi", kbar = "kuluttajabarometri",
                   ashi = "osakeasuntojen hinnat", asvu = "asuntojen vuokrat", raku = "rakennus- ja asuntotuotanto",

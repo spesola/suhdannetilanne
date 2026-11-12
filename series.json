@@ -887,6 +887,27 @@
                 "note": "Euroopan komission talouden ilmapiiri-indikaattori (ESI), pitkän ajan keskiarvo 100. Kausitasoitettu, neljänneksen keskiarvo. Lähde: Eurostat."
               },
               {
+                "title": "Tavaroiden ja palveluiden ulkomaankauppa, vuosimuutos %",
+                "lines": [
+                  "x_tp_x",
+                  "x_tp_xg",
+                  "x_tp_xs",
+                  "x_tp_m"
+                ],
+                "colors": {
+                  "x_tp_x": "var(--fg)",
+                  "x_tp_xg": "var(--accent)",
+                  "x_tp_xs": "var(--g3)",
+                  "x_tp_m": "var(--q-down)"
+                },
+                "dash": [
+                  "x_tp_m"
+                ],
+                "unit": "%",
+                "dec": 1,
+                "note": "Käyvin hinnoin, ei kausitasoitettu; muutos vuodentakaisesta neljänneksestä. Julkaistaan noin kaksi viikkoa ennen kansantalouden tilinpitoa. Lähde: Tilastokeskus, tavaroiden ja palveluiden ulkomaankauppa."
+              },
+              {
                 "title": "Vienti- ja tuontihinnat (2015=100)",
                 "lines": [
                   "x_px",
@@ -5840,6 +5861,62 @@
         "s_adj": "SA"
       },
       "to_quarter": true
+    },
+    {
+      "id": "x_tp_x",
+      "label": "Vienti yhteensä",
+      "set": "bkt",
+      "chart_only": true,
+      "source": "statfin",
+      "table": "tpulk/12gq.px",
+      "pick": {
+        "valtio_27_20180101": "ULK",
+        "taloustoimi_1_20180101": "GS",
+        "contentscode": "tpulk_C"
+      },
+      "pct_lag": 4
+    },
+    {
+      "id": "x_tp_xg",
+      "label": "Tavaravienti",
+      "set": "bkt",
+      "chart_only": true,
+      "source": "statfin",
+      "table": "tpulk/12gq.px",
+      "pick": {
+        "valtio_27_20180101": "ULK",
+        "taloustoimi_1_20180101": "G",
+        "contentscode": "tpulk_C"
+      },
+      "pct_lag": 4
+    },
+    {
+      "id": "x_tp_xs",
+      "label": "Palveluvienti",
+      "set": "bkt",
+      "chart_only": true,
+      "source": "statfin",
+      "table": "tpulk/12gq.px",
+      "pick": {
+        "valtio_27_20180101": "ULK",
+        "taloustoimi_1_20180101": "S",
+        "contentscode": "tpulk_C"
+      },
+      "pct_lag": 4
+    },
+    {
+      "id": "x_tp_m",
+      "label": "Tuonti yhteensä",
+      "set": "bkt",
+      "chart_only": true,
+      "source": "statfin",
+      "table": "tpulk/12gq.px",
+      "pick": {
+        "valtio_27_20180101": "ULK",
+        "taloustoimi_1_20180101": "GS",
+        "contentscode": "tpulk_D"
+      },
+      "pct_lag": 4
     },
     {
       "id": "x_ulc_fi",
