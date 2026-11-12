@@ -89,7 +89,7 @@ body { font-variant-numeric: tabular-nums; background: var(--bg); min-height: 10
 .wrap > .topbar { margin-bottom: -36px; }
 
 .topbar { display: flex; justify-content: space-between; align-items: stretch; gap: 10px 24px; flex-wrap: wrap; border-bottom: 1px solid var(--line); }
-.topbar .brand { padding: 6px 0 14px; }
+.topbar .brandw { display: flex; flex-direction: column; gap: 6px; padding: 6px 0 12px; }   /* paivitysrivi ja loki aina samassa paikassa nimen alla */
 .brand { display: inline-flex; align-items: center; gap: 9px; color: var(--fg); text-decoration: none; font-weight: 500; font-size: 1rem; letter-spacing: -0.01em; }
 .brand svg { width: 22px; height: 22px; flex: none; }
 .brand .tld { color: var(--muted); font-weight: 400; }
@@ -625,7 +625,7 @@ footer .ffine { font-size: 0.78rem; }
 
 <div class="wrap">
   <header class="topbar">
-    <a class="brand" href="./"><h1 id="headline">Suhdannetilanne</h1></a>
+    <div class="brandw"><a class="brand" href="./"><h1 id="headline">Suhdannetilanne</h1></a><p class="upd" id="sub"></p></div>
     <nav class="sets" id="sets" aria-label="Näkymä"></nav>
     <div class="thm" id="thm" role="group" aria-label="Väriteema">
       <button type="button" data-t="" title="Vaalea" aria-label="Vaalea teema" style="--sw:linear-gradient(135deg, #fbfbfc 50%, #1d4f7f 50%)"></button>
@@ -637,7 +637,7 @@ footer .ffine { font-size: 0.78rem; }
   <section class="hero">
     <div class="hlead" id="hlead"></div>
     <div class="kpirow" id="kpiRow"></div>
-    <div class="hsum"><div id="summary"></div><p class="upd" id="sub"></p></div>
+    <div class="hsum"><div id="summary"></div></div>
   </section>
 
   <section class="top" id="topSec">
