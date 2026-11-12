@@ -820,12 +820,22 @@ for (set in cfg$sets) {
            r3((if (is.null(s$raw_scale)) 1 else s$raw_scale) * a$value[match(periods, a$date)]) } else NULL)
   }, clock_members, res)
 
-  # kokonaisindikaattori: keskiarvo, vain jaksot joissa kaikki mukana olevat sarjat
+  # kokonaisindikaattori: keskiarvo jaksoilta, joilla kaikki mukana olevat sarjat ovat saatavilla;
+  # uusimmille jaksoille ennakkoluku, kun vahintaan COMP_MIN sarjoista on saatavilla: puuttuvan sarjan tilalla sen viimeisin arvo
+  # (koostumus ei muutu). Takautuva testi 11/2026: 2/18 puuttuessa keskim. ero lopulliseen 0,01, 12/18 puuttuessa 0,05 (maks. 0,4).
+  COMP_MIN <- 0.75
   comp_ids <- which(vapply(inds, function(x) x$in_composite, logical(1)))
   L <- sapply(inds[comp_ids], function(x) unlist(lapply(x$level, function(v) if (is.null(v)) NA else v)))
-  comp_lvl <- rowMeans(L)                            # NA jos yksikin puuttuu
+  full_lvl <- rowMeans(L)                            # NA jos yksikin puuttuu
+  i_full <- max(which(!is.na(full_lvl))); comp_lvl <- full_lvl; comp_prelim <- list()
+  Lf <- L; for (j in seq_len(ncol(L))) { k <- max(which(!is.na(L[, j]))); if (k < nrow(L)) Lf[(k + 1):nrow(L), j] <- L[k, j] }
+  for (i in seq_len(nrow(L))[-seq_len(i_full)]) {    # perakkaiset jaksot taydellisen jalkeen
+    av <- sum(!is.na(L[i, ])); if (av / ncol(L) < COMP_MIN) break
+    comp_lvl[i] <- mean(Lf[i, ])
+    comp_prelim[[length(comp_prelim) + 1]] <- list(period = periods[i], avail = av, n = ncol(L),
+      missing = unname(vapply(inds[comp_ids][is.na(L[i, ])], function(x) x$label, ""))) }
   dl <- c(NA, diff(comp_lvl))
-  comp_chg <- dl / sd(dl, na.rm = TRUE)
+  comp_chg <- dl / sd(c(NA, diff(full_lvl)), na.rm = TRUE)   # skaalaus taydellisista jaksoista
   comp_last <- periods[max(which(!is.na(comp_lvl)))]
 
   # indikaattorikohtaiset osatekijakuviot, laskutapa set$contribs[[ryhma]]$calc:
@@ -896,7 +906,7 @@ for (set in cfg$sets) {
   sets_out[[length(sets_out) + 1]] <- list(
     id = set$id, label = set$label, freq = freq, default = isTRUE(set$default),
     tail = TAIL_N[[freq]], groups = set$groups, lead = set$lead, periods = periods,
-    composite = list(last = comp_last, level = r3(comp_lvl), change = r3(comp_chg)),
+    composite = list(last = comp_last, level = r3(comp_lvl), change = r3(comp_chg), prelim = comp_prelim),
     indicators = unname(inds), series = unname(cser), contribs = contribs)
 }
 
@@ -993,7 +1003,7 @@ out <- list(
                     "Riskilisä on Suomen ja Saksan 10 vuoden korkojen ero."),
     caveat = paste0("Trendisuotimen loppupisteet tarkentuvat uuden datan myötä, ",
                     "joten viimeisimmät pisteet voivat siirtyä."),
-    composite = paste0("Kokonaisindikaattori: sarjojen tasojen keskiarvo jaksoilta, joilla kaikki sarjat ovat saatavilla. BKT ei ole mukana keskiarvossa. Käyttöaste, konkurssit ja tavaravienti näkyvät kartalla, mutta eivät ole mukana keskiarvossa; tavaravienti julkaistaan muita myöhemmin.", VALID_TXT),
+    composite = paste0("Kokonaisindikaattori: sarjojen tasojen keskiarvo. Uusimmille kuukausille lasketaan ennakkoluku, kun vähintään 75 % sarjoista on saatavilla; puuttuvan sarjan tilalla käytetään sen viimeisintä arvoa. BKT ei ole mukana keskiarvossa. Käyttöaste, konkurssit ja tavaravienti näkyvät kartalla, mutta eivät ole mukana keskiarvossa; tavaravienti julkaistaan muita myöhemmin.", VALID_TXT),
     sources = sources_out),
   sets = sets_out)
 

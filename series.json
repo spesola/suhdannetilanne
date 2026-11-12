@@ -1206,33 +1206,22 @@
       "id": "rahoitus",
       "kpis": [
         {
-          "label": "EKP:n talletuskorko",
-          "series": "dfr",
-          "row": "dfr_d",
-          "dec": 2,
-          "unit": "%",
-          "cmp": {
-            "kind": "kp",
-            "label": "vuodessa"
-          }
-        },
-        {
-          "label": "10 v korko, euroalue",
-          "series": "h_y10_ea",
-          "row": "y10_ea",
-          "dec": 2,
-          "unit": "%",
-          "cmp": {
-            "kind": "kp",
-            "label": "vuodessa"
-          }
-        },
-        {
           "label": "EUR/USD",
           "series": "h_eurusd",
           "row": "eurusd",
           "dec": 3,
           "unit": "",
+          "cmp": {
+            "kind": "pct",
+            "label": "vuodessa"
+          }
+        },
+        {
+          "label": "Brent-öljy",
+          "series": "h_brent",
+          "row": "brent",
+          "dec": 2,
+          "unit": "$",
           "cmp": {
             "kind": "pct",
             "label": "vuodessa"
@@ -1248,6 +1237,16 @@
             "kind": "yago",
             "label": "vuosi sitten",
             "unit": "%"
+          }
+        },
+        {
+          "label": "Volatiliteetti (VSTOXX)",
+          "series": "vstoxx",
+          "dec": 1,
+          "unit": "",
+          "cmp": {
+            "kind": "diff",
+            "label": "vuodessa"
           }
         }
       ],
@@ -1302,10 +1301,6 @@
             },
             {
               "id": "asuntokorko"
-            },
-            {
-              "id": "ciss",
-              "group": "Rahoitusolot"
             }
           ],
           "note": "Korkojen muutokset korkopisteinä. Kuukausisarjoista vain muutos vuoden alusta. Lähteet: EKP, Suomen Pankki. Klikkaa riviä nähdäksesi historian.",
@@ -1704,15 +1699,20 @@
         },
         {
           "id": "clifs",
-          "title": "Rahoitusstressi, Suomi (CLIFS)",
+          "title": "Rahoitusstressi, Suomi ja euroalue",
           "unit": "",
           "dec": 2,
           "lines": [
-            "clifs"
+            "clifs",
+            "ciss_m"
           ],
-          "note": "Kuukausiarvot. Lähde: EKP.",
+          "note": "Indeksit asteikolla 0–1, suurempi arvo tarkoittaa suurempaa stressiä. CLIFS: kuukausiarvo, CISS: kuukauden viimeinen havainto. Lähde: EKP.",
           "section": "Riskit ja epävarmuus",
-          "size": "half"
+          "size": "half",
+          "labels": {
+            "clifs": "Suomi (CLIFS)",
+            "ciss_m": "Euroalue (CISS)"
+          }
         },
         {
           "id": "epu",
@@ -4026,6 +4026,16 @@
     },
     {
       "set": "rahoitus",
+      "id": "ciss_m",
+      "label": "Rahoitusstressi (CISS, euroalue)",
+      "source": "ecb",
+      "flow": "CISS",
+      "key": "D.U2.Z0Z.4F.EC.SS_CIN.IDX",
+      "handling": "none",
+      "kind": "level"
+    },
+    {
+      "set": "rahoitus",
       "id": "epu",
       "label": "Talouspoliittinen epävarmuus (Eurooppa)",
       "source": "fred",
@@ -4317,22 +4327,6 @@
       "unit": "%-yks.",
       "handling": "none",
       "kind": "level"
-    },
-    {
-      "id": "ciss",
-      "label": "Rahoitusstressi (CISS, euroalue)",
-      "set": "rahoitus",
-      "table_only": true,
-      "daily": true,
-      "source": "ecb",
-      "flow": "CISS",
-      "key": "D.U2.Z0Z.4F.EC.SS_CIN.IDX",
-      "chg": "abs",
-      "dec": 3,
-      "unit": "",
-      "handling": "none",
-      "kind": "level",
-      "short": "Rahoitusstressi, euroalue (CISS)"
     },
     {
       "id": "eer_d",
