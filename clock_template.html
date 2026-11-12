@@ -14,9 +14,9 @@
 <meta name="claude:viewport-fit-sides" content="cover">
 <link rel="preload" href="fonts/manrope-latin.woff2" as="font" type="font/woff2" crossorigin>
 <style>@font-face { font-family: "Manrope"; font-style: normal; font-weight: 200 800; font-display: swap; src: url("fonts/manrope-latin.woff2") format("woff2"); }</style>
-<script>try { const t = new URLSearchParams(location.search).get("teema") || localStorage.getItem("teema"); if (t === "vapor" || t === "paperi" || t === "kortit") document.documentElement.dataset.theme = t; } catch (e) {}
+<script>try { const t = new URLSearchParams(location.search).get("teema") || localStorage.getItem("teema"); if (t === "vapor" || t === "vaporc" || t === "paperi" || t === "kortit") document.documentElement.dataset.theme = t; } catch (e) {}
 function vaporFont() { if (document.getElementById("vfont")) return; const l = document.createElement("link"); l.id = "vfont"; l.rel = "stylesheet"; l.href = "https://fonts.googleapis.com/css2?family=Orbitron:wght@500&display=swap"; document.head.appendChild(l); }
-if (document.documentElement.dataset.theme === "vapor") vaporFont();
+if (/^vapor/.test(document.documentElement.dataset.theme || "")) vaporFont();
 function paperFont() { if (document.getElementById("pfont")) return; const l = document.createElement("link"); l.id = "pfont"; l.rel = "stylesheet"; l.href = "https://fonts.googleapis.com/css2?family=Mona+Sans:wdth,wght@75..125,300..800&family=Martian+Mono:wght@400;500&display=swap"; document.head.appendChild(l); }
 if (document.documentElement.dataset.theme === "paperi") paperFont();</script>
 <style>
@@ -42,11 +42,28 @@ tr.pick:hover > th { color: var(--accent); }
 /* Kortit-teema (valinnainen): oletusvarit ja -fontti, kuviot ja taulukot valkoisina kortteina vaalealla reunaviivalla */
 :root[data-theme="kortit"] .card { border: 1px solid var(--line); border-radius: 10px; background: #fff; padding: 16px 18px; }
 :root[data-theme="kortit"] .zoom .card.fcard, :root[data-theme="kortit"] #tsContrib .card { border: 0; padding: 0; background: none; }
-:root[data-theme="kortit"] .card > .more { top: 12px; right: 10px; }
-:root[data-theme="kortit"] .haszoom > .more:not(.zb), :root[data-theme="kortit"] .haszoom > .cmenu { right: 40px; }
-:root[data-theme="kortit"] .card > .cmenu { top: 42px; }
-:root[data-theme="kortit"] #tsContrib .card > .more, :root[data-theme="kortit"] .zoom .card > .more { top: -4px; right: -6px; }
-:root[data-theme="kortit"] #tsContrib .haszoom > .more:not(.zb), :root[data-theme="kortit"] .zoom .haszoom > .more:not(.zb) { right: 24px; }
+:root[data-theme="vaporc"] .card { border: 1px solid color-mix(in srgb, #b68cff 30%, transparent); border-image: none; border-radius: 10px; background: #0e0a1a; padding: 16px 18px; }
+:root[data-theme="vaporc"] .zoom .card.fcard, :root[data-theme="vaporc"] #tsContrib .card { border: 0; padding: 0; background: none; }
+:root[data-theme="vaporc"] { --plot: #0e0a1a; }
+:root:is([data-theme="kortit"], [data-theme="paperi"], [data-theme="vaporc"]) .card > .more { top: 12px; right: 10px; }
+:root:is([data-theme="kortit"], [data-theme="paperi"], [data-theme="vaporc"]) .haszoom > .more:not(.zb), :root:is([data-theme="kortit"], [data-theme="paperi"], [data-theme="vaporc"]) .haszoom > .cmenu { right: 40px; }
+:root:is([data-theme="kortit"], [data-theme="paperi"], [data-theme="vaporc"]) .card > .cmenu { top: 42px; }
+:root:is([data-theme="kortit"], [data-theme="paperi"], [data-theme="vaporc"]) #tsContrib .card > .more, :root:is([data-theme="kortit"], [data-theme="paperi"], [data-theme="vaporc"]) .zoom .card > .more { top: -4px; right: -6px; }
+:root:is([data-theme="kortit"], [data-theme="paperi"], [data-theme="vaporc"]) #tsContrib .haszoom > .more:not(.zb), :root:is([data-theme="kortit"], [data-theme="paperi"], [data-theme="vaporc"]) .zoom .haszoom > .more:not(.zb) { right: 24px; }
+/* korttiteemat: tiiviimmat kortien valit ja avainluvut yhtena korttina */
+:root:is([data-theme="kortit"], [data-theme="paperi"], [data-theme="vaporc"]) .top { gap: 24px; }
+:root:is([data-theme="kortit"], [data-theme="paperi"], [data-theme="vaporc"]) .tsgrid, :root:is([data-theme="kortit"], [data-theme="paperi"], [data-theme="vaporc"]) .grrow { gap: 24px; }
+:root:is([data-theme="kortit"], [data-theme="paperi"], [data-theme="vaporc"]) .grleft, :root:is([data-theme="kortit"], [data-theme="paperi"], [data-theme="vaporc"]) .grside, :root:is([data-theme="kortit"], [data-theme="paperi"], [data-theme="vaporc"]) .grpair { gap: 24px; }
+:root:is([data-theme="kortit"], [data-theme="paperi"], [data-theme="vaporc"]) .fgrid { column-gap: 24px; }
+:root:is([data-theme="kortit"], [data-theme="paperi"], [data-theme="vaporc"]) .fgrid > * { margin-bottom: 24px; }
+:root:is([data-theme="kortit"], [data-theme="paperi"], [data-theme="vaporc"]) .fgrid > .fsec { margin-bottom: 14px; }
+:root:is([data-theme="kortit"], [data-theme="paperi"], [data-theme="vaporc"]) .fgrid > :last-child { margin-bottom: 0; }
+:root:is([data-theme="kortit"], [data-theme="paperi"], [data-theme="vaporc"]) .kpirow { border: 1px solid var(--line); border-radius: 10px; overflow: hidden; background: var(--plot); }
+:root:is([data-theme="kortit"], [data-theme="paperi"], [data-theme="vaporc"]) .kpi, :root:is([data-theme="kortit"], [data-theme="paperi"], [data-theme="vaporc"]) .kpi:first-child { padding-left: 22px; padding-right: 22px; background: none; }
+:root[data-theme="kortit"] .kpirow { background: #fff; }
+:root[data-theme="paperi"] .kpirow { border-color: var(--rule); background: var(--surface); }
+:root[data-theme="vaporc"] .kpirow { border-color: color-mix(in srgb, #b68cff 30%, transparent); border-image: none; background: #0e0a1a; }
+@media (max-width: 860px) { :root:is([data-theme="kortit"], [data-theme="paperi"], [data-theme="vaporc"]) .kpi, :root:is([data-theme="kortit"], [data-theme="paperi"], [data-theme="vaporc"]) .kpi:nth-child(odd) { padding-left: 16px; padding-right: 12px; } }
 /* Paperi-teema (valinnainen): kermanvarinen pohja, rajatut kortit, metsanvihrea, ruoste ja sinapinkeltainen; Mona Sans ja Martian Mono */
 :root[data-theme="paperi"] { --bg: #f2ede2; --surface: #fbf8f1; --plot: #fbf8f1; --fg: #1c1a17; --muted: #6f675b; --line: #e2d9c6; --grid: #e9e2d2; --rule: #2b2620; --pt: #3a342c;
   --accent: #1f4a3a; --q-up: #1f4a3a; --q-turn: #d9961a; --q-down: #b0532c; --q-rec: #47698a;
@@ -60,40 +77,35 @@ tr.pick:hover > th { color: var(--accent); }
 :root[data-theme="paperi"] .legend, :root[data-theme="paperi"] .fmeta, :root[data-theme="paperi"] .kpiy, :root[data-theme="paperi"] .meta { font-family: var(--font-mono); font-size: 0.68rem; text-transform: uppercase; letter-spacing: 0.04em; }
 :root[data-theme="paperi"] .legend span.sq::before, :root[data-theme="paperi"] .fsub .si.sq::before { outline: 1px solid var(--rule); outline-offset: -1px; }
 :root[data-theme="paperi"] .kpi { background: var(--surface); }
-:root[data-theme="paperi"] .card > .more { top: 12px; right: 10px; }
-:root[data-theme="paperi"] .haszoom > .more:not(.zb), :root[data-theme="paperi"] .haszoom > .cmenu { right: 40px; }
-:root[data-theme="paperi"] .card > .cmenu { top: 42px; }
-:root[data-theme="paperi"] #tsContrib .card > .more, :root[data-theme="paperi"] .zoom .card > .more { top: -4px; right: -6px; }
-:root[data-theme="paperi"] #tsContrib .haszoom > .more:not(.zb), :root[data-theme="paperi"] .zoom .haszoom > .more:not(.zb) { right: 24px; }
 /* Vaporwave-teema (valinnainen): musta tausta, auringonlasku-neonvarit */
-:root[data-theme="vapor"] { --bg: #07050d; --surface: #07050d; --plot: #0c0816; --fg: #ece4f7; --muted: #a892c9; --line: #2a1c42; --grid: #191029; --rule: #e7d6ff; --pt: #d8c4f6;
+:root:is([data-theme="vapor"], [data-theme="vaporc"]) { --bg: #07050d; --surface: #07050d; --plot: #0c0816; --fg: #ece4f7; --muted: #a892c9; --line: #2a1c42; --grid: #191029; --rule: #e7d6ff; --pt: #d8c4f6;
   --accent: #b68cff; --q-up: #2de2e6; --q-turn: #ffa23d; --q-down: #ff3d7f; --q-rec: #6f86ff;
   --g1: #ff4fd8; --g2: #ffb347; --g3: #2de2e6; --g4: #9d8bd1; --g5: #f9e14f; --g6: #6f86ff; --g7: #ff8fab; --g8: #7fe0c3; --dim: #3b2d55;
   --hatch: #c9b6ea; --hover-line: color-mix(in srgb, #2de2e6 70%, transparent); --fc-zone: color-mix(in srgb, #8f3dff 14%, transparent);
   --vgrad: linear-gradient(90deg, #ffb347 0%, #ff4fd8 55%, #8f7dff 100%); --font-head: "Orbitron", "Manrope", system-ui, sans-serif;
   color-scheme: dark; scrollbar-color: #4a2f75 #07050d; }
-:root[data-theme="vapor"] ::selection { background: #ff4fd8; color: #07050d; }
+:root:is([data-theme="vapor"], [data-theme="vaporc"]) ::selection { background: #ff4fd8; color: #07050d; }
 /* lampokartat vaporwavessa: lapikuultava taytto ja neonkehys */
-:root[data-theme="vapor"] .hm td.hc { background: color-mix(in srgb, var(--hc) var(--hv), transparent); box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--hc) 70%, transparent); color: #fff; }
-:root[data-theme="vapor"] tr.pick:hover > td.hc, :root[data-theme="vapor"] tr.pick:hover > td { filter: brightness(1.3); }
-:root[data-theme="vapor"] .strip i { background: color-mix(in srgb, var(--qc) 62%, var(--surface)); }
+:root:is([data-theme="vapor"], [data-theme="vaporc"]) .hm td.hc { background: color-mix(in srgb, var(--hc) var(--hv), transparent); box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--hc) 70%, transparent); color: #fff; }
+:root:is([data-theme="vapor"], [data-theme="vaporc"]) tr.pick:hover > td.hc, :root:is([data-theme="vapor"], [data-theme="vaporc"]) tr.pick:hover > td { filter: brightness(1.3); }
+:root:is([data-theme="vapor"], [data-theme="vaporc"]) .strip i { background: color-mix(in srgb, var(--qc) 62%, var(--surface)); }
 /* aurinko yläpalkin takana */
-:root[data-theme="vapor"] body::before { content: ""; position: absolute; left: 50%; top: -60px; width: 300px; height: 150px; transform: translateX(-50%); border-radius: 150px 150px 0 0;
+:root:is([data-theme="vapor"], [data-theme="vaporc"]) body::before { content: ""; position: absolute; left: 50%; top: -60px; width: 300px; height: 150px; transform: translateX(-50%); border-radius: 150px 150px 0 0;
   background: linear-gradient(180deg, #ffb347 0%, #ff4fd8 75%, #8f3dff 100%); opacity: 0.16; pointer-events: none; z-index: 0;
   -webkit-mask: repeating-linear-gradient(180deg, #000 0 11px, transparent 11px 16px); mask: repeating-linear-gradient(180deg, #000 0 11px, transparent 11px 16px); }
-:root[data-theme="vapor"] .wrap { position: relative; z-index: 1; }
+:root:is([data-theme="vapor"], [data-theme="vaporc"]) .wrap { position: relative; z-index: 1; }
 /* liukuvariaksentit */
-:root[data-theme="vapor"] .sets button[aria-pressed="true"] { border-bottom-color: transparent; border-image: var(--vgrad) 1; }
-:root[data-theme="vapor"] .card, :root[data-theme="vapor"] .tiles { border-image: linear-gradient(90deg, rgba(255,179,71,.65), rgba(255,79,216,.65) 55%, rgba(143,125,255,.65)) 1; }
-:root[data-theme="vapor"] .hp i { box-shadow: 0 0 14px 2px var(--qc); }
+:root:is([data-theme="vapor"], [data-theme="vaporc"]) .sets button[aria-pressed="true"] { border-bottom-color: transparent; border-image: var(--vgrad) 1; }
+:root:is([data-theme="vapor"], [data-theme="vaporc"]) .card, :root:is([data-theme="vapor"], [data-theme="vaporc"]) .tiles { border-image: linear-gradient(90deg, rgba(255,179,71,.65), rgba(255,79,216,.65) 55%, rgba(143,125,255,.65)) 1; }
+:root:is([data-theme="vapor"], [data-theme="vaporc"]) .hp i { box-shadow: 0 0 14px 2px var(--qc); }
 /* hehku pisteisiin */
-:root[data-theme="vapor"] svg.fc circle, :root[data-theme="vapor"] #clock circle { filter: drop-shadow(0 0 3px color-mix(in srgb, var(--accent) 60%, transparent)); }
+:root:is([data-theme="vapor"], [data-theme="vaporc"]) svg.fc circle, :root:is([data-theme="vapor"], [data-theme="vaporc"]) #clock circle { filter: drop-shadow(0 0 3px color-mix(in srgb, var(--accent) 60%, transparent)); }
 /* retrofontti otsikoihin */
-:root[data-theme="vapor"] .brand h1 { font-family: var(--font-head); font-weight: 700; letter-spacing: 0.02em; font-size: 1.45rem; }
-:root[data-theme="vapor"] .fsec, :root[data-theme="vapor"] .hp { font-family: var(--font-head); font-weight: 500; letter-spacing: 0.02em; }
-:root[data-theme="vapor"] body { background: radial-gradient(1100px 520px at 50% -140px, rgba(150, 40, 220, 0.32), transparent 70%), var(--bg); background-repeat: no-repeat; }
-:root[data-theme="vapor"] .brand h1 { background: linear-gradient(90deg, #ffb347 0%, #ff4fd8 55%, #8f7dff 100%); -webkit-background-clip: text; background-clip: text; color: transparent; }
-:root[data-theme="vapor"] svg.fc path[fill="none"] { filter: drop-shadow(0 0 2.5px color-mix(in srgb, var(--accent) 45%, transparent)); }
+:root:is([data-theme="vapor"], [data-theme="vaporc"]) .brand h1 { font-family: var(--font-head); font-weight: 700; letter-spacing: 0.02em; font-size: 1.45rem; }
+:root:is([data-theme="vapor"], [data-theme="vaporc"]) .fsec, :root:is([data-theme="vapor"], [data-theme="vaporc"]) .hp { font-family: var(--font-head); font-weight: 500; letter-spacing: 0.02em; }
+:root:is([data-theme="vapor"], [data-theme="vaporc"]) body { background: radial-gradient(1100px 520px at 50% -140px, rgba(150, 40, 220, 0.32), transparent 70%), var(--bg); background-repeat: no-repeat; }
+:root:is([data-theme="vapor"], [data-theme="vaporc"]) .brand h1 { background: linear-gradient(90deg, #ffb347 0%, #ff4fd8 55%, #8f7dff 100%); -webkit-background-clip: text; background-clip: text; color: transparent; }
+:root:is([data-theme="vapor"], [data-theme="vaporc"]) svg.fc path[fill="none"] { filter: drop-shadow(0 0 2.5px color-mix(in srgb, var(--accent) 45%, transparent)); }
 .thm { display: flex; align-items: center; gap: 7px; }
 .thm button { width: 16px; height: 16px; padding: 0; border-radius: 50%; border: 1px solid var(--line); cursor: pointer; background: var(--sw); }
 .thm button[aria-pressed="true"] { box-shadow: 0 0 0 2px var(--bg), 0 0 0 3.5px var(--fg); }
@@ -179,7 +191,7 @@ body { font-variant-numeric: tabular-nums; background: var(--bg); min-height: 10
 .kpic { font-size: 0.78rem; color: var(--muted); margin-top: 3px; min-height: 1.2em; }
 .kpic b { color: var(--fg); font-weight: 500; white-space: nowrap; }
 .kpi svg { display: block; width: 100%; height: 72px; margin-top: 12px; }
-:root[data-theme="vapor"] .kpi svg path.ln { filter: drop-shadow(0 0 4px var(--accent)); }
+:root:is([data-theme="vapor"], [data-theme="vaporc"]) .kpi svg path.ln { filter: drop-shadow(0 0 4px var(--accent)); }
 .kpiy { display: flex; justify-content: space-between; font-size: 0.78rem; color: var(--muted); margin-top: 5px; font-variant-numeric: tabular-nums; }
 .hero.haskpi .hsum { margin-top: 14px; }
 @media (max-width: 860px) {
@@ -215,14 +227,16 @@ body { font-variant-numeric: tabular-nums; background: var(--bg); min-height: 10
 .phn { font-size: 0.75rem; color: var(--muted); margin: 10px 0 0; }
 .phn i { display: inline-block; width: 11px; height: 11px; border-radius: 2px; background: var(--muted); box-shadow: 0 0 0 1.5px var(--bg), 0 0 0 3px var(--fg); vertical-align: -1px; margin: 0 7px 0 2px; }
 @media (max-width: 560px) { .phb b { font-size: 2.5rem; } .phr { grid-template-columns: 92px minmax(0, calc(var(--N) * 20px)) auto; gap: 10px; } .phr .sq { gap: 3px; } }
-:root[data-theme="vapor"] .phr.cur .sq i:not(.new) { box-shadow: 0 0 8px color-mix(in srgb, var(--qc) 70%, transparent); }
-:root[data-theme="vapor"] .phb b { text-shadow: 0 0 14px var(--qc); }
+:root:is([data-theme="vapor"], [data-theme="vaporc"]) .phr.cur .sq i:not(.new) { box-shadow: 0 0 8px color-mix(in srgb, var(--qc) 70%, transparent); }
+:root:is([data-theme="vapor"], [data-theme="vaporc"]) .phb b { text-shadow: 0 0 14px var(--qc); }
 #toast { position: fixed; left: 50%; bottom: 24px; transform: translate(-50%, 12px); z-index: 100; background: var(--fg); color: var(--bg); font-size: 0.84rem; padding: 8px 14px; border-radius: 8px; opacity: 0; pointer-events: none; transition: opacity .18s, transform .18s; }
 #toast.on { opacity: 1; transform: translate(-50%, 0); }
 #tip { position: fixed; z-index: 120; max-width: 320px; background: var(--fg); color: var(--bg); font-size: 0.76rem; line-height: 1.4; padding: 5px 9px; border-radius: 6px;
   box-shadow: 0 4px 14px rgba(0, 0, 0, .14); pointer-events: none; opacity: 0; transform: translateY(3px); transition: opacity .12s, transform .12s; }
 #tip.on { opacity: 1; transform: none; }
-#tip span { display: block; opacity: .72; }
+#tip b { display: block; font-weight: 600; }
+#tip span { display: flex; align-items: center; gap: 6px; opacity: .78; }
+#tip span i { width: 8px; height: 8px; border-radius: 50%; flex: none; }
 .ind .cnt { font-size: 0.78rem; font-weight: 400; color: var(--muted); margin-left: 6px; cursor: default; }
 .sbar { display: flex; gap: 12px; margin: 2px 0; }
 .sbar button { display: flex; gap: 4px; flex: 0 1 calc(var(--n) * 20px + (var(--n) - 1) * 4px); min-width: 0; border: 0; padding: 0; background: none; cursor: pointer; border-radius: 3px; }
@@ -259,7 +273,7 @@ body { font-variant-numeric: tabular-nums; background: var(--bg); min-height: 10
 #clock text { font-family: var(--font-body); }
 .pt { cursor: pointer; }
 .pt .lbl { opacity: 0; transition: opacity .12s; pointer-events: none; }
-.pt:hover .lbl, .pt.sel .lbl, .pt.comp .lbl { opacity: 1; }
+.pt.sel .lbl, .pt.comp .lbl { opacity: 1; }   /* hover: nimi ja arvot vihjeessa, ei erillista nimea */
 .tg { display: inline-flex; align-items: center; gap: 6px; font-size: 0.875rem; color: var(--muted); cursor: pointer; }
 .tg input { appearance: none; -webkit-appearance: none; width: 28px; height: 16px; border-radius: 8px; background: var(--line); position: relative; margin: 0; cursor: pointer; transition: background .15s; flex: none; }
 .tg input::after { content: ""; position: absolute; top: 2px; left: 2px; width: 12px; height: 12px; border-radius: 50%; background: #fff; box-shadow: 0 1px 2px rgba(0,0,0,.2); transition: transform .15s; }
@@ -459,7 +473,7 @@ body { font-variant-numeric: tabular-nums; background: var(--bg); min-height: 10
 .updg .ud { font-size: 0.78rem; color: var(--muted); margin: 14px 0 2px; }
 .updg .ud.now { color: var(--fg); font-weight: 600; }
 .fresh { display: inline-block; width: 7px; height: 7px; border-radius: 50%; background: #3b82f6; margin-left: 6px; vertical-align: 1px; box-shadow: 0 0 0 2px color-mix(in srgb, #3b82f6 22%, transparent); }
-:root[data-theme="vapor"] .fresh { background: #4dc9ff; box-shadow: 0 0 6px #4dc9ff; }
+:root:is([data-theme="vapor"], [data-theme="vaporc"]) .fresh { background: #4dc9ff; box-shadow: 0 0 6px #4dc9ff; }
 .updg .us { font-size: 0.78rem; font-weight: 600; margin: 8px 0 0; }
 .updg .ui { display: flex; justify-content: space-between; gap: 12px; font-size: 0.875rem; padding: 3px 0; border-bottom: 1px solid var(--grid); }
 .updg .ui a { color: inherit; text-decoration: none; } .updg .ui a:hover { text-decoration: underline; }
@@ -709,6 +723,7 @@ footer .flinks .lnk:hover { text-decoration-color: currentColor; }
         <button type="button" data-t="kortit" title="Kortit" aria-label="Kortit-teema" style="--sw:linear-gradient(135deg, #ffffff 50%, #d9dde3 50%)"></button>
         <button type="button" data-t="paperi" title="Paperi" aria-label="Paperi-teema" style="--sw:conic-gradient(#1f4a3a 0 33%, #b0532c 0 66%, #e2a019 0)"></button>
         <button type="button" data-t="vapor" title="Vaporwave" aria-label="Vaporwave-teema" style="--sw:linear-gradient(180deg, #ffb347 0%, #ff4fd8 50%, #2b0a4d 100%)"></button>
+        <button type="button" data-t="vaporc" title="Vaporwave, kortit" aria-label="Vaporwave-korttiteema" style="--sw:linear-gradient(135deg, #ff4fd8 50%, #1a1030 50%)"></button>
       </div>
     </div>
   </div>
@@ -980,7 +995,10 @@ footer .flinks .lnk:hover { text-decoration-color: currentColor; }
       lbl.textContent = many && hi(s) ? (s.map || s.list || s.label) : s.label;   // useita valittuna: lyhyet nimet
       if (s.comp) { lbl.setAttribute("font-weight", 600); placed.push(lbl); }   // kokonaisindikaattorin nimi aina nakyvissa
       if (sel === s.id) lbl.setAttribute("font-weight", 600);
-      g.dataset.tip = s.label; g.dataset.sub = (p.stale && !s.comp ? "Viimeisin havainto " : "") + `${fmtP(set.periods[p.i])}: taso ${fmtN(p.l)}, muutos ${fmtN(p.c)}.` + (!s.comp && !s.isGroup && !s.in_composite ? " Ei mukana kokonaisindikaattorissa." : "");
+      const pq = quad(p.l, p.c);
+      g.dataset.tip = s.label; g.dataset.side = "1"; g.dataset.qc = qcol(pq);
+      g.dataset.sub = `${Q[pq].short} ${fmtP(set.periods[p.i])}${p.stale && !s.comp ? " (uusin havainto)" : ""}\ntaso ${fmtN(p.l)}, muutos ${fmtN(p.c)}` +
+        (!s.comp && !s.isGroup && !s.in_composite ? "\nei mukana kokonaisindikaattorissa" : "");
       if (hi(s)) placed.push(lbl);
       g.addEventListener("click", () => s.comp || s.isGroup ? select(s.id) : pick(s.id));
       g.addEventListener("mouseenter", () => { if (svg.lastChild !== g) svg.appendChild(g); hlRow(s.id);
@@ -2383,7 +2401,7 @@ footer .flinks .lnk:hover { text-decoration-color: currentColor; }
   (function () {                                                    // teeman valinta: vaalea tai vaporwave, muistetaan selaimessa
     const bs = [...document.querySelectorAll("#thm button")], cur = () => document.documentElement.dataset.theme || "";
     const mark = () => bs.forEach(b => b.setAttribute("aria-pressed", b.dataset.t === cur()));
-    bs.forEach(b => b.onclick = () => { if (b.dataset.t) { document.documentElement.dataset.theme = b.dataset.t; if (b.dataset.t === "vapor") vaporFont(); if (b.dataset.t === "paperi") paperFont(); } else delete document.documentElement.dataset.theme;
+    bs.forEach(b => b.onclick = () => { if (b.dataset.t) { document.documentElement.dataset.theme = b.dataset.t; if (/^vapor/.test(b.dataset.t)) vaporFont(); if (b.dataset.t === "paperi") paperFont(); } else delete document.documentElement.dataset.theme;
       try { localStorage.setItem("teema", b.dataset.t || "vaalea"); } catch (e) {} mark(); });
     mark();
   })();
@@ -2391,9 +2409,15 @@ footer .flinks .lnk:hover { text-decoration-color: currentColor; }
     const t = document.createElement("div"); t.id = "tip"; t.setAttribute("role", "tooltip"); document.body.appendChild(t); let cur = null;
     const hide = () => { cur = null; t.classList.remove("on"); };
     document.addEventListener("pointerover", e => { const el = e.target.closest && e.target.closest("[data-tip]"); if (el === cur) return; if (!el) return hide(); cur = el;
-      t.textContent = el.dataset.tip; if (el.dataset.sub) { const u = document.createElement("span"); u.textContent = el.dataset.sub; t.appendChild(u); } t.classList.add("on"); const r = el.getBoundingClientRect(), w = t.offsetWidth, h = t.offsetHeight;
-      let y = r.top - h - 8; if (y < 8) y = r.bottom + 8;
-      t.style.left = Math.max(8, Math.min(innerWidth - w - 8, r.left + r.width / 2 - w / 2)) + "px"; t.style.top = y + "px"; });
+      t.replaceChildren(); const hd = document.createElement("b"); hd.textContent = el.dataset.tip; t.appendChild(hd);
+      (el.dataset.sub || "").split("\n").filter(Boolean).forEach((line, k) => { const u = document.createElement("span"); u.textContent = line;
+        if (!k && el.dataset.qc) { const d = document.createElement("i"); d.style.background = el.dataset.qc; u.prepend(d); } t.appendChild(u); });
+      t.classList.add("on");
+      const cs = el.querySelectorAll ? el.querySelectorAll(":scope > circle") : [], hb = cs.length ? cs[cs.length - 1] : null;
+      const r = (hb || el).getBoundingClientRect(), w = t.offsetWidth, h = t.offsetHeight; let x, y;
+      if (el.dataset.side) { x = r.right + 10; if (x + w > innerWidth - 8) x = r.left - w - 10; y = r.top + r.height / 2 - h / 2; }   // kartan piste: vihje sivulle
+      else { x = r.left + r.width / 2 - w / 2; y = r.top - h - 8; if (y < 8) y = r.bottom + 8; }
+      t.style.left = Math.max(8, Math.min(innerWidth - w - 8, x)) + "px"; t.style.top = Math.max(8, y) + "px"; });
     addEventListener("scroll", hide, { passive: true }); document.addEventListener("pointerdown", hide);
   })();
   (function () {                                                    // valikko: avaus painikkeesta, sulku ulkopuolelta tai Escillä
