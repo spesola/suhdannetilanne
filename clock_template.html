@@ -961,7 +961,7 @@ footer .flinks .lnk:hover { text-decoration-color: currentColor; }
       const tailCol = s.comp ? col : hi(s) && single ? col : "var(--muted)";
       const off = qf && (quad(p.l, p.c) !== qf || (!s.comp && !s.isGroup && !s.in_composite)) && !hi(s);
       const dim = false;                                                // valitsemattomat neutraalin harmaina (vari yllä), ei himmennysta
-      const g = el("g", { class: "pt" + (s.comp ? " comp" : "") + (hi(s) ? " sel" : "") + (off ? " off" : "") + (dim ? " dim" : ""), tabindex: -1, "data-id": s.id, opacity: p.stale && !s.comp ? 0.45 : 1 }, svg);
+      const g = el("g", { class: "pt" + (s.comp ? " comp" : "") + (hi(s) ? " sel" : "") + (off ? " off" : "") + (dim ? " dim" : ""), tabindex: -1, "data-id": s.id }, svg);   // kaikki pisteet samanlaisia; vanha havainto ja kokonaisindikaattorin ulkopuolisuus kerrotaan vihjeessa
       const pts = [], from = (showTails || (hi(s) && single) || s.comp) ? Math.max(0, p.i - set.tail) : p.i;   // polku: kokonaisindikaattori aina, yksittainen valittu; ryhmassa vain Kulku-kytkimella
       for (let k = from; k <= p.i; k++)
         if (s.level[k] != null && s.change[k] != null) pts.push([X(s.change[k]), Y(s.level[k])]);
@@ -972,8 +972,7 @@ footer .flinks .lnk:hover { text-decoration-color: currentColor; }
       }
       const [hx, hy] = pts[pts.length - 1];
       const r = ((s.comp ? 8 : s.isGroup ? 7 : 4.5) + (hi(s) ? 1.5 : 0)) * K;
-      const hollow = !s.comp && !s.isGroup && !s.in_composite;           // ei kokonaisindikaattorissa: ontto piste
-      el("circle", { cx: hx, cy: hy, r, fill: hollow ? "var(--plot)" : s.comp ? "var(--fg)" : col, stroke: hollow ? col : "var(--plot)", "stroke-width": hollow ? 1.6 : 1.5 }, g);
+      el("circle", { cx: hx, cy: hy, r, fill: s.comp ? "var(--fg)" : col, stroke: "var(--plot)", "stroke-width": 1.5 }, g);
       if (sel === s.id && !s.comp) el("circle", { class: "ring", cx: hx, cy: hy, r: r + 3.5 * K, fill: "none", stroke: "var(--fg)", "stroke-width": 1.4 }, g);   // kohdistettu sarja
       const right = hx + r + 8 + s.label.length * 6.6 < W - M;   // nimi oikealle, jos mahtuu kehyksen sisaan
       const lbl = el("text", { class: "lbl", x: hx + (right ? r + 6 : -r - 6), y: hy - 10, "text-anchor": right ? "start" : "end",
@@ -981,7 +980,7 @@ footer .flinks .lnk:hover { text-decoration-color: currentColor; }
       lbl.textContent = many && hi(s) ? (s.map || s.list || s.label) : s.label;   // useita valittuna: lyhyet nimet
       if (s.comp) { lbl.setAttribute("font-weight", 600); placed.push(lbl); }   // kokonaisindikaattorin nimi aina nakyvissa
       if (sel === s.id) lbl.setAttribute("font-weight", 600);
-      el("title", {}, g).textContent = `${s.label}, ${fmtP(set.periods[p.i])}: taso ${fmtN(p.l)}, muutos ${fmtN(p.c)}`;
+      g.dataset.tip = s.label; g.dataset.sub = (p.stale && !s.comp ? "Viimeisin havainto " : "") + `${fmtP(set.periods[p.i])}: taso ${fmtN(p.l)}, muutos ${fmtN(p.c)}.` + (!s.comp && !s.isGroup && !s.in_composite ? " Ei mukana kokonaisindikaattorissa." : "");
       if (hi(s)) placed.push(lbl);
       g.addEventListener("click", () => s.comp || s.isGroup ? select(s.id) : pick(s.id));
       g.addEventListener("mouseenter", () => { if (svg.lastChild !== g) svg.appendChild(g); hlRow(s.id);
@@ -1372,7 +1371,7 @@ footer .flinks .lnk:hover { text-decoration-color: currentColor; }
         <p>Luvut haetaan avoimista tilastolähteistä automaattisesti. Tilastot tarkentuvat jälkikäteen, joten aiemmin esitetyt luvut voivat muuttua.</p></div>
       <div><p class="fh">Tietolähteet</p><p>${(D.meta.sources || []).map(x => x.name).join(", ")}.</p><p>Laskelmat ja esitystapa ovat omia.</p></div>`;
     INFO.met = { t: "Menetelmä", h: `<p>${D.meta.method}</p><p>${D.meta.composite}</p><p>${D.meta.growth || ""}</p><p>${D.meta.charts || ""}</p>
-      <p><b>Huomio.</b> ${D.meta.caveat} Kartan suurin piste on kokonaisindikaattori, ja viiva näyttää sen kulun kuuden kuukauden ajalta. Haaleat pisteet: sarjan viimeisin havainto on valittua ajankohtaa vanhempi. Ontot pisteet eivät ole mukana kokonaisindikaattorissa.</p>` };
+      <p><b>Huomio.</b> ${D.meta.caveat} Kartan suurin piste on kokonaisindikaattori, ja viiva näyttää sen kulun kuuden kuukauden ajalta. Pisteen vihje kertoo, jos sarjan viimeisin havainto on valittua ajankohtaa vanhempi tai jos sarja ei ole mukana kokonaisindikaattorissa.</p>` };
     INFO.src = { t: "Lähteet", h: `<dl class="srcl">${(D.meta.sources || []).map(x => `<dt>${x.name}</dt><dd>${[].concat(x.items).join(", ")}</dd>`).join("")}</dl>
       <p><b>Käyttöehdot.</b> Tilastokeskuksen ja Maailmanpankin aineistot CC BY 4.0. Muut aineistot lähteiden käyttöehtojen mukaisesti, lähde mainiten. Epävarmuusindeksi: Baker, Bloom ja Davis, policyuncertainty.com. Laskelmat ja esitystapa ovat omia.</p>
       <p><b>Vastuuvapaus.</b> Sivuston tiedot perustuvat avoimiin lähteisiin. Tietoja ei ole tarkoitettu sijoitusneuvoiksi.</p>` };
