@@ -3,7 +3,16 @@
 // Vaatii salaisuuden GH_TOKEN (fine-grained token, vain tama repo, Actions: Read and write).
 export default {
   async fetch(request, env) {
-    return env.ASSETS.fetch(request);
+    const url = new URL(request.url);
+    // yksi osoite: https ja ilman www-etuliitetta
+    if (url.hostname === "www.suhdannetilanne.fi" || url.protocol === "http:") {
+      url.hostname = "suhdannetilanne.fi"; url.protocol = "https:";
+      return Response.redirect(url.toString(), 301);
+    }
+    const res = await env.ASSETS.fetch(request);
+    // tuntematon osoite etusivulle
+    if (res.status === 404 && (request.method === "GET" || request.method === "HEAD")) return Response.redirect(url.origin + "/", 302);
+    return res;
   },
   async scheduled(event, env, ctx) {
     if (!env.GH_TOKEN) { console.log("GH_TOKEN puuttuu, ajoa ei kaynnistetty"); return; }

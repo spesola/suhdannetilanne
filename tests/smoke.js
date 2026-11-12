@@ -1,9 +1,16 @@
 // Savutesti ennen julkaisua: avaa kaikki nakymat kahdella leveydella ja klikkaa Reaalitalouden rivit.
 // Epaonnistuu, jos konsoliin tulee virhe, sivu vierii sivusuunnassa tai keskeinen sisalto puuttuu.
 const { chromium } = require("playwright");
-const path = require("path");
-const file = "file://" + path.resolve(process.argv[2] || "public/index.html");
+const path = require("path"), fs = require("fs"), http = require("http");
+// sivu tarjoillaan paikallisella palvelimella kuten julkaisussa (fontit ja muut tiedostot samasta osoitteesta)
+const full = path.resolve(process.argv[2] || "public/index.html"), root = path.dirname(full);
+const TYPES = { ".html": "text/html; charset=utf-8", ".json": "application/json", ".svg": "image/svg+xml", ".woff2": "font/woff2", ".xml": "application/xml" };
+const srv = http.createServer((q, r) => { const u = decodeURIComponent(q.url.split("?")[0]), f = path.join(root, u === "/" ? path.basename(full) : u);
+  if (!f.startsWith(root) || !fs.existsSync(f) || fs.statSync(f).isDirectory()) { r.writeHead(404); r.end(); return; }
+  r.writeHead(200, { "Content-Type": TYPES[path.extname(f)] || "application/octet-stream" }); fs.createReadStream(f).pipe(r); });
+let file;
 (async () => {
+  await new Promise(ok => srv.listen(0, "127.0.0.1", ok)); file = `http://127.0.0.1:${srv.address().port}/`;
   const b = await chromium.launch(); const fails = [];
   for (const w of [1440, 360]) {
     const p = await b.newPage({ viewport: { width: w, height: 900 } });
@@ -31,7 +38,7 @@ const file = "file://" + path.resolve(process.argv[2] || "public/index.html");
     }
     await p.close();
   }
-  await b.close();
+  await b.close(); srv.close();
   if (fails.length) { console.error("SAVUTESTI EPAONNISTUI:\n" + [...new Set(fails)].join("\n")); process.exit(1); }
   console.log("Savutesti ok");
 })();
