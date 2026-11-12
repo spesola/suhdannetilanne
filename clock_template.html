@@ -1088,13 +1088,13 @@ footer .ffine { margin-top: 22px; padding-top: 12px; border-top: 1px solid var(-
         for (let k = 1; k < it.length; k++) if (it[k].y - it[k - 1].y < gap) it[k].y = it[k - 1].y + gap;
         const over = it.length ? it[it.length - 1].y - (o.yb - 4) : 0; if (over > 0) it.forEach(d => d.y -= over);
         const under = it.length ? (o.yt || 0) + fs - it[0].y : 0; if (under > 0) it.forEach(d => d.y += under);
-        const ts = it.map(d => { const e = el("text", { y: d.y + fs * 0.35, "font-size": fs, "font-weight": d.w || 600, fill: d.sq ? "var(--fg)" : d.col,
-          stroke: d.sq ? "none" : "var(--surface)", "stroke-width": 4, "stroke-linejoin": "round", "paint-order": "stroke" }, lab);
-          if (d.sq) { el("tspan", { fill: d.sq }, e).textContent = "\u25A0 "; el("tspan", {}, e).textContent = d.t; } else e.textContent = d.t; return e; });   // sq: varineliö nimen edessä
+        const ts = it.map(d => { const e = el("text", { y: d.y + fs * 0.35, "font-size": fs, "font-weight": d.w || 600, fill: d.sq || d.ln ? "var(--fg)" : d.col,
+          stroke: d.sq || d.ln ? "none" : "var(--surface)", "stroke-width": 4, "stroke-linejoin": "round", "paint-order": "stroke" }, lab);
+          if (d.sq || d.ln) { el("tspan", { fill: d.sq || d.ln, "font-weight": 700 }, e).textContent = d.sq ? "\u25A0 " : "\u2014 "; el("tspan", {}, e).textContent = d.t; } else e.textContent = d.t; return e; });   // sq: varineliö, ln: viivamerkki nimen edessä
         const mw = Math.max(0, ...ts.map(e => e.getComputedTextLength()));
         const right = x > o.x1 - (o.flip || 90) || x + 9 + mw > o.x1 + 4, tx = x + (right ? -9 : 9);   // oikealle, jos teksti ei mahdu
         ts.forEach(e => { e.setAttribute("x", tx); e.setAttribute("text-anchor", right ? "end" : "start"); });
-        if (it.some(d => d.sq)) { const bb = lab.getBBox();                // erittelysarake: vaalea tausta luettavuuden vuoksi
+        if (it.some(d => d.sq || d.ln)) { const bb = lab.getBBox();                // erittelysarake: vaalea tausta luettavuuden vuoksi
           lab.insertBefore(el("rect", { x: bb.x - 5, y: bb.y - 3, width: bb.width + 10, height: bb.height + 6, rx: 4, fill: "var(--surface)", "fill-opacity": 0.9 }), lab.firstChild); }
       },
       hide() { lab.replaceChildren(); chip.setAttribute("visibility", "hidden"); }
@@ -2160,11 +2160,15 @@ footer .ffine { margin-top: 22px; padding-top: 12px; border-top: 1px solid var(-
         L.forEach((a, k) => { const ok = a[iD] != null; dots[k].setAttribute("visibility", ok ? "visible" : "hidden");
           if (ok) { dots[k].setAttribute("cx", xs(iD)); dots[k].setAttribute("cy", (isY2(k) ? ys2 : ys)(a[iD])); } });
         if (!lab) hm.hide(); else {
-          const sgL = v => (c.ts && !c.rawv && v > 0) || (S.length && !c.lvl && v > 0) ? "+" : "";
+          const sgL = v => (c.ts && !c.rawv && v > 0) || (S.length && !c.lvl && v > 0) ? "+" : "";   // etumerkki muutoksille
           const it = [];
+          const multi = L.length > 1 && !B && !S.length;
           L.forEach((a, k) => { const v = a[iD], id = c.lines[k]; if (v == null) return;
+            if (multi) { it.push({ y: (isY2(k) ? ys2 : ys)(v), ln: colOf[id], w: 500, t: `${lbl(id)}${(c.y2 || []).includes(id) ? " (oik.)" : ""} ${sgL(v)}${fmtV(v, (c.decs || {})[id] ?? c.dec)}${c.unit === "%" ? " %" : c.unit ? " " + c.unit : ""}` }); return; }   // viivakuviot kuten pylvaskuviot: nimi ja arvo
             it.push({ y: (isY2(k) ? ys2 : ys)(v), col: colOf[id], w: S.length ? 700 : 600,
               t: (L.length > 1 && !B) || S.length ? `${sgL(v)}${fmtV(v, (c.decs || {})[id] ?? c.dec)}${c.unit === "%" ? " %" : c.unit ? " " + c.unit : ""}` : withU(v, c) }); });
+          if (multi && LW && LW[iD] != null) { const v = LW[iD];             // alapaneelin palkki samaan sarakkeeseen
+            it.push({ y: yl(v), sq: v >= 0 ? "var(--q-up)" : "var(--q-down)", w: 500, t: `${c.lower.label} ${v > 0 ? "+" : ""}${fmtV(v, c.lower.dec != null ? c.lower.dec : 1)}` }); }
           if (B && B[iD] != null) { const d = B[iD];
             it.push({ y: ys(d), col: c.barsNeutral ? "var(--fg)" : d >= 0 ? "var(--q-up)" : "var(--q-down)", t: `${c.barsName || "ero"} ${d > 0 ? "+" : ""}${fmtV(d, c.dec)} ${c.barsUnit || "%-yks."}` }); }
           if (S.length && !erit) { let y = (it.length ? Math.max(...it.map(d => d.y)) : ys(0)) + fs + 3;   // pinotut: osat nimineen sarakkeena kokonaisarvon alle
@@ -2191,11 +2195,10 @@ footer .ffine { margin-top: 22px; padding-top: 12px; border-top: 1px solid var(-
           if (!c.hdr && valEl && valEl.innerHTML) { subEl.innerHTML = valEl.innerHTML + (valEl.textContent.trim().endsWith(".") ? " " : ". ") + subEl.innerHTML; valEl.innerHTML = ""; }
         } else if (L.length > 1) {
           let j = i; while (j > 0 && L.every(a => a[j] == null)) j--;
-          if (valEl) valEl.innerHTML = "";                                   // pvm ja arvot otsikon alle, ei alakulmaan
-          const sg = v => c.ts && !c.rawv && v > 0 ? "+" : "";
-          subEl.innerHTML = (c.avg ? `${fP(P[j])} keskiarvo: ` : `${fP(P[j])}: `) +   // avg: kuukausisarjat neljanneksen keskiarvona; nimet varikoodattuina
-            c.lines.map(id => { const v = L[c.lines.indexOf(id)][j]; return `${siTag(lbl(id) + ((c.y2 || []).includes(id) ? " (oik.)" : ""), colOf[id], (c.dash || []).includes(id) ? "ds" : "")} <b>${sg(v)}${fmtV(v, (c.decs || {})[id] ?? c.dec)}${c.unit === "%" ? " %" : ""}</b>`; }).join(", ") +
-            (LW && LW[j] != null ? `, ${c.lower.label} ${LW[j] > 0 ? "+" : ""}${fmtV(LW[j], c.lower.dec != null ? c.lower.dec : 1)}` : "") + ".";
+          if (valEl) valEl.innerHTML = "";                                   // pelkka selite kuten pylvaskuvioissa; arvot hoverissa kuvion sisalla
+          subEl.classList.add("lgd");
+          subEl.innerHTML = c.lines.map(id => siTag(lbl(id) + ((c.y2 || []).includes(id) ? " (oik.)" : ""), colOf[id], (c.dash || []).includes(id) ? "ds" : "")).join(" ") +
+            (c.avg ? ` <span class="sunit">(neljänneksen keskiarvo)</span>` : "");
         } else {
           const a = L[0]; let j = i; while (j > 0 && a[j] == null) j--;
           if (valEl) valEl.innerHTML = "";
