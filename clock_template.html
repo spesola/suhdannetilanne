@@ -2164,7 +2164,7 @@ footer .flinks .lnk:hover { text-decoration-color: currentColor; }
       }
       if (c.ref != null) {                                                // kynnysviiva (esim. Sahmin saanto 0,5)
         el("line", { x1: ml, x2: W2 - mr, y1: ys(c.ref), y2: ys(c.ref), stroke: "var(--fg)", "stroke-opacity": 0.55, "stroke-dasharray": "4 3", "stroke-width": 1 }, svg);
-        el("text", { x: W2 - mr - 4, y: ys(c.ref) - 5, "text-anchor": "end", "font-size": fs, fill: "var(--muted)", stroke: "var(--surface)", "stroke-width": 3, "paint-order": "stroke" }, svg).textContent = `kynnys ${fmtV(c.ref, 1)}`;
+        el("text", { x: W2 - mr - 4, y: ys(c.ref) - 5, "text-anchor": "end", "font-size": fs, fill: "var(--muted)", stroke: "var(--surface)", "stroke-width": 3, "paint-order": "stroke" }, svg).textContent = c.refLabel || `kynnys ${fmtV(c.ref, 1)}`;
       }
       let yl = null;
       if (LW) {                                                           // alapaneeli: palkit omalla asteikolla

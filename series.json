@@ -867,6 +867,26 @@
                 "contrib": "bkt_vienti"
               },
               {
+                "title": "Talouden ilmapiiri: Suomi ja vientimaat",
+                "lines": [
+                  "x_esi_fi",
+                  "x_esi_se",
+                  "x_esi_de",
+                  "x_esi_ea"
+                ],
+                "colors": {
+                  "x_esi_fi": "var(--fg)",
+                  "x_esi_se": "var(--accent)",
+                  "x_esi_de": "var(--g3)",
+                  "x_esi_ea": "var(--g2)"
+                },
+                "ref": 100,
+                "refLabel": "keskiarvo 100",
+                "unit": "",
+                "dec": 1,
+                "note": "Euroopan komission talouden ilmapiiri-indikaattori (ESI), pitkän ajan keskiarvo 100. Kausitasoitettu, neljänneksen keskiarvo. Lähde: Eurostat."
+              },
+              {
                 "title": "Vienti- ja tuontihinnat (2015=100)",
                 "lines": [
                   "x_px",
@@ -5764,6 +5784,62 @@
         "na_item": "B1GQ"
       },
       "rebase": 2019
+    },
+    {
+      "id": "x_esi_fi",
+      "label": "Suomi",
+      "set": "bkt",
+      "chart_only": true,
+      "source": "eurostat",
+      "ds": "ei_bssi_m_r2",
+      "geo": "FI",
+      "pick": {
+        "indic": "BS-ESI-I",
+        "s_adj": "SA"
+      },
+      "to_quarter": true
+    },
+    {
+      "id": "x_esi_se",
+      "label": "Ruotsi",
+      "set": "bkt",
+      "chart_only": true,
+      "source": "eurostat",
+      "ds": "ei_bssi_m_r2",
+      "geo": "SE",
+      "pick": {
+        "indic": "BS-ESI-I",
+        "s_adj": "SA"
+      },
+      "to_quarter": true
+    },
+    {
+      "id": "x_esi_de",
+      "label": "Saksa",
+      "set": "bkt",
+      "chart_only": true,
+      "source": "eurostat",
+      "ds": "ei_bssi_m_r2",
+      "geo": "DE",
+      "pick": {
+        "indic": "BS-ESI-I",
+        "s_adj": "SA"
+      },
+      "to_quarter": true
+    },
+    {
+      "id": "x_esi_ea",
+      "label": "Euroalue",
+      "set": "bkt",
+      "chart_only": true,
+      "source": "eurostat",
+      "ds": "ei_bssi_m_r2",
+      "geo": "EA21",
+      "pick": {
+        "indic": "BS-ESI-I",
+        "s_adj": "SA"
+      },
+      "to_quarter": true
     },
     {
       "id": "x_ulc_fi",

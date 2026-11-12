@@ -922,7 +922,7 @@ SRC_NAMES <- list(
                   ktkk = "tuotannon suhdannekuvaaja", kony = "konkurssit",
                   plv = "palvelualojen liikevaihtokuvaaja", merek = "ajoneuvojen ensirekisteröinnit"),
   eurostat = list(.n = "Eurostat", ei_bsin_m_r2 = "Euroopan komission luottamuskyselyt", ei_bsbu_m_r2 = "Euroopan komission luottamuskyselyt",
-                  ei_bsrt_m_r2 = "Euroopan komission luottamuskyselyt", ei_bsse_m_r2 = "Euroopan komission luottamuskyselyt",
+                  ei_bsrt_m_r2 = "Euroopan komission luottamuskyselyt", ei_bsse_m_r2 = "Euroopan komission luottamuskyselyt", ei_bssi_m_r2 = "talouden ilmapiiri-indikaattori",
                   ei_bsin_q_r2 = "kapasiteetin käyttöaste", sts_trtu_m = "vähittäiskaupan liikevaihto", sts_setu_m = "palvelujen liikevaihto",
                   prc_hicp_minr = "YKHI", prc_hicp_iw = "YKHI-painot", namq_10_gdp = "BKT vertailumaissa", namq_10_lp_ulc = "yksikkötyökustannukset",
                   bop_c6_q = "maksutase", ext_st_27_2020msbec = "tavarakauppa", gov_10q_ggnfa = "julkisyhteisöjen verotulot"),
