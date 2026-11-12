@@ -118,14 +118,31 @@ body { font-variant-numeric: tabular-nums; background: var(--bg); min-height: 10
   -webkit-backdrop-filter: blur(22px) saturate(1.6); backdrop-filter: blur(22px) saturate(1.6);
   -webkit-mask-image: linear-gradient(#000 calc(100% - 24px), transparent); mask-image: linear-gradient(#000 calc(100% - 24px), transparent); }
 .topbar .brandw { display: flex; align-items: baseline; gap: 18px; align-self: center; min-width: 0; }
-.topbar .upd { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .topbar .sets { flex-wrap: nowrap; }
-.topbar .thm { align-self: center; }
-@media (max-width: 1240px) { .topbar { min-height: 64px; } .topbar .brandw { flex-direction: column; align-items: flex-start; gap: 5px; } }
+/* valikko: paivitys, loki ja teemat yhden painikkeen takana */
+.smw { position: relative; align-self: center; }
+.smb { width: 34px; height: 34px; padding: 0; border-radius: 8px; border: 1px solid var(--line); background: transparent; color: var(--fg); display: grid; place-items: center; cursor: pointer; }
+.smb svg { width: 16px; height: 16px; fill: none; stroke: currentColor; stroke-width: 1.6; stroke-linecap: round; }
+.smb:hover, .smb[aria-expanded="true"] { background: color-mix(in srgb, var(--fg) 6%, transparent); }
+.smb:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.smenu { position: absolute; right: 0; top: calc(100% + 10px); width: 260px; z-index: 60; background: var(--bg); border: 1px solid var(--line); border-radius: 10px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, .12); padding: 14px 12px 10px; display: flex; flex-direction: column; gap: 12px; }
+.smenu[hidden] { display: none; }
+.smenu .upd { display: flex; flex-direction: column; align-items: flex-start; gap: 6px; font-size: 0.8rem; padding: 0 6px 12px; border-bottom: 1px solid var(--line); }
+.smenu .upd .lnk { font-size: 0.875rem; color: var(--fg); }
+.smh { font-size: 0.68rem; font-weight: 600; letter-spacing: 0.09em; text-transform: uppercase; color: var(--muted); margin: 0 6px -6px; }
+.smenu .thm { flex-direction: column; align-items: stretch; gap: 1px; }
+.smenu .thm button { width: auto; height: auto; border: 0; border-radius: 6px; background: none; box-shadow: none; display: flex; align-items: center; gap: 10px; padding: 7px 6px;
+  font: inherit; font-size: 0.875rem; color: var(--fg); text-align: left; }
+.smenu .thm button::before { content: ""; width: 16px; height: 16px; border-radius: 50%; background: var(--sw); border: 1px solid var(--line); flex: none; }
+.smenu .thm button::after { content: attr(title); }
+.smenu .thm button:hover { background: color-mix(in srgb, var(--fg) 6%, transparent); }
+.smenu .thm button[aria-pressed="true"] { font-weight: 600; box-shadow: none; }
+.smenu .thm button[aria-pressed="true"]::before { box-shadow: 0 0 0 2px var(--bg), 0 0 0 3.5px var(--fg); }
 @media (max-width: 860px) {                                           /* kapealla vain valilehtirivi jaa nakyviin */
   .topbar { flex-wrap: wrap; padding-top: 12px; }
   .topbar .brandw { flex-direction: column; align-items: flex-start; gap: 5px; flex: 1; }
-  .topbar .thm { order: 2; align-self: flex-start; padding-top: 4px; }
+  .topbar .smw { order: 2; align-self: flex-start; }
   .topbar .sets { order: 3; flex-basis: 100%; margin-left: 0; height: 46px; overflow-x: auto; scrollbar-width: none; } }
 .brand { display: inline-flex; align-items: center; gap: 9px; color: var(--fg); text-decoration: none; font-weight: 500; font-size: 1rem; letter-spacing: -0.01em; }
 .brand svg { width: 26px; height: 26px; flex: none; display: block; }
@@ -181,13 +198,10 @@ body { font-variant-numeric: tabular-nums; background: var(--bg); min-height: 10
 .phh { display: flex; align-items: baseline; gap: 12px; margin: 0 0 14px; }
 .phh span { font-size: 1.05rem; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; color: var(--qc); }
 .phh em { font-style: normal; font-size: 0.78rem; color: var(--muted); }
-.pretag { font-size: 0.7rem; font-weight: 500; color: var(--muted); border: 1px dashed color-mix(in srgb, var(--muted) 70%, transparent); border-radius: 4px; padding: 0 5px; line-height: 1.5; white-space: nowrap; cursor: help; }
-.pretag[hidden] { display: none; }
 #toast { position: fixed; left: 50%; bottom: 24px; transform: translate(-50%, 12px); z-index: 100; background: var(--fg); color: var(--bg); font-size: 0.84rem; padding: 8px 14px; border-radius: 8px; opacity: 0; pointer-events: none; transition: opacity .18s, transform .18s; }
 #toast.on { opacity: 1; transform: translate(-50%, 0); }
-.phh span.pretag { font-size: 0.7rem; font-weight: 500; letter-spacing: 0; text-transform: none; color: var(--muted); text-shadow: none; align-self: center; }
-#perOut.pre { text-decoration: underline dashed color-mix(in srgb, var(--muted) 70%, transparent); text-underline-offset: 4px; cursor: help; }
-@media (max-width: 560px) { #perPre { display: none; } }
+.prenote { text-decoration: underline dotted color-mix(in srgb, var(--muted) 80%, transparent); text-underline-offset: 3px; cursor: help; }
+#perOut.pre { text-decoration: underline dotted color-mix(in srgb, var(--muted) 80%, transparent); text-underline-offset: 4px; cursor: help; }
 .phrs { display: flex; flex-direction: column; gap: 10px; }
 .phr { display: grid; grid-template-columns: minmax(0, 1fr) 26px; align-items: center; gap: 16px; width: 100%; font: inherit; color: var(--fg); background: none; border: 0; padding: 0; cursor: pointer; text-align: left; }
 .phr .trk { position: relative; display: grid; grid-template-columns: repeat(var(--N), minmax(0, 18px)); align-items: center; gap: 3px; height: 28px; padding: 5px; box-sizing: border-box; border-radius: 7px; background: color-mix(in srgb, var(--line) 60%, transparent); }
@@ -674,13 +688,20 @@ footer .flinks .lnk:hover { text-decoration-color: currentColor; }
 </style>
 
 <header class="topbar">
-  <div class="brandw"><a class="brand" href="./"><svg aria-hidden="true" class="logo" viewBox="0 0 32 32"><rect width="32" height="32" rx="8" fill="#161b22"/><rect x="7" y="7" width="8" height="8" rx="1.6" fill="#fbfbfc"/><rect x="17" y="7" width="8" height="8" rx="1.6" fill="#fbfbfc" opacity=".35"/><rect x="7" y="17" width="8" height="8" rx="1.6" fill="#fbfbfc" opacity=".35"/><rect x="17" y="17" width="8" height="8" rx="1.6" fill="#3aa36b"/></svg><h1 id="headline">Suhdannetilanne</h1></a><p class="upd" id="sub"></p></div>
+  <div class="brandw"><a class="brand" href="./"><svg aria-hidden="true" class="logo" viewBox="0 0 32 32"><rect width="32" height="32" rx="8" fill="#161b22"/><rect x="7" y="7" width="8" height="8" rx="1.6" fill="#fbfbfc"/><rect x="17" y="7" width="8" height="8" rx="1.6" fill="#fbfbfc" opacity=".35"/><rect x="7" y="17" width="8" height="8" rx="1.6" fill="#fbfbfc" opacity=".35"/><rect x="17" y="17" width="8" height="8" rx="1.6" fill="#3aa36b"/></svg><h1 id="headline">Suhdannetilanne</h1></a></div>
   <nav class="sets" id="sets" aria-label="Näkymä"></nav>
-  <div class="thm" id="thm" role="group" aria-label="Väriteema">
-    <button type="button" data-t="" title="Vaalea" aria-label="Vaalea teema" style="--sw:linear-gradient(135deg, #fbfbfc 50%, #1d4f7f 50%)"></button>
-    <button type="button" data-t="kortit" title="Kortit" aria-label="Kortit-teema" style="--sw:linear-gradient(135deg, #ffffff 50%, #d9dde3 50%)"></button>
-    <button type="button" data-t="paperi" title="Paperi" aria-label="Paperi-teema" style="--sw:conic-gradient(#1f4a3a 0 33%, #b0532c 0 66%, #e2a019 0)"></button>
-    <button type="button" data-t="vapor" title="Vaporwave" aria-label="Vaporwave-teema" style="--sw:linear-gradient(180deg, #ffb347 0%, #ff4fd8 50%, #2b0a4d 100%)"></button>
+  <div class="smw">
+    <button type="button" class="smb" id="smBtn" aria-expanded="false" aria-controls="siteMenu" aria-label="Valikko" title="Valikko"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M2.5 5.5h11M2.5 10.5h11"/></svg></button>
+    <div class="smenu" id="siteMenu" hidden>
+      <p class="upd" id="sub"></p>
+      <p class="smh">Teema</p>
+      <div class="thm" id="thm" role="group" aria-label="Väriteema">
+        <button type="button" data-t="" title="Vaalea" aria-label="Vaalea teema" style="--sw:linear-gradient(135deg, #fbfbfc 50%, #1d4f7f 50%)"></button>
+        <button type="button" data-t="kortit" title="Kortit" aria-label="Kortit-teema" style="--sw:linear-gradient(135deg, #ffffff 50%, #d9dde3 50%)"></button>
+        <button type="button" data-t="paperi" title="Paperi" aria-label="Paperi-teema" style="--sw:conic-gradient(#1f4a3a 0 33%, #b0532c 0 66%, #e2a019 0)"></button>
+        <button type="button" data-t="vapor" title="Vaporwave" aria-label="Vaporwave-teema" style="--sw:linear-gradient(180deg, #ffb347 0%, #ff4fd8 50%, #2b0a4d 100%)"></button>
+      </div>
+    </div>
   </div>
 </header>
 <div class="wrap">
@@ -700,7 +721,7 @@ footer .flinks .lnk:hover { text-decoration-color: currentColor; }
         <button class="step" id="prev" type="button" aria-label="Edellinen jakso"><svg width="12" height="12" viewBox="0 0 12 12" aria-hidden="true"><path d="M7.5 2.5L4 6l3.5 3.5" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
         <input type="range" id="per" min="0" max="0" value="0">
         <button class="step" id="next" type="button" aria-label="Seuraava jakso"><svg width="12" height="12" viewBox="0 0 12 12" aria-hidden="true"><path d="M4.5 2.5L8 6l-3.5 3.5" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
-        <output id="perOut" for="per"></output><span class="pretag" id="perPre" hidden>ennakko</span>
+        <output id="perOut" for="per"></output>
       </div></div>
       <p class="cdesc" id="clockDesc" hidden></p>
       <div class="clegend" id="clockLegend"></div>
@@ -998,7 +1019,7 @@ footer .flinks .lnk:hover { text-decoration-color: currentColor; }
     $("tailsLbl").textContent = `Kulku ${set.tail} ${set.freq === "M" ? "kk" : "nelj."}`;
     const r = $("per"); r.max = set.periods.length - 1; r.value = idx;
     $("perOut").textContent = fmtP(set.periods[idx]);
-    const pi = preInfo(idx), pt = $("perPre"), po = $("perOut"); pt.hidden = !pi; po.classList.toggle("pre", !!pi); pt.title = po.title = pi || "";
+    const pi = preInfo(idx), po = $("perOut"); po.classList.toggle("pre", !!pi); po.title = pi || "";
   }
   $("tails").addEventListener("change", e => { showTails = e.target.checked; update(); });
   $("per").addEventListener("input", e => { stopPlay(); idx = +e.target.value; update(); });
@@ -1016,7 +1037,7 @@ footer .flinks .lnk:hover { text-decoration-color: currentColor; }
     const cp = at(comp(), idx); let cq = null, hdr = "";            // ylaosa: kokonaisindikaattorin vaihe otsikkona, vaiheiden jakauma lokeropalkkeina
     if (cp) { cq = quad(cp.l, cp.c); const C = comp(); let k = cp.i;
       while (k > 0 && C.level[k - 1] != null && C.change[k - 1] != null && quad(C.level[k - 1], C.change[k - 1]) === cq) k--;
-      hdr = `<p class="phh" style="--qc:${qcol(cq)}"><span>${Q[cq].short}</span><em>${fmtP(set.periods[k])} alkaen</em>${preInfo(cp.i) ? `<span class="pretag" title="${preInfo(cp.i)}">${fmtP(set.periods[cp.i])} ennakko</span>` : ""}</p>`; }
+      hdr = `<p class="phh" style="--qc:${qcol(cq)}"><span>${Q[cq].short}</span><em>${fmtP(set.periods[k])} alkaen${preInfo(cp.i) ? `, <abbr class="prenote" title="${preInfo(cp.i)}">${fmtP(set.periods[cp.i])} ennakkotieto</abbr>` : ""}</em></p>`; }
     $("hlead").innerHTML = "";
     $("summary").innerHTML = `<div class="phx${qf ? " f" : ""}">${hdr}<div class="phrs">${QORDER.map(q => `<button type="button" class="phr${q === cq ? " cur" : ""}${qf === q ? " on" : ""}" data-q="${q}" style="--qc:${qcol(q)};--N:${Math.max(n, 1)}" aria-pressed="${qf === q}" title="${Q[q].name}: ${counts[q]}/${n}. Klikkaa suodattaaksesi." aria-label="${Q[q].name}: ${counts[q]}"><span class="trk">${"<i></i>".repeat(counts[q])}<span class="nm"${counts[q] > n - 5 ? " hidden" : ""}>${Q[q].short}</span></span><b>${counts[q]}</b></button>`).join("")}</div></div>`;   // yksi lokero = yksi sarja
     $("summary").querySelectorAll("[data-q]").forEach(b => b.onclick = () => { qf = qf === b.dataset.q ? null : b.dataset.q; update(); });
@@ -2347,6 +2368,14 @@ footer .flinks .lnk:hover { text-decoration-color: currentColor; }
     bs.forEach(b => b.onclick = () => { if (b.dataset.t) { document.documentElement.dataset.theme = b.dataset.t; if (b.dataset.t === "vapor") vaporFont(); if (b.dataset.t === "paperi") paperFont(); } else delete document.documentElement.dataset.theme;
       try { localStorage.setItem("teema", b.dataset.t || "vaalea"); } catch (e) {} mark(); });
     mark();
+  })();
+  (function () {                                                    // valikko: avaus painikkeesta, sulku ulkopuolelta tai Escillä
+    const b = $("smBtn"), m = $("siteMenu"); if (!b || !m) return;
+    const set_ = o => { m.hidden = !o; b.setAttribute("aria-expanded", String(o)); };
+    b.onclick = e => { e.stopPropagation(); set_(m.hidden); if (!m.hidden) (m.querySelector("[aria-pressed=true]") || m.querySelector("button")).focus({ preventScroll: true }); };
+    m.addEventListener("click", e => { e.stopPropagation(); if (e.target.closest("#updOpen")) set_(false); });
+    document.addEventListener("click", () => { if (!m.hidden) set_(false); });
+    document.addEventListener("keydown", e => { if (e.key === "Escape" && !m.hidden) { set_(false); b.focus(); } });
   })();
   (function () {                                                    // ylapalkin nakyva korkeus; kapealla vain valilehtirivi jaa kiinni ylos
     const h = document.querySelector(".topbar"), s = $("sets"); if (!h || !s) return;
