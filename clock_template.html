@@ -400,6 +400,14 @@ body { font-variant-numeric: tabular-nums; background: var(--bg); min-height: 10
 .zoom .zbar button:hover { border-color: var(--fg); }
 .zoom .fgrid { grid-template-columns: minmax(0, 1fr); }
 .zoom .card.fcard { border: 0; padding: 0; grid-column: 1 / -1; }
+.zrow { display: grid; grid-template-columns: minmax(0, 1fr) 230px; gap: 20px; align-items: start; }
+.zpanel { font-size: 0.85rem; line-height: 1.4; padding: 6px 0 0 18px; border-left: 1px solid var(--line); min-height: 60%; }
+.zpanel p { margin: 0; }
+.zpanel .zd { font-weight: 600; margin-bottom: 10px; }
+.zpanel .zr { display: flex; gap: 8px; align-items: baseline; padding: 3px 0; }
+.zpanel .zr.tot { font-weight: 600; border-bottom: 1px solid var(--line); padding-bottom: 6px; margin-bottom: 4px; }
+.zpanel .zr i { flex: none; display: inline-block; width: 12px; height: 3px; border-radius: 2px; background: var(--c); transform: translateY(-3px); }
+.zpanel .zr i.sq { width: 10px; height: 10px; border-radius: 2px; transform: translateY(0); }
 body.zoomed { overflow: hidden; }
 @media (max-width: 640px) { .zoom { padding: 10px 12px 14px; } }
 .tsgrid { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 48px; align-items: start; }
@@ -1081,9 +1089,14 @@ footer .ffine { margin-top: 22px; padding-top: 12px; border-top: 1px solid var(-
     const ct = el("text", { y: o.ay + 3 + fs + 2, "text-anchor": "middle", "font-size": fs, "font-weight": 600, fill: "var(--surface)" }, chip);
     return {
       show(x, items, date) {
-        lab.replaceChildren(); chip.setAttribute("visibility", date ? "visible" : "hidden");
-        if (date) { ct.textContent = date; const w = ct.getComputedTextLength() + 12, cx = Math.max(o.x0 + w / 2 - 6, Math.min(o.x1 - w / 2 + 6, x));
+        lab.replaceChildren(); chip.setAttribute("visibility", date && x != null ? "visible" : "hidden");
+        if (o.side) {                                                     // suurennos: arvot paneelissa kuvion oikealla puolella, ylhaalta alas kuten kuviossa
+          const it = (items || []).filter(Boolean).sort((a, b) => a.y - b.y);
+          o.side.innerHTML = `<p class="zd">${date || ""}</p>` + it.map(d => `<p class="zr${d.w >= 700 ? " tot" : ""}"><i class="${d.sq ? "sq" : "ln"}" style="--c:${d.sq || d.ln || d.col}"></i><span>${escH(d.t)}</span></p>`).join("");
+          if (x == null) return; }
+        if (date && x != null) { ct.textContent = date; const w = ct.getComputedTextLength() + 12, cx = Math.max(o.x0 + w / 2 - 6, Math.min(o.x1 - w / 2 + 6, x));
           ct.setAttribute("x", cx); cr.setAttribute("x", cx - w / 2); cr.setAttribute("width", w); }
+        if (o.side) return;
         const it = (items || []).filter(Boolean).map(d => ({ ...d })).sort((a, b) => a.y - b.y), gap = fs + 3;
         for (let k = 1; k < it.length; k++) if (it[k].y - it[k - 1].y < gap) it[k].y = it[k - 1].y + gap;
         const over = it.length ? it[it.length - 1].y - (o.yb - 4) : 0; if (over > 0) it.forEach(d => d.y -= over);
@@ -1638,7 +1651,8 @@ footer .ffine { margin-top: 22px; padding-top: 12px; border-top: 1px solid var(-
     const w = Math.round(b.clientWidth), nar = w < 640;
     const h = Math.max(220, Math.round(Math.min(nar ? w * 0.85 : w * 0.5, innerHeight - (nar ? 300 : 240))));
     zoomRendering = true;
-    try { renderCharts(b, [{ ...cfg, section: undefined, size: undefined, wide: true, w, height: cfg.lower ? Math.round(h * 1.15) : h }]); } finally { zoomRendering = false; }
+    const zs = w >= 900;                                                // leveassa suurennoksessa arvot kuvion oikealle puolelle
+    try { renderCharts(b, [{ ...cfg, section: undefined, size: undefined, wide: true, w: zs ? w - 250 : w, zside: zs, height: cfg.lower ? Math.round(h * 1.15) : h }]); } finally { zoomRendering = false; }
     $("zoomClose").focus();
   }
   $("zoom").addEventListener("close", () => { $("zoomBody").innerHTML = ""; document.body.classList.remove("zoomed"); if (zoomHooks) chartHooks = zoomHooks; zoomHooks = null; });
@@ -2139,7 +2153,10 @@ footer .ffine { margin-top: 22px; padding-top: 12px; border-top: 1px solid var(-
           "stroke-linecap": (c.dot || []).includes(id) ? "round" : "butt", "stroke-linejoin": "round" }, svg); });
       const cur = el("line", { y1: mt, y2: H2 - mb, stroke: "var(--muted)", "stroke-width": 1, "stroke-dasharray": "2 3" }, svg);
       const dots = L.map((a, k) => el("circle", { r: big ? 3.5 : 4, fill: colOf[c.lines[k]], stroke: "var(--surface)", "stroke-width": 1.5 }, svg));
-      const hm = hoverMarks(svg, { fs, ay: H2 - mb, x0: ml, x1: W2 - mr, yt: mt, yb: pb });
+      let zpan = null;
+      if (c.zside) { const row = document.createElement("div"); row.className = "zrow"; svg.before(row); row.appendChild(svg);
+        zpan = document.createElement("div"); zpan.className = "zpanel"; zpan.setAttribute("aria-live", "polite"); row.appendChild(zpan); }
+      const hm = hoverMarks(svg, { fs, ay: H2 - mb, x0: ml, x1: W2 - mr, yt: mt, yb: pb, side: zpan });
 
       const valEl = card.querySelector(".fval"), subEl = card.querySelector(".fsub");
       const qOnly = set.freq === "M" && [...c.lines, ...(c.stack || [])].every(id => { const v = ser(id) && ser(id).values;   // vain neljannesten viimeisilla kuukausilla havaintoja
@@ -2159,14 +2176,15 @@ footer .ffine { margin-top: 22px; padding-top: 12px; border-top: 1px solid var(-
         cur.setAttribute("visibility", hov ? "visible" : "hidden"); cur.setAttribute("stroke", "var(--hover-line)"); cur.setAttribute("stroke-opacity", 1);   // ei viimeisen havainnon pisteviivaa
         L.forEach((a, k) => { const ok = a[iD] != null; dots[k].setAttribute("visibility", ok ? "visible" : "hidden");
           if (ok) { dots[k].setAttribute("cx", xs(iD)); dots[k].setAttribute("cy", (isY2(k) ? ys2 : ys)(a[iD])); } });
-        if (!lab) hm.hide(); else {
+        const at = lab ? iD : zpan ? i : null;                          // suurennoksen paneeli nayttaa oletuksena viimeisimman jakson
+        if (at == null) hm.hide(); else { const iD = at;
           const sgL = v => (c.ts && !c.rawv && v > 0) || (S.length && !c.lvl && v > 0) ? "+" : "";   // etumerkki muutoksille
           const it = [];
           const multi = L.length > 1 && !B && !S.length;
           L.forEach((a, k) => { const v = a[iD], id = c.lines[k]; if (v == null) return;
             if (multi) { it.push({ y: (isY2(k) ? ys2 : ys)(v), ln: colOf[id], w: 500, t: `${lbl(id)}${(c.y2 || []).includes(id) ? " (oik.)" : ""} ${sgL(v)}${fmtV(v, (c.decs || {})[id] ?? c.dec)}${c.unit === "%" ? " %" : c.unit ? " " + c.unit : ""}` }); return; }   // viivakuviot kuten pylvaskuviot: nimi ja arvo
             it.push({ y: (isY2(k) ? ys2 : ys)(v), col: colOf[id], w: S.length ? 700 : 600,
-              t: (L.length > 1 && !B) || S.length ? `${sgL(v)}${fmtV(v, (c.decs || {})[id] ?? c.dec)}${c.unit === "%" ? " %" : c.unit ? " " + c.unit : ""}` : withU(v, c) }); });
+              t: (zpan ? lbl(id) + " " : "") + ((L.length > 1 && !B) || S.length ? `${sgL(v)}${fmtV(v, (c.decs || {})[id] ?? c.dec)}${c.unit === "%" ? " %" : c.unit ? " " + c.unit : ""}` : withU(v, c)) }); });
           if (multi && LW && LW[iD] != null) { const v = LW[iD];             // alapaneelin palkki samaan sarakkeeseen
             it.push({ y: yl(v), sq: v >= 0 ? "var(--q-up)" : "var(--q-down)", w: 500, t: `${c.lower.label} ${v > 0 ? "+" : ""}${fmtV(v, c.lower.dec != null ? c.lower.dec : 1)}` }); }
           if (B && B[iD] != null) { const d = B[iD];
@@ -2174,7 +2192,7 @@ footer .ffine { margin-top: 22px; padding-top: 12px; border-top: 1px solid var(-
           if (S.length && !erit) { let y = (it.length ? Math.max(...it.map(d => d.y)) : ys(0)) + fs + 3;   // pinotut: osat nimineen sarakkeena kokonaisarvon alle
             S.forEach((s, k) => { const v = s[iD]; if (v == null) return;
               it.push({ y, sq: isRes(c.stack[k]) ? "var(--muted)" : stCol(c, k), w: 500, t: `${ser(c.stack[k]).label} ${sgL(v)}${fmtV(v, c.dec)}` }); y += fs + 3; }); }
-          hm.show(xs(iD), it, fP(P[iD]));
+          hm.show(lab ? xs(iD) : null, it, fP(P[iD]));
         }
         if (S.length) {
           const g = L[0][i], u = c.unit === "%" ? " %" : c.unit ? " " + c.unit : "";
