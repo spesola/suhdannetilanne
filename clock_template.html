@@ -214,6 +214,11 @@ body { font-variant-numeric: tabular-nums; background: var(--bg); min-height: 10
 
 
 .timebar { display: flex; align-items: center; gap: 10px; margin-top: 14px; flex-wrap: wrap; }
+.phead .tb-top { margin-top: 0; flex: 1 1 260px; max-width: 400px; gap: 6px; flex-wrap: nowrap; align-self: center; }   /* ajankohta kartan ylapuolella: liikuttaessa ylaosan palkit nakyvat samalla */
+.tb-top .step { width: 26px; height: 26px; }
+.tb-top .step svg { width: 10px; height: 10px; }
+.tb-top output { font-size: 0.8rem; min-width: 6ch; }
+.cfoot { display: flex; justify-content: flex-end; margin-top: 6px; }
 .timebar > label { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); }
 .timebar input[type=range] { flex: 1 1 200px; min-width: 0; -webkit-appearance: none; appearance: none; background: transparent; height: 20px; cursor: pointer; }
 .timebar input[type=range]::-webkit-slider-runnable-track { height: 2px; background: var(--fg); border-radius: 1px; }
@@ -637,18 +642,19 @@ footer .ffine { margin-top: 22px; padding-top: 12px; border-top: 1px solid var(-
 
   <section class="top" id="topSec">
     <div class="card">
-      <div class="phead"><span class="ph2"><h2 id="clockTitle">Suhdannekartta</h2><button type="button" class="xbtn" data-x="clockDesc" aria-expanded="false" aria-label="Näytä selite" title="Näytä selite"><svg viewBox="0 0 16 16" width="16" height="16" aria-hidden="true"><circle cx="3" cy="8" r="1.5"/><circle cx="8" cy="8" r="1.5"/><circle cx="13" cy="8" r="1.5"/></svg></button></span><label class="tg" id="tailsTg"><input type="checkbox" id="tails"> <span id="tailsLbl">Kulku</span></label></div>
-      <p class="cdesc" id="clockDesc" hidden></p>
-      <div class="clegend" id="clockLegend"></div>
-      <svg id="clock" viewBox="12 22 548 578" role="img" aria-label="Suhdannekartta"></svg>
-      <div class="timebar">
+      <div class="phead"><span class="ph2"><h2 id="clockTitle">Suhdannekartta</h2><button type="button" class="xbtn" data-x="clockDesc" aria-expanded="false" aria-label="Näytä selite" title="Näytä selite"><svg viewBox="0 0 16 16" width="16" height="16" aria-hidden="true"><circle cx="3" cy="8" r="1.5"/><circle cx="8" cy="8" r="1.5"/><circle cx="13" cy="8" r="1.5"/></svg></button></span>
+      <div class="timebar tb-top">
         <label for="per">Ajankohta</label>
         <button class="step play" id="play" type="button" aria-label="Toista ajassa" title="Toista ajassa">&#9654;</button>
         <button class="step" id="prev" type="button" aria-label="Edellinen jakso"><svg width="12" height="12" viewBox="0 0 12 12" aria-hidden="true"><path d="M7.5 2.5L4 6l3.5 3.5" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
         <input type="range" id="per" min="0" max="0" value="0">
         <button class="step" id="next" type="button" aria-label="Seuraava jakso"><svg width="12" height="12" viewBox="0 0 12 12" aria-hidden="true"><path d="M4.5 2.5L8 6l-3.5 3.5" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
         <output id="perOut" for="per"></output>
-      </div>
+      </div></div>
+      <p class="cdesc" id="clockDesc" hidden></p>
+      <div class="clegend" id="clockLegend"></div>
+      <svg id="clock" viewBox="12 22 548 578" role="img" aria-label="Suhdannekartta"></svg>
+      <div class="cfoot"><label class="tg" id="tailsTg"><input type="checkbox" id="tails"> <span id="tailsLbl">Kulku</span></label></div>
     </div>
     <div class="card">
       <div class="phead"><span class="ph2"><h2>Indikaattorit</h2><button type="button" class="xbtn" data-x="listNote" aria-expanded="false" aria-label="Näytä selite" title="Näytä selite"><svg viewBox="0 0 16 16" width="16" height="16" aria-hidden="true"><circle cx="3" cy="8" r="1.5"/><circle cx="8" cy="8" r="1.5"/><circle cx="13" cy="8" r="1.5"/></svg></button></span><span class="pmeta"><button type="button" class="chip" id="clrSel" hidden></button><span class="meta" id="listMeta"></span></span></div>
