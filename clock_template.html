@@ -841,8 +841,11 @@ footer .flinks .lnk:hover { text-decoration-color: currentColor; }
   const prelimIdx = () => new Set([].concat((set.composite && set.composite.prelim) || []).map(r => set.periods.indexOf(r.period)));
   const preInfo = k => { const r = [].concat((set.composite && set.composite.prelim) || []).find(x => set.periods.indexOf(x.period) === k); if (!r) return null;   // ennakkoluvun selite
     const m = [].concat(r.missing || []); return `Ennakkoluku: ${r.avail}/${r.n} sarjaa saatavilla.${m.length ? " Puuttuu: " + m.join(", ") + "." : ""} Puuttuvan sarjan tilalla on sen viimeisin arvo.`; };
-  const compCnt = () => { const p = at(comp(), idx); if (!p) return ""; const r = [].concat((set.composite && set.composite.prelim) || []).find(x => set.periods.indexOf(x.period) === p.i);   // ennakkoluku: saatavilla olevat sarjat
-    return r ? `<span class="cnt" title="${preInfo(p.i)}">${r.avail}/${r.n}</span>` : ""; };
+  const compCnt = () => {                                            // valitun kuukauden saatavilla olevat sarjat, aina nakyvissa
+    const mem = set.indicators.filter(x => x.in_composite), n = mem.length, av = mem.filter(x => x.level[idx] != null).length, C = comp();
+    const t = C.level[idx] == null ? `${fmtP(set.periods[idx])}: ${av}/${n} sarjaa saatavilla. Kokonaisindikaattori lasketaan, kun vähintään ${Math.ceil(0.75 * n)} sarjaa on saatavilla, joten näkyvissä on edellinen arvo.`
+      : preInfo(idx) || `${fmtP(set.periods[idx])}: kaikki ${n} sarjaa saatavilla.`;
+    return `<span class="cnt" title="${t}">${av}/${n}</span>`; };
   const lvlCF = (x, k) => { if (x.level[k] != null) return x.level[k]; const j = lastNN(x.level); return prelimIdx().has(k) && j >= 0 && j < k ? x.level[j] : 0; };
   // ryhmapiste: ryhman sarjojen tasojen keskiarvo (vain jaksot, joilla kaikki sarjat ovat saatavilla)
   // ryhman jasenet keskiarvoon: kokonaisindikaattorin sarjat (ei *-merkittyja), jos niita on
