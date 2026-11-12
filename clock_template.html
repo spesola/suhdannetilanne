@@ -125,10 +125,13 @@ body { font-variant-numeric: tabular-nums; background: var(--bg); min-height: 10
 .topbar { position: sticky; top: 0; z-index: 50; display: flex; align-items: stretch; gap: 0 28px; min-height: 60px;
   margin: 0 calc(-1 * max(16px, env(safe-area-inset-right, 0px))) 36px calc(-1 * max(16px, env(safe-area-inset-left, 0px)));
   padding-inline: calc(max(0px, (100% - 1180px) / 2) + max(16px, env(safe-area-inset-left, 0px))); }   /* nimi ja valikko sisaltopalstan reunoihin */
-.topbar::before { content: ""; position: absolute; inset: 0 0 -24px; z-index: -1; pointer-events: none;
-  background: linear-gradient(color-mix(in srgb, var(--bg) 88%, transparent), color-mix(in srgb, var(--bg) 82%, transparent) calc(100% - 24px), color-mix(in srgb, var(--bg) 40%, transparent));
-  -webkit-backdrop-filter: blur(22px) saturate(1.6); backdrop-filter: blur(22px) saturate(1.6);
-  -webkit-mask-image: linear-gradient(#000 calc(100% - 24px), transparent); mask-image: linear-gradient(#000 calc(100% - 24px), transparent); }
+.topbar::before { content: ""; position: absolute; inset: 0; z-index: -1; pointer-events: none;   /* erotus sisallosta: hiusviiva ja vieritettaessa pehmea varjo */
+  background: color-mix(in srgb, var(--bg) 84%, transparent); border-bottom: 1px solid var(--line);
+  -webkit-backdrop-filter: blur(22px) saturate(1.6); backdrop-filter: blur(22px) saturate(1.6); transition: box-shadow .2s; }
+.topbar.scr::before { box-shadow: 0 8px 24px -14px rgba(0, 0, 0, .28); }
+:root:is([data-theme="vapor"], [data-theme="vaporc"]) .topbar::before { border-image: linear-gradient(90deg, rgba(255,179,71,.7), rgba(255,79,216,.7) 50%, rgba(143,125,255,.7)) 1; }
+:root:is([data-theme="vapor"], [data-theme="vaporc"]) .topbar.scr::before { box-shadow: 0 8px 28px -12px rgba(143, 61, 255, .45); }
+:root[data-theme="paperi"] .topbar::before { border-bottom-color: color-mix(in srgb, var(--rule) 35%, transparent); }
 .topbar .brandw { display: flex; align-items: baseline; gap: 18px; align-self: center; min-width: 0; }
 .topbar .sets { flex-wrap: nowrap; }
 @media (min-width: 861px) { .topbar { margin-bottom: 92px; } }      /* leveällä väljempi alku */
@@ -2463,6 +2466,7 @@ footer .flinks .lnk:hover { text-decoration-color: currentColor; }
     const f = () => { const t = innerWidth <= 860 ? -s.offsetTop : 0; h.style.top = t + "px";
       document.documentElement.style.setProperty("--barv", (h.offsetHeight + t) + "px"); };
     if (window.ResizeObserver) new ResizeObserver(f).observe(h); addEventListener("resize", f); f();
+    const sc = () => h.classList.toggle("scr", scrollY > 4); addEventListener("scroll", sc, { passive: true }); sc();   // varjo vain vieritettaessa
   })();
   [["tsHead", "tsSec", "aikasarjat", true, () => renderTS()], ["hmHead", "detail", "taulukko", false, null]].forEach(([hid, sid, key, def, onOpen]) => {
     const h = $(hid), d = $(sid); let on = def;                     // taittuvat osiot: aikasarjat oletuksena auki, taulukko kiinni; tila muistetaan selaimessa
