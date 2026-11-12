@@ -219,7 +219,11 @@ body { font-variant-numeric: tabular-nums; background: var(--bg); min-height: 10
 :root[data-theme="vapor"] .phb b { text-shadow: 0 0 14px var(--qc); }
 #toast { position: fixed; left: 50%; bottom: 24px; transform: translate(-50%, 12px); z-index: 100; background: var(--fg); color: var(--bg); font-size: 0.84rem; padding: 8px 14px; border-radius: 8px; opacity: 0; pointer-events: none; transition: opacity .18s, transform .18s; }
 #toast.on { opacity: 1; transform: translate(-50%, 0); }
-.ind .cnt { font-size: 0.78rem; font-weight: 400; color: var(--muted); margin-left: 6px; cursor: help; }
+#tip { position: fixed; z-index: 120; max-width: 320px; background: var(--fg); color: var(--bg); font-size: 0.76rem; line-height: 1.4; padding: 5px 9px; border-radius: 6px;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, .14); pointer-events: none; opacity: 0; transform: translateY(3px); transition: opacity .12s, transform .12s; }
+#tip.on { opacity: 1; transform: none; }
+#tip span { display: block; opacity: .72; }
+.ind .cnt { font-size: 0.78rem; font-weight: 400; color: var(--muted); margin-left: 6px; cursor: default; }
 .sbar { display: flex; gap: 12px; margin: 2px 0; }
 .sbar button { display: flex; gap: 4px; flex: 0 1 calc(var(--n) * 20px + (var(--n) - 1) * 4px); min-width: 0; border: 0; padding: 0; background: none; cursor: pointer; border-radius: 3px; }
 .sbar i { flex: 1 1 0; min-width: 0; max-width: 20px; aspect-ratio: 1; border-radius: 3px; background: var(--qc); }
@@ -851,7 +855,7 @@ footer .flinks .lnk:hover { text-decoration-color: currentColor; }
     const mem = set.indicators.filter(x => x.in_composite), n = mem.length, av = mem.filter(x => x.level[idx] != null).length, C = comp();
     const t = C.level[idx] == null ? `${fmtP(set.periods[idx])}: ${av}/${n} sarjaa saatavilla. Kokonaisindikaattori lasketaan, kun vähintään ${Math.ceil(0.75 * n)} sarjaa on saatavilla, joten näkyvissä on edellinen arvo.`
       : preInfo(idx) || `${fmtP(set.periods[idx])}: kaikki ${n} sarjaa saatavilla.`;
-    return `<span class="cnt" title="${t}">${av}/${n}</span>`; };
+    return `<span class="cnt" data-tip="${t}">${av}/${n}</span>`; };
   const lvlCF = (x, k) => { if (x.level[k] != null) return x.level[k]; const j = lastNN(x.level); return prelimIdx().has(k) && j >= 0 && j < k ? x.level[j] : 0; };
   // ryhmapiste: ryhman sarjojen tasojen keskiarvo (vain jaksot, joilla kaikki sarjat ovat saatavilla)
   // ryhman jasenet keskiarvoon: kokonaisindikaattorin sarjat (ei *-merkittyja), jos niita on
@@ -1054,7 +1058,7 @@ footer .flinks .lnk:hover { text-decoration-color: currentColor; }
       hdr = `<p class="phl">Suhdannevaihe</p><p class="phb" style="--qc:${qcol(cq)}"><b>${Q[cq].short}</b><em>${fmtP(set.periods[k])} alkaen</em></p>`; }
     $("hlead").innerHTML = "";
     const anyMv = QORDER.some(q => mv[q].length);
-    $("summary").innerHTML = `<div class="phx${qf ? " f" : ""}">${hdr}<div class="phrs">${QORDER.map(q => `<button type="button" class="phr${q === cq ? " cur" : ""}${qf === q ? " on" : ""}" data-q="${q}" style="--qc:${qcol(q)};--N:${Math.max(1, ...Object.values(counts))}" aria-pressed="${qf === q}" title="${Q[q].name}: ${counts[q]}/${n}. Klikkaa suodattaaksesi." aria-label="${Q[q].name}: ${counts[q]}"><span class="nm">${Q[q].short}</span><span class="sq">${stay[q].map(x => `<i title="${escH(x.s.label)}"></i>`).join("")}${mv[q].map(x => `<i class="new" title="${escH(x.s.label)}: ${Q[x.q0].short.toLowerCase()} → ${Q[q].short.toLowerCase()}"></i>`).join("")}</span><span class="n">${counts[q]}</span></button>`).join("")}</div>${anyMv ? `<p class="phn"><i></i>siirtyi vaiheeseen ${fmtP(set.periods[idx])}</p>` : ""}</div>`;   // yksi neliö = yksi sarja
+    $("summary").innerHTML = `<div class="phx${qf ? " f" : ""}">${hdr}<div class="phrs">${QORDER.map(q => `<button type="button" class="phr${q === cq ? " cur" : ""}${qf === q ? " on" : ""}" data-q="${q}" style="--qc:${qcol(q)};--N:${Math.max(1, ...Object.values(counts))}" aria-pressed="${qf === q}" aria-label="${Q[q].name}: ${counts[q]}. Klikkaa suodattaaksesi."><span class="nm">${Q[q].short}</span><span class="sq">${stay[q].map(x => `<i data-tip="${escH(x.s.label)}"></i>`).join("")}${mv[q].map(x => `<i class="new" data-tip="${escH(x.s.label)}" data-sub="${Q[x.q0].short} → ${Q[q].short.toLowerCase()} ${fmtP(set.periods[idx])}"></i>`).join("")}</span><span class="n">${counts[q]}</span></button>`).join("")}</div>${anyMv ? `<p class="phn"><i></i>siirtyi vaiheeseen ${fmtP(set.periods[idx])}</p>` : ""}</div>`;   // yksi neliö = yksi sarja
     $("summary").querySelectorAll("[data-q]").forEach(b => b.onclick = () => { qf = qf === b.dataset.q ? null : b.dataset.q; update(); });
     const pass = s => { if (!qf) return true; if (!s.comp && !s.in_composite) return false; const p = at(s, idx); return !!p && quad(p.l, p.c) === qf; };
 
@@ -2383,6 +2387,15 @@ footer .flinks .lnk:hover { text-decoration-color: currentColor; }
     bs.forEach(b => b.onclick = () => { if (b.dataset.t) { document.documentElement.dataset.theme = b.dataset.t; if (b.dataset.t === "vapor") vaporFont(); if (b.dataset.t === "paperi") paperFont(); } else delete document.documentElement.dataset.theme;
       try { localStorage.setItem("teema", b.dataset.t || "vaalea"); } catch (e) {} mark(); });
     mark();
+  })();
+  (function () {                                                    // oma vihje [data-tip]-elementeille (selaimen title-laatikon sijaan)
+    const t = document.createElement("div"); t.id = "tip"; t.setAttribute("role", "tooltip"); document.body.appendChild(t); let cur = null;
+    const hide = () => { cur = null; t.classList.remove("on"); };
+    document.addEventListener("pointerover", e => { const el = e.target.closest && e.target.closest("[data-tip]"); if (el === cur) return; if (!el) return hide(); cur = el;
+      t.textContent = el.dataset.tip; if (el.dataset.sub) { const u = document.createElement("span"); u.textContent = el.dataset.sub; t.appendChild(u); } t.classList.add("on"); const r = el.getBoundingClientRect(), w = t.offsetWidth, h = t.offsetHeight;
+      let y = r.top - h - 8; if (y < 8) y = r.bottom + 8;
+      t.style.left = Math.max(8, Math.min(innerWidth - w - 8, r.left + r.width / 2 - w / 2)) + "px"; t.style.top = y + "px"; });
+    addEventListener("scroll", hide, { passive: true }); document.addEventListener("pointerdown", hide);
   })();
   (function () {                                                    // valikko: avaus painikkeesta, sulku ulkopuolelta tai Escillä
     const b = $("smBtn"), m = $("siteMenu"); if (!b || !m) return;
