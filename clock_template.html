@@ -633,15 +633,15 @@ table.hm { border-collapse: separate; border-spacing: 2px; font-variant-numeric:
 
 /* alaosa: nimi, linkit, huomioitavaa ja lahteet omina palstoinaan */
 footer { color: var(--muted); font-size: 0.84rem; line-height: 1.6; border-top: 1px solid var(--rule); padding: 28px 0 24px; margin-top: 48px;
-  display: grid; grid-template-columns: minmax(0, 1.1fr) minmax(0, 0.8fr) minmax(0, 1.7fr) minmax(0, 1fr); gap: 28px 40px; }
+  display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.7fr) minmax(0, 1fr); gap: 28px 40px; }
 footer p { margin: 0 0 8px; } footer p:last-child { margin-bottom: 0; }
 footer .fh { font-size: 0.68rem; font-weight: 600; letter-spacing: 0.09em; text-transform: uppercase; color: var(--fg); margin: 0 0 12px; }
-footer .fbrand { display: flex; align-items: center; gap: 9px; color: var(--fg); font-weight: 700; font-size: 1rem; letter-spacing: -0.02em; margin-bottom: 10px; }
+footer .fbrand { display: flex; align-items: center; gap: 9px; color: var(--fg); font-weight: 700; font-size: 1rem; letter-spacing: -0.02em; margin-bottom: 14px; }
 footer .fbrand svg { width: 22px; height: 22px; flex: none; }
 footer .flinks { display: flex; flex-direction: column; align-items: flex-start; gap: 6px; }
 footer .flinks .lnk { font: inherit; color: var(--fg); background: none; border: 0; padding: 0; cursor: pointer; text-decoration: underline; text-decoration-color: var(--line); text-underline-offset: 3px; }
 footer .flinks .lnk:hover { text-decoration-color: currentColor; }
-@media (max-width: 860px) { footer { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); } }
+@media (max-width: 860px) { footer { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); } footer > div:first-child { grid-column: 1 / -1; } }
 @media (max-width: 560px) { footer { grid-template-columns: minmax(0, 1fr); gap: 24px; } }
 .infod { width: min(760px, calc(100vw - 24px)); }
 .infod h2 { font-size: 1.1rem; font-weight: 600; margin: 0 4px 10px; padding-bottom: 8px; border-bottom: 1px solid var(--rule); }
@@ -1316,11 +1316,9 @@ footer .flinks .lnk:hover { text-decoration-color: currentColor; }
 
   function renderFoot() {
     const logo = document.querySelector(".brand svg.logo");
-    $("foot").innerHTML = `<div><div class="fbrand">${logo ? logo.outerHTML : ""}Suhdannetilanne</div><p>Suomen talouden suhdannetilanne avoimista tilastoista. Päivittyy arkisin.</p></div>
-      <div><p class="fh">Sivusto</p><nav class="flinks" aria-label="Sivuston tiedot"><button type="button" class="lnk" data-info="met">Menetelmä</button><button type="button" class="lnk" data-info="src">Lähteet</button><button type="button" class="lnk" id="updOpen2">Loki ja tulevat julkaisut</button></nav></div>
-      <div><p class="fh">Huomioitavaa</p><p>Sivusto ei ole viranomaisen julkaisu, eikä sen tietoja ole tarkoitettu sijoitusneuvoiksi.</p>
-        <p>Luvut haetaan avoimista tilastolähteistä automaattisesti. Tilastot tarkentuvat jälkikäteen, joten aiemmin esitetyt luvut voivat muuttua.</p>
-        <p>Kävijämäärät lasketaan Cloudflare Web Analyticsilla ilman evästeitä. Valinnat, kuten teema, tallennetaan vain omaan selaimeen.</p></div>
+    $("foot").innerHTML = `<div><div class="fbrand">${logo ? logo.outerHTML : ""}Suhdannetilanne</div><nav class="flinks" aria-label="Sivuston tiedot"><button type="button" class="lnk" data-info="met">Menetelmä</button><button type="button" class="lnk" data-info="src">Lähteet</button><button type="button" class="lnk" id="updOpen2">Loki ja tulevat julkaisut</button></nav></div>
+      <div><p class="fh">Huomioitavaa</p><p>Suomen talouden suhdannetilanne avoimista tilastoista. Päivittyy arkisin.</p><p>Sivusto ei ole viranomaisen julkaisu, eikä sen tietoja ole tarkoitettu sijoitusneuvoiksi.</p>
+        <p>Luvut haetaan avoimista tilastolähteistä automaattisesti. Tilastot tarkentuvat jälkikäteen, joten aiemmin esitetyt luvut voivat muuttua.</p></div>
       <div><p class="fh">Tietolähteet</p><p>${(D.meta.sources || []).map(x => x.name).join(", ")}.</p><p>Laskelmat ja esitystapa ovat omia.</p></div>`;
     INFO.met = { t: "Menetelmä", h: `<p>${D.meta.method}</p><p>${D.meta.composite}</p><p>${D.meta.growth || ""}</p><p>${D.meta.charts || ""}</p>
       <p><b>Huomio.</b> ${D.meta.caveat} Kartan suurin piste on kokonaisindikaattori, ja viiva näyttää sen kulun kuuden kuukauden ajalta. Haaleat pisteet: sarjan viimeisin havainto on valittua ajankohtaa vanhempi. Ontot pisteet eivät ole mukana kokonaisindikaattorissa.</p>` };
