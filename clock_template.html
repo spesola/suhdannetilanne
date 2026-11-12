@@ -14,8 +14,8 @@
 <meta name="claude:viewport-fit-sides" content="cover">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Manrope:wght@300;400;500;600&display=swap">
-<script>try { const t = new URLSearchParams(location.search).get("teema") || localStorage.getItem("teema"); if (t === "vapor" || t === "selkea" || t === "paperi" || t === "kortit") document.documentElement.dataset.theme = t; } catch (e) {}
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Manrope:wght@300;400;500;600;700&display=swap">
+<script>try { const t = new URLSearchParams(location.search).get("teema") || localStorage.getItem("teema"); if (t === "vapor" || t === "paperi" || t === "kortit") document.documentElement.dataset.theme = t; } catch (e) {}
 function vaporFont() { if (document.getElementById("vfont")) return; const l = document.createElement("link"); l.id = "vfont"; l.rel = "stylesheet"; l.href = "https://fonts.googleapis.com/css2?family=Orbitron:wght@500&display=swap"; document.head.appendChild(l); }
 if (document.documentElement.dataset.theme === "vapor") vaporFont();
 function paperFont() { if (document.getElementById("pfont")) return; const l = document.createElement("link"); l.id = "pfont"; l.rel = "stylesheet"; l.href = "https://fonts.googleapis.com/css2?family=Mona+Sans:wdth,wght@75..125,300..800&family=Martian+Mono:wght@400;500&display=swap"; document.head.appendChild(l); }
@@ -40,9 +40,6 @@ if (document.documentElement.dataset.theme === "paperi") paperFont();</script>
 .hm td.hc { background: color-mix(in srgb, var(--hc) var(--hp), var(--surface)); }
 tr.pick:hover > td.hc, tr.pick:hover > td { filter: brightness(0.94); }
 tr.pick:hover > th { color: var(--accent); }
-/* Selkea-teema (valinnainen): korallinpunainen, kuninkaansininen ja petrooli, keltainen ennallaan */
-:root[data-theme="selkea"] { --fg: #1f2430; --accent: #4f5fc6; --q-up: #2a8a85; --q-down: #c4554a; --q-rec: #4f5fc6;
-  --g1: #4f5fc6; --g3: #2a8a85; --g4: #8a8f98; --g5: #a65fa8; --g6: #d0675a; --g7: #9a7a20; --g8: #7fb3ae; }
 /* Kortit-teema (valinnainen): oletusvarit ja -fontti, kuviot ja taulukot valkoisina kortteina vaalealla reunaviivalla */
 :root[data-theme="kortit"] .card { border: 1px solid var(--line); border-radius: 10px; background: #fff; padding: 16px 18px; }
 :root[data-theme="kortit"] .zoom .card.fcard, :root[data-theme="kortit"] #tsContrib .card { border: 0; padding: 0; background: none; }
@@ -93,18 +90,17 @@ tr.pick:hover > th { color: var(--accent); }
 /* hehku pisteisiin */
 :root[data-theme="vapor"] svg.fc circle, :root[data-theme="vapor"] #clock circle { filter: drop-shadow(0 0 3px color-mix(in srgb, var(--accent) 60%, transparent)); }
 /* retrofontti otsikoihin */
-:root[data-theme="vapor"] .brand h1 { font-family: var(--font-head); font-weight: 500; letter-spacing: 0.02em; font-size: 1.45rem; }
+:root[data-theme="vapor"] .brand h1 { font-family: var(--font-head); font-weight: 700; letter-spacing: 0.02em; font-size: 1.45rem; }
 :root[data-theme="vapor"] .fsec, :root[data-theme="vapor"] .hp { font-family: var(--font-head); font-weight: 500; letter-spacing: 0.02em; }
 :root[data-theme="vapor"] body { background: radial-gradient(1100px 520px at 50% -140px, rgba(150, 40, 220, 0.32), transparent 70%), var(--bg); background-repeat: no-repeat; }
 :root[data-theme="vapor"] .brand h1 { background: linear-gradient(90deg, #ffb347 0%, #ff4fd8 55%, #8f7dff 100%); -webkit-background-clip: text; background-clip: text; color: transparent; }
-:root[data-theme="vapor"] .topbar { border-image: linear-gradient(90deg, #ffb347, #ff4fd8 50%, #8f7dff) 1; }
 :root[data-theme="vapor"] svg.fc path[fill="none"] { filter: drop-shadow(0 0 2.5px color-mix(in srgb, var(--accent) 45%, transparent)); }
-.thm { display: flex; align-items: center; gap: 7px; padding: 6px 0 14px; }
+.thm { display: flex; align-items: center; gap: 7px; }
 .thm button { width: 16px; height: 16px; padding: 0; border-radius: 50%; border: 1px solid var(--line); cursor: pointer; background: var(--sw); }
 .thm button[aria-pressed="true"] { box-shadow: 0 0 0 2px var(--bg), 0 0 0 3.5px var(--fg); }
 .thm button:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; }
 .topbar .sets { margin-left: auto; }
-@media (max-width: 860px) { .topbar .sets { margin-left: 0; } .thm { padding: 0 0 12px; } }
+
 
 
 * { box-sizing: border-box; }
@@ -112,19 +108,33 @@ tr.pick:hover > th { color: var(--accent); }
 html { background: var(--bg); }
 body { font-variant-numeric: tabular-nums; background: var(--bg); min-height: 100%; color: var(--fg); font-family: var(--font-body); font-size: 15px; line-height: 1.5;
   padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px));
-  padding-block: 22px 56px; }
+  padding-block: 0 56px; }
 .wrap { max-width: 1180px; margin: 0 auto; display: flex; flex-direction: column; gap: 72px; }
-.wrap > .topbar { margin-bottom: -36px; }
-
-.topbar { display: flex; justify-content: space-between; align-items: stretch; gap: 10px 24px; flex-wrap: wrap; border-bottom: 1px solid var(--line); }
-.topbar .brandw { display: flex; flex-direction: column; gap: 6px; padding: 6px 0 12px; }   /* paivitysrivi ja loki aina samassa paikassa nimen alla */
+/* ylapalkki: koko levea, pysyy ylhaalla, lapikuultava ja sumentava; nimi hieman sisaltopalstan ulkopuolella */
+.topbar { position: sticky; top: 0; z-index: 50; display: flex; align-items: stretch; gap: 0 28px; min-height: 60px;
+  margin: 0 calc(-1 * max(16px, env(safe-area-inset-right, 0px))) 36px calc(-1 * max(16px, env(safe-area-inset-left, 0px)));
+  padding-inline: max(16px, calc((100% - 1180px) / 2 - 40px)); }
+.topbar::before { content: ""; position: absolute; inset: 0 0 -24px; z-index: -1; pointer-events: none;
+  background: linear-gradient(color-mix(in srgb, var(--bg) 72%, transparent), color-mix(in srgb, var(--bg) 30%, transparent));
+  -webkit-backdrop-filter: blur(22px) saturate(1.6); backdrop-filter: blur(22px) saturate(1.6);
+  -webkit-mask-image: linear-gradient(#000 calc(100% - 24px), transparent); mask-image: linear-gradient(#000 calc(100% - 24px), transparent); }
+.topbar .brandw { display: flex; align-items: baseline; gap: 18px; align-self: center; min-width: 0; }
+.topbar .upd { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.topbar .sets { flex-wrap: nowrap; }
+.topbar .thm { align-self: center; }
+@media (max-width: 1240px) { .topbar { min-height: 64px; } .topbar .brandw { flex-direction: column; align-items: flex-start; gap: 5px; } }
+@media (max-width: 860px) {                                           /* kapealla vain valilehtirivi jaa nakyviin */
+  .topbar { flex-wrap: wrap; padding-top: 12px; }
+  .topbar .brandw { flex-direction: column; align-items: flex-start; gap: 5px; flex: 1; }
+  .topbar .thm { order: 2; align-self: flex-start; padding-top: 4px; }
+  .topbar .sets { order: 3; flex-basis: 100%; margin-left: 0; height: 46px; overflow-x: auto; scrollbar-width: none; } }
 .brand { display: inline-flex; align-items: center; gap: 9px; color: var(--fg); text-decoration: none; font-weight: 500; font-size: 1rem; letter-spacing: -0.01em; }
 .brand svg { width: 22px; height: 22px; flex: none; }
 .brand .tld { color: var(--muted); font-weight: 400; }
 .brand:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; }
 .sets { display: flex; flex-wrap: wrap; gap: 4px 22px; }
 .sets .sh { display: none; }
-.sets button { font: inherit; font-size: 0.875rem; color: var(--muted); background: none; border: 0; padding: 6px 0 14px; margin-bottom: -1px; cursor: pointer;
+.sets button { font: inherit; font-size: 0.875rem; color: var(--muted); background: none; border: 0; padding: 2px 0 0; cursor: pointer; white-space: nowrap;
   border-bottom: 2px solid transparent; }
 .sets button:hover { color: var(--fg); }
 .sets button[aria-pressed="true"] { color: var(--fg); border-bottom-color: var(--fg); font-weight: 600; }
@@ -160,7 +170,7 @@ body { font-variant-numeric: tabular-nums; background: var(--bg); min-height: 10
   .kpi { padding: 16px 0 12px 16px; } .kpi:nth-child(odd) { border-left: 0; padding-left: 0; } .kpi:nth-child(n + 3) { border-top: 1px solid var(--line); }
   .kpih { flex-direction: column; gap: 2px; } .kpiv { font-size: 1.25rem; } .kpi svg { height: 52px; }
 }
-.brand h1 { font: inherit; font-weight: 300; font-size: 1.6rem; letter-spacing: -0.02em; line-height: 1; margin: 0; }
+.brand h1 { font: inherit; font-weight: 700; font-size: 1.3rem; letter-spacing: -0.025em; line-height: 1; margin: 0; }
 .hsum { display: flex; flex-direction: column; gap: 12px; }
 #summary { display: flex; flex-direction: column; gap: 8px; }
 #summary:empty { display: none; }
@@ -199,7 +209,7 @@ body { font-variant-numeric: tabular-nums; background: var(--bg); min-height: 10
 .sl:focus-visible, .sbar button:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
 
 .top { display: grid; grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr); gap: 56px; align-items: start; }
-.top > .card:first-child { position: sticky; top: 16px; }
+.top > .card:first-child { position: sticky; top: calc(var(--barv, 60px) + 16px); }
 @media (max-width: 860px) { .top { grid-template-columns: minmax(0, 1fr); gap: 40px; } .top > .card:first-child { position: static; } }
 .card { border-top: 1px solid var(--rule); padding-top: 14px; min-width: 0; }
 .phead { display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: 4px 12px; margin-bottom: 14px; }
@@ -514,7 +524,7 @@ button.dl:hover { text-decoration-color: var(--fg); }
 .snap.fct tr.avg th, .snap.fct tr.avg td { font-weight: 600; border-bottom: 0; border-top: 1px solid var(--fg); }
 .grmore .fhead h3 { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; min-width: 0; flex: 1 1 0; }   /* tasakorkeat kortit */
 .grmore .fsub { display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; min-height: 2.4em; }
-.secnav { grid-column: 1 / -1; position: sticky; top: 0; z-index: 5; background: var(--bg); display: flex; gap: 6px; overflow-x: auto; scrollbar-width: none;
+.secnav { grid-column: 1 / -1; position: sticky; top: var(--barv, 60px); scroll-margin-top: var(--barv, 60px); z-index: 5; background: var(--bg); display: flex; gap: 6px; overflow-x: auto; scrollbar-width: none;
   padding: 10px 0; margin: -10px 0 -30px; border-bottom: 1px solid var(--line); min-width: 0; box-shadow: 0 0 0 100vmax var(--bg); clip-path: inset(0 -100vmax); }
 .secnav::-webkit-scrollbar { display: none; }
 .secnav { gap: 22px; }
@@ -651,18 +661,17 @@ footer .ffine { font-size: 0.78rem; }
 @media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
 </style>
 
+<header class="topbar">
+  <div class="brandw"><a class="brand" href="./"><h1 id="headline">Suhdannetilanne</h1></a><p class="upd" id="sub"></p></div>
+  <nav class="sets" id="sets" aria-label="Näkymä"></nav>
+  <div class="thm" id="thm" role="group" aria-label="Väriteema">
+    <button type="button" data-t="" title="Vaalea" aria-label="Vaalea teema" style="--sw:linear-gradient(135deg, #fbfbfc 50%, #1d4f7f 50%)"></button>
+    <button type="button" data-t="kortit" title="Kortit" aria-label="Kortit-teema" style="--sw:linear-gradient(135deg, #ffffff 50%, #d9dde3 50%)"></button>
+    <button type="button" data-t="paperi" title="Paperi" aria-label="Paperi-teema" style="--sw:conic-gradient(#1f4a3a 0 33%, #b0532c 0 66%, #e2a019 0)"></button>
+    <button type="button" data-t="vapor" title="Vaporwave" aria-label="Vaporwave-teema" style="--sw:linear-gradient(180deg, #ffb347 0%, #ff4fd8 50%, #2b0a4d 100%)"></button>
+  </div>
+</header>
 <div class="wrap">
-  <header class="topbar">
-    <div class="brandw"><a class="brand" href="./"><h1 id="headline">Suhdannetilanne</h1></a><p class="upd" id="sub"></p></div>
-    <nav class="sets" id="sets" aria-label="Näkymä"></nav>
-    <div class="thm" id="thm" role="group" aria-label="Väriteema">
-      <button type="button" data-t="" title="Vaalea" aria-label="Vaalea teema" style="--sw:linear-gradient(135deg, #fbfbfc 50%, #1d4f7f 50%)"></button>
-      <button type="button" data-t="selkea" title="Selkeä" aria-label="Selkeä teema" style="--sw:conic-gradient(#d0675a 0 33%, #4f5fc6 0 66%, #2a8a85 0)"></button>
-      <button type="button" data-t="kortit" title="Kortit" aria-label="Kortit-teema" style="--sw:linear-gradient(135deg, #ffffff 50%, #d9dde3 50%)"></button>
-      <button type="button" data-t="paperi" title="Paperi" aria-label="Paperi-teema" style="--sw:conic-gradient(#1f4a3a 0 33%, #b0532c 0 66%, #e2a019 0)"></button>
-      <button type="button" data-t="vapor" title="Vaporwave" aria-label="Vaporwave-teema" style="--sw:linear-gradient(180deg, #ffb347 0%, #ff4fd8 50%, #2b0a4d 100%)"></button>
-    </div>
-  </header>
 
   <section class="hero">
     <div class="hlead" id="hlead"></div>
@@ -2019,7 +2028,7 @@ footer .ffine { font-size: 0.78rem; }
   function secOpen(box, k) {                                           // valilehti vaihtaa osion
     const h = box.querySelectorAll(":scope > .fsec")[k]; if (!h) return;
     if (openSec[set.id] !== h.dataset.name) { openSec[set.id] = h.dataset.name; secFold(box, h.dataset.name); }
-    const nav = box.querySelector(".secnav"); if (nav && nav.getBoundingClientRect().top < 0) nav.scrollIntoView({ block: "start" });
+    const nav = box.querySelector(".secnav"); if (nav && nav.getBoundingClientRect().top < parseFloat(getComputedStyle(nav).top) - 1) nav.scrollIntoView({ block: "start" });
   }
   // rinnakkaiset kuviokortit samaan linjaan: parille yhteiset rivit (subgrid); taulukon vieressa ei
   function pairRows(g) {
@@ -2309,6 +2318,12 @@ footer .ffine { font-size: 0.78rem; }
     bs.forEach(b => b.onclick = () => { if (b.dataset.t) { document.documentElement.dataset.theme = b.dataset.t; if (b.dataset.t === "vapor") vaporFont(); if (b.dataset.t === "paperi") paperFont(); } else delete document.documentElement.dataset.theme;
       try { localStorage.setItem("teema", b.dataset.t || "vaalea"); } catch (e) {} mark(); });
     mark();
+  })();
+  (function () {                                                    // ylapalkin nakyva korkeus; kapealla vain valilehtirivi jaa kiinni ylos
+    const h = document.querySelector(".topbar"), s = $("sets"); if (!h || !s) return;
+    const f = () => { const t = innerWidth <= 860 ? -s.offsetTop : 0; h.style.top = t + "px";
+      document.documentElement.style.setProperty("--barv", (h.offsetHeight + t) + "px"); };
+    if (window.ResizeObserver) new ResizeObserver(f).observe(h); addEventListener("resize", f); f();
   })();
   [["tsHead", "tsSec", "aikasarjat", true, () => renderTS()], ["hmHead", "detail", "taulukko", false, null]].forEach(([hid, sid, key, def, onOpen]) => {
     const h = $(hid), d = $(sid); let on = def;                     // taittuvat osiot: aikasarjat oletuksena auki, taulukko kiinni; tila muistetaan selaimessa
