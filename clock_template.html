@@ -15,9 +15,11 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Manrope:wght@300;400;500;600&display=swap">
-<script>try { const t = new URLSearchParams(location.search).get("teema") || localStorage.getItem("teema"); if (t === "vapor" || t === "selkea") document.documentElement.dataset.theme = t; } catch (e) {}
+<script>try { const t = new URLSearchParams(location.search).get("teema") || localStorage.getItem("teema"); if (t === "vapor" || t === "selkea" || t === "paperi") document.documentElement.dataset.theme = t; } catch (e) {}
 function vaporFont() { if (document.getElementById("vfont")) return; const l = document.createElement("link"); l.id = "vfont"; l.rel = "stylesheet"; l.href = "https://fonts.googleapis.com/css2?family=Orbitron:wght@500&display=swap"; document.head.appendChild(l); }
-if (document.documentElement.dataset.theme === "vapor") vaporFont();</script>
+if (document.documentElement.dataset.theme === "vapor") vaporFont();
+function paperFont() { if (document.getElementById("pfont")) return; const l = document.createElement("link"); l.id = "pfont"; l.rel = "stylesheet"; l.href = "https://fonts.googleapis.com/css2?family=Mona+Sans:wdth,wght@75..125,300..800&family=Martian+Mono:wght@400;500&display=swap"; document.head.appendChild(l); }
+if (document.documentElement.dataset.theme === "paperi") paperFont();</script>
 <style>
 /* Layout: tasainen vaalea pohja, osiot erotettu ohuella ylaviivalla (ei kortteja). Ylapalkki, iso otsikko, kello + luettelo, yksityiskohdat alla. */
 :root {
@@ -41,6 +43,24 @@ tr.pick:hover > th { color: var(--accent); }
 /* Selkea-teema (valinnainen): korallinpunainen, kuninkaansininen ja petrooli, keltainen ennallaan */
 :root[data-theme="selkea"] { --fg: #1f2430; --accent: #4f5fc6; --q-up: #2a8a85; --q-down: #c4554a; --q-rec: #4f5fc6;
   --g1: #4f5fc6; --g3: #2a8a85; --g4: #8a8f98; --g5: #a65fa8; --g6: #d0675a; --g7: #9a7a20; --g8: #7fb3ae; }
+/* Paperi-teema (valinnainen): kermanvarinen pohja, rajatut kortit, metsanvihrea, ruoste ja sinapinkeltainen; Mona Sans ja Martian Mono */
+:root[data-theme="paperi"] { --bg: #f2ede2; --surface: #fbf8f1; --plot: #fbf8f1; --fg: #1c1a17; --muted: #6f675b; --line: #e2d9c6; --grid: #e9e2d2; --rule: #2b2620; --pt: #3a342c;
+  --accent: #1f4a3a; --q-up: #1f4a3a; --q-turn: #d9961a; --q-down: #b0532c; --q-rec: #47698a;
+  --g1: #1f4a3a; --g2: #e2a019; --g3: #b0532c; --g4: #7d7468; --g5: #47698a; --g6: #8c6d4f; --g7: #c27b8f; --g8: #8fae9a; --dim: #d6cdbb; --hatch: #8c6d4f;
+  --font-body: "Mona Sans", system-ui, -apple-system, "Segoe UI", sans-serif; --font-data: "Mona Sans", system-ui, sans-serif; --font-mono: "Martian Mono", ui-monospace, monospace; }
+:root[data-theme="paperi"] .card { border: 1px solid var(--rule); border-radius: 10px; background: var(--surface); padding: 16px 18px; }
+:root[data-theme="paperi"] .zoom .card.fcard, :root[data-theme="paperi"] #tsContrib .card { border: 0; padding: 0; background: none; }
+:root[data-theme="paperi"] .card h2, :root[data-theme="paperi"] .card h3, :root[data-theme="paperi"] .phead h2 { font-stretch: 88%; font-weight: 700; letter-spacing: 0.005em; }
+:root[data-theme="paperi"] svg.fc text, :root[data-theme="paperi"] #clock .ax text { font-family: var(--font-mono); letter-spacing: -0.02em; }
+:root[data-theme="paperi"] svg.fc rect.bar { stroke: var(--rule); stroke-width: 0.8; fill-opacity: 1; }
+:root[data-theme="paperi"] .legend, :root[data-theme="paperi"] .fmeta, :root[data-theme="paperi"] .kpiy, :root[data-theme="paperi"] .meta { font-family: var(--font-mono); font-size: 0.68rem; text-transform: uppercase; letter-spacing: 0.04em; }
+:root[data-theme="paperi"] .legend span.sq::before, :root[data-theme="paperi"] .fsub .si.sq::before { outline: 1px solid var(--rule); outline-offset: -1px; }
+:root[data-theme="paperi"] .kpi { background: var(--surface); }
+:root[data-theme="paperi"] .card > .more { top: 12px; right: 10px; }
+:root[data-theme="paperi"] .haszoom > .more:not(.zb), :root[data-theme="paperi"] .haszoom > .cmenu { right: 40px; }
+:root[data-theme="paperi"] .card > .cmenu { top: 42px; }
+:root[data-theme="paperi"] #tsContrib .card > .more, :root[data-theme="paperi"] .zoom .card > .more { top: -4px; right: -6px; }
+:root[data-theme="paperi"] #tsContrib .haszoom > .more:not(.zb), :root[data-theme="paperi"] .zoom .haszoom > .more:not(.zb) { right: 24px; }
 /* Vaporwave-teema (valinnainen): musta tausta, auringonlasku-neonvarit */
 :root[data-theme="vapor"] { --bg: #07050d; --surface: #07050d; --plot: #0c0816; --fg: #ece4f7; --muted: #a892c9; --line: #2a1c42; --grid: #191029; --rule: #e7d6ff; --pt: #d8c4f6;
   --accent: #b68cff; --q-up: #2de2e6; --q-turn: #ffa23d; --q-down: #ff3d7f; --q-rec: #6f86ff;
@@ -630,6 +650,7 @@ footer .ffine { font-size: 0.78rem; }
     <div class="thm" id="thm" role="group" aria-label="Väriteema">
       <button type="button" data-t="" title="Vaalea" aria-label="Vaalea teema" style="--sw:linear-gradient(135deg, #fbfbfc 50%, #1d4f7f 50%)"></button>
       <button type="button" data-t="selkea" title="Selkeä" aria-label="Selkeä teema" style="--sw:conic-gradient(#d0675a 0 33%, #4f5fc6 0 66%, #2a8a85 0)"></button>
+      <button type="button" data-t="paperi" title="Paperi" aria-label="Paperi-teema" style="--sw:conic-gradient(#1f4a3a 0 33%, #b0532c 0 66%, #e2a019 0)"></button>
       <button type="button" data-t="vapor" title="Vaporwave" aria-label="Vaporwave-teema" style="--sw:linear-gradient(180deg, #ffb347 0%, #ff4fd8 50%, #2b0a4d 100%)"></button>
     </div>
   </header>
@@ -2151,7 +2172,7 @@ footer .ffine { font-size: 0.78rem; }
           S.forEach((s, k) => { const v = s[i]; if (v == null || v === 0) return;
             const y0 = v > 0 ? up : dn, y1 = y0 + v; if (v > 0) up = y1; else dn = y1;
             el("rect", { x: xs(i - (sp - 1) / 2) - bw / 2, y: ys(Math.max(y0, y1)), width: bw, height: Math.abs(ys(y1) - ys(y0)),
-              fill: isRes(c.stack[k]) ? `url(#${hid})` : stCol(c, k), "fill-opacity": isRes(c.stack[k]) ? 0.7 : 0.82 }, svg); }); }); }
+              fill: isRes(c.stack[k]) ? `url(#${hid})` : stCol(c, k), "fill-opacity": isRes(c.stack[k]) ? 0.7 : 0.82, ...(bw >= 4 ? { class: "bar" } : {}) }, svg); }); }); }
       const path = (a, step, yf = ys) => { let d = "", pen = false;
         a.forEach((v, i) => { if (v == null) { if (!c.connect) pen = false; return; }   // connect: harva sarja (nelj.) yhtenaisena
           d += pen ? (step ? `H${xs(i).toFixed(1)}V${yf(v).toFixed(1)}` : `L${xs(i).toFixed(1)} ${yf(v).toFixed(1)}`) : `M${xs(i).toFixed(1)} ${yf(v).toFixed(1)}`; pen = true; }); return d; };
@@ -2276,7 +2297,7 @@ footer .ffine { font-size: 0.78rem; }
   (function () {                                                    // teeman valinta: vaalea tai vaporwave, muistetaan selaimessa
     const bs = [...document.querySelectorAll("#thm button")], cur = () => document.documentElement.dataset.theme || "";
     const mark = () => bs.forEach(b => b.setAttribute("aria-pressed", b.dataset.t === cur()));
-    bs.forEach(b => b.onclick = () => { if (b.dataset.t) { document.documentElement.dataset.theme = b.dataset.t; if (b.dataset.t === "vapor") vaporFont(); } else delete document.documentElement.dataset.theme;
+    bs.forEach(b => b.onclick = () => { if (b.dataset.t) { document.documentElement.dataset.theme = b.dataset.t; if (b.dataset.t === "vapor") vaporFont(); if (b.dataset.t === "paperi") paperFont(); } else delete document.documentElement.dataset.theme;
       try { localStorage.setItem("teema", b.dataset.t || "vaalea"); } catch (e) {} mark(); });
     mark();
   })();
