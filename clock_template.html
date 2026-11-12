@@ -481,6 +481,9 @@ body { font-variant-numeric: tabular-nums; background: var(--bg); min-height: 10
 .updg .ui { display: flex; justify-content: space-between; gap: 12px; font-size: 0.875rem; padding: 3px 0; border-bottom: 1px solid var(--grid); }
 .updg .ui a { color: inherit; text-decoration: none; } .updg .ui a:hover { text-decoration: underline; }
 .updg .ui span:last-child { color: var(--muted); white-space: nowrap; font-family: var(--font-data); }
+.updg button.ui { width: 100%; font: inherit; font-size: 0.875rem; color: inherit; background: none; border: 0; border-bottom: 1px solid var(--grid); text-align: left; cursor: pointer; border-radius: 0; }
+.updg button.ui:hover span:first-child { text-decoration: underline; text-underline-offset: 3px; }
+.updg button.ui:focus-visible { outline: 2px solid var(--accent); outline-offset: 1px; }
 .updg .ui i { display: inline-block; width: 8px; height: 8px; border-radius: 50%; background: var(--qc); margin: 0 4px 0 2px; }
 .updg .none { font-size: 0.875rem; color: var(--muted); margin: 10px 0; }
 .upd .lnk { font: inherit; color: inherit; background: none; border: 0; padding: 0; text-decoration: underline; text-underline-offset: 2px; cursor: pointer; }
@@ -1764,11 +1767,32 @@ footer .flinks .lnk:hover { text-decoration-color: currentColor; }
       (e.upd || []).forEach(u => { if (!sets.includes(u.set)) sets.push(u.set); });
       return `<p class="ud">${d.toLocaleDateString("fi-FI", { weekday: "short", day: "numeric", month: "numeric", year: "numeric" })}</p>` +
         sets.map(l => `<p class="us">${escH(l || "Muut")}</p>` +
-          (e.upd || []).filter(u => u.set === l).map(u => `<div class="ui"><span>${escH(u.src)}</span><span>${u.period}</span></div>`).join("") +
-          (e.phase || []).filter(p => p.set === l).map(p => `<div class="ui"><span>${escH(p.label)}</span><span>${qn(p.from)} → ${qn(p.to)}</span></div>`).join("")).join(""); }).join("")
+          (e.upd || []).filter(u => u.set === l).map(u => logRow(u, escH(u.src), u.period)).join("") +
+          (e.phase || []).filter(p => p.set === l).map(p => logRow(p, escH(p.label), `${qn(p.from)} → ${qn(p.to)}`)).join("")).join(""); }).join("")
       : `<p class="none">Loki täyttyy seuraavista päivityksistä alkaen.</p>`;
+    $("updLog").querySelectorAll("[data-go]").forEach(b => b.onclick = () => { $("upd").close(); goTo(b.dataset.go); });
     $("upd").showModal(); $("updClose").focus();
   }
+  // lokirivi linkiksi: sarjan tunnuksesta nakyma, osio ja kuvio
+  const logRow = (r, name, right) => { const h = r.id ? targetOf(r.set, r.id) : null;
+    return h ? `<button type="button" class="ui go" data-go="${h}" title="Siirry kuvioon"><span>${name}</span><span>${right}</span></button>` : `<div class="ui"><span>${name}</span><span>${right}</span></div>`; };
+  function targetOf(setLabel, id) {
+    const s = D.sets.find(x => x.label === setLabel); if (!s) return null;
+    const base = "#" + (HASH[s.id] || s.id), has = c => c && typeof c === "object" && JSON.stringify(c).includes(`"${id}"`);
+    if (s.indicators) return s.indicators.some(x => x.id === id) ? base + "/" + id : base;
+    if (s.growth) {
+      if (s.growth.some(r => r.id === id)) return base + "/" + id;
+      const V = (s.charts && s.charts[0] && s.charts[0].views) || {};
+      for (const row of Object.keys(V)) { const c = V[row].find(has); if (c) return base + "/" + row + (c.title ? "~" + slugAll(c.title) : ""); }
+      return base; }
+    const c = (s.charts || []).find(has); if (!c) return base;
+    const sec = c.section && (s.charts || []).find(x => x.section) && (s.charts || []).filter(x => x.section)[0].section !== c.section ? "/" + slug1(c.section) : "";
+    return base + sec + (c.title ? "~" + slugAll(c.title) : ""); }
+  function goTo(h) {
+    const top = h.startsWith("#suhdanne");
+    if (location.hash !== h) location.hash = h; else { const k = h.split("~")[1]; if (k) { wantCard = k; goCard(); } }
+    if (top) setTimeout(() => { const t = $("topSec"), bar = parseFloat(getComputedStyle(document.documentElement).getPropertyValue("--barv")) || 60;
+      scrollTo({ top: t.getBoundingClientRect().top + scrollY - bar - 16 }); }, 120); }
   function openInfo(k) { $("infoT").textContent = INFO[k].t; $("infoB").innerHTML = INFO[k].h; $("info").showModal(); $("infoClose").focus(); }
   $("infoClose").onclick = () => $("info").close();
   $("info").addEventListener("click", e => { if (e.target === $("info")) $("info").close(); });
@@ -2499,8 +2523,8 @@ footer .flinks .lnk:hover { text-decoration-color: currentColor; }
       const bar = parseFloat(getComputedStyle(document.documentElement).getPropertyValue("--barv")) || 60;
       const nav = c.closest("#charts") && [...document.querySelectorAll("#charts .secnav")].find(n => n.offsetParent);
       scrollTo({ top: c.getBoundingClientRect().top + scrollY - bar - (nav ? nav.offsetHeight + 8 : 0) - 16 }); }, 350); }
-  addEventListener("popstate", () => { if (applyHash()) renderAll(); });
-  addEventListener("hashchange", () => { if (applyHash()) renderAll(); });
+  addEventListener("popstate", () => { if (applyHash()) renderAll(); goCard(); });
+  addEventListener("hashchange", () => { if (applyHash()) renderAll(); goCard(); });
   applyHash(); renderFoot(); renderAll();
   if (document.fonts && document.fonts.ready) document.fonts.ready.then(() => { if (set.growth && set.view === "charts") drawCharts(); goCard(); }); else goCard();   // fontin latauksen jalkeen korkeudet uudelleen
 })();

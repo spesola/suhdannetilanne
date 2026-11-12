@@ -1044,7 +1044,7 @@ for (st in sets_out) {
     q <- NA_character_; if (isTRUE(x$clock)) { i <- match(x$last, st$periods); if (!is.na(i)) q <- quad_of(x$level[i], x$change[i]) }
     v <- if (!is.null(x$values)) x$values else x$raw; pm <- st$periods[!is.na(v)]   # neljannessarja kuukausiakselilla: Q-merkinta
     qo <- st$freq == "M" && length(pm) > 0 && all(as.integer(substr(pm, 6, 7)) %% 3 == 0)
-    log_state[[k]] <- list(last = x$last, src = src_of(s), label = s$label, set = st$label, q = q, qo = qo)
+    log_state[[k]] <- list(last = x$last, src = src_of(s), label = s$label, set = st$label, q = q, qo = qo, id = base_id(x$id))
   }
 }
 LOG_STATE <- file.path(CACHE_DIR, "loki_tila.json"); LOG_FILE <- file.path(CACHE_DIR, "loki.json")
@@ -1055,9 +1055,9 @@ if (!is.null(prev)) {
   upd <- list(); ph <- list()
   for (k in names(log_state)) { a <- log_state[[k]]; b <- prev[[k]]; if (is.null(b)) next
     if (!is.na(a$src) && a$last > b$last) { uk <- paste(a$set, a$src, sep = "|"); u <- upd[[uk]]   # valilehdittain
-      if (is.null(u) || a$last > u$last) upd[[uk]] <- list(set = a$set, src = a$src, last = a$last, period = fmt_per(a$last, isTRUE(a$qo))) }
+      if (is.null(u) || a$last > u$last) upd[[uk]] <- list(set = a$set, src = a$src, last = a$last, period = fmt_per(a$last, isTRUE(a$qo)), id = a$id) }
     qb <- if (is.null(b$q)) NA_character_ else b$q
-    if (!is.na(a$q) && !is.na(qb) && a$q != qb) ph[[length(ph) + 1]] <- list(label = a$label, set = a$set, from = qb, to = a$q) }
+    if (!is.na(a$q) && !is.na(qb) && a$q != qb) ph[[length(ph) + 1]] <- list(label = a$label, set = a$set, from = qb, to = a$q, id = a$id) }
   if (length(upd) || length(ph)) {
     e <- if (length(log) && identical(log[[1]]$date, today)) log[[1]] else list(date = today, upd = list(), phase = list())
     old <- Filter(function(u) !(paste(u$set, u$src, sep = "|") %in% names(upd)), e$upd)
@@ -1066,6 +1066,12 @@ if (!is.null(prev)) {
   }
 }
 log <- Filter(function(e) as.Date(e$date) >= as.Date(today) - 60, log)
+# sarjan tunnus lokiriveille (sivulla rivin klikkaus vie kuvioon); vanhoille riveille haetaan lahteen tai nimen perusteella
+id_by <- function(set, f) { h <- Filter(function(a) identical(a$set, set) && f(a), log_state); if (length(h)) h[[1]]$id else NULL }
+for (i in seq_along(log)) {
+  log[[i]]$upd <- lapply(log[[i]]$upd, function(u) { if (is.null(u[["id"]])) u[["id"]] <- id_by(u$set, function(a) identical(a$src, u$src)); u })
+  log[[i]]$phase <- lapply(log[[i]]$phase, function(p) { if (is.null(p[["id"]])) p[["id"]] <- id_by(p$set, function(a) identical(a$label, p$label)); p })
+}
 # since: paiva, jolloin sarjan viimeisin havainto ilmestyi (sivun "paivittynyt"-merkki); ensimmaisella kerralla lokista
 for (k in names(log_state)) {
   a <- log_state[[k]]; b <- if (is.null(prev)) NULL else prev[[k]]
