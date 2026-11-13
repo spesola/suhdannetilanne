@@ -2242,7 +2242,7 @@ footer .flinks .lnk:hover { text-decoration-color: currentColor; }
       const db = document.createElement("button"); db.type = "button"; db.className = "dl"; db.textContent = "Lataa CSV"; db.title = "Lataa kuvan data";
       db.onclick = () => chartCSV(c);
       card._zc = { ...c, colors: Object.fromEntries([...c.lines].map(id => [id, colOf[id]])) };   // suurennus: samat varit
-      if (c.lines.length > 1 || (c.stack && c.stack.length)) { const lg = fm.querySelector(".legend"); if (lg && !c.bars) lg.classList.add("hide"); }   // nimet varikoodattuina alaotsikossa
+      if (c.lines.length > 1 || (c.stack && c.stack.length)) { const lg = fm.querySelector(".legend"); if (lg && (!c.bars || !c.hdr)) lg.classList.add("hide"); }   // nimet varikoodattuina alaotsikossa
       if (c.ts) card.querySelector(".fhead").appendChild(db); else fm.appendChild(db);   // aikasarjanakymassa kuten vasen kuvio: otsikkoriville
       addPng(db, card);
       if (fm.children.length) card.appendChild(fm);
@@ -2375,8 +2375,12 @@ footer .flinks .lnk:hover { text-decoration-color: currentColor; }
         } else if (c.bars) {
           const d = B[i]; if (valEl) valEl.innerHTML = `${fP(P[i])}: ${c.barsName || "ero"} <b style="color:${c.barsNeutral ? "var(--fg)" : d >= 0 ? "var(--q-up)" : "var(--q-down)"}">${d > 0 ? "+" : ""}${fmtV(d, c.dec)} ${c.barsUnit || "%-yks."}</b>`;
           subEl.hidden = !!c.hdr;                                          // otsakkeessa jo v/v ja q/q
-          subEl.innerHTML = c.lines.map(id => `${siTag(lbl(id), colOf[id], (c.dash || []).includes(id) ? "ds" : "")} ${withU(L[c.lines.indexOf(id)][i], c)}`).join(", ") + ".";
-          if (!c.hdr && valEl && valEl.innerHTML) { subEl.innerHTML = valEl.innerHTML + (valEl.textContent.trim().endsWith(".") ? " " : ". ") + subEl.innerHTML; valEl.innerHTML = ""; }
+          if (!c.hdr) {                                                    // pelkka selite kuten viivakuvioissa; arvot hoverissa
+            if (valEl) valEl.innerHTML = ""; subEl.classList.add("lgd");
+            subEl.innerHTML = [...c.lines.map(id => siTag(lbl(id), colOf[id], (c.dash || []).includes(id) ? "ds" : "")),
+              ...(c.barsNeutral ? [siTag(`${c.barsName || ser(c.bars).label} (palkit)`, "color-mix(in srgb, var(--g3) 45%, var(--surface))", "sq")]
+                : [siTag((c.barsLegend || [])[0] || "Normaali käyrä", "var(--q-up)", "sq"), siTag((c.barsLegend || [])[1] || "Käänteinen käyrä", "var(--q-down)", "sq")])].join(" ");
+          } else subEl.innerHTML = c.lines.map(id => `${siTag(lbl(id), colOf[id], (c.dash || []).includes(id) ? "ds" : "")} ${withU(L[c.lines.indexOf(id)][i], c)}`).join(", ") + ".";
         } else if (L.length > 1) {
           let j = i; while (j > 0 && L.every(a => a[j] == null)) j--;
           if (valEl) valEl.innerHTML = "";                                   // pelkka selite kuten pylvaskuvioissa; arvot hoverissa kuvion sisalla
