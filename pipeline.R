@@ -930,7 +930,7 @@ SRC_NAMES <- list(
                   tyti = "työvoimatutkimus", atp = "avoimet työpaikat", tyonv = "työnvälitystilasto", ati = "ansiotasoindeksi",
                   ktps = "palkkasummakuvaajat", khi = "kuluttajahintaindeksi", kbar = "kuluttajabarometri",
                   ashi = "osakeasuntojen hinnat", asvu = "asuntojen vuokrat", raku = "rakennus- ja asuntotuotanto",
-                  rlv = "rakentamisen liikevaihtokuvaaja", ttvi = "teollisuustuotanto", teul = "teollisuuden uudet tilaukset",
+                  rlv = "rakentamisen liikevaihtokuvaaja", rki = "rakennuskustannusindeksi", ttvi = "teollisuustuotanto", teul = "teollisuuden uudet tilaukset",
                   ktkk = "tuotannon suhdannekuvaaja", kony = "konkurssit",
                   plv = "palvelualojen liikevaihtokuvaaja", merek = "ajoneuvojen ensirekisteröinnit"),
   eurostat = list(.n = "Eurostat", ei_bsin_m_r2 = "Euroopan komission luottamuskyselyt", ei_bsbu_m_r2 = "Euroopan komission luottamuskyselyt",

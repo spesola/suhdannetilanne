@@ -544,6 +544,32 @@
                 "note": "Lähde: Tilastokeskus."
               },
               {
+                "title": "Ansiotasoindeksi sektoreittain, vuosimuutos %",
+                "lines": [
+                  "x_ati_kok",
+                  "x_ati_yr",
+                  "x_ati_val",
+                  "x_ati_pai",
+                  "x_ati_kun",
+                  "x_ati_hva"
+                ],
+                "colors": {
+                  "x_ati_kok": "var(--fg)",
+                  "x_ati_yr": "var(--accent)",
+                  "x_ati_val": "var(--g3)",
+                  "x_ati_pai": "var(--g4)",
+                  "x_ati_kun": "var(--g2)",
+                  "x_ati_hva": "var(--g5)"
+                },
+                "dash": [
+                  "x_ati_pai"
+                ],
+                "unit": "%",
+                "dec": 1,
+                "from": 2019,
+                "note": "Paikallishallinto sisältää kunnat ja hyvinvointialueet, jotka ovat erikseen vuodesta 2024. Kunnat pl. Helsingin hyvinvointipalvelut, hyvinvointialueet ml. Lähde: Tilastokeskus."
+              },
+              {
                 "title": "Yksikkötyökustannukset, vuosimuutos %",
                 "lines": [
                   "x_ulc_fi",
@@ -630,6 +656,24 @@
                 "unit": "",
                 "dec": 1,
                 "note": "Kaikki talotyypit. Lähde: Tilastokeskus."
+              },
+              {
+                "title": "Asuinrakentamisen kustannukset, vuosimuutos %",
+                "monthly": true,
+                "lines": [
+                  "x_rki_as",
+                  "x_rki_uud",
+                  "x_rki_kor"
+                ],
+                "colors": {
+                  "x_rki_as": "var(--fg)",
+                  "x_rki_uud": "var(--accent)",
+                  "x_rki_kor": "var(--g2)"
+                },
+                "unit": "%",
+                "dec": 1,
+                "from": 2016,
+                "note": "Rakennuskustannusindeksi, asuinrakentaminen. Vuodesta 2026 perusvuosi 2025=100. Lähde: Tilastokeskus."
               }
             ],
             "tyottomat": [
@@ -8425,6 +8469,174 @@
       "handling": "none",
       "kind": "level",
       "q_to_m": true
+    },
+    {
+      "id": "x_ati_kok",
+      "label": "Koko kansantalous",
+      "set": "bkt",
+      "chart_only": true,
+      "source": "statfin",
+      "table": "ati/14um.px",
+      "pick": {
+        "tyonantajasekt_3_20190528": "SSS",
+        "palk_muo_2_20120101": "0",
+        "sukupuoli_9_20180101": "SSS",
+        "contentscode": "ati_vuosimuutosprosentti"
+      }
+    },
+    {
+      "id": "x_ati_yr",
+      "label": "Yritykset",
+      "set": "bkt",
+      "chart_only": true,
+      "source": "statfin",
+      "table": "ati/14um.px",
+      "pick": {
+        "tyonantajasekt_3_20190528": "11-12",
+        "palk_muo_2_20120101": "0",
+        "sukupuoli_9_20180101": "SSS",
+        "contentscode": "ati_vuosimuutosprosentti"
+      }
+    },
+    {
+      "id": "x_ati_val",
+      "label": "Valtio",
+      "set": "bkt",
+      "chart_only": true,
+      "source": "statfin",
+      "table": "ati/14um.px",
+      "pick": {
+        "tyonantajasekt_3_20190528": "1311",
+        "palk_muo_2_20120101": "0",
+        "sukupuoli_9_20180101": "SSS",
+        "contentscode": "ati_vuosimuutosprosentti"
+      }
+    },
+    {
+      "id": "x_ati_pai",
+      "label": "Paikallishallinto",
+      "set": "bkt",
+      "chart_only": true,
+      "source": "statfin",
+      "table": "ati/14um.px",
+      "pick": {
+        "tyonantajasekt_3_20190528": "1313",
+        "palk_muo_2_20120101": "0",
+        "sukupuoli_9_20180101": "SSS",
+        "contentscode": "ati_vuosimuutosprosentti"
+      }
+    },
+    {
+      "id": "x_ati_kun",
+      "label": "Kunnat",
+      "set": "bkt",
+      "chart_only": true,
+      "source": "statfin",
+      "table": "ati/14um.px",
+      "pick": {
+        "tyonantajasekt_3_20190528": "1313p",
+        "palk_muo_2_20120101": "0",
+        "sukupuoli_9_20180101": "SSS",
+        "contentscode": "ati_vuosimuutosprosentti"
+      }
+    },
+    {
+      "id": "x_ati_hva",
+      "label": "Hyvinvointialueet",
+      "set": "bkt",
+      "chart_only": true,
+      "source": "statfin",
+      "table": "ati/14um.px",
+      "pick": {
+        "tyonantajasekt_3_20190528": "1313s",
+        "palk_muo_2_20120101": "0",
+        "sukupuoli_9_20180101": "SSS",
+        "contentscode": "ati_vuosimuutosprosentti"
+      }
+    },
+    {
+      "id": "x_rki_as",
+      "label": "Asuinrakentaminen yhteensä",
+      "set": "bkt",
+      "chart_only": true,
+      "monthly": true,
+      "source": "splice",
+      "parts": [
+        {
+          "table": "rki/13fx.px",
+          "pick": {
+            "rki_asuinrak_2_20210101": "0",
+            "perusv_1_20180101": "2015_100",
+            "contentscode": "rki-vuosimuutos"
+          },
+          "to": "2025-12"
+        },
+        {
+          "table": "rki/13fx.px",
+          "pick": {
+            "rki_asuinrak_2_20210101": "0",
+            "perusv_1_20180101": "2025_100",
+            "contentscode": "rki-vuosimuutos"
+          },
+          "from": "2026-01"
+        }
+      ]
+    },
+    {
+      "id": "x_rki_uud",
+      "label": "Uudisrakentaminen",
+      "set": "bkt",
+      "chart_only": true,
+      "monthly": true,
+      "source": "splice",
+      "parts": [
+        {
+          "table": "rki/13fx.px",
+          "pick": {
+            "rki_asuinrak_2_20210101": "01",
+            "perusv_1_20180101": "2015_100",
+            "contentscode": "rki-vuosimuutos"
+          },
+          "to": "2025-12"
+        },
+        {
+          "table": "rki/13fx.px",
+          "pick": {
+            "rki_asuinrak_2_20210101": "01",
+            "perusv_1_20180101": "2025_100",
+            "contentscode": "rki-vuosimuutos"
+          },
+          "from": "2026-01"
+        }
+      ]
+    },
+    {
+      "id": "x_rki_kor",
+      "label": "Korjausrakentaminen",
+      "set": "bkt",
+      "chart_only": true,
+      "monthly": true,
+      "source": "splice",
+      "parts": [
+        {
+          "table": "rki/13fx.px",
+          "pick": {
+            "rki_asuinrak_2_20210101": "02",
+            "perusv_1_20180101": "2015_100",
+            "contentscode": "rki-vuosimuutos"
+          },
+          "to": "2025-12"
+        },
+        {
+          "table": "rki/13fx.px",
+          "pick": {
+            "rki_asuinrak_2_20210101": "02",
+            "perusv_1_20180101": "2025_100",
+            "contentscode": "rki-vuosimuutos"
+          },
+          "from": "2026-01"
+        }
+      ]
     }
   ]
 }
