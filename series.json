@@ -2338,7 +2338,7 @@
           },
           "unit": "",
           "dec": 0,
-          "from": 2021,
+          "from": 2022,
           "size": "half",
           "note": "Henkilöt, joille maksettiin etuutta kuukauden aikana, 3 kk liukuva keskiarvo. Lähde: Verohallinto (tulorekisteri)."
         },
@@ -2366,7 +2366,7 @@
           "unit": "mrd €",
           "stackUnit": "mrd €",
           "dec": 2,
-          "from": 2021,
+          "from": 2022,
           "size": "half",
           "note": "Veronalaiset työttömyysetuudet, 12 kk liukuva summa. Lähde: Verohallinto (tulorekisteri)."
         }
