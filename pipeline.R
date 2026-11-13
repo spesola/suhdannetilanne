@@ -981,6 +981,41 @@ src_walk <- function(x) {
 for (s in Filter(function(s) !isFALSE(s$enabled), cfg$series)) src_walk(s)
 sources_out <- lapply(intersect(names(SRC_NAMES), names(src_used)), function(p)
   list(name = SRC_NAMES[[p]]$.n, items = I(intersect(unique(unlist(SRC_NAMES[[p]][names(SRC_NAMES[[p]]) != ".n"])), src_used[[p]]))))   # jarjestys SRC_NAMES:n mukaan
+# lahdelinkit sarjoittain: sivulla kuvion lahderivin nimet vievat tilaston sivulle tai tietokantaan
+LNK_BASE <- list(bof = "https://www.suomenpankki.fi/fi/tilastot/", wb = "https://www.worldbank.org/en/research/commodity-markets",
+  stoxx = "https://www.stoxx.com/", vk = "https://www.tutkihallintoa.fi/", lam = "https://www.digitraffic.fi/tieliikenne/",
+  ameco = "https://economy-finance.ec.europa.eu/economic-research-and-databases/economic-databases/ameco-database_en",
+  vero = "https://vero2.stat.fi/PXWeb/pxweb/fi/Vero/")
+lnk_stf <- function(t) paste0("https://stat.fi/tilasto/", sub("/.*", "", t))
+lnk_est <- function(ds) paste0("https://ec.europa.eu/eurostat/databrowser/view/", ds, "/default/table")
+lnk_acc <- list()
+lnk_add <- function(p, u) if (!is.null(u) && length(u) && nzchar(u)) lnk_acc[[length(lnk_acc) + 1]] <<- c(p, u)
+lnk_ser <- setNames(cfg$series, vapply(cfg$series, function(s) s$id, ""))
+lnk_seen <- character()
+lnk_walk <- function(x) {
+  if (is.character(x)) { for (id in intersect(x, names(lnk_ser))) if (!(id %in% lnk_seen)) { lnk_seen <<- c(lnk_seen, id); lnk_walk(lnk_ser[[id]]) }; return() }   # johdettu sarja: osasarjojen lahteet
+  if (!is.list(x)) return()
+  sc <- x$source
+  if (!is.null(sc)) {
+    if (sc == "statfin" && !is.null(x$px_base)) lnk_add("vero", LNK_BASE$vero)
+    else if (sc == "statfin" || (sc == "splice" && !is.null(x$table))) lnk_add("statfin", lnk_stf(x$table))
+    else if (sc %in% c("jt_decomp", "jk_decomp")) lnk_add("statfin", lnk_stf("jtume"))
+    else if (sc == "tel_ret") lnk_add("statfin", lnk_stf("rtp"))
+    else if (sc %in% c("ntp_ctrb", "hhi_ctrb", "gdp_np")) lnk_add("statfin", lnk_stf("ntp"))
+    else if (sc == "khi_ctrb") lnk_add("statfin", lnk_stf("khi"))
+    else if (sc == "eurostat") lnk_add("eurostat", lnk_est(x$ds))
+    else if (sc == "hicp_ctrb") lnk_add("eurostat", lnk_est("prc_hicp_minr"))
+    else if (sc == "ecb") lnk_add("ecb", paste0("https://data.ecb.europa.eu/data/datasets/", x$flow))
+    else if (sc == "fred") lnk_add("fred", paste0("https://fred.stlouisfed.org/series/", x$fred_id))
+    else if (sc == "xlsx" && !is.null(x$url)) lnk_add("xlsx", sub("^(https?://[^/]+/).*$", "\\1", x$url))
+    else if (sc %in% names(LNK_BASE)) lnk_add(sc, LNK_BASE[[sc]])
+  } else if (!is.null(x$table)) lnk_add("statfin", lnk_stf(x$table))
+  for (k in setdiff(names(x), c("pick", "id", "label", "source"))) lnk_walk(x[[k]])
+  if (is.null(names(x))) for (v in x) lnk_walk(v)
+}
+src_links <- list()
+for (s in Filter(function(s) !isFALSE(s$enabled), cfg$series)) { lnk_acc <- list(); lnk_seen <- s$id; lnk_walk(s)
+  if (length(lnk_acc)) src_links[[s$id]] <- unique(lnk_acc) }
 
 out <- list(
   meta = list(
@@ -1014,7 +1049,7 @@ out <- list(
     caveat = paste0("Trendisuotimen loppupisteet tarkentuvat uuden datan myötä, ",
                     "joten viimeisimmät pisteet voivat siirtyä."),
     composite = paste0("Kokonaisindikaattori: sarjojen tasojen keskiarvo. Uusimmille kuukausille lasketaan ennakkoluku, kun vähintään 75 % sarjoista on saatavilla; puuttuvan sarjan tilalla käytetään sen viimeisintä arvoa. BKT ei ole mukana keskiarvossa. Käyttöaste, konkurssit ja tavaravienti näkyvät kartalla, mutta eivät ole mukana keskiarvossa; tavaravienti julkaistaan muita myöhemmin.", VALID_TXT),
-    sources = sources_out),
+    sources = sources_out, links = src_links),
   sets = sets_out)
 
 # ---------------------------------------------------------------------

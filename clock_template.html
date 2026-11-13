@@ -616,6 +616,8 @@ table.snap { width: 100%; border-collapse: collapse; font-size: 0.875rem; font-v
 .fgrid > .fcard.sg { grid-row: span 5; display: grid; grid-template-rows: subgrid; row-gap: 0; align-content: start; }
 .fgrid > .fcard.sg > * { align-self: start; min-width: 0; }
 .fnote { color: var(--muted); font-size: 0.78rem; margin: 8px 0 0; }
+.fnote a.srcl { color: inherit; text-decoration: underline; text-decoration-color: color-mix(in srgb, currentColor 40%, transparent); text-underline-offset: 2px; }
+.fnote a.srcl:hover { color: var(--fg); text-decoration-color: currentColor; }
 .fc { width: 100%; height: auto; display: block; margin-top: 10px; touch-action: pan-y; }
 .fc text { font-family: var(--font-body); }
 .hmwrap { overflow-x: auto; }
@@ -1870,7 +1872,7 @@ footer .flinks .lnk:hover { text-decoration-color: currentColor; }
     db.onclick = () => saveFile(`suhdannetilanne-${slug(c.title)}.csv`, toCSV([["Sarja", "Päivä", "Viimeisin", ...cols.map(k => COLH[k]), "Muutoksen yksikkö"],
       ...c.rows.map(r => [r.label, r.date, r.last, ...cols.map(k => r[k]), r.chg === "kp" ? "korkopistettä" : r.chg === "pct" ? "%" : "indeksi"])]));
     fm.appendChild(db); card.appendChild(fm);
-    if (c.note) { const p = document.createElement("p"); p.className = "fnote"; p.textContent = c.note; card.appendChild(p); }
+    if (c.note) { const p = document.createElement("p"); p.className = "fnote"; p.textContent = c.note; linkSrc(p, c); card.appendChild(p); }
     return card;
   }
   // hajontakuvio ajassa (esim. Beveridgen kayra): pisteet yhdistetty, uusimmat tummimpina
@@ -1922,7 +1924,7 @@ footer .flinks .lnk:hover { text-decoration-color: currentColor; }
     const db = document.createElement("button"); db.type = "button"; db.className = "dl"; db.textContent = "Lataa CSV";
     db.onclick = () => saveFile(`suhdannetilanne-${slug(c.title)}.csv`, toCSV([["Jakso", c.xlab, c.ylab], ...pts.map(i => [set.periods[i], X[i], Y[i]])]));
     fm.appendChild(db); addPng(db, card); card.appendChild(fm);
-    if (c.note) { const p = document.createElement("p"); p.className = "fnote"; p.textContent = c.note; card.appendChild(p); }
+    if (c.note) { const p = document.createElement("p"); p.className = "fnote"; p.textContent = c.note; linkSrc(p, c); card.appendChild(p); }
     return card;
   }
   function curveCard(c, narrow) {
@@ -1966,7 +1968,7 @@ footer .flinks .lnk:hover { text-decoration-color: currentColor; }
     const db = document.createElement("button"); db.type = "button"; db.className = "dl"; db.textContent = "Lataa CSV";
     db.onclick = () => saveFile(`suhdannetilanne-${slug(c.title)}.csv`, toCSV([["Maturiteetti", ...K.lines.map(l => `${l.label} ${l.date}`)], ...K.labels.map((m, i) => [m, ...K.lines.map(l => l.values[i])])]));
     fm.appendChild(db); addPng(db, card); card.appendChild(fm);
-    if (c.note) { const p = document.createElement("p"); p.className = "fnote"; p.textContent = c.note; card.appendChild(p); }
+    if (c.note) { const p = document.createElement("p"); p.className = "fnote"; p.textContent = c.note; linkSrc(p, c); card.appendChild(p); }
     return card;
   }
 
@@ -2005,7 +2007,7 @@ footer .flinks .lnk:hover { text-decoration-color: currentColor; }
     const db = document.createElement("button"); db.type = "button"; db.className = "dl"; db.textContent = "Lataa CSV";
     db.onclick = () => saveFile(`suhdannetilanne-${slug(c.title)}.csv`, toCSV([["Vuosi", ...K.groups.map(g => g.label + ", mrd. €")], ...K.years.map((y, i) => [y, ...K.groups.map(g => g.values[i])])]));
     fm.appendChild(db); addPng(db, card); card.appendChild(fm);
-    if (c.note) { const p = document.createElement("p"); p.className = "fnote"; p.textContent = c.note + ` Tilanne ${fmtD(K.updated)}.`; card.appendChild(p); }
+    if (c.note) { const p = document.createElement("p"); p.className = "fnote"; p.textContent = c.note + ` Tilanne ${fmtD(K.updated)}.`; linkSrc(p, c); card.appendChild(p); }
     return card;
   }
 
@@ -2042,6 +2044,29 @@ footer .flinks .lnk:hover { text-decoration-color: currentColor; }
   document.addEventListener("keydown", e => { if (e.key === "Escape") closeMenus(); });
   // kuvion ajankohta oikeaan alakulmaan (viimeiselle riville); paakuvion v/v- ja q/q-otsake jaa ylos
   const escH = t => t.replace(/&/g, "&amp;").replace(/</g, "&lt;");
+  // lahderivin nimet linkeiksi: kuvion sarjojen lahteista (meta.links) ensimmainen kunkin lahteen linkki
+  const SRC_ALIAS = { "Tilastokeskus": ["statfin"], "Eurostat": ["eurostat"], "Euroopan komissio": ["eurostat", "ameco"], "EKP": ["ecb"], "Suomen Pankki": ["bof"],
+    "Valtiokonttori": ["vk"], "Verohallinto": ["vero"], "Maailmanpankki": ["wb"], "FRED": ["fred"], "STOXX": ["stoxx"], "Caldara": ["xlsx"], "Fintraffic": ["lam"] };
+  const SRC_RE = new RegExp("(" + Object.keys(SRC_ALIAS).sort((a, b) => b.length - a.length).join("|") + ")", "g");
+  function chartLinks(c) {
+    const L = (D.meta && D.meta.links) || {}, out = {}, seen = new Set();
+    const walk = x => { if (typeof x === "string") { const id = x.replace(/^h_/, "").replace(/_(qq|yy)$/, "");
+        for (const k of [x, id]) if (L[k] && !seen.has(k)) { seen.add(k); L[k].forEach(([p, u]) => { if (!out[p]) out[p] = u; }); } }
+      else if (Array.isArray(x)) x.forEach(walk); else if (x && typeof x === "object") Object.values(x).forEach(walk); };
+    walk(c);
+    if (c.flow && !out.ecb) out.ecb = "https://data.ecb.europa.eu/data/datasets/" + c.flow;   // tuottokayra: suoraan EKP:n aineistosta
+    if (!chartLinks.one) { const u = {}; Object.values(L).flat().forEach(([p, v]) => (u[p] = u[p] || new Set()).add(v));
+      chartLinks.one = Object.fromEntries(Object.entries(u).filter(([, v]) => v.size === 1).map(([p, v]) => [p, [...v][0]])); }
+    Object.entries(chartLinks.one).forEach(([p, v]) => { if (!out[p]) out[p] = v; });   // lahteet, joilla on yksi yleissivu
+    return out;
+  }
+  function linkSrc(p, c) {
+    const t = p.textContent, m = t.match(/(Lähde|Lähteet):/); if (!m) return;
+    const lk = chartLinks(c), i = m.index + m[0].length, used = new Set();
+    const tail = escH(t.slice(i)).replace(SRC_RE, nm => { const pr = SRC_ALIAS[nm].find(x => lk[x]); if (!pr || used.has(nm)) return nm; used.add(nm);
+      return `<a class="srcl" href="${lk[pr]}" target="_blank" rel="noopener">${nm}</a>`; });
+    if (used.size) p.innerHTML = escH(t.slice(0, i)) + tail;
+  }
   function dateDown(card) {
     const fv = card.querySelector(":scope > .fhead > .fval"); if (!fv || !fv.innerHTML.trim() || !card.querySelector(":scope > svg.fc") || (card._zc && card._zc.hdr)) return;
     const last = card.lastElementChild;
@@ -2058,7 +2083,7 @@ footer .flinks .lnk:hover { text-decoration-color: currentColor; }
       b.onclick = () => { pe.hidden = !pe.hidden; b.textContent = pe.hidden ? "Näytä selite" : "Piilota selite"; };
       fm.insertBefore(b, fm.querySelector("button.dl"));
     }
-    const ps = document.createElement("p"); ps.className = "fnote"; ps.textContent = src; card.appendChild(ps);
+    const ps = document.createElement("p"); ps.className = "fnote"; ps.textContent = src; linkSrc(ps, card._zc || {}); card.appendChild(ps);
   }
   const fold1 = t => String(t).toLowerCase().replace(/[äå]/g, "a").replace(/ö/g, "o").split(/[^a-z0-9]+/).filter(Boolean);
   const slug1 = t => fold1(t)[0] || "", slugAll = t => fold1(t).slice(0, 6).join("-");
