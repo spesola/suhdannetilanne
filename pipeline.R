@@ -755,21 +755,23 @@ for (set in cfg$sets) {
       raws[[rid]] <- data.frame(date = m$date, value = m[[totS$id]] - rowSums(m[parts]))
       ser[[length(ser) + 1]] <- list(id = rid, label = totS$residual)
     }
-    # tyottomien maaran vuosimuutoksen hajotelma (tyovoimatutkimus), osuudet vaestosta:
-    # U = P*a - P*e (a = (E+U)/P tyovoimaosuus, e = E/P tyollisyysaste)
-    # => dU = dP*U0/P0 + P1*da - P1*de, summautuu tarkasti julkaistuilla (pyoristetyilla) luvuilla
+    # tyottomien maaran vuosimuutoksen hajotelma (tyovoimatutkimus), tyovoiman kautta:
+    # U = L*u, L = P*a (a = (E+U)/P tyovoimaosuus, u = U/L tyottomyysaste)
+    # => dU = dP*a0*u0 + P1*da*u0 + L1*du; tyovoimaan tulijoista oletetaan tyottomiksi sama osuus kuin tyovoimasta (u0),
+    #    joten osallistumisen ja tyollisyyden erat eivat kumoa toisiaan. Summautuu tarkasti julkaistuilla (pyoristetyilla) luvuilla
     dmem <- Filter(function(s) identical(s$set, set$id) && !is.null(s$decomp) && !isFALSE(s$enabled), cfg$series)
     if (length(dmem)) {
       dd <- lapply(dmem, function(s) { message("  ", s$id); setNames(fetch_series(s), c("date", s$decomp)) })
       m <- Reduce(function(a, b) merge(a, b, by = "date"), dd); m <- m[order(m$date), ]
       j <- match(idx_per(per_idx(m$date, freq) - lag, freq), m$date)
       P0 <- m$P[j]; P1 <- m$P
+      L0 <- m$E[j] + m$U[j]; L1 <- m$E + m$U; u0 <- m$U[j] / L0
       dec <- list(tu_d      = m$U - m$U[j],
                   tu_vaesto = (P1 - P0) * m$U[j] / P0,
-                  tu_osall  = P1 * ((m$E + m$U) / P1 - (m$E[j] + m$U[j]) / P0),
-                  tu_tyoll  = -P1 * (m$E / P1 - m$E[j] / P0))
+                  tu_osall  = P1 * (L1 / P1 - L0 / P0) * u0,
+                  tu_tyoll  = L1 * (m$U / L1 - u0))
       labs <- c(tu_d = "Työttömien määrän muutos", tu_vaesto = "Väestönkasvu",
-                tu_osall = "Työvoimaosuus", tu_tyoll = "Työllisyysaste")
+                tu_osall = "Työvoimaosuus", tu_tyoll = "Työttömyysaste")
       for (k in names(dec)) {
         raws[[k]] <- data.frame(date = m$date, value = dec[[k]])
         ser[[length(ser) + 1]] <- list(id = k, label = labs[[k]])

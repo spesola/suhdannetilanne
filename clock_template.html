@@ -489,6 +489,7 @@ body.zoomed { overflow: hidden; }
 button.dl { font: inherit; font-size: 0.78rem; color: var(--fg); background: none; border: 0; padding: 0; cursor: pointer; margin-left: 10px; text-decoration: underline; text-underline-offset: 3px; text-decoration-color: var(--line); }
 button.dl:hover { text-decoration-color: var(--fg); }
 .fmeta { display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: 6px 16px; margin-top: 8px; }
+.fmeta.e { margin-top: 0; }
 .fmeta .legend { margin-top: 0; }
 .fmeta > .dl { margin-left: auto; }
 .fhead > .dl { margin-left: auto; }
@@ -2105,7 +2106,7 @@ footer .flinks .lnk:hover { text-decoration-color: currentColor; }
       const lb = document.createElement("button"); lb.type = "button"; lb.className = "dl"; lb.textContent = "Kopioi linkki"; lb.title = "Kopioi linkki tähän kuvioon";
       lb.onclick = () => copyLink(hashFor() + (ttl ? "~" + slugAll(ttl) : "")); m.appendChild(lb); }
     card.append(mb, m);
-    card.querySelectorAll(":scope > .fmeta").forEach(f => { if (!f.children.length) f.remove(); });
+    card.querySelectorAll(":scope > .fmeta").forEach(f => { if (!f.children.length) f.classList.add("e"); });   // tyhja rivi jaa: rinnakkaisten korttien rivit (subgrid) pysyvat linjassa
     mb.onclick = e => { e.stopPropagation(); const open = m.hidden; closeMenus(); if (open) { m.hidden = false; mb.setAttribute("aria-expanded", "true"); m.querySelector("button").focus(); } };
     m.addEventListener("click", e => { e.stopPropagation(); if (e.target.closest("button")) { closeMenus(); mb.focus({ preventScroll: true }); } });
     const svg = card.querySelector(":scope > svg.fc");
