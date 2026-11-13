@@ -82,7 +82,7 @@ jobs:
           mkdir -p public
           # doctype ja kieli: ilman doctypea selain kayttaa quirks-tilaa
           { echo '<!doctype html><html lang="fi">'; cat suhdannetilanne.html; } > public/index.html
-          cp clock.json favicon.svg public/
+          cp clock.json favicon.svg favicon.ico favicon-96.png apple-touch-icon.png public/
           cp -r fonts public/
           # sivustokartta hakukoneille, muutospaivana julkaisupaiva
           printf '<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"><url><loc>https://suhdannetilanne.fi/</loc><lastmod>%s</lastmod><changefreq>daily</changefreq></url></urlset>\n' "$(date -u +%Y-%m-%d)" > public/sitemap.xml
