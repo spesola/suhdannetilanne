@@ -1917,6 +1917,33 @@
           "note": "Julkisyhteisöjen tulot ja menot käyvin hinnoin, neljän neljänneksen liukuvan summan muutos vuodentakaisesta. Lähde: Tilastokeskus."
         },
         {
+          "id": "jt_jk",
+          "section": "Rahoitusasema",
+          "title": "Julkisten kulutusmenojen muutos menolajeittain",
+          "unit": "%",
+          "dec": 1,
+          "lines": [
+            "jt_jk_tot"
+          ],
+          "stack": [
+            "jt_jk_d1",
+            "jt_jk_p2",
+            "jt_jk_d632",
+            "jt_jk_p51c",
+            "jt_jk_sales",
+            "jt_jk_muu"
+          ],
+          "barSpan": 3,
+          "connect": true,
+          "from": 2015,
+          "size": "half",
+          "colors": {
+            "jt_jk_tot": "var(--fg)"
+          },
+          "stackUnit": "%-yks.",
+          "note": "Käyvin hinnoin, neljän neljänneksen liukuvan summan muutos vuodentakaisesta. Ostopalvelut: ostettuna markkinatuotantona annetut luontoisetuudet (esim. palvelusetelit, yksityiset hoivapalvelut). Myyntitulot vähennetään kulutusmenoista. Muut erät: mm. tuotantoverot. Lähde: Tilastokeskus, oma laskelma."
+        },
+        {
           "id": "jt_tel",
           "section": "Rahoitusasema",
           "title": "Työeläkelaitosten sijoitustuotto, arvio, %",
@@ -8168,6 +8195,76 @@
       "q_to_m": true,
       "handling": "none",
       "kind": "level"
+    },
+    {
+      "id": "jt_jk_tot",
+      "label": "Julkiset kulutusmenot",
+      "set": "julkinen",
+      "source": "jk_decomp",
+      "part": "tot",
+      "handling": "none",
+      "kind": "level",
+      "q_to_m": true
+    },
+    {
+      "id": "jt_jk_d1",
+      "label": "Palkansaajakorvaukset",
+      "set": "julkinen",
+      "source": "jk_decomp",
+      "part": "d1",
+      "handling": "none",
+      "kind": "level",
+      "q_to_m": true
+    },
+    {
+      "id": "jt_jk_p2",
+      "label": "Välituotekäyttö",
+      "set": "julkinen",
+      "source": "jk_decomp",
+      "part": "p2",
+      "handling": "none",
+      "kind": "level",
+      "q_to_m": true
+    },
+    {
+      "id": "jt_jk_d632",
+      "label": "Ostopalvelut (luontoisetuudet)",
+      "set": "julkinen",
+      "source": "jk_decomp",
+      "part": "d632",
+      "handling": "none",
+      "kind": "level",
+      "q_to_m": true
+    },
+    {
+      "id": "jt_jk_p51c",
+      "label": "Kiinteän pääoman kuluminen",
+      "set": "julkinen",
+      "source": "jk_decomp",
+      "part": "p51c",
+      "handling": "none",
+      "kind": "level",
+      "q_to_m": true
+    },
+    {
+      "id": "jt_jk_sales",
+      "label": "Myyntitulot (vähennys)",
+      "set": "julkinen",
+      "source": "jk_decomp",
+      "part": "sales",
+      "handling": "none",
+      "kind": "level",
+      "q_to_m": true
+    },
+    {
+      "id": "jt_jk_muu",
+      "label": "Muut erät",
+      "set": "julkinen",
+      "source": "jk_decomp",
+      "part": "muu",
+      "handling": "none",
+      "kind": "level",
+      "q_to_m": true
     }
   ]
 }
