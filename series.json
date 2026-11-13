@@ -905,6 +905,20 @@
                 "unit": "",
                 "dec": 1,
                 "note": "Myynnin määrä, kausitasoitettu, neljänneksen keskiarvo. Lähde: Tilastokeskus, rakentamisen liikevaihtokuvaaja."
+              },
+              {
+                "title": "Paketti- ja kuorma-autojen ensirekisteröinnit, liukuva vuosisumma, tuhatta",
+                "lines": [
+                  "x_ensirek_pa",
+                  "x_ensirek_ka"
+                ],
+                "colors": {
+                  "x_ensirek_pa": "var(--accent)",
+                  "x_ensirek_ka": "var(--g2)"
+                },
+                "unit": "",
+                "dec": 1,
+                "note": "Neljän neljänneksen summa, Manner-Suomi. Lähde: Tilastokeskus."
               }
             ],
             "bkt_vienti": [
@@ -1027,6 +1041,22 @@
                 "dec": 1,
                 "from": 2017,
                 "note": "Vientikuljetukset tonneina, 12 kk liukuvan summan muutos vuodentakaisesta. Metsäteollisuus: sahatavara, sellu, paperi ja vaneri. Lähde: Tilastokeskus."
+              },
+              {
+                "title": "Konttiliikenne satamissa, tuhatta TEU (12 kk summa)",
+                "monthly": true,
+                "lines": [
+                  "x_teu_v",
+                  "x_teu_t"
+                ],
+                "colors": {
+                  "x_teu_v": "var(--accent)",
+                  "x_teu_t": "var(--g2)"
+                },
+                "unit": "",
+                "dec": 0,
+                "from": 2017,
+                "note": "Ulkomaan meriliikenteen kontit (TEU), pl. kauttakulkuliikenne, 12 kk liukuva summa. Lähde: Tilastokeskus."
               }
             ],
             "bkt_tuonti": [
@@ -9077,6 +9107,112 @@
         "suunta_10_20200101": "000",
         "contentscode": "uvliik-tonn"
       }
+    },
+    {
+      "id": "x_ensirek_pa",
+      "label": "Pakettiautot",
+      "set": "bkt",
+      "chart_only": true,
+      "source": "statfin",
+      "table": "merek/11ar.px",
+      "pick": {
+        "ajoneuvolaji_2_20190101": "02",
+        "maakunta_26_20190101": "MA1",
+        "contentscode": "merek-N"
+      },
+      "to_quarter": "sum",
+      "mult": 0.001,
+      "roll": 4
+    },
+    {
+      "id": "x_ensirek_ka",
+      "label": "Kuorma-autot",
+      "set": "bkt",
+      "chart_only": true,
+      "source": "statfin",
+      "table": "merek/11ar.px",
+      "pick": {
+        "ajoneuvolaji_2_20190101": "03",
+        "maakunta_26_20190101": "MA1",
+        "contentscode": "merek-N"
+      },
+      "to_quarter": "sum",
+      "mult": 0.001,
+      "roll": 4
+    },
+    {
+      "id": "x_teu_v",
+      "label": "Vienti",
+      "set": "bkt",
+      "chart_only": true,
+      "monthly": true,
+      "source": "sum",
+      "parts": [
+        {
+          "source": "statfin",
+          "table": "uvliik/12iy.px",
+          "pick": {
+            "satama_2_20200101": "SSSSS",
+            "suunta_10_20200101": "000",
+            "liikennetyyppi_2_20200101": "SSS",
+            "contentscode": "teut"
+          },
+          "na0": true
+        },
+        {
+          "source": "statfin",
+          "table": "uvliik/12iy.px",
+          "pick": {
+            "satama_2_20200101": "SSSSS",
+            "suunta_10_20200101": "000",
+            "liikennetyyppi_2_20200101": "002",
+            "contentscode": "teut"
+          },
+          "na0": true,
+          "neg": true
+        }
+      ],
+      "roll": 12,
+      "mult": 0.001,
+      "handling": "none",
+      "kind": "level"
+    },
+    {
+      "id": "x_teu_t",
+      "label": "Tuonti",
+      "set": "bkt",
+      "chart_only": true,
+      "monthly": true,
+      "source": "sum",
+      "parts": [
+        {
+          "source": "statfin",
+          "table": "uvliik/12iy.px",
+          "pick": {
+            "satama_2_20200101": "SSSSS",
+            "suunta_10_20200101": "001",
+            "liikennetyyppi_2_20200101": "SSS",
+            "contentscode": "teut"
+          },
+          "na0": true
+        },
+        {
+          "source": "statfin",
+          "table": "uvliik/12iy.px",
+          "pick": {
+            "satama_2_20200101": "SSSSS",
+            "suunta_10_20200101": "001",
+            "liikennetyyppi_2_20200101": "002",
+            "contentscode": "teut"
+          },
+          "na0": true,
+          "neg": true
+        }
+      ],
+      "roll": 12,
+      "mult": 0.001,
+      "handling": "none",
+      "kind": "level"
     }
   ]
 }
