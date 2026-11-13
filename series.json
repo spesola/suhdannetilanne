@@ -989,6 +989,44 @@
                 "unit": "",
                 "dec": 1,
                 "note": "Kausitasoitettu volyymi-indeksi, neljänneksen keskiarvo. Lähde: Eurostat."
+              },
+              {
+                "title": "Meriliikenteen vienti ja tuonti, vuosimuutos %",
+                "monthly": true,
+                "lines": [
+                  "x_mv_tot",
+                  "x_mv_plo",
+                  "x_mt_tot"
+                ],
+                "colors": {
+                  "x_mv_tot": "var(--fg)",
+                  "x_mv_plo": "var(--accent)",
+                  "x_mt_tot": "var(--g2)"
+                },
+                "unit": "%",
+                "dec": 1,
+                "from": 2017,
+                "note": "Ulkomaan meriliikenteen kuljetukset tonneina, 3 kk liukuvan summan muutos vuodentakaisesta. Öljy: raakaöljy ja öljytuotteet. Lähde: Tilastokeskus."
+              },
+              {
+                "title": "Merivienti tavaralajeittain, vuosimuutos %",
+                "monthly": true,
+                "lines": [
+                  "x_mv_mets",
+                  "x_mv_met",
+                  "x_mv_kem",
+                  "x_mv_kpl"
+                ],
+                "colors": {
+                  "x_mv_mets": "var(--accent)",
+                  "x_mv_met": "var(--g2)",
+                  "x_mv_kem": "var(--g3)",
+                  "x_mv_kpl": "var(--g5)"
+                },
+                "unit": "%",
+                "dec": 1,
+                "from": 2017,
+                "note": "Vientikuljetukset tonneina, 12 kk liukuvan summan muutos vuodentakaisesta. Metsäteollisuus: sahatavara, sellu, paperi ja vaneri. Lähde: Tilastokeskus."
               }
             ],
             "bkt_tuonti": [
@@ -2681,6 +2719,58 @@
       "unit": "ind. 1/2010=100",
       "raw_desc": "Raskaiden ajoneuvojen määrä LAM-pisteillä, kalenterikorjattu, kausitasoitettu, samojen pisteiden muutoksista ketjutettu",
       "kname": "Raskas liikenne"
+    },
+    {
+      "id": "meriv",
+      "label": "Merivienti pl. öljy",
+      "set": "suhdanne",
+      "group": "Kokeelliset",
+      "source": "sum",
+      "parts": [
+        {
+          "source": "statfin",
+          "table": "uvliik/12is.px",
+          "pick": {
+            "satama_2_20200101": "SSSSS",
+            "tavaralaji_20_20200101": "SSS",
+            "suunta_10_20200101": "000",
+            "contentscode": "uvliik-tonn"
+          },
+          "na0": true
+        },
+        {
+          "source": "statfin",
+          "table": "uvliik/12is.px",
+          "pick": {
+            "satama_2_20200101": "SSSSS",
+            "tavaralaji_20_20200101": "008",
+            "suunta_10_20200101": "000",
+            "contentscode": "uvliik-tonn"
+          },
+          "neg": true,
+          "na0": true
+        },
+        {
+          "source": "statfin",
+          "table": "uvliik/12is.px",
+          "pick": {
+            "satama_2_20200101": "SSSSS",
+            "tavaralaji_20_20200101": "009",
+            "suunta_10_20200101": "000",
+            "contentscode": "uvliik-tonn"
+          },
+          "neg": true,
+          "na0": true
+        }
+      ],
+      "from": "2016-01",
+      "handling": "sa_trend",
+      "kind": "volume",
+      "invert": false,
+      "in_composite": false,
+      "unit": "tonnia",
+      "kname": "Merivienti",
+      "raw_desc": "Ulkomaan meriliikenteen vientikuljetukset tonneina pl. raakaöljy ja öljytuotteet, kausitasoitettu trendi"
     },
     {
       "id": "palv_vol",
@@ -8768,6 +8858,225 @@
       "kind": "level",
       "roll": 12,
       "mult": 1e-09
+    },
+    {
+      "id": "x_mv_tot",
+      "label": "Vienti",
+      "set": "bkt",
+      "chart_only": true,
+      "monthly": true,
+      "roll": 3,
+      "pct_lag": 12,
+      "handling": "none",
+      "kind": "level",
+      "source": "statfin",
+      "table": "uvliik/12is.px",
+      "pick": {
+        "satama_2_20200101": "SSSSS",
+        "tavaralaji_20_20200101": "SSS",
+        "suunta_10_20200101": "000",
+        "contentscode": "uvliik-tonn"
+      }
+    },
+    {
+      "id": "x_mv_plo",
+      "label": "Vienti pl. öljy",
+      "set": "bkt",
+      "chart_only": true,
+      "monthly": true,
+      "roll": 3,
+      "pct_lag": 12,
+      "handling": "none",
+      "kind": "level",
+      "source": "sum",
+      "parts": [
+        {
+          "source": "statfin",
+          "table": "uvliik/12is.px",
+          "pick": {
+            "satama_2_20200101": "SSSSS",
+            "tavaralaji_20_20200101": "SSS",
+            "suunta_10_20200101": "000",
+            "contentscode": "uvliik-tonn"
+          },
+          "na0": true
+        },
+        {
+          "source": "statfin",
+          "table": "uvliik/12is.px",
+          "pick": {
+            "satama_2_20200101": "SSSSS",
+            "tavaralaji_20_20200101": "008",
+            "suunta_10_20200101": "000",
+            "contentscode": "uvliik-tonn"
+          },
+          "neg": true,
+          "na0": true
+        },
+        {
+          "source": "statfin",
+          "table": "uvliik/12is.px",
+          "pick": {
+            "satama_2_20200101": "SSSSS",
+            "tavaralaji_20_20200101": "009",
+            "suunta_10_20200101": "000",
+            "contentscode": "uvliik-tonn"
+          },
+          "neg": true,
+          "na0": true
+        }
+      ]
+    },
+    {
+      "id": "x_mt_tot",
+      "label": "Tuonti",
+      "set": "bkt",
+      "chart_only": true,
+      "monthly": true,
+      "roll": 3,
+      "pct_lag": 12,
+      "handling": "none",
+      "kind": "level",
+      "source": "statfin",
+      "table": "uvliik/12is.px",
+      "pick": {
+        "satama_2_20200101": "SSSSS",
+        "tavaralaji_20_20200101": "SSS",
+        "suunta_10_20200101": "001",
+        "contentscode": "uvliik-tonn"
+      }
+    },
+    {
+      "id": "x_mv_mets",
+      "label": "Metsäteollisuus",
+      "set": "bkt",
+      "chart_only": true,
+      "monthly": true,
+      "roll": 12,
+      "pct_lag": 12,
+      "handling": "none",
+      "kind": "level",
+      "source": "sum",
+      "parts": [
+        {
+          "source": "statfin",
+          "table": "uvliik/12is.px",
+          "pick": {
+            "satama_2_20200101": "SSSSS",
+            "tavaralaji_20_20200101": "002",
+            "suunta_10_20200101": "000",
+            "contentscode": "uvliik-tonn"
+          },
+          "na0": true
+        },
+        {
+          "source": "statfin",
+          "table": "uvliik/12is.px",
+          "pick": {
+            "satama_2_20200101": "SSSSS",
+            "tavaralaji_20_20200101": "003",
+            "suunta_10_20200101": "000",
+            "contentscode": "uvliik-tonn"
+          },
+          "na0": true
+        },
+        {
+          "source": "statfin",
+          "table": "uvliik/12is.px",
+          "pick": {
+            "satama_2_20200101": "SSSSS",
+            "tavaralaji_20_20200101": "004",
+            "suunta_10_20200101": "000",
+            "contentscode": "uvliik-tonn"
+          },
+          "na0": true
+        },
+        {
+          "source": "statfin",
+          "table": "uvliik/12is.px",
+          "pick": {
+            "satama_2_20200101": "SSSSS",
+            "tavaralaji_20_20200101": "005",
+            "suunta_10_20200101": "000",
+            "contentscode": "uvliik-tonn"
+          },
+          "na0": true
+        }
+      ]
+    },
+    {
+      "id": "x_mv_met",
+      "label": "Metallit ja malmit",
+      "set": "bkt",
+      "chart_only": true,
+      "monthly": true,
+      "roll": 12,
+      "pct_lag": 12,
+      "handling": "none",
+      "kind": "level",
+      "source": "sum",
+      "parts": [
+        {
+          "source": "statfin",
+          "table": "uvliik/12is.px",
+          "pick": {
+            "satama_2_20200101": "SSSSS",
+            "tavaralaji_20_20200101": "007",
+            "suunta_10_20200101": "000",
+            "contentscode": "uvliik-tonn"
+          },
+          "na0": true
+        },
+        {
+          "source": "statfin",
+          "table": "uvliik/12is.px",
+          "pick": {
+            "satama_2_20200101": "SSSSS",
+            "tavaralaji_20_20200101": "006",
+            "suunta_10_20200101": "000",
+            "contentscode": "uvliik-tonn"
+          },
+          "na0": true
+        }
+      ]
+    },
+    {
+      "id": "x_mv_kem",
+      "label": "Kemikaalit",
+      "set": "bkt",
+      "chart_only": true,
+      "monthly": true,
+      "roll": 12,
+      "pct_lag": 12,
+      "handling": "none",
+      "kind": "level",
+      "source": "statfin",
+      "table": "uvliik/12is.px",
+      "pick": {
+        "satama_2_20200101": "SSSSS",
+        "tavaralaji_20_20200101": "012",
+        "suunta_10_20200101": "000",
+        "contentscode": "uvliik-tonn"
+      }
+    },
+    {
+      "id": "x_mv_kpl",
+      "label": "Kappaletavara",
+      "set": "bkt",
+      "chart_only": true,
+      "monthly": true,
+      "roll": 12,
+      "pct_lag": 12,
+      "handling": "none",
+      "kind": "level",
+      "source": "statfin",
+      "table": "uvliik/12is.px",
+      "pick": {
+        "satama_2_20200101": "SSSSS",
+        "tavaralaji_20_20200101": "015",
+        "suunta_10_20200101": "000",
+        "contentscode": "uvliik-tonn"
+      }
     }
   ]
 }

@@ -454,7 +454,8 @@ fetch_series <- function(s) {
   # valimuisti: onnistunut haku tallennetaan, epaonnistuessa kaytetaan edellista hakua
   cache <- file.path(CACHE_DIR, paste0(s$id, ".csv"))
   d <- tryCatch({
-    x <- f(s); dir.create(CACHE_DIR, showWarnings = FALSE)
+    x <- f(s); if (isTRUE(s$na0)) x$value[is.na(x$value)] <- 0   # na0: puuttuva = ei kuljetuksia (esim. "." meriliikenteen tavaralajeissa)
+    dir.create(CACHE_DIR, showWarnings = FALSE)
     write.csv(x, cache, row.names = FALSE); writeLines(format(Sys.time(), "%Y-%m-%d %H:%M:%S"), paste0(cache, ".t")); x
   }, error = function(e) {
     if (!file.exists(cache)) stop("Haku epaonnistui eika valimuistia ole: ", s$id, " (", conditionMessage(e), ")")
@@ -930,7 +931,7 @@ SRC_NAMES <- list(
                   tyti = "työvoimatutkimus", atp = "avoimet työpaikat", tyonv = "työnvälitystilasto", ati = "ansiotasoindeksi",
                   ktps = "palkkasummakuvaajat", khi = "kuluttajahintaindeksi", kbar = "kuluttajabarometri",
                   ashi = "osakeasuntojen hinnat", asvu = "asuntojen vuokrat", raku = "rakennus- ja asuntotuotanto",
-                  rlv = "rakentamisen liikevaihtokuvaaja", rki = "rakennuskustannusindeksi", ttvi = "teollisuustuotanto", teul = "teollisuuden uudet tilaukset",
+                  rlv = "rakentamisen liikevaihtokuvaaja", rki = "rakennuskustannusindeksi", uvliik = "ulkomaan meriliikenne", ttvi = "teollisuustuotanto", teul = "teollisuuden uudet tilaukset",
                   ktkk = "tuotannon suhdannekuvaaja", kony = "konkurssit",
                   plv = "palvelualojen liikevaihtokuvaaja", merek = "ajoneuvojen ensirekisteröinnit"),
   eurostat = list(.n = "Eurostat", ei_bsin_m_r2 = "Euroopan komission luottamuskyselyt", ei_bsbu_m_r2 = "Euroopan komission luottamuskyselyt",
