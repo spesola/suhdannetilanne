@@ -780,7 +780,7 @@ footer .flinks .lnk:hover { text-decoration-color: currentColor; }
   <section class="fcsec" id="fcSec" hidden><h2 class="fsec rfold" data-k="fc" role="button" tabindex="0" aria-expanded="false"><span class="chev" aria-hidden="true"><svg viewBox="0 0 12 12" width="14" height="14"><path d="M4 2.5 7.5 6 4 9.5"/></svg></span>Ennusteet</h2><div class="fgrid" id="fcGrid"></div></section>
   <section class="card" id="finSum" hidden></section>
   <section class="fgrid" id="charts" hidden></section>
-  <dialog class="zoom updd" id="upd" aria-label="Loki ja tulevat julkaisut"><div class="zbar"><button type="button" id="updClose">Sulje</button></div>
+  <dialog class="zoom updd" id="upd" aria-label="Julkaisut"><div class="zbar"><button type="button" id="updClose">Sulje</button></div>
     <div class="updg"><section><h2>Tulevat julkaisut</h2><div id="updNext"></div></section><section><h2>Loki</h2><div id="updLog"></div></section></div></dialog>
   <dialog class="zoom infod" id="info" aria-labelledby="infoT"><div class="zbar"><button type="button" id="infoClose">Sulje</button></div><h2 id="infoT"></h2><div class="ibody" id="infoB"></div></dialog>
   <dialog class="zoom" id="zoom" aria-label="Suurennettu kuvio"><div class="zbar"><button type="button" id="zoomClose">Sulje</button></div><div class="fgrid" id="zoomBody"></div></dialog>
@@ -893,7 +893,7 @@ footer .flinks .lnk:hover { text-decoration-color: currentColor; }
   function renderHeader() {
     const gen = new Date(D.meta.generated.replace(/(\+\d{2})(\d{2})$/, "$1:$2"));
     $("headline").textContent = "Suhdannetilanne";   // sivuston nimi pysyy, valilehti kertoo osion
-    $("sub").innerHTML = `Päivitetty ${gen.toLocaleDateString("fi-FI")}. <button type="button" class="lnk" id="updOpen">Loki ja tulevat julkaisut</button>`;
+    $("sub").innerHTML = `Päivitetty ${gen.toLocaleDateString("fi-FI")}. <button type="button" class="lnk" id="updOpen">Julkaisut</button>`;
     $("updOpen").onclick = openUpd;
     const box = $("sets"); box.innerHTML = "";
     D.sets.forEach(s => { const b = document.createElement("button"); b.type = "button"; b.innerHTML = `<span class="lg">${s.label}</span><span class="sh">${SHORT[s.id] || s.label}</span>`;
@@ -1379,7 +1379,7 @@ footer .flinks .lnk:hover { text-decoration-color: currentColor; }
 
   function renderFoot() {
     const logo = document.querySelector(".brand svg.logo");
-    $("foot").innerHTML = `<div><div class="fbrand">${logo ? logo.outerHTML : ""}Suhdannetilanne</div><nav class="flinks" aria-label="Sivuston tiedot"><button type="button" class="lnk" data-info="met">Menetelmä</button><button type="button" class="lnk" data-info="src">Lähteet</button><button type="button" class="lnk" id="updOpen2">Loki ja tulevat julkaisut</button></nav></div>
+    $("foot").innerHTML = `<div><div class="fbrand">${logo ? logo.outerHTML : ""}Suhdannetilanne</div><nav class="flinks" aria-label="Sivuston tiedot"><button type="button" class="lnk" data-info="met">Menetelmä</button><button type="button" class="lnk" data-info="src">Lähteet</button><button type="button" class="lnk" id="updOpen2">Julkaisut</button></nav></div>
       <div><p class="fh">Huomioitavaa</p><p>Suomen talouden suhdannetilanne avoimista tilastoista. Päivittyy arkisin.</p><p>Luvut haetaan automaattisesti avoimista tilastolähteistä, eikä niitä ole tarkoitettu sijoitusneuvoiksi. Tilastot tarkentuvat jälkikäteen, joten aiemmin esitetyt luvut voivat muuttua.</p></div>
       <div><p class="fh">Tietolähteet</p><p>${(D.meta.sources || []).map(x => x.name).join(", ")}.</p><p>Laskelmat ja esitystapa ovat omia.</p></div>`;
     INFO.met = { t: "Menetelmä", h: `<p>${D.meta.method}</p><p>${D.meta.composite}</p><p>${D.meta.growth || ""}</p><p>${D.meta.charts || ""}</p>
