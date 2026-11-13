@@ -259,7 +259,8 @@
         },
         {
           "label": "Inflaatio (KHI), v/v",
-          "series": "inflaatio_yy",
+          "series": "x_khi_m",
+          "monthly": true,
           "dec": 1,
           "unit": "%",
           "cmp": {
@@ -1010,6 +1011,52 @@
             "inflaatio": [
               {
                 "contrib": "inflaatio"
+              },
+              {
+                "title": "Inflaatio kuukausittain, %",
+                "monthly": true,
+                "lines": [
+                  "x_khi_m",
+                  "x_ykhi_m",
+                  "x_core_m"
+                ],
+                "colors": {
+                  "x_khi_m": "var(--fg)",
+                  "x_ykhi_m": "var(--g2)",
+                  "x_core_m": "var(--accent)"
+                },
+                "dash": [
+                  "x_core_m"
+                ],
+                "unit": "%",
+                "dec": 1,
+                "from": 2019,
+                "note": "Vuosimuutos. Pohjainflaatio: yhdenmukaistettu kuluttajahintaindeksi ilman energiaa, ruokaa, alkoholia ja tupakkaa. Lähteet: Tilastokeskus, Eurostat."
+              },
+              {
+                "title": "Inflaatio ja kontribuutiot kuukausittain",
+                "monthly": true,
+                "lines": [
+                  "x_kkm_tot"
+                ],
+                "stack": [
+                  "x_kkm_food",
+                  "x_kkm_nrg",
+                  "x_kkm_kor",
+                  "x_kkm_asu",
+                  "x_kkm_muut"
+                ],
+                "labels": {
+                  "x_kkm_tot": "KHI v/v"
+                },
+                "colors": {
+                  "x_kkm_tot": "var(--fg)"
+                },
+                "unit": "%",
+                "stackUnit": "%-yks.",
+                "dec": 1,
+                "from": 2021,
+                "note": "Kontribuutiot kuluttajahintaindeksin (KHI) vuosimuutokseen. Lähde: Tilastokeskus."
               },
               {
                 "title": "Inflaatio: Suomi ja euroalue, %",
@@ -6611,6 +6658,119 @@
         "coicop18": "TOT_X_NRG_FOOD"
       },
       "to_quarter": true
+    },
+    {
+      "id": "x_khi_m",
+      "label": "KHI",
+      "set": "bkt",
+      "chart_only": true,
+      "monthly": true,
+      "source": "statfin",
+      "table": "khi/122p.px",
+      "pick": {
+        "contentscode": "Vuosimuutos"
+      }
+    },
+    {
+      "id": "x_ykhi_m",
+      "label": "YKHI",
+      "set": "bkt",
+      "chart_only": true,
+      "monthly": true,
+      "source": "statfin",
+      "table": "khi/15b7.px",
+      "pick": {
+        "coicop_46_20231201": "SSS",
+        "contentscode": "vm_ykhi"
+      }
+    },
+    {
+      "id": "x_core_m",
+      "label": "YKHI pl. energia ja ruoka",
+      "set": "bkt",
+      "chart_only": true,
+      "monthly": true,
+      "source": "eurostat",
+      "ds": "prc_hicp_minr",
+      "geo": "FI",
+      "pick": {
+        "unit": "RCH_A",
+        "coicop18": "TOT_X_NRG_FOOD"
+      }
+    },
+    {
+      "id": "x_kkm_tot",
+      "label": "KHI v/v",
+      "set": "bkt",
+      "chart_only": true,
+      "monthly": true,
+      "source": "khi_ctrb",
+      "terms": {
+        "TOT": 1
+      }
+    },
+    {
+      "id": "x_kkm_food",
+      "label": "Ruoka ja alkoholijuomat",
+      "set": "bkt",
+      "chart_only": true,
+      "monthly": true,
+      "source": "khi_ctrb",
+      "terms": {
+        "01": 1,
+        "02": 1
+      }
+    },
+    {
+      "id": "x_kkm_nrg",
+      "label": "Energia",
+      "set": "bkt",
+      "chart_only": true,
+      "monthly": true,
+      "source": "khi_ctrb",
+      "terms": {
+        "045": 1,
+        "0722": 1
+      }
+    },
+    {
+      "id": "x_kkm_kor",
+      "label": "Asuntolainojen korot",
+      "set": "bkt",
+      "chart_only": true,
+      "monthly": true,
+      "source": "khi_ctrb",
+      "terms": {
+        "0463": 1
+      }
+    },
+    {
+      "id": "x_kkm_asu",
+      "label": "Muu asuminen",
+      "set": "bkt",
+      "chart_only": true,
+      "monthly": true,
+      "source": "khi_ctrb",
+      "terms": {
+        "04": 1,
+        "045": -1,
+        "0463": -1
+      }
+    },
+    {
+      "id": "x_kkm_muut",
+      "label": "Muut tavarat ja palvelut",
+      "set": "bkt",
+      "chart_only": true,
+      "monthly": true,
+      "source": "khi_ctrb",
+      "terms": {
+        "TOT": 1,
+        "01": -1,
+        "02": -1,
+        "04": -1,
+        "0722": -1
+      }
     },
     {
       "id": "x_as_vuokra",

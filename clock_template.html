@@ -1485,17 +1485,19 @@ footer .flinks .lnk:hover { text-decoration-color: currentColor; }
     const hero = document.querySelector("section.hero"), K = set.kpis || [];
     hero.classList.toggle("haskpi", !!K.length); if (!K.length) { $("kpiRow").innerHTML = ""; return; }
     $("summary").innerHTML = ""; $("hlead").innerHTML = "";
-    const lag = set.freq === "M" ? 12 : 4, win = set.freq === "M" ? 60 : 20, P = set.periods;
+    const lag0 = set.freq === "M" ? 12 : 4, win0 = set.freq === "M" ? 60 : 20, P0 = set.periods;
     const rowOf = id => { for (const c of set.charts || []) for (const r of c.rows || []) if (r.id === id) return r; return null; };
     const sg = (v, d) => (+v.toFixed(d) > 0 ? "+" : "") + fmtV(v, d);
     const u = x => x ? (x === "%" ? " %" : " " + x) : "";
     $("kpiRow").innerHTML = K.map(t => {
-      const s = set.series.find(x => x.id === t.series); if (!s) return "";
+      const mon = t.monthly && set.mperiods, SS = mon ? set.mseries || [] : set.series;   // monthly: neljannesnakyman kuukausisarja
+      const P = mon ? set.mperiods : P0, lag = mon ? 12 : lag0, win = mon ? 60 : win0;
+      const s = SS.find(x => x.id === t.series); if (!s) return "";
       const v = s.values, k = lastNN(v), r = t.row ? rowOf(t.row) : null;
       const val = r && r.last != null ? r.last : v[k];
       const km = r ? Math.max(0, P.indexOf(r.date.slice(0, 7))) || k : k, kb = km - lag, base = kb >= 0 ? v[kb] : null;
       const c = t.cmp || {}; let ct = "";
-      if (c.kind === "series") { const o = set.series.find(x => x.id === c.series); const ov = o ? o.values[k] : null; if (ov != null) ct = `${c.label} <b>${sg(ov, 1)}${u(c.unit)}</b>`; }
+      if (c.kind === "series") { const o = SS.find(x => x.id === c.series); const ov = o ? o.values[k] : null; if (ov != null) ct = `${c.label} <b>${sg(ov, 1)}${u(c.unit)}</b>`; }
       else if (base != null && c.kind === "diff") ct = `${c.label} <b>${sg(val - base, 1)}${u(c.unit)}</b>`;
       else if (base != null && c.kind === "kp") ct = `${c.label} <b>${sg((val - base) * 100, 0)} kp</b>`;
       else if (base != null && c.kind === "pct") ct = `${c.label} <b>${sg(100 * (val / base - 1), 1)} %</b>`;
@@ -2175,7 +2177,7 @@ footer .flinks .lnk:hover { text-decoration-color: currentColor; }
           return v.type === "scatter" ? { ...v, id: `${c.id}_${k}` }
           : v.growth ? { ...c, id: `${c.id}_${k}`, title: `${gRow.label}: kasvu`, lines: [grSel + "_yy"], bars: grSel + "_qq" }   // rivin kasvukuvio
           : v.contrib ? (cbv && ser(cbv.line) ? fromCb(cbv, `${c.id}_${k}`) : null)
-          : ({ ...c, ...v, id: `${c.id}_${k}`, bars: undefined, stack: undefined, size: "half", wide: false, w: undefined, height: undefined }); }).filter(Boolean);
+          : ({ ...c, ...v, id: `${c.id}_${k}`, bars: v.bars, stack: v.stack, size: "half", wide: false, w: undefined, height: undefined }); }).filter(Boolean);
       if (vw) return { ...c, ...vw, bars: undefined, stack: undefined };
       const cb = (c.contribs && c.contribs[gRow.id]) || (gRow.id === "bkt" ? c.contrib : null);
       return cb && ser(cb.line) ? fromCb(cb)
@@ -2202,7 +2204,10 @@ footer .flinks .lnk:hover { text-decoration-color: currentColor; }
     }
     const more = col ? $("grMoreGrid") : null; if (more) more.innerHTML = "";
     let tgt = box;
+    const SET = set, MSET = set.mperiods ? { ...set, periods: set.mperiods, series: set.mseries || [], freq: "M" } : null, SER = ser;
     charts.forEach(c0 => {
+      const mon = !!(c0.monthly && MSET), set = mon ? MSET : SET, ser = mon ? (id => set.series.find(x => x.id === id)) : SER;
+      const hooks = mon ? [] : chartHooks;                               // kuukausikuvio: oma hover, ei neljannesvuosikuvioiden tahdissa
       if (col && nth > 0) tgt = more;                                    // valitun rivin lisakuviot ylaparin alle
       if (c0.section && c0.section !== lastSec) {                        // valiotsikko osioiden valiin
         const h = document.createElement("h2"); h.className = "fsec"; h.textContent = c0.section; box.appendChild(h); lastSec = c0.section; }
@@ -2399,7 +2404,7 @@ footer .flinks .lnk:hover { text-decoration-color: currentColor; }
           valEl.innerHTML = `${fmtP(set.periods[j])}: v/v <b>${sg1(gy[j])}</b>, q/q <b>${sg1(gq[j])}</b>`;
         }
       };
-      show(null); chartHooks.push(show);
+      show(null); hooks.push(show);
       if (subEl && !subEl.hidden) subEl.style.minHeight = subEl.offsetHeight + "px";   // alaotsikon rivimaaran vaihtelu ei heiluta kuviota
       if (S.length && erit) {                                             // valitun jakson erittely kuvion viereen tai alle
         const side = document.createElement("div"); side.className = "card fcard side";
@@ -2416,13 +2421,13 @@ footer .flinks .lnk:hover { text-decoration-color: currentColor; }
           sv.textContent = fmtP(P[i]) + (su0 ? ", " + su0 : "");
           bx.innerHTML = `<span class="bl bt">${lbl(c.lines[0])}</span>${bar(g, "var(--fg)")}<span class="bv bt">${sg(g, c.dec)}${u}</span><span class="sep"></span>` +
             c.stack.map((id, k) => `<span class="bl">${ser(id).label}</span>${bar(vals[k], stCol(c, k), isRes(id) ? "hx" : "")}<span class="bv">${sg(vals[k], c.dec)}</span>`).join(""); };
-        draw(null); chartHooks.push(draw);
+        draw(null); hooks.push(draw);
       }
       const hit = el("rect", { x: ml, y: mt, width: W2 - ml - mr, height: H2 - mt - mb, fill: "transparent" }, svg);
       hit.addEventListener("pointermove", e => { const r = svg.getBoundingClientRect();
         const i = Math.max(0, Math.min(n - 1, Math.round(((e.clientX - r.left) / r.width * W2 - ml) / (W2 - ml - mr) * (n - 1))));
-        chartHooks.forEach(fn => fn(i + i0)); });
-      hit.addEventListener("pointerleave", () => chartHooks.forEach(fn => fn(null)));
+        hooks.forEach(fn => fn(i + i0)); });
+      hit.addEventListener("pointerleave", () => hooks.forEach(fn => fn(null)));
     });
     if (more) { $("grMore").hidden = !more.children.length; $("grMoreN").textContent = more.querySelectorAll(".fcard:not(.side)").length || ""; }
   }

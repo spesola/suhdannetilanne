@@ -742,7 +742,9 @@ for (set in cfg$sets) {
     for (s in cmem) { message("  ", s$id); raws[[s$id]] <- fetch_series(s); ser[[length(ser) + 1]] <- list(id = s$id, label = s$label) }
     # chart_only: tasosarjat rivikohtaisiin kuvioihin (esim. asuntojen hinnat ja kaupat alueittain), ei taulukkoon eika kelloon
     xmem <- Filter(function(s) identical(s$set, set$id) && isTRUE(s$chart_only) && !isFALSE(s$enabled), cfg$series)
-    for (s in xmem) { message("  ", s$id); raws[[s$id]] <- fetch_series(s); ser[[length(ser) + 1]] <- list(id = s$id, label = s$label) }
+    mser <- list()                                 # monthly: kuukausisarja neljannesnakymaan omalla kuukausiakselilla (esim. inflaatio)
+    for (s in xmem) { message("  ", s$id); raws[[s$id]] <- fetch_series(s)
+      if (isTRUE(s[["monthly"]])) mser[[length(mser) + 1]] <- list(id = s$id, label = s$label) else ser[[length(ser) + 1]] <- list(id = s$id, label = s$label) }
     for (g in unique(vapply(cmem, grp_of, ""))) {
       gm <- Filter(function(s) grp_of(s) == g, cmem)
       totS <- Filter(function(s) isTRUE(s$contrib_total), gm)[[1]]
@@ -787,12 +789,20 @@ for (set in cfg$sets) {
       nd <- max(as.Date(vapply(fc$rows, function(r) r$date, "")))
       if (as.numeric(Sys.Date() - nd) > 60) CHECKS <- c(CHECKS, sprintf("BKT-ennusteet: uusin ennuste %s, päivitä series.json", format(nd, "%d.%m.%Y")))
     }
+    mper <- NULL; mser_out <- NULL
+    if (length(mser)) {
+      ml <- max(unlist(lapply(mser, function(x) { r <- raws[[x$id]]; r$date[!is.na(r$value)] })))
+      mper <- idx_per(per_idx(sprintf("%d-01", from_y), "M"):per_idx(ml, "M"), "M")
+      mser_out <- unname(lapply(mser, function(x) { r <- raws[[x$id]]
+        list(id = x$id, label = x$label, last = r$date[max(which(!is.na(r$value)))], values = r3(r$value[match(mper, r$date)])) }))
+    }
     sets_out[[length(sets_out) + 1]] <- list(
       id = set$id, label = set$label, freq = freq, default = isTRUE(set$default), view = "charts",
       from = from_y, periods = periods, charts = set$charts, colors = set$colors, forecast = fc,
       growth = unname(rows), tabs = set$tabs, kpis = set$kpis,   # kasvunakyma: taulukko ja kuviot (ei karttaa), alavalilehdet
       series = unname(lapply(ser, function(x) { r <- raws[[x$id]]
-        list(id = x$id, label = x$label, last = r$date[max(which(!is.na(r$value)))], values = r3(r$value[match(periods, r$date)])) })))
+        list(id = x$id, label = x$label, last = r$date[max(which(!is.na(r$value)))], values = r3(r$value[match(periods, r$date)])) })),
+      mperiods = mper, mseries = mser_out)
     next
   }
   clock_members <- Filter(function(s) !isFALSE(s$in_clock), members)
@@ -1037,12 +1047,12 @@ base_id <- function(id) sub("_(qq|yy)$", "", sub("^h_", "", id))
 fmt_per <- function(p, q = FALSE) if (grepl("-Q", p)) paste0("Q", substr(p, 7, 7), "/", substr(p, 1, 4)) else if (q) paste0("Q", as.integer(substr(p, 6, 7)) %/% 3, "/", substr(p, 1, 4)) else paste0(as.integer(substr(p, 6, 7)), "/", substr(p, 1, 4))
 log_state <- list()
 for (st in sets_out) {
-  for (x in c(lapply(st$indicators, function(x) c(x, list(clock = TRUE))), st$series)) {
+  for (x in c(lapply(st$indicators, function(x) c(x, list(clock = TRUE))), st$series, lapply(st$mseries, function(x) c(x, list(mon = TRUE))))) {
     if (is.null(x$last) || !length(x$last) || is.na(x$last)) next
     s <- tryCatch(ser_cfg(base_id(x$id)), error = function(e) NULL); if (is.null(s) || isTRUE(s$tile)) next
     k <- paste(st$id, base_id(x$id), sep = "/"); if (!is.null(log_state[[k]])) next
     q <- NA_character_; if (isTRUE(x$clock)) { i <- match(x$last, st$periods); if (!is.na(i)) q <- quad_of(x$level[i], x$change[i]) }
-    v <- if (!is.null(x$values)) x$values else x$raw; pm <- st$periods[!is.na(v)]   # neljannessarja kuukausiakselilla: Q-merkinta
+    v <- if (!is.null(x$values)) x$values else x$raw; pm <- (if (isTRUE(x$mon)) st$mperiods else st$periods)[!is.na(v)]   # neljannessarja kuukausiakselilla: Q-merkinta
     qo <- st$freq == "M" && length(pm) > 0 && all(as.integer(substr(pm, 6, 7)) %% 3 == 0)
     log_state[[k]] <- list(last = x$last, src = src_of(s), label = s$label, set = st$label, q = q, qo = qo, id = base_id(x$id))
   }
