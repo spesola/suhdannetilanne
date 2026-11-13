@@ -2323,6 +2323,52 @@
             "jt_trt_tt"
           ],
           "note": "3 kk liukuvan summan muutos vuodentakaisesta. Työttömyysetuudet oikealla akselilla. Lähde: Verohallinto (tulorekisteri)."
+        },
+        {
+          "id": "jt_tt_n",
+          "section": "Sosiaalietuudet",
+          "title": "Työttömyysetuuksien saajat, tuhatta",
+          "lines": [
+            "jt_tt_n_ansio",
+            "jt_tt_n_kela"
+          ],
+          "colors": {
+            "jt_tt_n_ansio": "var(--accent)",
+            "jt_tt_n_kela": "var(--g2)"
+          },
+          "unit": "",
+          "dec": 0,
+          "from": 2021,
+          "size": "half",
+          "note": "Henkilöt, joille maksettiin etuutta kuukauden aikana, 3 kk liukuva keskiarvo. Lähde: Verohallinto (tulorekisteri)."
+        },
+        {
+          "id": "jt_tt_e",
+          "section": "Sosiaalietuudet",
+          "title": "Työttömyysetuudet, mrd € (12 kk summa)",
+          "lines": [
+            "jt_tt_e_tot"
+          ],
+          "stack": [
+            "jt_tt_e_ansio",
+            "jt_tt_e_kela"
+          ],
+          "stackColors": [
+            "var(--accent)",
+            "var(--g2)"
+          ],
+          "colors": {
+            "jt_tt_e_tot": "var(--fg)"
+          },
+          "labels": {
+            "jt_tt_e_tot": "Yhteensä"
+          },
+          "unit": "mrd €",
+          "stackUnit": "mrd €",
+          "dec": 2,
+          "from": 2021,
+          "size": "half",
+          "note": "Veronalaiset työttömyysetuudet, 12 kk liukuva summa. Lähde: Verohallinto (tulorekisteri)."
         }
       ]
     }
@@ -8637,6 +8683,91 @@
           "from": "2026-01"
         }
       ]
+    },
+    {
+      "id": "jt_tt_n_ansio",
+      "label": "Ansiopäivärahat",
+      "set": "julkinen",
+      "source": "statfin",
+      "px_base": "https://vero2.stat.fi/PXWeb/api/v1/fi/Vero/",
+      "table": "Tulorekisteri/trt_010.px",
+      "pick": {
+        "Verotuskunta": "000",
+        "Erä": "TRT_TULOT_90",
+        "Tunnusluvut": "Arvo_n"
+      },
+      "handling": "none",
+      "kind": "level",
+      "ma": 3,
+      "mult": 0.001
+    },
+    {
+      "id": "jt_tt_n_kela",
+      "label": "Kelan työttömyysetuudet",
+      "set": "julkinen",
+      "source": "statfin",
+      "px_base": "https://vero2.stat.fi/PXWeb/api/v1/fi/Vero/",
+      "table": "Tulorekisteri/trt_010.px",
+      "pick": {
+        "Verotuskunta": "000",
+        "Erä": "TRT_TULOT_100",
+        "Tunnusluvut": "Arvo_n"
+      },
+      "handling": "none",
+      "kind": "level",
+      "ma": 3,
+      "mult": 0.001
+    },
+    {
+      "id": "jt_tt_e_tot",
+      "label": "Yhteensä",
+      "set": "julkinen",
+      "source": "statfin",
+      "px_base": "https://vero2.stat.fi/PXWeb/api/v1/fi/Vero/",
+      "table": "Tulorekisteri/trt_010.px",
+      "pick": {
+        "Verotuskunta": "000",
+        "Erä": "TRT_TULOT_80",
+        "Tunnusluvut": "Arvo_sum"
+      },
+      "handling": "none",
+      "kind": "level",
+      "roll": 12,
+      "mult": 1e-09
+    },
+    {
+      "id": "jt_tt_e_ansio",
+      "label": "Ansiopäivärahat",
+      "set": "julkinen",
+      "source": "statfin",
+      "px_base": "https://vero2.stat.fi/PXWeb/api/v1/fi/Vero/",
+      "table": "Tulorekisteri/trt_010.px",
+      "pick": {
+        "Verotuskunta": "000",
+        "Erä": "TRT_TULOT_90",
+        "Tunnusluvut": "Arvo_sum"
+      },
+      "handling": "none",
+      "kind": "level",
+      "roll": 12,
+      "mult": 1e-09
+    },
+    {
+      "id": "jt_tt_e_kela",
+      "label": "Kelan työttömyysetuudet",
+      "set": "julkinen",
+      "source": "statfin",
+      "px_base": "https://vero2.stat.fi/PXWeb/api/v1/fi/Vero/",
+      "table": "Tulorekisteri/trt_010.px",
+      "pick": {
+        "Verotuskunta": "000",
+        "Erä": "TRT_TULOT_100",
+        "Tunnusluvut": "Arvo_sum"
+      },
+      "handling": "none",
+      "kind": "level",
+      "roll": 12,
+      "mult": 1e-09
     }
   ]
 }
