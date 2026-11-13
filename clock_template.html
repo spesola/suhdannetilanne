@@ -20,7 +20,7 @@
 <meta name="claude:viewport-fit-sides" content="cover">
 <link rel="preload" href="fonts/manrope-latin.woff2" as="font" type="font/woff2" crossorigin>
 <style>@font-face { font-family: "Manrope"; font-style: normal; font-weight: 200 800; font-display: swap; src: url("fonts/manrope-latin.woff2") format("woff2"); }</style>
-<script>try { const t = new URLSearchParams(location.search).get("teema") || localStorage.getItem("teema"); if (t === "vapor") document.documentElement.dataset.theme = t; } catch (e) {}
+<script>try { const t = new URLSearchParams(location.search).get("teema") || localStorage.getItem("teema"); if (t === "vapor" || t === "petrooli") document.documentElement.dataset.theme = t; } catch (e) {}
 function vaporFont() { if (document.getElementById("vfont")) return; const l = document.createElement("link"); l.id = "vfont"; l.rel = "stylesheet"; l.href = "https://fonts.googleapis.com/css2?family=Orbitron:wght@500&display=swap"; document.head.appendChild(l); }
 if (document.documentElement.dataset.theme === "vapor") vaporFont();
 </script>
@@ -44,6 +44,25 @@ if (document.documentElement.dataset.theme === "vapor") vaporFont();
 .hm td.hc { background: color-mix(in srgb, var(--hc) var(--hp), var(--surface)); }
 tr.pick:hover > td.hc, tr.pick:hover > td { filter: brightness(0.94); }
 tr.pick:hover > th { color: var(--accent); }
+/* Petrooli-teema (valinnainen): petrooli, okra ja siniset, kuviot ja taulukot valkoisina kortteina */
+:root[data-theme="petrooli"] { --bg: #f2f5f5; --surface: #f2f5f5; --plot: #ffffff; --fg: #161b22; --muted: #5f6b6d; --line: #dce3e2; --grid: #e8edec; --rule: #1f2933; --pt: #34403f;
+  --accent: #006475; --q-up: #006475; --q-turn: #c48903; --q-down: #c4382e; --q-rec: #365abd;
+  --g1: #006475; --g2: #c48903; --g3: #0098e8; --g4: #9da8a6; --g5: #1b396d; --g6: #365abd; --g7: #00959b; --g8: #b5d8cc; --dim: #c6d0ce; }
+:root[data-theme="petrooli"] .logo rect:last-child { fill: #00959b; }
+:root[data-theme="petrooli"] .card { border: 1px solid var(--line); border-radius: 10px; background: #fff; --surface: #fff; padding: 16px 18px; }
+:root[data-theme="petrooli"] .zoom .card.fcard, :root[data-theme="petrooli"] #tsContrib .card { border: 0; padding: 0; background: none; }
+:root[data-theme="petrooli"] .card > .more { top: 12px; right: 10px; }
+:root[data-theme="petrooli"] .haszoom > .more:not(.zb), :root[data-theme="petrooli"] .haszoom > .cmenu { right: 40px; }
+:root[data-theme="petrooli"] .card > .cmenu { top: 42px; }
+:root[data-theme="petrooli"] #tsContrib .card > .more, :root[data-theme="petrooli"] .zoom .card > .more { top: -4px; right: -6px; }
+:root[data-theme="petrooli"] #tsContrib .haszoom > .more:not(.zb), :root[data-theme="petrooli"] .zoom .haszoom > .more:not(.zb) { right: 24px; }
+:root[data-theme="petrooli"] .top, :root[data-theme="petrooli"] .tsgrid, :root[data-theme="petrooli"] .grrow, :root[data-theme="petrooli"] .grleft, :root[data-theme="petrooli"] .grside, :root[data-theme="petrooli"] .grpair { gap: 24px; }
+:root[data-theme="petrooli"] .fgrid { column-gap: 24px; margin-bottom: -24px; }
+:root[data-theme="petrooli"] .fgrid > *, :root[data-theme="petrooli"] .fgrid > :last-child { margin-bottom: 24px; }   /* sama marginaali kaikille: samalla rivilla olevat kortit yhta korkeita */
+:root[data-theme="petrooli"] .fgrid > .fsec { margin-bottom: 14px; }
+:root[data-theme="petrooli"] .kpirow { border: 1px solid var(--line); border-radius: 10px; overflow: hidden; background: #fff; }
+:root[data-theme="petrooli"] .kpi, :root[data-theme="petrooli"] .kpi:first-child { padding-left: 22px; padding-right: 22px; background: none; }
+@media (max-width: 860px) { :root[data-theme="petrooli"] .kpi, :root[data-theme="petrooli"] .kpi:nth-child(odd) { padding-left: 16px; padding-right: 12px; } }
 /* Vaporwave-teema (valinnainen): musta tausta, auringonlasku-neonvarit */
 :root[data-theme="vapor"] { --bg: #07050d; --surface: #07050d; --plot: #0c0816; --fg: #ece4f7; --muted: #a892c9; --line: #2a1c42; --grid: #191029; --rule: #e7d6ff; --pt: #d8c4f6;
   --accent: #b68cff; --q-up: #2de2e6; --q-turn: #ffa23d; --q-down: #ff3d7f; --q-rec: #6f86ff;
@@ -696,6 +715,7 @@ footer .flinks .lnk:hover { text-decoration-color: currentColor; }
       <div class="thm" id="thm" role="group" aria-label="Väriteema">
         <button type="button" data-t="" title="Vaalea" aria-label="Vaalea teema" style="--sw:linear-gradient(135deg, #fbfbfc 50%, #1d4f7f 50%)"></button>
         <button type="button" data-t="vapor" title="Vaporwave" aria-label="Vaporwave-teema" style="--sw:linear-gradient(180deg, #ffb347 0%, #ff4fd8 50%, #2b0a4d 100%)"></button>
+        <button type="button" data-t="petrooli" title="Petrooli" aria-label="Petrooli-teema" style="--sw:linear-gradient(135deg, #006475 50%, #c48903 50%)"></button>
       </div>
     </div>
   </div>
@@ -2402,7 +2422,7 @@ footer .flinks .lnk:hover { text-decoration-color: currentColor; }
     if (b.id === "grCharts") { clearTimeout(rzT); rzT = setTimeout(() => { drawCharts(); if (set.forecast) renderFc(); }, 150); return; }   // ylapari sovitetaan uudelleen
     if (nw !== lastNarrow) { lastNarrow = nw; renderCharts(b); } });
   function renderAll() { renderHeader(); update(); }
-  (function () {                                                    // teeman valinta: vaalea tai vaporwave, muistetaan selaimessa
+  (function () {                                                    // teeman valinta: vaalea, vaporwave tai petrooli, muistetaan selaimessa
     const bs = [...document.querySelectorAll("#thm button")], cur = () => document.documentElement.dataset.theme || "";
     const mark = () => bs.forEach(b => b.setAttribute("aria-pressed", b.dataset.t === cur()));
     bs.forEach(b => b.onclick = () => { if (b.dataset.t) { document.documentElement.dataset.theme = b.dataset.t; if (b.dataset.t === "vapor") vaporFont(); } else delete document.documentElement.dataset.theme;
