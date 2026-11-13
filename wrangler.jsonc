@@ -5,6 +5,7 @@
   "workers_dev": false,
   "preview_urls": false,
   "assets": { "directory": "./public", "binding": "ASSETS", "run_worker_first": true },
-  // arkisin (UTC): 6.05 = 8.05 talviaikaan Tilastokeskuksen julkaisujen jalkeen, 10.35 = 12.35 Eurostatin ja EKP:n julkaisujen jalkeen
-  "triggers": { "crons": ["5 6 * * 1-5", "35 10 * * 1-5"] }
+  // arkisin (UTC): 6.05 = 8.05 talviaikaan Tilastokeskuksen julkaisujen jalkeen, 10.35 = 12.35 Eurostatin ja EKP:n julkaisujen jalkeen;
+  // 6.35 ja 11.05 varmistavat, jos edellinen ajastus ei kaynnistanyt ajoa
+  "triggers": { "crons": ["5 6 * * 1-5", "35 6 * * 1-5", "35 10 * * 1-5", "5 11 * * 1-5"] }
 }
