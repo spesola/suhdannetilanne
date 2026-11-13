@@ -1258,14 +1258,15 @@
           }
         },
         {
-          "label": "Brent-öljy",
-          "series": "h_brent",
-          "row": "brent",
+          "label": "Euroalueen 10 v korko",
+          "series": "h_y10_ea",
+          "row": "y10_ea",
           "dec": 2,
-          "unit": "$",
+          "unit": "%",
           "cmp": {
-            "kind": "pct",
-            "label": "vuodessa"
+            "kind": "diff",
+            "label": "vuodessa",
+            "unit": "%-yks."
           }
         },
         {
