@@ -444,6 +444,8 @@ body { font-variant-numeric: tabular-nums; background: var(--bg); min-height: 10
 @media (prefers-reduced-motion: reduce) { .zoom[open], .zoom[open]::backdrop { animation: none; } }
 .zoom .zbar { display: flex; justify-content: flex-end; margin-bottom: 2px; }
 .updd { width: min(940px, calc(100vw - 24px)); }
+.chgd { width: min(620px, calc(100vw - 24px)); }
+.updg.one { grid-template-columns: minmax(0, 1fr); }
 .updg { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 16px 48px; padding: 0 4px 6px; }
 @media (max-width: 700px) { .updg { grid-template-columns: minmax(0, 1fr); } }
 .updg h2 { font-size: 1rem; font-weight: 600; margin: 0 0 4px; padding-bottom: 8px; border-bottom: 1px solid var(--rule); }
@@ -771,6 +773,8 @@ footer .flinks .lnk:hover { text-decoration-color: currentColor; }
   <section class="fgrid" id="charts" hidden></section>
   <dialog class="zoom updd" id="upd" aria-label="Julkaisut"><div class="zbar"><button type="button" id="updClose">Sulje</button></div>
     <div class="updg"><section><h2>Tulevat julkaisut</h2><div id="updNext"></div></section><section><h2>Loki</h2><div id="updLog"></div></section></div></dialog>
+  <dialog class="zoom updd chgd" id="chg" aria-label="Sivuston muutokset"><div class="zbar"><button type="button" id="chgClose">Sulje</button></div>
+    <div class="updg one"><section><h2>Sivuston muutokset</h2><div id="chgList"></div></section></div></dialog>
   <dialog class="zoom infod" id="info" aria-labelledby="infoT"><div class="zbar"><button type="button" id="infoClose">Sulje</button></div><h2 id="infoT"></h2><div class="ibody" id="infoB"></div></dialog>
   <dialog class="zoom" id="zoom" aria-label="Suurennettu kuvio"><div class="zbar"><button type="button" id="zoomClose">Sulje</button></div><div class="fgrid" id="zoomBody"></div></dialog>
 
@@ -1368,7 +1372,7 @@ footer .flinks .lnk:hover { text-decoration-color: currentColor; }
 
   function renderFoot() {
     const logo = document.querySelector(".brand svg.logo");
-    $("foot").innerHTML = `<div><div class="fbrand">${logo ? logo.outerHTML : ""}Suhdannetilanne</div><nav class="flinks" aria-label="Sivuston tiedot"><button type="button" class="lnk" data-info="met">Menetelmä</button><button type="button" class="lnk" data-info="src">Lähteet</button><button type="button" class="lnk" id="updOpen2">Julkaisut</button></nav></div>
+    $("foot").innerHTML = `<div><div class="fbrand">${logo ? logo.outerHTML : ""}Suhdannetilanne</div><nav class="flinks" aria-label="Sivuston tiedot"><button type="button" class="lnk" data-info="met">Menetelmä</button><button type="button" class="lnk" data-info="src">Lähteet</button><button type="button" class="lnk" id="updOpen2">Julkaisut</button><button type="button" class="lnk" id="chgOpen">Muutokset</button></nav></div>
       <div><p class="fh">Huomioitavaa</p><p>Suomen talouden suhdannetilanne avoimista tilastoista. Päivittyy arkisin.</p><p>Luvut haetaan automaattisesti avoimista tilastolähteistä, eikä niitä ole tarkoitettu sijoitusneuvoiksi. Tilastot tarkentuvat jälkikäteen, joten aiemmin esitetyt luvut voivat muuttua.</p></div>
       <div><p class="fh">Tietolähteet</p><p>${(D.meta.sources || []).map(x => x.name).join(", ")}.</p><p>Laskelmat ja esitystapa ovat omia.</p></div>`;
     INFO.met = { t: "Menetelmä", h: `<p>${D.meta.method}</p><p>${D.meta.composite}</p><p>${D.meta.growth || ""}</p><p>${D.meta.charts || ""}</p>
@@ -1376,7 +1380,7 @@ footer .flinks .lnk:hover { text-decoration-color: currentColor; }
     INFO.src = { t: "Lähteet", h: `<dl class="srcl">${(D.meta.sources || []).map(x => `<dt>${x.name}</dt><dd>${[].concat(x.items).join(", ")}</dd>`).join("")}</dl>
       <p><b>Käyttöehdot.</b> Tilastokeskuksen ja Maailmanpankin aineistot CC BY 4.0. Muut aineistot lähteiden käyttöehtojen mukaisesti, lähde mainiten. Epävarmuusindeksi: Baker, Bloom ja Davis, policyuncertainty.com. Laskelmat ja esitystapa ovat omia.</p>
       <p><b>Vastuuvapaus.</b> Sivuston tiedot perustuvat avoimiin lähteisiin. Tietoja ei ole tarkoitettu sijoitusneuvoiksi.</p>` };
-    $("foot").querySelectorAll("[data-info]").forEach(b => b.onclick = () => openInfo(b.dataset.info)); $("updOpen2").onclick = openUpd;
+    $("foot").querySelectorAll("[data-info]").forEach(b => b.onclick = () => openInfo(b.dataset.info)); $("updOpen2").onclick = openUpd; $("chgOpen").onclick = openChg;
   }
 
   function renderMeta() {
@@ -1760,6 +1764,8 @@ footer .flinks .lnk:hover { text-decoration-color: currentColor; }
       if (s.growth.some(r => r.id === id)) return base + "/" + id;
       const V = (s.charts && s.charts[0] && s.charts[0].views) || {};
       for (const row of Object.keys(V)) { const c = V[row].find(has); if (c) return base + "/" + row + (c.title ? "~" + slugAll(c.title) : ""); }
+      const CB = (s.charts && s.charts[0] && s.charts[0].contribs) || {};   // rivin kontribuutiokuvio
+      for (const row of Object.keys(CB)) if (has(CB[row])) return base + "/" + row + (CB[row].title ? "~" + slugAll(CB[row].title) : "");
       return base; }
     const c = (s.charts || []).find(has); if (!c) return base;
     const sec = c.section && (s.charts || []).find(x => x.section) && (s.charts || []).filter(x => x.section)[0].section !== c.section ? "/" + slug1(c.section) : "";
@@ -1769,6 +1775,37 @@ footer .flinks .lnk:hover { text-decoration-color: currentColor; }
     if (location.hash !== h) location.hash = h; else { const k = h.split("~")[1]; if (k) { wantCard = k; goCard(); } }
     if (top) setTimeout(() => { const t = $("topSec"), bar = parseFloat(getComputedStyle(document.documentElement).getPropertyValue("--barv")) || 60;
       scrollTo({ top: t.getBoundingClientRect().top + scrollY - bar - 16 }); }, 120); }
+  // sivuston muutokset: uudet kuviot ja muut isommat lisaykset (kasin yllapidetty, uusin ensin); set + id -> linkki kuvioon
+  const CHANGES = [
+    { d: "2026-11-13", t: "Työttömyysetuuksien saajat ja euromäärät (tulorekisteri)", set: "Julkinen talous", id: "jt_tt_n_ansio" },
+    { d: "2026-11-13", t: "Ansiotasoindeksi sektoreittain", set: "Reaalitalous", id: "x_ati_kok" },
+    { d: "2026-11-13", t: "Asuinrakentamisen kustannukset", set: "Reaalitalous", id: "x_rki_as" },
+    { d: "2026-11-13", t: "Työttömien määrän muutoksen hajotelma työvoiman kautta", set: "Reaalitalous", id: "tu_d" },
+    { d: "2026-11-13", t: "Kuvioiden lähteet linkkeinä tilastojen sivuille" },
+    { d: "2026-11-13", t: "Inflaatio kuukausittain: KHI, YKHI, pohjainflaatio ja kontribuutiot", set: "Reaalitalous", id: "x_khi_m" },
+    { d: "2026-11-13", t: "Julkisten kulutusmenojen menolajihajotelma", set: "Julkinen talous", id: "jt_jk_tot" },
+    { d: "2026-11-13", t: "Euroalueen 10 vuoden korko avainlukuihin", set: "Rahoitusmarkkinat", id: "h_y10_ea" },
+    { d: "2026-11-12", t: "Tavaroiden ja palveluiden ulkomaankauppa", set: "Reaalitalous", id: "x_tp_x" },
+    { d: "2026-11-12", t: "Talouden ilmapiiri: Suomi ja vientimaat", set: "Reaalitalous", id: "x_esi_fi" },
+    { d: "2026-11-12", t: "Syvälinkit ja kuvion linkin kopiointi" },
+    { d: "2026-11-11", t: "Työeläkelaitosten sijoitustuotto, arvio", set: "Julkinen talous", id: "jt_tel_ret" },
+    { d: "2026-11-10", t: "M3 rahan määrän kuvioon", set: "Rahoitusmarkkinat", id: "ea_m3" },
+    { d: "2026-11-09", t: "Korko-kasvuero (r − g)", set: "Julkinen talous", id: "jt_rg" },
+    { d: "2026-11-09", t: "Valtionvelan erääntymisprofiili", set: "Julkinen talous", id: "jt_eraant" },
+    { d: "2026-11-09", t: "BKT:n kasvu toimialoittain", set: "Reaalitalous", id: "kt_teol" },
+    { d: "2026-11-09", t: "Funktionaalinen tulonjako", set: "Reaalitalous", id: "x_tj_palkka" },
+    { d: "2026-11-09", t: "Raskas liikenne (kokeellinen)", set: "Suhdannetilanne", id: "raskasliik" },
+    { d: "2026-11-09", t: "Loki ja tulevat julkaisut" },
+  ];
+  function openChg() {
+    const g = new Map(); CHANGES.forEach(c => { if (!g.has(c.d)) g.set(c.d, []); g.get(c.d).push(c); });
+    $("chgList").innerHTML = [...g].map(([d, cs]) => `<p class="ud">${new Date(d + "T12:00:00").toLocaleDateString("fi-FI", { day: "numeric", month: "numeric", year: "numeric" })}</p>` +
+      cs.map(c => logRow(c, escH(c.t), c.set ? escH(c.set) : "")).join("")).join("");
+    $("chgList").querySelectorAll("[data-go]").forEach(b => b.onclick = () => { $("chg").close(); goTo(b.dataset.go); });
+    $("chg").showModal(); $("chgClose").focus();
+  }
+  $("chgClose").onclick = () => $("chg").close();
+  $("chg").addEventListener("click", e => { if (e.target === $("chg")) $("chg").close(); });
   function openInfo(k) { $("infoT").textContent = INFO[k].t; $("infoB").innerHTML = INFO[k].h; $("info").showModal(); $("infoClose").focus(); }
   $("infoClose").onclick = () => $("info").close();
   $("info").addEventListener("click", e => { if (e.target === $("info")) $("info").close(); });
