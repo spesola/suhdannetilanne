@@ -1075,6 +1075,16 @@ if (!is.null(prev)) {
     if (length(log) && identical(log[[1]]$date, today)) log[[1]] <- e else log <- c(list(e), log)
   }
 }
+# kasin lisatyt rivit: sarja tuli mukaan vasta julkaisupaivana, joten edellista tilaa ei ollut vertailuun
+for (sd in list(list(date = "2026-11-13", key = "bkt/x_khi_m"))) {
+  a <- log_state[[sd$key]]; if (is.null(a) || is.na(a$src)) next
+  if (any(vapply(log, function(e) any(vapply(e$upd, function(u) identical(u$set, a$set) && identical(u$src, a$src) && identical(u$last, a$last), TRUE)), TRUE))) next
+  u <- list(set = a$set, src = a$src, last = a$last, period = fmt_per(a$last, isTRUE(a$qo)), id = a$id)
+  i <- which(vapply(log, function(e) identical(e$date, sd$date), TRUE))
+  if (length(i)) log[[i[1]]]$upd <- c(list(u), log[[i[1]]]$upd) else {
+    log <- c(log, list(list(date = sd$date, upd = list(u), phase = list())))
+    log <- log[order(vapply(log, function(e) e$date, ""), decreasing = TRUE)] }
+}
 log <- Filter(function(e) as.Date(e$date) >= as.Date(today) - 60, log)
 # sarjan tunnus lokiriveille (sivulla rivin klikkaus vie kuvioon); vanhoille riveille haetaan lahteen tai nimen perusteella
 id_by <- function(set, f) { h <- Filter(function(a) identical(a$set, set) && f(a), log_state); if (length(h)) h[[1]]$id else NULL }
