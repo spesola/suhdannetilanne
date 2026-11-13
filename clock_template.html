@@ -1067,7 +1067,7 @@ footer .flinks .lnk:hover { text-decoration-color: currentColor; }
       hdr = `<p class="phl">Suhdannevaihe</p><p class="phb" style="--qc:${qcol(cq)}"><b>${Q[cq].short}</b><em>${fmtP(set.periods[k])} alkaen</em></p>`; }
     $("hlead").innerHTML = "";
     const anyMv = QORDER.some(q => mv[q].length);
-    $("summary").innerHTML = `<div class="phx${qf ? " f" : ""}">${hdr}<div class="phrs">${QORDER.map(q => `<button type="button" class="phr${q === cq ? " cur" : ""}${qf === q ? " on" : ""}" data-q="${q}" style="--qc:${qcol(q)};--N:${Math.max(1, ...Object.values(counts))}" aria-pressed="${qf === q}" aria-label="${Q[q].name}: ${counts[q]}. Klikkaa suodattaaksesi."><span class="nm">${Q[q].short}</span><span class="sq">${stay[q].map(x => `<i data-id="${x.s.id}" data-tip="${escH(x.s.label)}"${picked.has(x.s.id) ? ' class="pk"' : ""}></i>`).join("")}${mv[q].map(x => `<i class="new${picked.has(x.s.id) ? " pk" : ""}" data-id="${x.s.id}" data-tip="${escH(x.s.label)}" data-sub="${Q[x.q0].short} → ${Q[q].short.toLowerCase()} ${fmtP(set.periods[idx])}"></i>`).join("")}</span><span class="n">${counts[q]}</span></button>`).join("")}</div>${anyMv ? `<p class="phn"><i></i>siirtyi vaiheeseen ${fmtP(set.periods[idx])}</p>` : ""}</div>`;   // yksi neliö = yksi sarja
+    $("summary").innerHTML = `<div class="phx${qf ? " f" : ""}">${hdr}<div class="phrs">${QORDER.map(q => `<button type="button" class="phr${q === cq ? " cur" : ""}${qf === q ? " on" : ""}" data-q="${q}" style="--qc:${qcol(q)};--N:${Math.max(1, ...Object.values(counts))}" aria-pressed="${qf === q}" aria-label="${Q[q].name}: ${counts[q]}. Klikkaa suodattaaksesi."><span class="nm">${Q[q].short}</span><span class="sq">${stay[q].map(x => `<i data-id="${x.s.id}" data-tip="${escH(x.s.label)}"${picked.has(x.s.id) ? ' class="pk"' : ""}></i>`).join("")}${mv[q].map(x => `<i class="new${picked.has(x.s.id) ? " pk" : ""}" data-id="${x.s.id}" data-tip="${escH(x.s.label)}" data-sub="${Q[x.q0].short} → ${Q[q].short.toLowerCase()} ${fmtP(set.periods[idx])}"></i>`).join("")}</span><span class="n">${counts[q]}</span></button>`).join("")}</div>${anyMv ? `<p class="phn"><i></i>muutos ${fmtP(set.periods[idx])}</p>` : ""}</div>`;   // yksi neliö = yksi sarja
     $("summary").querySelectorAll("[data-q]").forEach(b => b.onclick = e => {
       const sq = e.target.closest("i[data-id]");                       // yksittainen neliö: vain se sarja valituksi
       if (sq) { const id = sq.dataset.id; if (sel === id && picked.size === 1) { clearPicks(); return; } qf = null; picked.clear(); sel = null; pick(id); return; }
@@ -1348,7 +1348,7 @@ footer .flinks .lnk:hover { text-decoration-color: currentColor; }
     ["lvl", "chg", "raw"].forEach(m => $("hm-" + m).setAttribute("aria-pressed", hmMode === m));
     $("hmTitle").textContent = raw ? "Julkaistu arvo" : lvl ? "Poikkeama trendistä" : `Muutos edellisestä ${set.freq === "M" ? "kuukaudesta" : "neljänneksestä"}`;
     $("hmNote").textContent = raw ? "Lähteen julkaisema luku sarjan omassa yksikössä. Nuoli: suunta edelliseen jaksoon."
-      : lvl ? "Nuoli: suunta edelliseen jaksoon." : "Standardoitu, kuten kartan vaaka-akseli.";
+      : lvl ? "Nuoli: suunta edelliseen jaksoon." : "Standardoitu.";
     const rawCell = (a, k) => { const v = a ? a[k] : null, p = a && k > 0 ? a[k - 1] : null;
       if (v == null) return `<td class="na">–</td>`;
       const rd = x => Math.abs(x) >= 1000 ? Math.round(x) : Math.round(x * 10) / 10;   // nuoli naytetyn tarkkuuden mukaan
