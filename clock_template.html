@@ -1398,8 +1398,7 @@ footer .flinks .lnk:hover { text-decoration-color: currentColor; }
   function renderFoot() {
     const logo = document.querySelector(".brand svg.logo");
     $("foot").innerHTML = `<div><div class="fbrand">${logo ? logo.outerHTML : ""}Suhdannetilanne</div><nav class="flinks" aria-label="Sivuston tiedot"><button type="button" class="lnk" data-info="met">Menetelmä</button><button type="button" class="lnk" data-info="src">Lähteet</button><button type="button" class="lnk" id="updOpen2">Loki ja tulevat julkaisut</button></nav></div>
-      <div><p class="fh">Huomioitavaa</p><p>Suomen talouden suhdannetilanne avoimista tilastoista. Päivittyy arkisin.</p><p>Sivusto ei ole viranomaisen julkaisu, eikä sen tietoja ole tarkoitettu sijoitusneuvoiksi.</p>
-        <p>Luvut haetaan avoimista tilastolähteistä automaattisesti. Tilastot tarkentuvat jälkikäteen, joten aiemmin esitetyt luvut voivat muuttua.</p></div>
+      <div><p class="fh">Huomioitavaa</p><p>Suomen talouden suhdannetilanne avoimista tilastoista. Päivittyy arkisin.</p><p>Luvut haetaan automaattisesti avoimista tilastolähteistä, eikä niitä ole tarkoitettu sijoitusneuvoiksi. Tilastot tarkentuvat jälkikäteen, joten aiemmin esitetyt luvut voivat muuttua.</p></div>
       <div><p class="fh">Tietolähteet</p><p>${(D.meta.sources || []).map(x => x.name).join(", ")}.</p><p>Laskelmat ja esitystapa ovat omia.</p></div>`;
     INFO.met = { t: "Menetelmä", h: `<p>${D.meta.method}</p><p>${D.meta.composite}</p><p>${D.meta.growth || ""}</p><p>${D.meta.charts || ""}</p>
       <p><b>Huomio.</b> ${D.meta.caveat} Kartan suurin piste on kokonaisindikaattori, ja viiva näyttää sen kulun kuuden kuukauden ajalta. Pisteen vihje kertoo, jos sarjan viimeisin havainto on valittua ajankohtaa vanhempi tai jos sarja ei ole mukana kokonaisindikaattorissa.</p>` };
