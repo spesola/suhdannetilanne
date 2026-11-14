@@ -1937,30 +1937,48 @@ footer .flinks .lnk:hover { text-decoration-color: currentColor; }
       el("text", { x: AX.f(vv), y: H2 - mb + 4 + fs, "text-anchor": "middle", "font-size": fs, fill: "var(--muted)" }, svg).textContent = fmtV(vv, stepDec(AX.st)); }
     el("text", { x: W2 - mr, y: H2 - 4, "text-anchor": "end", "font-size": fs - 1, fill: "var(--muted)" }, svg).textContent = c.xlab + " →";
     el("text", { x: ml + 4, y: mt + fs, "font-size": fs - 1, fill: "var(--muted)" }, svg).textContent = "↑ " + c.ylab;
-    el("path", { d: pts.map((i, k) => `${k ? "L" : "M"}${AX.f(X[i]).toFixed(1)} ${AY.f(Y[i]).toFixed(1)}`).join(""), fill: "none", stroke: "var(--muted)", "stroke-opacity": 0.45, "stroke-width": 1.2 }, svg);
-    const n = pts.length;
-    pts.forEach((i, k) => el("circle", { cx: AX.f(X[i]), cy: AY.f(Y[i]), r: 3, fill: "var(--accent)", "fill-opacity": 0.15 + 0.75 * (k / (n - 1)) ** 2 }, svg));
-    const yrLab = new Set([pts[0], ...pts.filter(i => /-Q1$/.test(set.periods[i]) && +set.periods[i].slice(0, 4) % 5 === 0)]);   // vuosimerkit harvakseltaan
-    yrLab.forEach(i => { if (i === pts[n - 1]) return;
-      el("text", { x: AX.f(X[i]) + 6, y: AY.f(Y[i]) - 5, "font-size": fs - 1, fill: "var(--muted)", stroke: "var(--surface)", "stroke-width": 3, "paint-order": "stroke" }, svg).textContent = set.periods[i].slice(0, 4); });
-    const last = pts[n - 1];
-    const lr = AX.f(X[last]) > W2 - 80;                                 // oikeassa reunassa nimi pisteen vasemmalle
-    el("text", { x: AX.f(X[last]) + (lr ? -8 : 8), y: AY.f(Y[last]) + (lr ? -8 : 4), "text-anchor": lr ? "end" : "start", "font-size": fs, "font-weight": 600, fill: "var(--fg)", stroke: "var(--surface)", "stroke-width": 3, "paint-order": "stroke" }, svg).textContent = fmtP(set.periods[last]);
+    // pisteet: c.annual -> vanhemmat vuodet vuosikeskiarvoina, edellisesta vuodesta alkaen neljannesvuosittain (vahemman siksakkia)
+    const last = pts[pts.length - 1], mean = a => a.reduce((x, y) => x + y, 0) / a.length;
+    let C = pts.map(i => ({ i, x: X[i], y: Y[i], lab: fmtP(set.periods[i]), q: true }));
+    if (c.annual) {
+      const y0 = +set.periods[last].slice(0, 4) - 1, g = {};
+      pts.forEach(i => { const y = +set.periods[i].slice(0, 4); if (y < y0) (g[y] = g[y] || []).push(i); });
+      C = [...Object.entries(g).filter(([, a]) => a.length === 4).map(([y, a]) => ({ i: a[3], yr: y, x: mean(a.map(i => X[i])), y: mean(a.map(i => Y[i])), lab: `${y}, vuosikeskiarvo` })),
+        ...C.filter(p => +set.periods[p.i].slice(0, 4) >= y0)];
+    }
+    const PX = p => AX.f(p.x), PY = p => AY.f(p.y), n = C.length, nA = C.filter(p => !p.q).length;
+    const path = a => a.map((p, k) => `${k ? "L" : "M"}${PX(p).toFixed(1)} ${PY(p).toFixed(1)}`).join("");
+    if (nA) el("path", { d: path(C.slice(0, nA + 1)), fill: "none", stroke: "var(--muted)", "stroke-opacity": 0.5, "stroke-width": 1.3, "stroke-linejoin": "round" }, svg);
+    el("path", { d: path(C.slice(Math.max(0, nA))), fill: "none", stroke: nA ? "var(--accent)" : "var(--muted)", "stroke-opacity": nA ? 0.8 : 0.45, "stroke-width": nA ? 1.6 : 1.2, "stroke-linejoin": "round" }, svg);
+    C.forEach((p, k) => el("circle", { cx: PX(p), cy: PY(p), r: p.q ? 3 : 2.6, fill: p.q && nA ? "var(--accent)" : "var(--muted)",
+      "fill-opacity": nA ? (p.q ? 1 : 0.35 + 0.5 * k / Math.max(1, nA - 1)) : 0.15 + 0.75 * (k / (n - 1)) ** 2 }, svg));
+    const placed = [];                                                    // vuosinimet: vain jos ei osu aiempaan nimeen tai viimeisimpaan pisteeseen
+    const lp = C[n - 1], lr = PX(lp) > W2 - 80, lw = fmtP(set.periods[last]).length * fs * 0.62;
+    const lx = PX(lp) + (lr ? -8 - lw : 8), ly = PY(lp) + (lr ? 18 : 4);          // viimeisin: oikeassa reunassa pisteen alle vasemmalle (polku tulee ylhaalta)
+    placed.push({ x: lx, y: ly - 12, w: lw, h: 16 });
+    const fits = (x, y, w) => x > ml && x + w < W2 - mr && y > mt + fs + 4 && !placed.some(r => x < r.x + r.w && x + w > r.x && y - 11 < r.y + r.h && y > r.y);
+    const yl = nA ? C.filter(p => !p.q).map(p => [p, p.yr]).concat([[C[nA], set.periods[C[nA].i].slice(0, 4)]])
+      : [pts[0], ...pts.filter(i => /-Q1$/.test(set.periods[i]) && +set.periods[i].slice(0, 4) % 5 === 0)].map(i => [C.find(p => p.i === i), set.periods[i].slice(0, 4)]);
+    yl.forEach(([p, t]) => { if (!p || p === lp) return; const w = t.length * (fs - 1) * 0.6;
+      for (const [dx, dy] of [[6, -5], [6, 13], [-6 - w, -5], [-6 - w, 13], [-w / 2, -8], [-w / 2, 17], [8, 4], [-8 - w, 4]]) { const x = PX(p) + dx, y = PY(p) + dy;
+        if (fits(x, y, w)) { placed.push({ x, y: y - 11, w, h: 13 });
+          el("text", { x, y, "font-size": fs - 1, fill: "var(--muted)", stroke: "var(--surface)", "stroke-width": 3, "paint-order": "stroke" }, svg).textContent = t; break; } } });
+    el("text", { x: lx, y: ly, "font-size": fs, "font-weight": 600, fill: "var(--fg)", stroke: "var(--surface)", "stroke-width": 3, "paint-order": "stroke" }, svg).textContent = fmtP(set.periods[last]);
     const dot = el("circle", { r: 5, fill: "var(--fg)", stroke: "var(--surface)", "stroke-width": 1.5 }, svg);
     const hmS = hoverMarks(svg, { fs, ay: H2 - mb, x0: ml, x1: W2 - mr, yt: mt, yb: H2 - mb, flip: 130 });
     const valEl = card.querySelector(".fval"), subEl = card.querySelector(".fsub");
     valEl.textContent = fmtP(set.periods[last]);                        // otsikkorivi pysyy viimeisimmässä
     subEl.textContent = `${c.xlab.replace(/, %$/, "")} ${fmtV(X[last], c.dec)} %, ${c.ylab.replace(/, %$/, "").toLowerCase()} ${fmtV(Y[last], c.dec)} %.`;
-    const show = h => { let i = h == null ? last : h; if (!pts.includes(i)) i = pts.filter(j => j <= i).pop() ?? last;
-      dot.setAttribute("cx", AX.f(X[i])); dot.setAttribute("cy", AY.f(Y[i]));
+    const pick = h => C.find(p => p.i === h) || C.find(p => p.yr && p.yr === set.periods[h].slice(0, 4)) || C.filter(p => p.i <= h).pop() || lp;
+    const show = h => { const p = h == null ? lp : pick(h);
+      dot.setAttribute("cx", PX(p)); dot.setAttribute("cy", PY(p));
       if (h == null) { hmS.hide(); return; }
-      const y = AY.f(Y[i]);
-      hmS.show(AX.f(X[i]), [{ y: y - 7, col: "var(--fg)", t: fmtP(set.periods[i]) }, { y: y + 8, col: "var(--muted)", w: 500, t: `${fmtV(X[i], c.dec)} % / ${fmtV(Y[i], c.dec)} %` }]); };
+      hmS.show(PX(p), [{ y: PY(p) - 7, col: "var(--fg)", t: p.lab }, { y: PY(p) + 8, col: "var(--muted)", w: 500, t: `${fmtV(p.x, c.dec)} % / ${fmtV(p.y, c.dec)} %` }]); };
     show(null); chartHooks.push(show);
     const hit = el("rect", { x: ml, y: mt, width: W2 - ml - mr, height: H2 - mt - mb, fill: "transparent" }, svg);
     hit.addEventListener("pointermove", e => { const r = svg.getBoundingClientRect(), sx = (e.clientX - r.left) / r.width * W2, sy = (e.clientY - r.top) / r.height * H2;
-      let best = last, bd = Infinity; pts.forEach(i => { const d = (AX.f(X[i]) - sx) ** 2 + (AY.f(Y[i]) - sy) ** 2; if (d < bd) { bd = d; best = i; } });
-      chartHooks.forEach(fn => fn(best)); });
+      let best = lp, bd = Infinity; C.forEach(p => { const d = (PX(p) - sx) ** 2 + (PY(p) - sy) ** 2; if (d < bd) { bd = d; best = p; } });
+      chartHooks.forEach(fn => fn(best.i)); });
     hit.addEventListener("pointerleave", () => chartHooks.forEach(fn => fn(null)));
     const fm = document.createElement("div"); fm.className = "fmeta";
     const db = document.createElement("button"); db.type = "button"; db.className = "dl"; db.textContent = "Lataa CSV";

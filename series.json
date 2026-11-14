@@ -742,7 +742,8 @@
                 "xlab": "Työttömyysaste, %",
                 "ylab": "Avoimien työpaikkojen aste, %",
                 "dec": 1,
-                "note": "Kausitasoitettu. Lähde: Tilastokeskus."
+                "note": "Kausitasoitettu. Vuosikeskiarvot, kaksi viimeistä vuotta neljännesvuosittain. Lähde: Tilastokeskus.",
+                "annual": true
               }
             ],
             "bkt": [
