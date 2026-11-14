@@ -897,6 +897,52 @@
                 "note": "Kiinteän pääoman bruttomuodostus käyvin hinnoin, kausitasoitettu. Lähde: Tilastokeskus."
               },
               {
+                "title": "Yksityiset ja julkiset investoinnit, volyymin vuosimuutos %",
+                "lines": [
+                  "bkt_inv_yy",
+                  "inv_yks_yy",
+                  "inv_julk_yy"
+                ],
+                "labels": {
+                  "bkt_inv_yy": "Yhteensä",
+                  "inv_yks_yy": "Yksityiset",
+                  "inv_julk_yy": "Julkiset"
+                },
+                "colors": {
+                  "bkt_inv_yy": "var(--fg)",
+                  "inv_yks_yy": "var(--accent)",
+                  "inv_julk_yy": "var(--g2)"
+                },
+                "unit": "%",
+                "dec": 1,
+                "from": 2015,
+                "note": "Kausitasoitettu, viitevuoden 2015 hinnoin. Lähde: Tilastokeskus."
+              },
+              {
+                "title": "Julkiset investoinnit alasektoreittain, mrd € (4 neljänneksen summa)",
+                "lines": [
+                  "x_jinv_yht"
+                ],
+                "stack": [
+                  "x_jinv_val",
+                  "x_jinv_kun",
+                  "x_jinv_hva"
+                ],
+                "stackColors": [
+                  "var(--accent)",
+                  "var(--g2)",
+                  "var(--g3)"
+                ],
+                "colors": {
+                  "x_jinv_yht": "var(--fg)"
+                },
+                "unit": "mrd €",
+                "stackUnit": "mrd €",
+                "dec": 1,
+                "from": 2015,
+                "note": "Pääoman bruttomuodostus käypin hinnoin. Kunnat sisältää ennen vuotta 2023 myös sosiaali- ja terveyspalvelut. Sosiaaliturvarahastot eivät ole mukana. Lähde: Tilastokeskus."
+              },
+              {
                 "title": "Rakentamisen liikevaihdon volyymi (2021=100)",
                 "lines": [
                   "x_rlv_41",
@@ -9233,6 +9279,89 @@
         "sukupuoli_9_20180101": "SSS",
         "contentscode": "real_2015_100"
       }
+    },
+    {
+      "id": "x_jinv_val",
+      "label": "Valtio",
+      "set": "bkt",
+      "chart_only": true,
+      "roll": 4,
+      "mult": 0.001,
+      "source": "statfin",
+      "table": "jtume/11zf.px",
+      "pick": {
+        "taloustoimi_1_20180101": "P5K",
+        "sektoriluokitus_7_20230101": "S1311",
+        "contentscode": "jtume-TASM"
+      }
+    },
+    {
+      "id": "x_jinv_kun",
+      "label": "Kunnat",
+      "set": "bkt",
+      "chart_only": true,
+      "roll": 4,
+      "mult": 0.001,
+      "source": "statfin",
+      "table": "jtume/11zf.px",
+      "pick": {
+        "taloustoimi_1_20180101": "P5K",
+        "sektoriluokitus_7_20230101": "S13131",
+        "contentscode": "jtume-TASM"
+      }
+    },
+    {
+      "id": "x_jinv_hva",
+      "label": "Hyvinvointialueet",
+      "set": "bkt",
+      "chart_only": true,
+      "roll": 4,
+      "mult": 0.001,
+      "source": "statfin",
+      "table": "jtume/11zf.px",
+      "pick": {
+        "taloustoimi_1_20180101": "P5K",
+        "sektoriluokitus_7_20230101": "S13132",
+        "contentscode": "jtume-TASM"
+      }
+    },
+    {
+      "id": "x_jinv_yht",
+      "label": "Yhteensä",
+      "set": "bkt",
+      "chart_only": true,
+      "roll": 4,
+      "mult": 0.001,
+      "source": "sum",
+      "parts": [
+        {
+          "source": "statfin",
+          "table": "jtume/11zf.px",
+          "pick": {
+            "taloustoimi_1_20180101": "P5K",
+            "sektoriluokitus_7_20230101": "S1311",
+            "contentscode": "jtume-TASM"
+          }
+        },
+        {
+          "source": "statfin",
+          "table": "jtume/11zf.px",
+          "pick": {
+            "taloustoimi_1_20180101": "P5K",
+            "sektoriluokitus_7_20230101": "S13131",
+            "contentscode": "jtume-TASM"
+          }
+        },
+        {
+          "source": "statfin",
+          "table": "jtume/11zf.px",
+          "pick": {
+            "taloustoimi_1_20180101": "P5K",
+            "sektoriluokitus_7_20230101": "S13132",
+            "contentscode": "jtume-TASM"
+          }
+        }
+      ]
     }
   ]
 }
