@@ -919,7 +919,7 @@
                 "note": "Työpäiväkorjattu, viitevuoden 2015 hinnoin, kuten Tilastokeskuksen julkistamat vuosimuutokset. Lähde: Tilastokeskus."
               },
               {
-                "title": "Julkiset investoinnit alasektoreittain, mrd € (4 neljänneksen summa)",
+                "title": "Julkiset investoinnit alasektoreittain, mrd €",
                 "lines": [
                   "x_jinv_yht"
                 ],
@@ -940,7 +940,7 @@
                 "stackUnit": "mrd €",
                 "dec": 1,
                 "from": 2015,
-                "note": "Pääoman bruttomuodostus käypin hinnoin. Kunnat sisältää ennen vuotta 2023 myös sosiaali- ja terveyspalvelut. Sosiaaliturvarahastot eivät ole mukana. Lähde: Tilastokeskus."
+                "note": "Pääoman bruttomuodostus käypin hinnoin, neljän neljänneksen liukuva summa. Kunnat sisältää ennen vuotta 2023 myös sosiaali- ja terveyspalvelut. Sosiaaliturvarahastot eivät ole mukana. Lähde: Tilastokeskus."
               },
               {
                 "title": "Rakentamisen liikevaihdon volyymi (2021=100)",
@@ -959,7 +959,7 @@
                 "note": "Myynnin määrä, kausitasoitettu, neljänneksen keskiarvo. Lähde: Tilastokeskus, rakentamisen liikevaihtokuvaaja."
               },
               {
-                "title": "Paketti- ja kuorma-autojen ensirekisteröinnit, liukuva vuosisumma, tuhatta",
+                "title": "Paketti- ja kuorma-autojen ensirekisteröinnit, tuhatta",
                 "lines": [
                   "x_ensirek_pa",
                   "x_ensirek_ka"
@@ -970,7 +970,7 @@
                 },
                 "unit": "",
                 "dec": 1,
-                "note": "Neljän neljänneksen summa, Manner-Suomi. Lähde: Tilastokeskus."
+                "note": "Neljän neljänneksen liukuva summa, Manner-Suomi. Lähde: Tilastokeskus."
               }
             ],
             "bkt_vienti": [
