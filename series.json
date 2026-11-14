@@ -529,19 +529,23 @@
           "views": {
             "palkat": [
               {
-                "title": "Ansiotaso ja reaaliansiot",
+                "title": "Ansiotaso ja reaaliansiot (2015=100)",
                 "lines": [
-                  "palkat_yy",
-                  "reaalipalkat_yy"
+                  "x_ati_kok",
+                  "x_ati_real"
                 ],
                 "labels": {
-                  "palkat_yy": "Ansiotasoindeksi",
-                  "reaalipalkat_yy": "Reaaliansioindeksi"
+                  "x_ati_kok": "Ansiotasoindeksi",
+                  "x_ati_real": "Reaaliansioindeksi"
                 },
-                "lineColor": "var(--accent)",
-                "unit": "%",
+                "colors": {
+                  "x_ati_kok": "var(--accent)",
+                  "x_ati_real": "var(--g2)"
+                },
+                "unit": "",
                 "dec": 1,
-                "note": "Lähde: Tilastokeskus."
+                "from": 2015,
+                "note": "Reaaliansiot: ansiotasoindeksi kuluttajahintaindeksillä deflatoituna. Lähde: Tilastokeskus."
               },
               {
                 "title": "Ansiotasoindeksi sektoreittain (2015=100)",
@@ -9214,6 +9218,20 @@
       "mult": 0.001,
       "handling": "none",
       "kind": "level"
+    },
+    {
+      "id": "x_ati_real",
+      "label": "Reaaliansioindeksi",
+      "set": "bkt",
+      "chart_only": true,
+      "source": "statfin",
+      "table": "ati/14um.px",
+      "pick": {
+        "tyonantajasekt_3_20190528": "SSS",
+        "palk_muo_2_20120101": "0",
+        "sukupuoli_9_20180101": "SSS",
+        "contentscode": "real_2015_100"
+      }
     }
   ]
 }
