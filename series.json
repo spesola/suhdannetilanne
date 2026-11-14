@@ -529,22 +529,18 @@
           "views": {
             "palkat": [
               {
-                "title": "Ansiotaso ja reaaliansiot (2015=100)",
+                "title": "Ansiotaso ja reaaliansiot, vuosimuutos %",
                 "lines": [
-                  "x_ati_kok",
-                  "x_ati_real"
+                  "palkat_yy",
+                  "reaalipalkat_yy"
                 ],
                 "labels": {
-                  "x_ati_kok": "Ansiotasoindeksi",
-                  "x_ati_real": "Reaaliansioindeksi"
+                  "palkat_yy": "Ansiotasoindeksi",
+                  "reaalipalkat_yy": "Reaaliansioindeksi"
                 },
-                "colors": {
-                  "x_ati_kok": "var(--accent)",
-                  "x_ati_real": "var(--g2)"
-                },
-                "unit": "",
+                "lineColor": "var(--accent)",
+                "unit": "%",
                 "dec": 1,
-                "from": 2015,
                 "note": "Reaaliansiot: ansiotasoindeksi kuluttajahintaindeksillä deflatoituna. Lähde: Tilastokeskus."
               },
               {
@@ -555,7 +551,8 @@
                   "x_ati_val",
                   "x_ati_pai",
                   "x_ati_kun",
-                  "x_ati_hva"
+                  "x_ati_hva",
+                  "x_ati_real"
                 ],
                 "colors": {
                   "x_ati_kok": "var(--fg)",
@@ -563,15 +560,19 @@
                   "x_ati_val": "var(--g3)",
                   "x_ati_pai": "var(--g4)",
                   "x_ati_kun": "var(--g2)",
-                  "x_ati_hva": "var(--g5)"
+                  "x_ati_hva": "var(--g5)",
+                  "x_ati_real": "var(--muted)"
                 },
                 "dash": [
-                  "x_ati_pai"
+                  "x_ati_real"
                 ],
                 "unit": "",
                 "dec": 1,
                 "from": 2015,
-                "note": "Kunnat ja hyvinvointialueet erikseen vuodesta 2023, jolloin niiden taso on paikallishallinnon taso. Kunnat pl. Helsingin hyvinvointipalvelut, hyvinvointialueet ml. Lähde: Tilastokeskus."
+                "note": "Reaaliansiot: koko kansantalouden ansiotasoindeksi kuluttajahintaindeksillä deflatoituna. Kunnat ja hyvinvointialueet erikseen vuodesta 2023, jolloin niiden taso on paikallishallinnon taso. Kunnat pl. Helsingin hyvinvointipalvelut, hyvinvointialueet ml. Lähde: Tilastokeskus.",
+                "labels": {
+                  "x_ati_real": "Reaaliansiot, koko kansantalous"
+                }
               },
               {
                 "title": "Yksikkötyökustannukset, vuosimuutos %",
