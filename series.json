@@ -544,7 +544,7 @@
                 "note": "Lähde: Tilastokeskus."
               },
               {
-                "title": "Ansiotasoindeksi sektoreittain, vuosimuutos %",
+                "title": "Ansiotasoindeksi sektoreittain (2015=100)",
                 "lines": [
                   "x_ati_kok",
                   "x_ati_yr",
@@ -564,10 +564,10 @@
                 "dash": [
                   "x_ati_pai"
                 ],
-                "unit": "%",
+                "unit": "",
                 "dec": 1,
-                "from": 2019,
-                "note": "Paikallishallinto sisältää kunnat ja hyvinvointialueet, jotka ovat erikseen vuodesta 2024. Kunnat pl. Helsingin hyvinvointipalvelut, hyvinvointialueet ml. Lähde: Tilastokeskus."
+                "from": 2015,
+                "note": "Kunnat ja hyvinvointialueet erikseen vuodesta 2023, jolloin niiden taso on paikallishallinnon taso. Kunnat pl. Helsingin hyvinvointipalvelut, hyvinvointialueet ml. Lähde: Tilastokeskus."
               },
               {
                 "title": "Yksikkötyökustannukset, vuosimuutos %",
@@ -8648,7 +8648,7 @@
         "tyonantajasekt_3_20190528": "SSS",
         "palk_muo_2_20120101": "0",
         "sukupuoli_9_20180101": "SSS",
-        "contentscode": "ati_vuosimuutosprosentti"
+        "contentscode": "ati_2015_100"
       }
     },
     {
@@ -8662,7 +8662,7 @@
         "tyonantajasekt_3_20190528": "11-12",
         "palk_muo_2_20120101": "0",
         "sukupuoli_9_20180101": "SSS",
-        "contentscode": "ati_vuosimuutosprosentti"
+        "contentscode": "ati_2015_100"
       }
     },
     {
@@ -8676,7 +8676,7 @@
         "tyonantajasekt_3_20190528": "1311",
         "palk_muo_2_20120101": "0",
         "sukupuoli_9_20180101": "SSS",
-        "contentscode": "ati_vuosimuutosprosentti"
+        "contentscode": "ati_2015_100"
       }
     },
     {
@@ -8690,7 +8690,7 @@
         "tyonantajasekt_3_20190528": "1313",
         "palk_muo_2_20120101": "0",
         "sukupuoli_9_20180101": "SSS",
-        "contentscode": "ati_vuosimuutosprosentti"
+        "contentscode": "ati_2015_100"
       }
     },
     {
@@ -8704,7 +8704,7 @@
         "tyonantajasekt_3_20190528": "1313p",
         "palk_muo_2_20120101": "0",
         "sukupuoli_9_20180101": "SSS",
-        "contentscode": "ati_vuosimuutosprosentti"
+        "contentscode": "ati_2015_100"
       }
     },
     {
@@ -8718,7 +8718,7 @@
         "tyonantajasekt_3_20190528": "1313s",
         "palk_muo_2_20120101": "0",
         "sukupuoli_9_20180101": "SSS",
-        "contentscode": "ati_vuosimuutosprosentti"
+        "contentscode": "ati_2015_100"
       }
     },
     {
