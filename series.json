@@ -1003,6 +1003,39 @@
                 "note": "Kausitasoitettu volyymi-indeksi, neljänneksen keskiarvo. Lähde: Eurostat."
               },
               {
+                "title": "Palveluvienti palveluryhmittäin, mrd €",
+                "lines": [
+                  "x_pv_tot"
+                ],
+                "stack": [
+                  "x_pv_ict",
+                  "x_pv_lii",
+                  "x_pv_kulj",
+                  "x_pv_ip",
+                  "x_pv_mat",
+                  "x_pv_muu"
+                ],
+                "stackColors": [
+                  "var(--accent)",
+                  "var(--g2)",
+                  "var(--g3)",
+                  "var(--g5)",
+                  "var(--g6)",
+                  "var(--g4)"
+                ],
+                "colors": {
+                  "x_pv_tot": "var(--fg)"
+                },
+                "labels": {
+                  "x_pv_tot": "Yhteensä"
+                },
+                "unit": "mrd €",
+                "stackUnit": "mrd €",
+                "dec": 1,
+                "from": 2015,
+                "note": "Maksutaseen palveluvienti käypin hinnoin, neljän neljänneksen liukuva summa. Lähde: Eurostat (Suomen Pankki)."
+              },
+              {
                 "title": "Meriliikenteen vienti ja tuonti, vuosimuutos %",
                 "monthly": true,
                 "lines": [
@@ -9385,6 +9418,202 @@
             "sektoriluokitus_7_20230101": "S13132",
             "contentscode": "jtume-TASM"
           }
+        }
+      ]
+    },
+    {
+      "id": "x_pv_tot",
+      "label": "Palveluvienti yhteensä",
+      "set": "bkt",
+      "chart_only": true,
+      "roll": 4,
+      "mult": 0.001,
+      "source": "eurostat",
+      "ds": "bop_c6_q",
+      "pick": {
+        "bop_item": "S",
+        "stk_flow": "CRE",
+        "partner": "WRL_REST",
+        "currency": "MIO_EUR",
+        "sector10": "S1",
+        "sectpart": "S1"
+      }
+    },
+    {
+      "id": "x_pv_ict",
+      "label": "Tieto- ja viestintäpalvelut",
+      "set": "bkt",
+      "chart_only": true,
+      "roll": 4,
+      "mult": 0.001,
+      "source": "eurostat",
+      "ds": "bop_c6_q",
+      "pick": {
+        "bop_item": "SI",
+        "stk_flow": "CRE",
+        "partner": "WRL_REST",
+        "currency": "MIO_EUR",
+        "sector10": "S1",
+        "sectpart": "S1"
+      }
+    },
+    {
+      "id": "x_pv_lii",
+      "label": "Muut liike-elämän palvelut",
+      "set": "bkt",
+      "chart_only": true,
+      "roll": 4,
+      "mult": 0.001,
+      "source": "eurostat",
+      "ds": "bop_c6_q",
+      "pick": {
+        "bop_item": "SJ",
+        "stk_flow": "CRE",
+        "partner": "WRL_REST",
+        "currency": "MIO_EUR",
+        "sector10": "S1",
+        "sectpart": "S1"
+      }
+    },
+    {
+      "id": "x_pv_kulj",
+      "label": "Kuljetus",
+      "set": "bkt",
+      "chart_only": true,
+      "roll": 4,
+      "mult": 0.001,
+      "source": "eurostat",
+      "ds": "bop_c6_q",
+      "pick": {
+        "bop_item": "SC",
+        "stk_flow": "CRE",
+        "partner": "WRL_REST",
+        "currency": "MIO_EUR",
+        "sector10": "S1",
+        "sectpart": "S1"
+      }
+    },
+    {
+      "id": "x_pv_ip",
+      "label": "Immateriaalioikeuksien käyttömaksut",
+      "set": "bkt",
+      "chart_only": true,
+      "roll": 4,
+      "mult": 0.001,
+      "source": "eurostat",
+      "ds": "bop_c6_q",
+      "pick": {
+        "bop_item": "SH",
+        "stk_flow": "CRE",
+        "partner": "WRL_REST",
+        "currency": "MIO_EUR",
+        "sector10": "S1",
+        "sectpart": "S1"
+      }
+    },
+    {
+      "id": "x_pv_mat",
+      "label": "Matkailu",
+      "set": "bkt",
+      "chart_only": true,
+      "roll": 4,
+      "mult": 0.001,
+      "source": "eurostat",
+      "ds": "bop_c6_q",
+      "pick": {
+        "bop_item": "SD",
+        "stk_flow": "CRE",
+        "partner": "WRL_REST",
+        "currency": "MIO_EUR",
+        "sector10": "S1",
+        "sectpart": "S1"
+      }
+    },
+    {
+      "id": "x_pv_muu",
+      "label": "Muut palvelut",
+      "set": "bkt",
+      "chart_only": true,
+      "roll": 4,
+      "mult": 0.001,
+      "source": "sum",
+      "parts": [
+        {
+          "source": "eurostat",
+          "ds": "bop_c6_q",
+          "pick": {
+            "bop_item": "S",
+            "stk_flow": "CRE",
+            "partner": "WRL_REST",
+            "currency": "MIO_EUR",
+            "sector10": "S1",
+            "sectpart": "S1"
+          }
+        },
+        {
+          "source": "eurostat",
+          "ds": "bop_c6_q",
+          "pick": {
+            "bop_item": "SI",
+            "stk_flow": "CRE",
+            "partner": "WRL_REST",
+            "currency": "MIO_EUR",
+            "sector10": "S1",
+            "sectpart": "S1"
+          },
+          "neg": true
+        },
+        {
+          "source": "eurostat",
+          "ds": "bop_c6_q",
+          "pick": {
+            "bop_item": "SJ",
+            "stk_flow": "CRE",
+            "partner": "WRL_REST",
+            "currency": "MIO_EUR",
+            "sector10": "S1",
+            "sectpart": "S1"
+          },
+          "neg": true
+        },
+        {
+          "source": "eurostat",
+          "ds": "bop_c6_q",
+          "pick": {
+            "bop_item": "SC",
+            "stk_flow": "CRE",
+            "partner": "WRL_REST",
+            "currency": "MIO_EUR",
+            "sector10": "S1",
+            "sectpart": "S1"
+          },
+          "neg": true
+        },
+        {
+          "source": "eurostat",
+          "ds": "bop_c6_q",
+          "pick": {
+            "bop_item": "SH",
+            "stk_flow": "CRE",
+            "partner": "WRL_REST",
+            "currency": "MIO_EUR",
+            "sector10": "S1",
+            "sectpart": "S1"
+          },
+          "neg": true
+        },
+        {
+          "source": "eurostat",
+          "ds": "bop_c6_q",
+          "pick": {
+            "bop_item": "SD",
+            "stk_flow": "CRE",
+            "partner": "WRL_REST",
+            "currency": "MIO_EUR",
+            "sector10": "S1",
+            "sectpart": "S1"
+          },
+          "neg": true
         }
       ]
     }
