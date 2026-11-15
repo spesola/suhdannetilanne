@@ -2185,28 +2185,33 @@ footer .flinks .lnk:hover { text-decoration-color: currentColor; }
     if (box.id === "charts") secFold(box);
     return r;
   }
-  // pitkan sivun osiot valilehtina: yksi osio kerrallaan (oletuksena ensimmainen); valinta sailyy uudelleenpiirrossa
+  // pitkan sivun osiot allekkain; valilehdet vierittavat osioon ja korostavat nakyvissa olevan osion (scrollspy)
   const openSec = {}, secFirst = {}, secWant = {};
-  function secFold(box, anim) {
+  let secLock = 0;
+  const secTop = () => { const nav = document.querySelector("#charts .secnav");
+    return (parseFloat(getComputedStyle(document.documentElement).getPropertyValue("--barv")) || 60) + (nav ? nav.offsetHeight : 0) + 12; };
+  function secGo(h, smooth) { secLock = Date.now() + (smooth ? 900 : 200);
+    scrollTo({ top: h.getBoundingClientRect().top + scrollY - secTop(), behavior: smooth ? "smooth" : "auto" }); }
+  function secFold(box) {
     const hs = [...box.querySelectorAll(":scope > .fsec")]; if (hs.length < 3) return;
-    hs.forEach(h => { h.dataset.name = h.dataset.name || h.textContent; h.hidden = true; });   // valilehti toimii osion otsikkona
+    hs.forEach(h => { h.dataset.name = h.dataset.name || h.textContent; });
     secFirst[set.id] = hs[0].dataset.name;
-    if (secWant[set.id]) { const w = hs.find(h => slug1(h.dataset.name) === secWant[set.id]); if (w) openSec[set.id] = w.dataset.name; delete secWant[set.id]; }
+    if (secWant[set.id]) { const w = hs.find(h => slug1(h.dataset.name) === secWant[set.id]); delete secWant[set.id];
+      if (w) { openSec[set.id] = w.dataset.name; if (!wantCard) setTimeout(() => secGo(w, false), 60); } }
     if (!hs.some(h => h.dataset.name === openSec[set.id])) openSec[set.id] = hs[0].dataset.name;
-    let cur = null;
-    [...box.children].forEach(c => {
-      if (c.classList.contains("fsec")) { cur = c.dataset.name; return; }
-      if (!cur || c.classList.contains("secnav")) return;
-      const show = cur === openSec[set.id]; c.hidden = !show;
-      if (show && anim === cur) c.animate([{ opacity: 0, transform: "translateY(8px)" }, { opacity: 1, transform: "none" }], { duration: 260, easing: "cubic-bezier(.2,.7,.2,1)" });
-    });
     secSync();
   }
-  function secOpen(box, k) {                                           // valilehti vaihtaa osion
+  function secOpen(box, k) {                                           // valilehti vierittaa osioon
     const h = box.querySelectorAll(":scope > .fsec")[k]; if (!h) return;
-    if (openSec[set.id] !== h.dataset.name) { openSec[set.id] = h.dataset.name; secFold(box, h.dataset.name); syncHash(); }
-    const nav = box.querySelector(".secnav"); if (nav && nav.getBoundingClientRect().top < parseFloat(getComputedStyle(nav).top) - 1) nav.scrollIntoView({ block: "start" });
+    openSec[set.id] = h.dataset.name; secSync(); syncHash(); secGo(h, true);
   }
+  addEventListener("scroll", () => { if (secRaf) return; secRaf = requestAnimationFrame(() => { secRaf = 0;
+    if (Date.now() < secLock || set.growth || set.indicators) return;
+    const box = $("charts"); if (!box || box.hidden || !box.querySelector(":scope > .secnav")) return;
+    const hs = [...box.querySelectorAll(":scope > .fsec")], lim = secTop() + 40;
+    let cur = hs[0]; hs.forEach(h => { if (h.getBoundingClientRect().top <= lim) cur = h; });
+    if (innerHeight + scrollY >= document.documentElement.scrollHeight - 4) { const last = hs[hs.length - 1]; if (last.getBoundingClientRect().top < innerHeight) cur = last; }   // sivun loppu: viimeinen osio
+    if (cur && cur.dataset.name !== openSec[set.id]) { openSec[set.id] = cur.dataset.name; secSync(); syncHash(); } }); }, { passive: true });
   // rinnakkaiset kuviokortit samaan linjaan: parille yhteiset rivit (subgrid); taulukon vieressa ei
   function pairRows(g) {
     let row = [], used = 0;
