@@ -3964,21 +3964,20 @@
     },
     {
       "id": "tyottomat",
-      "label": "Työttömät",
+      "label": "Työttömyysaste",
       "set": "bkt",
       "group": "Työpanos",
       "source": "statfin",
-      "table": "tyti/137h.px",
+      "table": "tyti/135z.px",
       "pick": {
-        "sukupuoli_9_20180101": "SSS",
-        "ikaryhma_19_20190101": "15-64",
-        "contentscode": "tyti-Tyottomat"
+        "contentscode": "Tyottaste_kausi"
       },
-      "handling": "sa",
+      "to_quarter": true,
+      "handling": "none",
       "kind": "volume",
       "invert": true,
       "in_composite": false,
-      "yy_raw": true
+      "diff": true
     },
     {
       "id": "asuntohinnat",

@@ -723,13 +723,14 @@ for (set in cfg$sets) {
     ser <- list(); rows <- list(); lag <- if (freq == "Q") 4 else 12
     for (s in members) {
       r <- preprocess(raws[[s$id]], s$handling, freq); v <- r$value; n <- length(v)
-      raws[[paste0(s$id, "_qq")]] <- data.frame(date = r$date, value = 100 * (v / c(NA, v[-n]) - 1))
+      dl <- if (isTRUE(s$diff)) function(x, k) x - c(rep(NA, k), x[seq_len(length(x) - k)]) else function(x, k) 100 * (x / c(rep(NA, k), x[seq_len(length(x) - k)]) - 1)   # diff: muutos %-yksikkoina (asteet)
+      raws[[paste0(s$id, "_qq")]] <- data.frame(date = r$date, value = dl(v, 1))
       # v/v kuten virallisissa tilastoissa: tyopaivakorjatusta (yy_s_adj) tai alkuperaisesta (yy_raw) sarjasta
       ry <- if (!is.null(s$yy_s_adj)) { s2 <- s; s2$id <- paste0(s$id, "_", tolower(s$yy_s_adj)); s2$pick$s_adj <- s$yy_s_adj; fetch_series(s2) }
             else if (!is.null(s$yy_pick)) { s2 <- s; s2$id <- paste0(s$id, "_yyp"); s2$pick <- modifyList(s$pick, s$yy_pick); fetch_series(s2) }
             else if (isTRUE(s$yy_raw)) raws[[s$id]] else r
       vy <- ry$value; ny <- length(vy)
-      raws[[paste0(s$id, "_yy")]] <- data.frame(date = ry$date, value = 100 * (vy / c(rep(NA, lag), vy[1:(ny - lag)]) - 1))
+      raws[[paste0(s$id, "_yy")]] <- data.frame(date = ry$date, value = dl(vy, lag))
       ser[[length(ser) + 1]] <- list(id = paste0(s$id, "_qq"), label = paste(s$label, "q/q"))
       ser[[length(ser) + 1]] <- list(id = paste0(s$id, "_yy"), label = paste(s$label, "v/v"))
       # in_table = false: sarja vain kuvioihin (esim. reaaliansiot ansiotason kuviossa), ei taulukkoon eika kelloon
