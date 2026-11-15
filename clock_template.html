@@ -675,6 +675,12 @@ footer .flinks .lnk:hover { text-decoration-color: currentColor; }
 .infod h2 { font-size: 1.1rem; font-weight: 600; margin: 0 4px 10px; padding-bottom: 8px; border-bottom: 1px solid var(--rule); }
 .infod .ibody { padding: 0 4px 6px; font-size: 0.9rem; line-height: 1.6; max-width: 72ch; }
 .infod .ibody p { margin: 0 0 12px; }
+.vfig { margin: 4px 0 18px; }
+.vfig h3 { font-size: 0.95rem; font-weight: 600; margin: 0 0 2px; }
+.vfig .lg { display: flex; gap: 14px; flex-wrap: wrap; font-size: 0.78rem; color: var(--muted); margin-bottom: 4px; }
+.vfig .lg i { display: inline-block; width: 12px; height: 2px; vertical-align: middle; margin-right: 5px; }
+.vfig svg { width: 100%; height: auto; display: block; }
+.vfig .fnote { margin-top: 2px; }
 .infod b { font-weight: 600; }
 .srcl { margin: 0 0 16px; } .srcl dt { font-weight: 600; margin-top: 10px; } .srcl dd { margin: 2px 0 0; color: var(--muted); }
 @media (max-width: 560px) {
@@ -1813,7 +1819,40 @@ footer .flinks .lnk:hover { text-decoration-color: currentColor; }
   }
   $("chgClose").onclick = () => $("chg").close();
   $("chg").addEventListener("click", e => { if (e.target === $("chg")) $("chg").close(); });
-  function openInfo(k) { $("infoT").textContent = INFO[k].t; $("infoB").innerHTML = INFO[k].h; $("info").showModal(); $("infoClose").focus(); }
+  function openInfo(k) { $("infoT").textContent = INFO[k].t; $("infoB").innerHTML = INFO[k].h;
+    if (k === "met") { const f = valFig(); if (f) { const p = [...$("infoB").querySelectorAll("p")].find(p => /trendipoikkeamaan/.test(p.textContent)); p ? p.after(f) : $("infoB").appendChild(f); } }
+    $("info").showModal(); $("infoClose").focus(); }
+  // menetelmakuvauksen kuvio: kokonaisindikaattorin neljanneskeskiarvo ja BKT:n trendipoikkeama (putken val_comp, val_gdp)
+  function valFig() {
+    const su = D.sets.find(s => s.id === "suhdanne"); if (!su) return null;
+    const g = id => (su.series || []).find(x => x.id === id); const A = g("val_comp"), B = g("val_gdp"); if (!A || !B) return null;
+    const ix = su.periods.map((p, i) => i).filter(i => A.values[i] != null || B.values[i] != null); if (ix.length < 8) return null;
+    const nar = innerWidth < 600, W = nar ? 360 : 640, H = nar ? 220 : 230, ml = 28, mr = 8, mt = 10, mb = 24, n = ix.length;
+    const vals = ix.flatMap(i => [A.values[i], B.values[i]]).filter(v => v != null);
+    const lo = Math.floor(Math.min(...vals)), hi = Math.ceil(Math.max(...vals));
+    const X = k => ml + (W - ml - mr) * k / (n - 1), Y = v => mt + (H - mt - mb) * (hi - v) / (hi - lo);
+    const svg = document.createElementNS(NS, "svg"); svg.setAttribute("viewBox", `0 0 ${W} ${H}`); svg.setAttribute("role", "img");
+    svg.setAttribute("aria-label", "Kokonaisindikaattori ja BKT:n trendipoikkeama");
+    const k20 = ix.findIndex(i => su.periods[i].startsWith("2020")), k22 = ix.findIndex(i => su.periods[i].startsWith("2022"));
+    if (k20 >= 0 && k22 > k20) el("rect", { x: X(k20), y: mt, width: X(k22 - 1) - X(k20), height: H - mt - mb, fill: "var(--grid)", opacity: 0.6 }, svg);
+    for (let v = lo; v <= hi; v++) { el("line", { x1: ml, x2: W - mr, y1: Y(v), y2: Y(v), stroke: v === 0 ? "var(--muted)" : "var(--grid)", "stroke-width": v === 0 ? 1 : 0.8 }, svg);
+      el("text", { x: ml - 6, y: Y(v) + 4, "text-anchor": "end", "font-size": 11, fill: "var(--muted)" }, svg).textContent = v; }
+    ix.forEach((i, k) => { const p = su.periods[i]; if (p.endsWith("-03") && +p.slice(0, 4) % (nar ? 4 : 2) === 0)
+      el("text", { x: X(k), y: H - 6, "text-anchor": "middle", "font-size": 11, fill: "var(--muted)" }, svg).textContent = p.slice(0, 4); });
+    const line = (S, col, w, dash) => { let d = "", pen = false;
+      ix.forEach((i, k) => { const v = S.values[i]; if (v == null) { pen = false; return; } d += `${pen ? "L" : "M"}${X(k).toFixed(1)} ${Y(v).toFixed(1)}`; pen = true; });
+      el("path", { d, fill: "none", stroke: col, "stroke-width": w, "stroke-dasharray": dash || "none", "stroke-linejoin": "round" }, svg); };
+    line(B, "var(--fg)", 1.6); line(A, "var(--accent)", 2);
+    const f2 = v => v == null ? "–" : (v > 0 ? "+" : "") + v.toFixed(2).replace(".", ",").replace("-", "−");
+    ix.forEach((i, k) => { const r = el("rect", { x: X(k) - (W - ml - mr) / (n - 1) / 2, y: mt, width: (W - ml - mr) / (n - 1), height: H - mt - mb, fill: "transparent" }, svg);
+      r.dataset.tip = fmtP(su.periods[i].slice(0, 4) + "-Q" + Math.ceil(+su.periods[i].slice(5, 7) / 3));
+      r.dataset.sub = `Kokonaisindikaattori ${f2(A.values[i])}\nBKT:n trendipoikkeama ${f2(B.values[i])}`; });
+    const fig = document.createElement("figure"); fig.className = "vfig";
+    fig.innerHTML = '<h3>Kokonaisindikaattori ja BKT:n trendipoikkeama</h3><div class="lg"><span><i style="background:var(--accent)"></i>Kokonaisindikaattori, neljänneksen keskiarvo</span><span><i style="background:var(--fg)"></i>BKT:n trendipoikkeama</span></div>';
+    fig.appendChild(svg);
+    const n2 = document.createElement("p"); n2.className = "fnote"; n2.textContent = "Standardoidut poikkeamat trendistä, keskihajontaa. Varjostettu: 2020–2021. Lähde: Tilastokeskus, omat laskelmat."; fig.appendChild(n2);
+    return fig;
+  }
   $("infoClose").onclick = () => $("info").close();
   $("info").addEventListener("click", e => { if (e.target === $("info")) $("info").close(); });
   $("updClose").onclick = () => $("upd").close();
