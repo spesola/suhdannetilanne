@@ -2128,8 +2128,116 @@
           "note": "Julkisyhteisöjen tulot ja menot käyvin hinnoin, neljän neljänneksen liukuvan summan muutos vuodentakaisesta. Lähde: Tilastokeskus."
         },
         {
+          "id": "jt_va",
+          "section": "Tulot",
+          "title": "Veroaste ja sen rakenne, % BKT:stä",
+          "unit": "",
+          "dec": 1,
+          "lines": [
+            "jt_veroaste"
+          ],
+          "stack": [
+            "jt_va_d5",
+            "jt_va_alv",
+            "jt_va_overo",
+            "jt_va_ta",
+            "jt_va_vak"
+          ],
+          "stackColors": [
+            "var(--g1)",
+            "color-mix(in srgb, var(--g1) 62%, var(--plot))",
+            "color-mix(in srgb, var(--g1) 32%, var(--plot))",
+            "var(--g3)",
+            "color-mix(in srgb, var(--g3) 50%, var(--plot))"
+          ],
+          "barSpan": 3,
+          "connect": true,
+          "from": 2000,
+          "wide": true,
+          "stackUnit": "%",
+          "labels": {
+            "jt_veroaste": "Veroaste"
+          },
+          "colors": {
+            "jt_veroaste": "var(--fg)"
+          },
+          "note": "Neljän neljänneksen liukuva summa suhteessa BKT:hen. Muut verot: tuotanto- ja tuontiverot pl. arvonlisävero (mm. valmisteverot, kiinteistövero) sekä pääomaverot. Sosiaaliturvamaksut: todelliset maksut, pl. laskennalliset. Lähteet: Eurostat, Tilastokeskus.",
+          "lvl": true
+        },
+        {
+          "id": "jt_veroyy",
+          "section": "Tulot",
+          "title": "Verokertymien vuosimuutos, %",
+          "unit": "%",
+          "dec": 1,
+          "lines": [
+            "jt_veroyy",
+            "jt_veroyy_hlo",
+            "jt_veroyy_alv",
+            "jt_veroyy_yht"
+          ],
+          "from": 2015,
+          "size": "half",
+          "colors": {
+            "jt_veroyy": "var(--fg)",
+            "jt_veroyy_hlo": "var(--accent)",
+            "jt_veroyy_alv": "var(--g3)",
+            "jt_veroyy_yht": "var(--g2)"
+          },
+          "y2": [
+            "jt_veroyy_yht"
+          ],
+          "note": "12 kk liukuvan summan muutos vuodentakaisesta. Yhteisövero oikealla akselilla. Lähde: Verohallinto."
+        },
+        {
+          "id": "jt_trt",
+          "section": "Tulot",
+          "title": "Ennakonpidätyksen alaiset ansiotulot, vuosimuutos %",
+          "unit": "%",
+          "dec": 1,
+          "lines": [
+            "jt_trt_palk",
+            "jt_trt_elak",
+            "jt_trt_tt"
+          ],
+          "from": 2022,
+          "size": "half",
+          "colors": {
+            "jt_trt_palk": "var(--accent)",
+            "jt_trt_elak": "var(--g2)",
+            "jt_trt_tt": "var(--q-down)"
+          },
+          "y2": [
+            "jt_trt_tt"
+          ],
+          "note": "3 kk liukuvan summan muutos vuodentakaisesta. Työttömyysetuudet oikealla akselilla. Lähde: Verohallinto (tulorekisteri)."
+        },
+        {
+          "id": "jt_tel",
+          "section": "Tulot",
+          "title": "Työeläkelaitosten sijoitustuotto, arvio, %",
+          "unit": "",
+          "dec": 1,
+          "lines": [
+            "jt_tel_ret"
+          ],
+          "stack": [
+            "jt_tel_hg",
+            "jt_tel_inc"
+          ],
+          "barSpan": 3,
+          "connect": true,
+          "from": 2005,
+          "size": "half",
+          "stackUnit": "%",
+          "colors": {
+            "jt_tel_ret": "var(--fg)"
+          },
+          "note": "Neljän neljänneksen summa, % edellisen neljänneksen rahoitusvaroista. Arvonmuutokset: rahoitusvarojen muutos vähennettynä nettosijoituksilla. Omaisuustulot: korot, osingot ja muut omaisuustulot (D.4). Kansantalouden tilinpitoon perustuva arvio, joka poikkeaa Telan julkaisemasta tuotosta kattavuuden ja laskentatavan vuoksi (esim. 2025: arvio 5,5 %, Tela 7,4 %). Lähde: Tilastokeskus, oma laskelma."
+        },
+        {
           "id": "jt_jk",
-          "section": "Rahoitusasema",
+          "section": "Menot",
           "title": "Julkisten kulutusmenojen muutos menolajeittain",
           "unit": "%",
           "dec": 1,
@@ -2155,27 +2263,50 @@
           "note": "Käyvin hinnoin, neljän neljänneksen liukuvan summan muutos vuodentakaisesta. Ostopalvelut: ostettuna markkinatuotantona annetut luontoisetuudet (esim. palvelusetelit, yksityiset hoivapalvelut). Myyntitulot vähennetään kulutusmenoista. Muut erät: mm. tuotantoverot. Lähde: Tilastokeskus, oma laskelma."
         },
         {
-          "id": "jt_tel",
-          "section": "Rahoitusasema",
-          "title": "Työeläkelaitosten sijoitustuotto, arvio, %",
-          "unit": "",
-          "dec": 1,
+          "id": "jt_tt_n",
+          "section": "Menot",
+          "title": "Työttömyysetuuksien saajat, tuhatta",
           "lines": [
-            "jt_tel_ret"
+            "jt_tt_n_ansio",
+            "jt_tt_n_kela"
+          ],
+          "colors": {
+            "jt_tt_n_ansio": "var(--accent)",
+            "jt_tt_n_kela": "var(--g2)"
+          },
+          "unit": "",
+          "dec": 0,
+          "from": 2022,
+          "size": "half",
+          "note": "Henkilöt, joille maksettiin etuutta kuukauden aikana, 3 kk liukuva keskiarvo. Lähde: Verohallinto (tulorekisteri)."
+        },
+        {
+          "id": "jt_tt_e",
+          "section": "Menot",
+          "title": "Työttömyysetuudet, mrd € (12 kk summa)",
+          "lines": [
+            "jt_tt_e_tot"
           ],
           "stack": [
-            "jt_tel_hg",
-            "jt_tel_inc"
+            "jt_tt_e_ansio",
+            "jt_tt_e_kela"
           ],
-          "barSpan": 3,
-          "connect": true,
-          "from": 2005,
-          "size": "half",
-          "stackUnit": "%",
+          "stackColors": [
+            "var(--accent)",
+            "var(--g2)"
+          ],
           "colors": {
-            "jt_tel_ret": "var(--fg)"
+            "jt_tt_e_tot": "var(--fg)"
           },
-          "note": "Neljän neljänneksen summa, % edellisen neljänneksen rahoitusvaroista. Arvonmuutokset: rahoitusvarojen muutos vähennettynä nettosijoituksilla. Omaisuustulot: korot, osingot ja muut omaisuustulot (D.4). Kansantalouden tilinpitoon perustuva arvio, joka poikkeaa Telan julkaisemasta tuotosta kattavuuden ja laskentatavan vuoksi (esim. 2025: arvio 5,5 %, Tela 7,4 %). Lähde: Tilastokeskus, oma laskelma."
+          "labels": {
+            "jt_tt_e_tot": "Yhteensä"
+          },
+          "unit": "mrd €",
+          "stackUnit": "mrd €",
+          "dec": 2,
+          "from": 2022,
+          "size": "half",
+          "note": "Veronalaiset työttömyysetuudet, 12 kk liukuva summa. Lähde: Verohallinto (tulorekisteri)."
         },
         {
           "id": "jt_velka",
@@ -2358,137 +2489,6 @@
             }
           ],
           "note": "Budjettitalouden nykyisen velan kuoletukset vuosittain ilman uutta lainanottoa. Kuluvan vuoden luku sisältää vain jäljellä olevat kuoletukset. Lähde: Valtiokonttori."
-        },
-        {
-          "id": "jt_va",
-          "section": "Verotulot",
-          "title": "Veroaste ja sen rakenne, % BKT:stä",
-          "unit": "",
-          "dec": 1,
-          "lines": [
-            "jt_veroaste"
-          ],
-          "stack": [
-            "jt_va_d5",
-            "jt_va_alv",
-            "jt_va_overo",
-            "jt_va_ta",
-            "jt_va_vak"
-          ],
-          "stackColors": [
-            "var(--g1)",
-            "color-mix(in srgb, var(--g1) 62%, var(--plot))",
-            "color-mix(in srgb, var(--g1) 32%, var(--plot))",
-            "var(--g3)",
-            "color-mix(in srgb, var(--g3) 50%, var(--plot))"
-          ],
-          "barSpan": 3,
-          "connect": true,
-          "from": 2000,
-          "wide": true,
-          "stackUnit": "%",
-          "labels": {
-            "jt_veroaste": "Veroaste"
-          },
-          "colors": {
-            "jt_veroaste": "var(--fg)"
-          },
-          "note": "Neljän neljänneksen liukuva summa suhteessa BKT:hen. Muut verot: tuotanto- ja tuontiverot pl. arvonlisävero (mm. valmisteverot, kiinteistövero) sekä pääomaverot. Sosiaaliturvamaksut: todelliset maksut, pl. laskennalliset. Lähteet: Eurostat, Tilastokeskus.",
-          "lvl": true
-        },
-        {
-          "id": "jt_veroyy",
-          "section": "Verotulot",
-          "title": "Verokertymien vuosimuutos, %",
-          "unit": "%",
-          "dec": 1,
-          "lines": [
-            "jt_veroyy",
-            "jt_veroyy_hlo",
-            "jt_veroyy_alv",
-            "jt_veroyy_yht"
-          ],
-          "from": 2015,
-          "size": "half",
-          "colors": {
-            "jt_veroyy": "var(--fg)",
-            "jt_veroyy_hlo": "var(--accent)",
-            "jt_veroyy_alv": "var(--g3)",
-            "jt_veroyy_yht": "var(--g2)"
-          },
-          "y2": [
-            "jt_veroyy_yht"
-          ],
-          "note": "12 kk liukuvan summan muutos vuodentakaisesta. Yhteisövero oikealla akselilla. Lähde: Verohallinto."
-        },
-        {
-          "id": "jt_trt",
-          "section": "Verotulot",
-          "title": "Ennakonpidätyksen alaiset ansiotulot, vuosimuutos %",
-          "unit": "%",
-          "dec": 1,
-          "lines": [
-            "jt_trt_palk",
-            "jt_trt_elak",
-            "jt_trt_tt"
-          ],
-          "from": 2022,
-          "size": "half",
-          "colors": {
-            "jt_trt_palk": "var(--accent)",
-            "jt_trt_elak": "var(--g2)",
-            "jt_trt_tt": "var(--q-down)"
-          },
-          "y2": [
-            "jt_trt_tt"
-          ],
-          "note": "3 kk liukuvan summan muutos vuodentakaisesta. Työttömyysetuudet oikealla akselilla. Lähde: Verohallinto (tulorekisteri)."
-        },
-        {
-          "id": "jt_tt_n",
-          "section": "Sosiaalietuudet",
-          "title": "Työttömyysetuuksien saajat, tuhatta",
-          "lines": [
-            "jt_tt_n_ansio",
-            "jt_tt_n_kela"
-          ],
-          "colors": {
-            "jt_tt_n_ansio": "var(--accent)",
-            "jt_tt_n_kela": "var(--g2)"
-          },
-          "unit": "",
-          "dec": 0,
-          "from": 2022,
-          "size": "half",
-          "note": "Henkilöt, joille maksettiin etuutta kuukauden aikana, 3 kk liukuva keskiarvo. Lähde: Verohallinto (tulorekisteri)."
-        },
-        {
-          "id": "jt_tt_e",
-          "section": "Sosiaalietuudet",
-          "title": "Työttömyysetuudet, mrd € (12 kk summa)",
-          "lines": [
-            "jt_tt_e_tot"
-          ],
-          "stack": [
-            "jt_tt_e_ansio",
-            "jt_tt_e_kela"
-          ],
-          "stackColors": [
-            "var(--accent)",
-            "var(--g2)"
-          ],
-          "colors": {
-            "jt_tt_e_tot": "var(--fg)"
-          },
-          "labels": {
-            "jt_tt_e_tot": "Yhteensä"
-          },
-          "unit": "mrd €",
-          "stackUnit": "mrd €",
-          "dec": 2,
-          "from": 2022,
-          "size": "half",
-          "note": "Veronalaiset työttömyysetuudet, 12 kk liukuva summa. Lähde: Verohallinto (tulorekisteri)."
         }
       ]
     }

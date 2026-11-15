@@ -2563,7 +2563,8 @@ footer .flinks .lnk:hover { text-decoration-color: currentColor; }
     try { history.replaceState(null, "", h); } catch (e) {} }
   let wantCard = null;
   function applyHash() {                                               // palauttaa tilan osoitteesta; tuntematon -> oletus
-    const [hp, kv] = decodeURIComponent(location.hash.slice(1)).split("~"), [a, b] = hp.split("/"); if (kv) wantCard = kv;
+    const [hp, kv] = decodeURIComponent(location.hash.slice(1)).split("~"), [a, b0] = hp.split("/"); if (kv) wantCard = kv;
+    const b = ({ verotulot: "tulot", sosiaalietuudet: "menot" })[b0] || b0;   // vanhat osioiden nimet
     const s = D.sets.find(x => (HASH[x.id] || x.id) === a) || D.sets.find(x => x.default) || D.sets[0];
     // valinta: rivin id (#reaalitalous/tyottomat) tai aiheen id (vanhat linkit, #reaalitalous/tyomarkkinat)
     const tb = s.tabs && s.tabs.find(x => x.id === b);
