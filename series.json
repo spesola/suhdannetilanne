@@ -2855,6 +2855,22 @@
       "raw_desc": "Ulkomaan meriliikenteen vientikuljetukset tonneina pl. raakaöljy ja öljytuotteet, kausitasoitettu trendi"
     },
     {
+      "id": "tavarajunat",
+      "label": "Tavarajunat",
+      "set": "suhdanne",
+      "group": "Kokeelliset",
+      "source": "rail",
+      "file": "data/tavarajunat.csv",
+      "from": "2016-01",
+      "handling": "sa_trend",
+      "kind": "volume",
+      "invert": false,
+      "in_composite": false,
+      "unit": "junaa päivässä",
+      "kname": "Tavarajunat",
+      "raw_desc": "Ajettujen tavarajunien määrä päivässä, kuukauden keskiarvo, kausitasoitettu trendi"
+    },
+    {
       "id": "palv_vol",
       "label": "Palvelualojen liikevaihdon volyymi",
       "set": "suhdanne",

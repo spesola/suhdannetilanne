@@ -1777,6 +1777,7 @@ footer .flinks .lnk:hover { text-decoration-color: currentColor; }
       scrollTo({ top: t.getBoundingClientRect().top + scrollY - bar - 16 }); }, 120); }
   // sivuston muutokset: uudet kuviot ja muut isommat lisaykset (kasin yllapidetty, uusin ensin); set + id -> linkki kuvioon
   const CHANGES = [
+    { d: "2026-11-15", t: "Tavarajunat (kokeellinen) suhdannekarttaan", set: "Suhdannetilanne", id: "tavarajunat" },
     { d: "2026-11-14", t: "Julkiset investoinnit alasektoreittain", set: "Reaalitalous", id: "x_jinv_val" },
     { d: "2026-11-14", t: "Yksityisten ja julkisten investointien volyymi", set: "Reaalitalous", id: "inv_yks_yy" },
     { d: "2026-11-14", t: "Paketti- ja kuorma-autojen ensirekisteröinnit", set: "Reaalitalous", id: "x_ensirek_pa" },
@@ -2108,7 +2109,7 @@ footer .flinks .lnk:hover { text-decoration-color: currentColor; }
   const escH = t => t.replace(/&/g, "&amp;").replace(/</g, "&lt;");
   // lahderivin nimet linkeiksi: kuvion sarjojen lahteista (meta.links) ensimmainen kunkin lahteen linkki
   const SRC_ALIAS = { "Tilastokeskus": ["statfin"], "Eurostat": ["eurostat"], "Euroopan komissio": ["eurostat", "ameco"], "EKP": ["ecb"], "Suomen Pankki": ["bof"],
-    "Valtiokonttori": ["vk"], "Verohallinto": ["vero"], "Maailmanpankki": ["wb"], "FRED": ["fred"], "STOXX": ["stoxx"], "Caldara": ["xlsx"], "Fintraffic": ["lam"] };
+    "Valtiokonttori": ["vk"], "Verohallinto": ["vero"], "Maailmanpankki": ["wb"], "FRED": ["fred"], "STOXX": ["stoxx"], "Caldara": ["xlsx"], "Fintraffic": ["lam", "rail"] };
   const SRC_RE = new RegExp("(" + Object.keys(SRC_ALIAS).sort((a, b) => b.length - a.length).join("|") + ")", "g");
   function chartLinks(c) {
     const L = (D.meta && D.meta.links) || {}, out = {}, seen = new Set();

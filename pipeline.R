@@ -368,6 +368,35 @@ fetch_lam <- function(s) {
   data.frame(date = ms, value = lev)
 }
 
+# Digitraffic, rautatiet: ajettujen (ei peruttujen) tavarajunien maara paivittain, kuukauden paivakeskiarvo.
+# Historia repossa (data/tavarajunat.csv), uudet paivat haetaan GraphQL-rajapinnasta ja talletetaan valimuistiin.
+RAIL_API <- "https://rata.digitraffic.fi/api/v2/graphql/graphql"
+rail_day <- function(d) {
+  q <- sprintf('{ trainsByDepartureDate(departureDate: "%s", where: {trainType: {trainCategory: {name: {equals: "Cargo"}}}}) { cancelled } }', d)
+  r <- RETRY("POST", RAIL_API, body = toJSON(list(query = q), auto_unbox = TRUE), content_type_json(), timeout(60),
+             add_headers(`Digitraffic-User` = "suhdannetilanne.fi"), times = 3, pause_base = 3, quiet = TRUE)
+  stop_for_status(r)
+  x <- fromJSON(content(r, "text", encoding = "UTF-8"), simplifyVector = FALSE)$data$trainsByDepartureDate
+  c(ajetut = sum(!vapply(x, function(t) isTRUE(t$cancelled), TRUE)), kaikki = length(x))
+}
+fetch_rail <- function(s) {
+  b <- read.csv(s$file, colClasses = c("character", "numeric", "numeric"))
+  cf <- file.path(CACHE_DIR, "tavarajunat_paivat.csv")
+  if (file.exists(cf)) { c2 <- read.csv(cf, colClasses = c("character", "numeric", "numeric")); b <- rbind(b[!b$pvm %in% c2$pvm, ], c2) }
+  end <- Sys.Date() - 2                                   # perumistiedot tarkentuvat; viimeiset paivat haetaan uudelleen
+  from <- max(as.Date(max(b$pvm)) - 3, as.Date("2015-12-01"))
+  for (d in if (from <= end) as.character(seq(from, end, by = "day")) else character()) {
+    v <- tryCatch(rail_day(d), error = function(e) NULL)
+    if (!is.null(v)) b <- rbind(b[b$pvm != d, ], data.frame(pvm = d, ajetut = v[["ajetut"]], kaikki = v[["kaikki"]]))
+  }
+  b <- b[order(b$pvm), ]; dir.create(CACHE_DIR, showWarnings = FALSE); write.csv(b, cf, row.names = FALSE)
+  b$kk <- substr(b$pvm, 1, 7)
+  n <- tapply(b$pvm, b$kk, length); m <- tapply(b$ajetut, b$kk, mean)
+  dim <- vapply(names(n), function(k) { d0 <- as.Date(paste0(k, "-01")); as.integer(format(seq(d0, by = "month", length.out = 2)[2] - 1, "%d")) }, 0L)
+  ok <- n == dim & names(n) >= s$from                     # vain taydet kuukaudet
+  data.frame(date = names(n)[ok], value = as.numeric(m[ok]))
+}
+
 # Euroopan komission AMECO (Redisstat): vuosisarja, esim. NAWRU (rakenteellinen tyottomyys), mukana ennustevuodet
 AMECO_API <- "https://webgate.ec.europa.eu/ecfin/redisstat/api/dissemination/statistics/1.0/data/"
 fetch_ameco <- function(s) {
@@ -449,7 +478,7 @@ fetch_tel_ret <- function(s) {
 }
 
 fetch_series <- function(s) {
-  f <- switch(s$source, statfin = fetch_statfin, splice = fetch_splice, eurostat = fetch_eurostat, hicp_ctrb = fetch_hicp_ctrb, ntp_ctrb = fetch_ntp_ctrb, hhi_ctrb = fetch_hhi_ctrb, khi_ctrb = fetch_khi_ctrb, xlsx = fetch_xlsx, stoxx = fetch_stoxx, lam = fetch_lam, ameco = fetch_ameco, vk = fetch_vk, sum = fetch_sum, jt_decomp = fetch_jt_decomp, jk_decomp = fetch_jk_decomp, tel_ret = fetch_tel_ret, gdp_np = fetch_gdp_np,
+  f <- switch(s$source, statfin = fetch_statfin, splice = fetch_splice, eurostat = fetch_eurostat, hicp_ctrb = fetch_hicp_ctrb, ntp_ctrb = fetch_ntp_ctrb, hhi_ctrb = fetch_hhi_ctrb, khi_ctrb = fetch_khi_ctrb, xlsx = fetch_xlsx, stoxx = fetch_stoxx, lam = fetch_lam, rail = fetch_rail, ameco = fetch_ameco, vk = fetch_vk, sum = fetch_sum, jt_decomp = fetch_jt_decomp, jk_decomp = fetch_jk_decomp, tel_ret = fetch_tel_ret, gdp_np = fetch_gdp_np,
               ecb = fetch_ecb, fred = fetch_fred, bof = fetch_bof, wb = fetch_wb, stop("Tuntematon lahde ", s$source))
   # valimuisti: onnistunut haku tallennetaan, epaonnistuessa kaytetaan edellista hakua
   cache <- file.path(CACHE_DIR, paste0(s$id, ".csv"))
@@ -910,10 +939,13 @@ for (set in cfg$sets) {
       values = r3(ifelse(as.integer(substr(periods, 6, 7)) %% 3 == 0, unname(cq[qq]), NA)))
     cser[[length(cser) + 1]] <- list(id = "val_gdp", label = "BKT:n trendipoikkeama", last = qm(tail(g$date, 1)),
       values = r3(g$level[match(periods, qm(g$date))]))
+    sg <- round(100 * mean(sign(cq[both]) == sign(g$level[match(both, g$date)])))
     VALID_TXT <<- sprintf(   # vertailu BKT:hen menetelmakuvaukseen (kuvio poistettu sivulta)
-      " Kokonaisindikaattorin neljännesvuosikeskiarvon korrelaatio BKT:n trendipoikkeamaan %s–%s on %s (ilman vuosia 2020–21 %s).",
+      paste0(" Kokonaisindikaattorin neljännesvuosikeskiarvon korrelaatio BKT:n trendipoikkeamaan %s–%s on %s (ilman vuosia 2020–21 %s),",
+             " ja etumerkki on sama %d prosentissa neljänneksistä. Vertailu tehdään nykyisillä, jo tarkentuneilla luvuilla, joten se kuvaa",
+             " indikaattorin kykyä kuvata suhdannetta jälkikäteen, ei sen ennakoivuutta."),
       substr(both[1], 1, 4), substr(tail(both, 1), 1, 4),
-      sub(".", ",", sprintf("%.2f", r_all), fixed = TRUE), sub(".", ",", sprintf("%.2f", r_ex), fixed = TRUE))
+      sub(".", ",", sprintf("%.2f", r_all), fixed = TRUE), sub(".", ",", sprintf("%.2f", r_ex), fixed = TRUE), sg)
     message(sprintf("  Kokonaisindikaattori vs BKT: r = %.2f (ilman 2020-21 %.2f)", r_all, r_ex))
   }
 
@@ -949,7 +981,7 @@ SRC_NAMES <- list(
   stoxx    = list(.n = "STOXX", .all = "VSTOXX-volatiliteetti-indeksi"),
   vero     = list(.n = "Verohallinto", Verotulojen_kehitys = "verokertymät", Tulorekisteri = "ennakonpidätyksen alaiset ansiotulot (tulorekisteri)"),
   vk       = list(.n = "Valtiokonttori", .all = "valtionvelka"),
-  lam      = list(.n = "Fintraffic", .all = "LAM-liikennemäärät, Digitraffic"),
+  lam      = list(.n = "Fintraffic", lam = "LAM-liikennemäärät, Digitraffic", rail = "junaliikenne, Digitraffic"),
   ameco    = list(.n = "Euroopan komissio", .all = "AMECO, rakenteellinen työttömyys (NAWRU)"),
   fred     = list(.n = "FRED", EUEPUINDXM = "talouspoliittisen epävarmuuden indeksi", GS10 = "Yhdysvaltain korot © OECD",
                   FEDFUNDS = "Yhdysvaltain korot © OECD", IRLTLT01JPM156N = "Japanin korot © OECD", IRSTCI01JPM156N = "Japanin korot © OECD",
@@ -971,7 +1003,9 @@ src_walk <- function(x) {
     else if (sc == "eurostat") src_add("eurostat", x$ds)
     else if (sc == "ecb") src_add("ecb", x$flow)
     else if (sc == "fred") src_add("fred", x$fred_id)
-    else if (sc %in% c("bof", "wb", "stoxx", "vk", "lam", "ameco")) src_add(sc, "")
+    else if (sc == "lam") src_add("lam", "lam")
+    else if (sc == "rail") src_add("lam", "rail")
+    else if (sc %in% c("bof", "wb", "stoxx", "vk", "ameco")) src_add(sc, "")
     else if (sc == "ntp_ctrb") src_add("statfin", "ntp")
     else if (sc == "hhi_ctrb") src_add("statfin", "ntp")
     else if (sc == "khi_ctrb") src_add("statfin", "khi")
@@ -987,7 +1021,7 @@ sources_out <- lapply(intersect(names(SRC_NAMES), names(src_used)), function(p)
   list(name = SRC_NAMES[[p]]$.n, items = I(intersect(unique(unlist(SRC_NAMES[[p]][names(SRC_NAMES[[p]]) != ".n"])), src_used[[p]]))))   # jarjestys SRC_NAMES:n mukaan
 # lahdelinkit sarjoittain: sivulla kuvion lahderivin nimet vievat tilaston sivulle tai tietokantaan
 LNK_BASE <- list(bof = "https://www.suomenpankki.fi/fi/tilastot/", wb = "https://www.worldbank.org/en/research/commodity-markets",
-  stoxx = "https://www.stoxx.com/", vk = "https://www.tutkihallintoa.fi/", lam = "https://www.digitraffic.fi/tieliikenne/",
+  stoxx = "https://www.stoxx.com/", vk = "https://www.tutkihallintoa.fi/", lam = "https://www.digitraffic.fi/tieliikenne/", rail = "https://www.digitraffic.fi/rautatieliikenne/",
   ameco = "https://economy-finance.ec.europa.eu/economic-research-and-databases/economic-databases/ameco-database_en",
   vero = "https://vero2.stat.fi/PXWeb/pxweb/fi/Vero/")
 lnk_stf <- function(t) paste0("https://stat.fi/tilasto/", sub("/.*", "", t))

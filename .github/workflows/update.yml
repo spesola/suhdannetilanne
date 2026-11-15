@@ -18,6 +18,7 @@ jobs:
   build:
     runs-on: ubuntu-latest
     timeout-minutes: 50
+    permissions: { contents: write }   # arkisto-haaraan kirjoitus
     steps:
       - uses: actions/checkout@v4
 
@@ -118,6 +119,19 @@ jobs:
           accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
           wranglerVersion: "4.154.0"
           command: deploy
+
+      # paivan julkaistu tila talteen (reaaliaika-aineisto revisioihin ja mallien arviointiin); paivan viimeinen taysajo jaa voimaan
+      - name: Arkistoi päivän tila
+        if: ${{ !inputs.pika && hashFiles('public/clock.json') != '' }}
+        continue-on-error: true
+        run: |
+          d=$(TZ=Europe/Helsinki date +%F); y=${d:0:4}
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          if git fetch -q --depth 1 origin arkisto:arkisto; then git worktree add -q ../arkisto arkisto
+          else git worktree add -q --orphan -b arkisto ../arkisto; fi
+          mkdir -p ../arkisto/$y && gzip -9 -n -c public/clock.json > ../arkisto/$y/$d.json.gz
+          cd ../arkisto && git add -A && { git commit -qm "Arkisto $d" || exit 0; } && git push -q origin arkisto
 
       - name: Ilmoita tarkistushuomioista
         if: steps.run.outcome == 'failure'
