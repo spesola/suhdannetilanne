@@ -2236,33 +2236,6 @@
           "note": "Neljän neljänneksen summa, % edellisen neljänneksen rahoitusvaroista. Arvonmuutokset: rahoitusvarojen muutos vähennettynä nettosijoituksilla. Omaisuustulot: korot, osingot ja muut omaisuustulot (D.4). Kansantalouden tilinpitoon perustuva arvio, joka poikkeaa Telan julkaisemasta tuotosta kattavuuden ja laskentatavan vuoksi (esim. 2025: arvio 5,5 %, Tela 7,4 %). Lähde: Tilastokeskus, oma laskelma."
         },
         {
-          "id": "jt_jk",
-          "section": "Menot",
-          "title": "Julkisten kulutusmenojen muutos menolajeittain",
-          "unit": "%",
-          "dec": 1,
-          "lines": [
-            "jt_jk_tot"
-          ],
-          "stack": [
-            "jt_jk_d1",
-            "jt_jk_p2",
-            "jt_jk_d632",
-            "jt_jk_p51c",
-            "jt_jk_sales",
-            "jt_jk_muu"
-          ],
-          "barSpan": 3,
-          "connect": true,
-          "from": 2015,
-          "size": "half",
-          "colors": {
-            "jt_jk_tot": "var(--fg)"
-          },
-          "stackUnit": "%-yks.",
-          "note": "Käyvin hinnoin, neljän neljänneksen liukuvan summan muutos vuodentakaisesta. Ostopalvelut: ostettuna markkinatuotantona annetut luontoisetuudet (esim. palvelusetelit, yksityiset hoivapalvelut). Myyntitulot vähennetään kulutusmenoista. Muut erät: mm. tuotantoverot. Lähde: Tilastokeskus, oma laskelma."
-        },
-        {
           "id": "jt_tt_n",
           "section": "Menot",
           "title": "Työttömyysetuuksien saajat, tuhatta",
@@ -2307,6 +2280,33 @@
           "from": 2022,
           "size": "half",
           "note": "Veronalaiset työttömyysetuudet, 12 kk liukuva summa. Lähde: Verohallinto (tulorekisteri)."
+        },
+        {
+          "id": "jt_jk",
+          "section": "Menot",
+          "title": "Julkisten kulutusmenojen muutos menolajeittain",
+          "unit": "%",
+          "dec": 1,
+          "lines": [
+            "jt_jk_tot"
+          ],
+          "stack": [
+            "jt_jk_d1",
+            "jt_jk_p2",
+            "jt_jk_d632",
+            "jt_jk_p51c",
+            "jt_jk_sales",
+            "jt_jk_muu"
+          ],
+          "barSpan": 3,
+          "connect": true,
+          "from": 2015,
+          "size": "half",
+          "colors": {
+            "jt_jk_tot": "var(--fg)"
+          },
+          "stackUnit": "%-yks.",
+          "note": "Käyvin hinnoin, neljän neljänneksen liukuvan summan muutos vuodentakaisesta. Ostopalvelut: ostettuna markkinatuotantona annetut luontoisetuudet (esim. palvelusetelit, yksityiset hoivapalvelut). Myyntitulot vähennetään kulutusmenoista. Muut erät: mm. tuotantoverot. Lähde: Tilastokeskus, oma laskelma."
         },
         {
           "id": "jt_velka",
