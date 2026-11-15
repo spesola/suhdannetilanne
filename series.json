@@ -917,60 +917,6 @@
                 "dec": 1,
                 "from": 2015,
                 "note": "Työpäiväkorjattu, viitevuoden 2015 hinnoin, kuten Tilastokeskuksen julkistamat vuosimuutokset. Lähde: Tilastokeskus."
-              },
-              {
-                "title": "Julkiset investoinnit alasektoreittain, mrd €",
-                "lines": [
-                  "x_jinv_yht"
-                ],
-                "stack": [
-                  "x_jinv_val",
-                  "x_jinv_kun",
-                  "x_jinv_hva"
-                ],
-                "stackColors": [
-                  "var(--accent)",
-                  "var(--g2)",
-                  "var(--g3)"
-                ],
-                "colors": {
-                  "x_jinv_yht": "var(--fg)"
-                },
-                "unit": "mrd €",
-                "stackUnit": "mrd €",
-                "dec": 1,
-                "from": 2015,
-                "note": "Pääoman bruttomuodostus käypin hinnoin, neljän neljänneksen liukuva summa. Kunnat sisältää ennen vuotta 2023 myös sosiaali- ja terveyspalvelut. Sosiaaliturvarahastot eivät ole mukana. Lähde: Tilastokeskus."
-              },
-              {
-                "title": "Rakentamisen liikevaihdon volyymi (2021=100)",
-                "lines": [
-                  "x_rlv_41",
-                  "x_rlv_42",
-                  "x_rlv_43"
-                ],
-                "colors": {
-                  "x_rlv_41": "var(--q-down)",
-                  "x_rlv_42": "var(--g3)",
-                  "x_rlv_43": "var(--accent)"
-                },
-                "unit": "",
-                "dec": 1,
-                "note": "Myynnin määrä, kausitasoitettu, neljänneksen keskiarvo. Lähde: Tilastokeskus, rakentamisen liikevaihtokuvaaja."
-              },
-              {
-                "title": "Paketti- ja kuorma-autojen ensirekisteröinnit, tuhatta",
-                "lines": [
-                  "x_ensirek_pa",
-                  "x_ensirek_ka"
-                ],
-                "colors": {
-                  "x_ensirek_pa": "var(--accent)",
-                  "x_ensirek_ka": "var(--g2)"
-                },
-                "unit": "",
-                "dec": 1,
-                "note": "Neljän neljänneksen liukuva summa, Manner-Suomi. Lähde: Tilastokeskus."
               }
             ],
             "bkt_vienti": [
@@ -1264,6 +1210,70 @@
                 "unit": "%",
                 "dec": 1,
                 "note": "Neljänneksen keskiarvo. Lähteet: Tilastokeskus, EKP."
+              }
+            ],
+            "inv_yks": [
+              {
+                "growth": true
+              },
+              {
+                "title": "Rakentamisen liikevaihdon volyymi (2021=100)",
+                "lines": [
+                  "x_rlv_41",
+                  "x_rlv_42",
+                  "x_rlv_43"
+                ],
+                "colors": {
+                  "x_rlv_41": "var(--q-down)",
+                  "x_rlv_42": "var(--g3)",
+                  "x_rlv_43": "var(--accent)"
+                },
+                "unit": "",
+                "dec": 1,
+                "note": "Myynnin määrä, kausitasoitettu, neljänneksen keskiarvo. Lähde: Tilastokeskus, rakentamisen liikevaihtokuvaaja."
+              },
+              {
+                "title": "Paketti- ja kuorma-autojen ensirekisteröinnit, tuhatta",
+                "lines": [
+                  "x_ensirek_pa",
+                  "x_ensirek_ka"
+                ],
+                "colors": {
+                  "x_ensirek_pa": "var(--accent)",
+                  "x_ensirek_ka": "var(--g2)"
+                },
+                "unit": "",
+                "dec": 1,
+                "note": "Neljän neljänneksen liukuva summa, Manner-Suomi. Lähde: Tilastokeskus."
+              }
+            ],
+            "inv_julk": [
+              {
+                "growth": true
+              },
+              {
+                "title": "Julkiset investoinnit alasektoreittain, mrd €",
+                "lines": [
+                  "x_jinv_yht"
+                ],
+                "stack": [
+                  "x_jinv_val",
+                  "x_jinv_kun",
+                  "x_jinv_hva"
+                ],
+                "stackColors": [
+                  "var(--accent)",
+                  "var(--g2)",
+                  "var(--g3)"
+                ],
+                "colors": {
+                  "x_jinv_yht": "var(--fg)"
+                },
+                "unit": "mrd €",
+                "stackUnit": "mrd €",
+                "dec": 1,
+                "from": 2015,
+                "note": "Pääoman bruttomuodostus käypin hinnoin, neljän neljänneksen liukuva summa. Kunnat sisältää ennen vuotta 2023 myös sosiaali- ja terveyspalvelut. Sosiaaliturvarahastot eivät ole mukana. Lähde: Tilastokeskus."
               }
             ]
           },
