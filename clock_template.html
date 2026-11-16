@@ -2364,7 +2364,7 @@ footer .flinks .lnk:hover { text-decoration-color: currentColor; }
       if (c0.type === "scatter") { if (col && nth++ === 0) tgt = box; tgt.appendChild(scatterCard(c0, narrow)); return; }
       const c = { ...c0, lines: c0.lines.filter(id => ser(id)) };       // puuttuvat sarjat ohitetaan
       const isRes = id => (c.resid || []).includes(id) || /_muu$/.test(id);   // jaannoserat viivoitettuina
-      if (col && nth++ === 0 && grSel) c.hdr = grSel;                   // ensimmainen kuvio: otsakkeeseen rivin v/v ja q/q
+      if (col) nth++;                                                   // rivin v/v ja q/q nakyvat jo taulukossa, joten kuvioon ei omaa otsaketta
       const main = col && tgt === box;
       const erit = main ? !!(c.stack && c.stack.length) : !col && c.size === "tt" && !narrow;   // pinotuille: valitun jakson erittely
       if (main) { c.size = "half"; c.wide = false; delete c.w; delete c.height;
