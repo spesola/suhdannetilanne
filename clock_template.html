@@ -477,6 +477,9 @@ body { font-variant-numeric: tabular-nums; background: var(--bg); min-height: 10
 .updg h2 { font-size: 1rem; font-weight: 600; margin: 0 0 4px; padding-bottom: 8px; border-bottom: 1px solid var(--rule); }
 .updg .ud { font-size: 0.78rem; color: var(--muted); margin: 14px 0 2px; }
 .updg .ud.now { color: var(--fg); font-weight: 600; }
+#hm td[data-nw] { position: relative; }
+#hm td[data-nw]::after { content: ""; position: absolute; top: 3px; right: 3px; width: 5px; height: 5px; border-radius: 50%; background: #3b82f6; box-shadow: 0 0 0 1.5px var(--plot); }
+:root[data-theme="vapor"] #hm td[data-nw]::after { background: #4dc9ff; }
 .fresh { display: inline-block; width: 7px; height: 7px; border-radius: 50%; background: #3b82f6; margin-left: 6px; vertical-align: 1px; box-shadow: 0 0 0 2px color-mix(in srgb, #3b82f6 22%, transparent); }
 :root[data-theme="vapor"] .fresh { background: #4dc9ff; box-shadow: 0 0 6px #4dc9ff; }
 .updg .us { font-size: 0.78rem; font-weight: 600; margin: 8px 0 0; }
@@ -1395,29 +1398,35 @@ footer .flinks .lnk:hover { text-decoration-color: currentColor; }
     $("hmTitle").textContent = raw ? "Julkaistu arvo" : lvl ? "Poikkeama trendistä" : `Muutos edellisestä ${set.freq === "M" ? "kuukaudesta" : "neljänneksestä"}`;
     $("hmNote").textContent = raw ? "Lähteen julkaisema luku sarjan omassa yksikössä. Nuoli: suunta edelliseen jaksoon."
       : lvl ? "Nuoli: suunta edelliseen jaksoon." : "Standardoitu.";
-    const rawCell = (a, k) => { const v = a ? a[k] : null, p = a && k > 0 ? a[k - 1] : null;
+    // uusi havainto (viim. 7 pv): piste sarjan uusimman havainnon soluun
+    const nwK = s => { if (s.comp || !seenOf(set.id, s.id)) return -1; const a = (raw ? s.raw : s.level) || []; for (let k = a.length - 1; k >= 0; k--) if (a[k] != null) return k; return -1; };
+    const nwA = (on, s) => on ? ` data-nw="1" aria-label="uusi havainto ${new Date(seenOf(set.id, s.id) + "T12:00:00").toLocaleDateString("fi-FI")}"` : "";
+    let anyNw = false;
+    const rawCell = (a, k, nw = "") => { const v = a ? a[k] : null, p = a && k > 0 ? a[k - 1] : null;
       if (v == null) return `<td class="na">–</td>`;
       const rd = x => Math.abs(x) >= 1000 ? Math.round(x) : Math.round(x * 10) / 10;   // nuoli naytetyn tarkkuuden mukaan
       const ar = p == null || rd(v) === rd(p) ? "" : `<span class="ar">${rd(v) > rd(p) ? "▲" : "▼"}</span>`;
-      return `<td class="rawc">${fmtRaw(v)}${ar}</td>`; };
-    const cell = (l, c) => {
+      return `<td class="rawc"${nw}>${fmtRaw(v)}${ar}</td>`; };
+    const cell = (l, c, nw = "") => {
       const v = lvl ? l : c;
       if (v == null) return `<td class="na">–</td>`;
       const t = Math.min(1, Math.abs(v) / 2.5), base = v >= 0 ? "var(--q-up)" : "var(--q-down)";
       const ar = !lvl || c == null ? "" : `<span class="ar">${c >= 0 ? "▲" : "▼"}</span>`;
-      return `<td class="hc${t < 0.35 ? " lo" : ""}" style="--hc:${base};--hp:${Math.round(8 + 52 * t)}%;--hv:${Math.round(22 + 48 * t)}%" title="taso ${l == null ? "–" : fmtN(l)}, muutos ${c == null ? "–" : fmtN(c)}">${fmtN(v)}${ar}</td>`;
+      return `<td class="hc${t < 0.35 ? " lo" : ""}" style="--hc:${base};--hp:${Math.round(8 + 52 * t)}%;--hv:${Math.round(22 + 48 * t)}%" title="taso ${l == null ? "–" : fmtN(l)}, muutos ${c == null ? "–" : fmtN(c)}"${nw}>${fmtN(v)}${ar}</td>`;
     };
     let h = `<thead><tr><th></th>${cols.map(p => `<th>${fmtP(p)}</th>`).join("")}</tr></thead><tbody>`;
     const nm = s => s.comp ? s.label : (s.list || s.label);
-    const row = s => raw
-      ? `<tr><th class="rl${s.comp ? "" : " sub"}" title="${s.label}">${nm(s)}</th>${cols.map((_, k) => rawCell(s.raw, start + k)).join("")}<td class="unit">${s.unit || ""}</td></tr>`
-      : `<tr><th class="rl${s.comp ? "" : " sub"}" title="${s.label}">${nm(s)}</th>${cols.map((_, k) => cell(s.level[start + k], s.change[start + k])).join("")}</tr>`;
+    const row = s => { const fk = nwK(s); if (fk >= start && fk < start + cols.length) anyNw = true;
+      return raw
+      ? `<tr><th class="rl${s.comp ? "" : " sub"}" title="${s.label}">${nm(s)}</th>${cols.map((_, k) => rawCell(s.raw, start + k, nwA(start + k === fk, s))).join("")}<td class="unit">${s.unit || ""}</td></tr>`
+      : `<tr><th class="rl${s.comp ? "" : " sub"}" title="${s.label}">${nm(s)}</th>${cols.map((_, k) => cell(s.level[start + k], s.change[start + k], nwA(start + k === fk, s))).join("")}</tr>`; };
     h += raw ? `<tr><th class="rl">${comp().label}</th>${cols.map(() => `<td class="na">–</td>`).join("")}<td class="unit"></td></tr>` : row(comp());
     const GR = [...(set.groups || []), ...new Set(set.indicators.map(x => x.group))].filter((g, i, a) => a.indexOf(g) === i);   // listan ryhmat ja jarjestys
     GR.forEach(g => { const m = set.indicators.filter(x => x.group === g); if (!m.length) return;
       h += `<tr class="hg"><th class="rl">${g}</th><td colspan="${cols.length + (raw ? 1 : 0)}"></td></tr>`; m.forEach(s => { h += row(s); }); });
     h += "</tbody>";
     $("hm").innerHTML = h;
+    if (anyNw) $("hmNote").textContent += " Sininen piste: uusi havainto viimeisen 7 päivän aikana.";
   }
 
   function setTab(t) { tab = t;
