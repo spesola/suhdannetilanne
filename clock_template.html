@@ -125,11 +125,12 @@ body { font-variant-numeric: tabular-nums; background: var(--bg); min-height: 10
 .smi .sw { width: 16px; height: 16px; flex: none; border-radius: 50%; background: var(--sw); border: 1px solid var(--line); }
 .smi svg.chev { width: 12px; height: 12px; margin-left: auto; color: var(--muted); transition: transform .15s; }
 .smsub { position: relative; }
-.thmfly { position: absolute; right: calc(100% + 16px); top: -9px; width: 180px; padding: 8px; }
+.thmfly { position: absolute; left: calc(100% + 16px); top: -9px; width: 180px; padding: 8px; }
+.thmfly.flip { left: auto; right: calc(100% + 16px); }               /* ei mahdu oikealle: vasemmalle */
 .thmfly[hidden] { display: none; }
 @media (max-width: 860px) {                                           /* kapealla alavalikko avautuu rivin alle */
-  .thmfly { position: static; width: auto; border: 0; box-shadow: none; padding: 2px 0 0 18px; background: none; }
-  .smi[aria-expanded="true"] svg.chev { transform: rotate(-90deg); } }
+  .thmfly, .thmfly.flip { position: static; width: auto; border: 0; box-shadow: none; padding: 2px 0 0 18px; background: none; }
+  .smi[aria-expanded="true"] svg.chev { transform: rotate(90deg); } }
 .smenu .thm { flex-direction: column; align-items: stretch; gap: 1px; }
 .smenu .thm button { width: auto; height: auto; border: 0; border-radius: 6px; background: none; box-shadow: none; display: flex; align-items: center; gap: 10px; padding: 7px 8px;
   font: inherit; font-size: 0.875rem; color: var(--fg); text-align: left; }
@@ -724,7 +725,7 @@ footer .flinks .lnk:hover { text-decoration-color: currentColor; }
       <p class="upd" id="sub"></p>
       <button type="button" class="smi" id="updOpen"><svg viewBox="0 0 16 16" aria-hidden="true"><rect x="2.5" y="3.5" width="11" height="10" rx="1.5"/><path d="M2.5 6.5h11M5.5 2v3M10.5 2v3"/></svg>Julkaisut</button>
       <div class="smsub" id="thmSub">
-      <button type="button" class="smi" id="thmBtn" aria-expanded="false" aria-controls="thmFly"><i class="sw" id="thmSw"></i>Teema<svg class="chev" viewBox="0 0 12 12" aria-hidden="true"><path d="M7.5 2.5 4 6l3.5 3.5"/></svg></button>
+      <button type="button" class="smi" id="thmBtn" aria-expanded="false" aria-controls="thmFly"><i class="sw" id="thmSw"></i>Teema<svg class="chev" viewBox="0 0 12 12" aria-hidden="true"><path d="M4.5 2.5 8 6l-3.5 3.5"/></svg></button>
       <div class="thmfly" id="thmFly" hidden>
       <div class="thm" id="thm" role="group" aria-label="Väriteema">
         <button type="button" data-t="" title="Vaalea" aria-label="Vaalea teema" style="--sw:linear-gradient(135deg, #fbfbfc 50%, #1d4f7f 50%)"></button>
@@ -2593,10 +2594,12 @@ footer .flinks .lnk:hover { text-decoration-color: currentColor; }
   (function () {                                                    // valikko: avaus painikkeesta, sulku ulkopuolelta tai Escillä
     const b = $("smBtn"), m = $("siteMenu"); if (!b || !m) return;
     const tb = $("thmBtn"), fl = $("thmFly"), sub = $("thmSub"); let ht = 0;
-    const fly = o => { clearTimeout(ht); fl.hidden = !o; tb.setAttribute("aria-expanded", String(o)); };
+    const fly = o => { clearTimeout(ht); fl.classList.remove("flip"); fl.hidden = !o; tb.setAttribute("aria-expanded", String(o));
+      if (o && fl.getBoundingClientRect().right > document.documentElement.clientWidth - 8) fl.classList.add("flip"); };
     const set_ = o => { m.hidden = !o; b.setAttribute("aria-expanded", String(o)); if (!o) fly(false); };
-    b.onclick = e => { e.stopPropagation(); set_(m.hidden); if (!m.hidden) m.querySelector(".smi").focus({ preventScroll: true }); };
-    tb.onclick = () => { fly(hov() || fl.hidden); if (!fl.hidden) (fl.querySelector("[aria-pressed=true]") || fl.querySelector("button")).focus({ preventScroll: true }); };
+    // fokus siirretaan valikkoon vain nappaimistolla avattaessa (e.detail 0), ettei hiirikayttajalle jaa fokuskehysta
+    b.onclick = e => { e.stopPropagation(); set_(m.hidden); if (!m.hidden && !e.detail) m.querySelector(".smi").focus({ preventScroll: true }); };
+    tb.onclick = e => { fly(hov() || fl.hidden); if (!fl.hidden && !e.detail) (fl.querySelector("[aria-pressed=true]") || fl.querySelector("button")).focus({ preventScroll: true }); };
     const hov = () => matchMedia("(hover: hover) and (min-width: 861px)").matches;       // leveällä hiirellä alavalikko aukeaa myös osoittamalla
     sub.addEventListener("pointerenter", () => { if (hov()) fly(true); });
     sub.addEventListener("pointerleave", () => { if (hov()) ht = setTimeout(() => fly(false), 300); });
