@@ -2934,42 +2934,33 @@
       "raw_desc": "Ajettujen tavarajunien määrä päivässä, kuukauden keskiarvo, kausitasoitettu trendi"
     },
     {
-      "id": "haku_taantuma",
-      "label": "Taantumahaut",
+      "id": "hakuindeksi",
+      "label": "Taantuma- ja YT-haut",
       "set": "suhdanne",
       "group": "Kokeelliset",
       "source": "gtrends",
+      "korit": [
+        {
+          "hakusanat": [
+            "taantuma"
+          ],
+          "alku": "2008-01-01"
+        },
+        {
+          "hakusanat": [
+            "yt-neuvottelut",
+            "muutosneuvottelut"
+          ]
+        }
+      ],
+      "file": "data/hakuindeksi.csv",
       "handling": "sa",
       "kind": "balance",
       "invert": true,
       "in_composite": false,
-      "unit": "indeksi",
-      "hakusanat": [
-        "taantuma"
-      ],
-      "alku": "2008-01-01",
-      "file": "data/haku_taantuma.csv",
-      "kname": "Taantumahaut",
-      "raw_desc": "Google-hakujen suhteellinen määrä Suomesta, hakusana taantuma (huippukuukausi 100). Kausitasoitus oma laskelma. Kasvu heikentää indikaattoria"
-    },
-    {
-      "id": "haku_neuvottelut",
-      "label": "YT- ja muutosneuvotteluhaut",
-      "set": "suhdanne",
-      "group": "Kokeelliset",
-      "source": "gtrends",
-      "handling": "sa",
-      "kind": "balance",
-      "invert": true,
-      "in_composite": false,
-      "unit": "indeksi",
-      "hakusanat": [
-        "yt-neuvottelut",
-        "muutosneuvottelut"
-      ],
-      "file": "data/haku_neuvottelut.csv",
-      "kname": "YT-haut",
-      "raw_desc": "Google-hakujen suhteellinen määrä Suomesta, hakusanat yt-neuvottelut ja muutosneuvottelut yhteensä (nimi vaihtui 2022). Kausitasoitus oma laskelma. Kasvu heikentää indikaattoria"
+      "unit": "keskihajontaa",
+      "kname": "Hakuindeksi",
+      "raw_desc": "Google-hakujen määrä Suomesta: hakusana taantuma sekä yt-neuvottelut ja muutosneuvottelut yhteensä (nimi vaihtui 2022). Kumpikin standardoitu ja keskiarvoistettu. Kausitasoitus oma laskelma. Hakujen kasvu heikentää indikaattoria"
     },
     {
       "id": "palv_vol",

@@ -415,7 +415,16 @@ gt_fetch <- function(s) {
   data.frame(date = vapply(tl, function(p) format(as.POSIXct(as.numeric(p$time), origin = "1970-01-01", tz = "UTC"), "%Y-%m"), ""),
              value = vapply(tl, function(p) sum(unlist(p$value)), 0))
 }
-fetch_gtrends <- function(s) tryCatch(gt_fetch(s), error = function(e) {
+# korit: useampi hakusanaryhma yhdeksi indeksiksi. Eri kyselyiden skaalat eivat ole vertailukelpoisia, joten kukin kori
+# standardoidaan (keskiarvo 0, keskihajonta 1) ja korien keskiarvo otetaan kuukausittain saatavilla olevista.
+gt_korit <- function(s) {
+  ps <- lapply(seq_along(s$korit), function(i) { if (i > 1) Sys.sleep(2); x <- gt_fetch(s$korit[[i]])
+    data.frame(date = x$date, z = (x$value - mean(x$value)) / sd(x$value)) })
+  d <- sort(unique(unlist(lapply(ps, `[[`, "date"))))
+  m <- sapply(ps, function(x) x$z[match(d, x$date)])
+  data.frame(date = d, value = round(rowMeans(m, na.rm = TRUE), 4))
+}
+fetch_gtrends <- function(s) tryCatch(if (is.null(s$korit)) gt_fetch(s) else gt_korit(s), error = function(e) {
   if (file.exists(file.path(CACHE_DIR, paste0(s$id, ".csv")))) stop(e)
   message("  VAROITUS ", s$id, ": Google Trends ei vastannut, kaytetaan pohja-aineistoa ", s$file, " (", conditionMessage(e), ")")
   STALE <<- c(STALE, s$id); read.csv(s$file, colClasses = c("character", "numeric")) })
