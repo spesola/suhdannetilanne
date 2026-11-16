@@ -1328,7 +1328,7 @@ footer .flinks .lnk:hover { text-decoration-color: currentColor; }
     $("tsNow").innerHTML = p && !s.comp ? `<i style="--qc:${qcol(quad(p.l, p.c))}"></i>${Q[quad(p.l, p.c)].name} ${fmtP(set.periods[p.i])}. Taso ${fmtN(p.l)}, muutos ${fmtN(p.c)}.` : "";
     const svg = $("ts"); svg.innerHTML = "";
     const solo = false, W2 = 560, H2 = 300,   // puolen leveyden sarake kartan alla
-    ml = 40, mr = 14, mt = 12, mb = 28;
+    ml = 40, mr = 14, mt = 12, mb = 33;
     svg.setAttribute("viewBox", `0 0 ${W2} ${H2}`);
     const n = set.periods.length, xs = i => ml + i * (W2 - ml - mr) / (n - 1);
     const vals = s.level.filter(v => v != null);
@@ -1563,7 +1563,7 @@ footer .flinks .lnk:hover { text-decoration-color: currentColor; }
     const card = document.createElement("div"); card.className = "card fcard" + (narrow ? "" : " tt");
     const sub = st.filter(Boolean).map(s => `${s.y} <b>${pc(s.mean)} %</b> (${pc(s.lo)}…${pc(s.hi)})`).join(", ");
     card.innerHTML = `<div class="fhead"><h3>${F.title}</h3></div><p class="fsub">${sub ? `Keskiarvo ${sub}, ${inc.length} ennustetta.` : "Ei tuoreita ennusteita."}</p>`;
-    const W = narrow ? 420 : 760, H = narrow ? 260 : 320, fs = narrow ? 13 : 11, ml = 44, mr = 34, mt = 14, mb = 30;
+    const W = narrow ? 420 : 760, H = narrow ? 260 : 320, fs = narrow ? 13 : 11, ml = 44, mr = 34, mt = 14, mb = 35;
     const Y0 = F.from, Y1 = Math.max(...FY), n = Y1 - Y0 + 1;
     const vals = [...A.values, ...st.filter(Boolean).flatMap(s => s.v), 0];
     let lo = Math.min(...vals), hi = Math.max(...vals); const step = niceStep(hi - lo); lo = Math.floor(lo / step) * step; hi = Math.ceil(hi / step) * step;
@@ -1579,7 +1579,7 @@ footer .flinks .lnk:hover { text-decoration-color: currentColor; }
     const every = (W - ml - mr) / (n - 1) < 40 ? 2 : 1;
     for (let y = Y0; y <= Y1; y++) { if ((Y1 - y) % every) continue;
       el("line", { x1: xs(y), x2: xs(y), y1: H - mb, y2: H - mb + 4, stroke: "var(--muted)" }, svg);
-      el("text", { x: xs(y), y: H - mb + 8 + fs, "text-anchor": "middle", "font-size": fs, fill: "var(--muted)" }, svg).textContent = y; }
+      el("text", { x: xs(y), y: H - mb + 13 + fs, "text-anchor": "middle", "font-size": fs, fill: "var(--muted)" }, svg).textContent = y; }
     const S = st.filter(Boolean), base = lastA != null && S.length && S[0].y === lastA + 1 ? [[xs(lastA), ys(aOf(lastA))]] : [];
     if (S.length) {                                                     // vaihteluvali: ylin ja alin ennuste
       const up = S.map(s => [xs(s.y), ys(s.hi)]), dn = S.map(s => [xs(s.y), ys(s.lo)]).reverse();
@@ -2027,7 +2027,7 @@ footer .flinks .lnk:hover { text-decoration-color: currentColor; }
       el("text", { x: ml - 6, y: AY.f(vv) + 4, "text-anchor": "end", "font-size": fs, fill: "var(--muted)" }, svg).textContent = fmtV(vv, stepDec(AY.st)); }
     for (let v = AX.lo; v <= AX.hi + AX.st / 2; v += AX.st) { const vv = Math.round(v / AX.st) * AX.st;
       el("line", { x1: AX.f(vv), x2: AX.f(vv), y1: mt, y2: H2 - mb, stroke: "var(--grid)" }, svg);
-      el("text", { x: AX.f(vv), y: H2 - mb + 4 + fs, "text-anchor": "middle", "font-size": fs, fill: "var(--muted)" }, svg).textContent = fmtV(vv, stepDec(AX.st)); }
+      el("text", { x: AX.f(vv), y: H2 - mb + 9 + fs, "text-anchor": "middle", "font-size": fs, fill: "var(--muted)" }, svg).textContent = fmtV(vv, stepDec(AX.st)); }
     el("text", { x: W2 - mr, y: H2 - 4, "text-anchor": "end", "font-size": fs - 1, fill: "var(--muted)" }, svg).textContent = c.xlab + " →";
     el("text", { x: ml + 4, y: mt + fs, "font-size": fs - 1, fill: "var(--muted)" }, svg).textContent = "↑ " + c.ylab;
     // pisteet: c.annual -> vanhemmat vuodet vuosikeskiarvoina, edellisesta vuodesta alkaen neljannesvuosittain (vahemman siksakkia)
@@ -2083,7 +2083,7 @@ footer .flinks .lnk:hover { text-decoration-color: currentColor; }
   function curveCard(c, narrow) {
     const K = c.curve, card = document.createElement("div"); card.className = "card fcard" + (narrow ? "" : " half"); card._zc = c;
     card.innerHTML = `<div class="fhead"><h3>${c.title}</h3><span class="fval"></span></div><p class="fsub"></p>`;
-    const W2 = c.w || (narrow ? 420 : 560), H2 = c.height || 300, fs = c.w ? 12 : narrow ? 13 : 12, ml = 44, mr = 14, mt = 10, mb = 30, n = K.maturities.length;
+    const W2 = c.w || (narrow ? 420 : 560), H2 = c.height || 300, fs = c.w ? 12 : narrow ? 13 : 12, ml = 44, mr = 14, mt = 10, mb = 35, n = K.maturities.length;
     const svg = el("svg", { class: "fc", viewBox: `0 0 ${W2} ${H2}`, role: "img", "aria-label": c.title }, card);
     const all = K.lines.flatMap(l => l.values).filter(v => v != null);
     let lo = Math.min(...all), hi = Math.max(...all); const step = niceStep(hi - lo) || 0.5;
@@ -2093,7 +2093,7 @@ footer .flinks .lnk:hover { text-decoration-color: currentColor; }
       el("line", { x1: ml, x2: W2 - mr, y1: ys(vv), y2: ys(vv), stroke: "var(--grid)", "stroke-width": 1 }, svg);
       el("text", { x: ml - 6, y: ys(vv) + 4, "text-anchor": "end", "font-size": fs, fill: "var(--muted)" }, svg).textContent = fmtV(vv, step >= 1 ? 0 : Number.isInteger(+(step * 10).toFixed(6)) ? 1 : 2); }
     K.labels.forEach((l, i) => { if (narrow && i % 2) return;
-      el("text", { x: xs(i), y: H2 - mb + 8 + fs, "text-anchor": "middle", "font-size": fs, fill: "var(--muted)" }, svg).textContent = l; });
+      el("text", { x: xs(i), y: H2 - mb + 13 + fs, "text-anchor": "middle", "font-size": fs, fill: "var(--muted)" }, svg).textContent = l; });
     const ST = [{ col: "var(--fg)", w: 2.2, dash: "none" }, { col: "var(--accent)", w: 1.6, dash: "5 3" }, { col: "var(--muted)", w: 1.6, dash: "1.5 3" }];
     K.lines.forEach((l, k) => { const st = ST[k % ST.length];
       el("path", { d: l.values.map((v, i) => `${i ? "L" : "M"}${xs(i).toFixed(1)} ${ys(v).toFixed(1)}`).join(""), fill: "none", stroke: st.col, "stroke-width": st.w,
@@ -2129,7 +2129,7 @@ footer .flinks .lnk:hover { text-decoration-color: currentColor; }
   function profileCard(c, narrow) {
     const K = c.profile, card = document.createElement("div"); card.className = "card fcard" + (narrow ? "" : " half"); card._zc = c;
     card.innerHTML = `<div class="fhead"><h3>${c.title}</h3><span class="fval"></span></div><p class="fsub"></p>`;
-    const W2 = c.w || (narrow ? 420 : 560), H2 = c.height || 300, fs = c.w ? 12 : narrow ? 13 : 12, ml = 44, mr = 10, mt = 10, mb = 30, n = K.years.length;
+    const W2 = c.w || (narrow ? 420 : 560), H2 = c.height || 300, fs = c.w ? 12 : narrow ? 13 : 12, ml = 44, mr = 10, mt = 10, mb = 35, n = K.years.length;
     const svg = el("svg", { class: "fc", viewBox: `0 0 ${W2} ${H2}`, role: "img", "aria-label": c.title }, card);
     const tot = K.years.map((_, i) => K.groups.reduce((a, g) => a + g.values[i], 0));
     const step = niceStep(Math.max(...tot)) || 5, hi = Math.ceil(Math.max(...tot) / step) * step;
@@ -2139,7 +2139,7 @@ footer .flinks .lnk:hover { text-decoration-color: currentColor; }
       el("text", { x: ml - 6, y: ys(v) + 4, "text-anchor": "end", "font-size": fs, fill: "var(--muted)" }, svg).textContent = fmtV(v, 0); }
     const ev = narrow ? 5 : (n > 20 ? 5 : 2);
     K.years.forEach((y, i) => { if ((y % ev) && i) return;
-      el("text", { x: xs(i), y: H2 - mb + 8 + fs, "text-anchor": "middle", "font-size": fs, fill: "var(--muted)" }, svg).textContent = y; });
+      el("text", { x: xs(i), y: H2 - mb + 13 + fs, "text-anchor": "middle", "font-size": fs, fill: "var(--muted)" }, svg).textContent = y; });
     const col = k => STACK_COLS[k % STACK_COLS.length];
     K.years.forEach((_, i) => { let y0 = 0; K.groups.forEach((g, k) => { const v = g.values[i]; if (!v) return;
       el("rect", { x: xs(i) - bw * 0.39, y: ys(y0 + v), width: bw * 0.78, height: ys(y0) - ys(y0 + v), fill: col(k), "fill-opacity": 0.82 }, svg); y0 += v; }); });
@@ -2386,7 +2386,7 @@ footer .flinks .lnk:hover { text-decoration-color: currentColor; }
       if (c.size === "tt" && !narrow) { c.w = c.w || 760; c.height = c.height || 300; }   // kaksi kolmasosaa leveydesta
       const W2 = c.w || (big ? 960 : half ? 560 : 420), H2 = c.height || (big ? 300 : half ? 270 : (c.wide ? 270 : 230)), fs = c.w ? 11 : big ? 11 : half ? 12 : 13;
       const Y2 = c.y2 || [], isY2 = k => Y2.includes(c.lines[k]);   // toissijainen (oikea) akseli eri tason sarjoille
-      const ml = big ? 44 : 52, mr = 10 + (c.bars || c.stack ? W2 / set.periods.length / 2 : 0) + (Y2.length ? 34 : 0), mt = 10, mb = big ? 28 : 34;
+      const ml = big ? 44 : 52, mr = 10 + (c.bars || c.stack ? W2 / set.periods.length / 2 : 0) + (Y2.length ? 34 : 0), mt = 10, mb = big ? 33 : 39;
       const svg = el("svg", { class: "fc", viewBox: `0 0 ${W2} ${H2}`, role: "img", "aria-label": c.title }, card);
       const fm = document.createElement("div"); fm.className = "fmeta";
       if (c.lines.length > 1 || c.bars || c.stack) {
@@ -2454,7 +2454,7 @@ footer .flinks .lnk:hover { text-decoration-color: currentColor; }
       P.forEach((per, i) => { const yr = +per.slice(0, 4);
         if ((per.endsWith("-01") || per.endsWith("-Q1")) && yr % ystep === 0) {
           el("line", { x1: xs(i), x2: xs(i), y1: H2 - mb, y2: H2 - mb + 4, stroke: "var(--muted)" }, svg);
-          el("text", { x: xs(i), y: H2 - mb + 8 + fs, "text-anchor": "middle", "font-size": fs, fill: "var(--muted)" }, svg).textContent = yr; } });
+          el("text", { x: xs(i), y: H2 - mb + 13 + fs, "text-anchor": "middle", "font-size": fs, fill: "var(--muted)" }, svg).textContent = yr; } });
       if (B) { const sp = c.barSpan || 1, bw = (W2 - ml - mr) / n * (sp > 1 ? sp * 0.78 : 1);   // barSpan: nelj. kuukausiakselilla
         B.forEach((v, i) => { if (v == null) return;
           el("rect", { x: xs(i - (sp - 1) / 2) - bw / 2, y: Math.min(ys(0), ys(v)), width: bw + (sp > 1 ? 0 : 0.3), height: Math.abs(ys(v) - ys(0)),
