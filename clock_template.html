@@ -455,6 +455,10 @@ body { font-variant-numeric: tabular-nums; background: var(--bg); min-height: 10
 .cmenu[hidden] { display: none !important; }
 .cmenu button.dl { margin: 0 !important; text-decoration: none; text-align: left; padding: 7px 10px; border-radius: 5px; font-size: 0.875rem; }
 .cmenu button.dl:hover, .cmenu button.dl:focus-visible { background: color-mix(in srgb, var(--fg) 6%, transparent); outline: 0; }
+/* taulukoiden toiminnot (CSV) kolmen pisteen taakse kuten kuvioissa */
+.tdots { position: relative; display: inline-flex; margin-left: 4px; }
+.tdots > .more { position: static; }
+.tdots > .cmenu { top: 34px; right: 0; }
 
 .zoom { width: min(1280px, calc(100vw - 24px)); max-width: none; max-height: calc(100vh - 24px); border: 0; border-radius: 12px; padding: 14px 20px 20px; background: var(--bg); color: var(--fg); box-shadow: 0 12px 48px rgba(0,0,0,.22); }
 .zoom::backdrop { background: rgba(22, 27, 34, .45); }
@@ -794,7 +798,7 @@ footer .flinks .lnk:hover { text-decoration-color: currentColor; }
   <section class="grpair" id="growthSec" hidden>
     <div class="grleft"><div class="card grtab">
       <div class="phead"><h2 id="grTitle">Kasvu</h2>
-        <div class="hmctl"><div class="mini" role="group" aria-label="Kasvuvauhti"><button type="button" id="gr-yy" aria-pressed="true">v/v</button><button type="button" id="gr-qq" aria-pressed="false">q/q</button></div><button type="button" class="dl" id="gr-dl">Lataa CSV</button></div></div>
+        <div class="hmctl"><div class="mini" role="group" aria-label="Kasvuvauhti"><button type="button" id="gr-yy" aria-pressed="true">v/v</button><button type="button" id="gr-qq" aria-pressed="false">q/q</button></div><span class="tdots"><button type="button" class="more" aria-haspopup="true" aria-expanded="false" aria-label="Taulukon toiminnot" title="Lataa"><svg viewBox="0 0 16 16" width="16" height="16" aria-hidden="true"><circle cx="3" cy="8" r="1.5"/><circle cx="8" cy="8" r="1.5"/><circle cx="13" cy="8" r="1.5"/></svg></button><div class="cmenu" hidden><button type="button" class="dl" id="gr-dl">Lataa CSV</button></div></span></div></div>
       <div class="hmwrap"><table class="hm" id="grTable"></table></div>
       <p class="fnote">Muutos, %, työttömyysasteessa %-yks. Värin voimakkuus suhteessa sarjan keskihajontaan vuodesta 2015 (pl. 2020–2021), täysi väri kahdesta keskihajonnasta. Sininen piste: uusi havainto viimeisen 7 päivän aikana.<span id="grNeutral"> Hinnoissa ja palkoissa sininen väri.</span> Klikkaa riviä nähdäksesi kuviot.</p>
     </div></div>
@@ -815,7 +819,7 @@ footer .flinks .lnk:hover { text-decoration-color: currentColor; }
     <div id="view-hm">
       <div class="viewhead"><h2 class="hmhead" id="hmHead" role="button" tabindex="0" aria-expanded="false" aria-controls="hmBody"><span class="chev" aria-hidden="true"><svg viewBox="0 0 12 12" width="14" height="14"><path d="M4 2.5 7.5 6 4 9.5"/></svg></span>Taulukko<span class="hmsub" id="hmTitle">Poikkeama trendistä</span></h2>
         <div class="hmctl">
-          <div class="mini" role="group" aria-label="Taulukon arvo"><button type="button" id="hm-chg" aria-pressed="true">Muutos</button><button type="button" id="hm-lvl" aria-pressed="false">Taso</button><button type="button" id="hm-raw" aria-pressed="false">Arvo</button></div><button type="button" class="dl" id="hm-dl">Lataa CSV</button></div></div>
+          <div class="mini" role="group" aria-label="Taulukon arvo"><button type="button" id="hm-chg" aria-pressed="true">Muutos</button><button type="button" id="hm-lvl" aria-pressed="false">Taso</button><button type="button" id="hm-raw" aria-pressed="false">Arvo</button></div><span class="tdots"><button type="button" class="more" aria-haspopup="true" aria-expanded="false" aria-label="Taulukon toiminnot" title="Lataa"><svg viewBox="0 0 16 16" width="16" height="16" aria-hidden="true"><circle cx="3" cy="8" r="1.5"/><circle cx="8" cy="8" r="1.5"/><circle cx="13" cy="8" r="1.5"/></svg></button><div class="cmenu" hidden><button type="button" class="dl" id="hm-dl">Lataa CSV</button></div></span></div></div>
       <div id="hmBody"><div class="hmwrap"><table class="hm" id="hm"></table></div>
       <p class="fnote" id="hmNote"></p></div>
     </div>
@@ -2190,6 +2194,9 @@ footer .flinks .lnk:hover { text-decoration-color: currentColor; }
   const DOTS = '<svg viewBox="0 0 16 16" width="16" height="16" aria-hidden="true"><circle cx="3" cy="8" r="1.5"/><circle cx="8" cy="8" r="1.5"/><circle cx="13" cy="8" r="1.5"/></svg>';
   function closeMenus() { document.querySelectorAll(".cmenu:not([hidden])").forEach(m => { m.hidden = true; const b = m.parentNode.querySelector(":scope > .more"); if (b) b.setAttribute("aria-expanded", "false"); }); }
   document.addEventListener("click", closeMenus);
+  document.querySelectorAll(".tdots").forEach(w => { const mb = w.querySelector(".more"), m = w.querySelector(".cmenu");
+    mb.onclick = e => { e.stopPropagation(); const open = m.hidden; closeMenus(); if (open) { m.hidden = false; mb.setAttribute("aria-expanded", "true"); if (!e.detail) m.querySelector("button").focus(); } };
+    m.addEventListener("click", e => { e.stopPropagation(); if (e.target.closest("button")) { closeMenus(); mb.focus({ preventScroll: true }); } }); });
   document.addEventListener("keydown", e => { if (e.key === "Escape") closeMenus(); });
   // kuvion ajankohta oikeaan alakulmaan (viimeiselle riville); paakuvion v/v- ja q/q-otsake jaa ylos
   const escH = t => t.replace(/&/g, "&amp;").replace(/</g, "&lt;");
