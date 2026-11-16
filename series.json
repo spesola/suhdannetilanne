@@ -109,6 +109,26 @@
           "from": 2016,
           "note": "Kysymysten saldoluvut / 4, kausitasoittamaton. Lähde: Tilastokeskus."
         },
+        "g:Luottamus": {
+          "id": "luot_esi",
+          "title": "Talouden ilmapiiri: Suomi ja EU",
+          "wide": true,
+          "lines": [
+            "esi_fi",
+            "esi_eu"
+          ],
+          "colors": {
+            "esi_fi": "var(--fg)",
+            "esi_eu": "var(--accent)"
+          },
+          "ref": 100,
+          "refLabel": "keskiarvo 100",
+          "unit": "",
+          "dec": 1,
+          "lvl": true,
+          "from": 2010,
+          "note": "Euroopan komission talouden ilmapiiri-indikaattori (ESI): teollisuuden, palvelujen, kuluttajien, vähittäiskaupan ja rakentamisen luottamuksen painotettu yhdistelmä, pitkän ajan keskiarvo 100. Kausitasoitettu. Lähde: Euroopan komissio (Eurostat)."
+        },
         "teoltuot": {
           "id": "kontr_teoltuot",
           "title": "Teollisuustuotanto: toimialojen kontribuutiot",
@@ -3069,6 +3089,34 @@
       "unit": "henkilöä",
       "raw_desc": "Kausitasoittamaton kuukausiluku",
       "list": "Lomautetut"
+    },
+    {
+      "id": "esi_fi",
+      "label": "Suomi",
+      "set": "suhdanne",
+      "contrib": true,
+      "contrib_group": "g:Luottamus",
+      "source": "eurostat",
+      "ds": "ei_bssi_m_r2",
+      "geo": "FI",
+      "pick": {
+        "indic": "BS-ESI-I",
+        "s_adj": "SA"
+      }
+    },
+    {
+      "id": "esi_eu",
+      "label": "EU",
+      "set": "suhdanne",
+      "contrib": true,
+      "contrib_group": "g:Luottamus",
+      "source": "eurostat",
+      "ds": "ei_bssi_m_r2",
+      "geo": "EU27_2020",
+      "pick": {
+        "indic": "BS-ESI-I",
+        "s_adj": "SA"
+      }
     },
     {
       "id": "kc_ek_teol",
