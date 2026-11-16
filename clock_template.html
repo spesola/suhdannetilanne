@@ -1361,8 +1361,12 @@ footer .flinks .lnk:hover { text-decoration-color: currentColor; }
   const fmtRaw = v => v == null ? "–" : Math.abs(v) >= 1000 ? (v < 0 ? "−" : "") + thou(String(Math.round(Math.abs(v))))
     : (+v.toFixed(1) < 0 ? "−" : "") + Math.abs(v).toFixed(1).replace(".", ",");
   function renderHM() {
-    const N = set.freq === "M" ? 12 : 8, start = Math.max(0, idx - N + 1);
-    const cols = set.periods.slice(start, idx + 1), lvl = hmMode === "lvl", raw = hmMode === "raw";
+    // oletuskohdassa taulukko jatkuu viimeisimpaan jaksoon, jolta on yksikin havainto (kokonaisindikaattori voi olla jaksoa jaljessa)
+    const N = set.freq === "M" ? 12 : 8;
+    let end = idx;
+    if (idx >= defIdx(set)) for (let k = set.periods.length - 1; k > idx; k--) if (set.indicators.some(s => s.level[k] != null || (s.raw && s.raw[k] != null))) { end = k; break; }
+    const start = Math.max(0, end - N + 1);
+    const cols = set.periods.slice(start, end + 1), lvl = hmMode === "lvl", raw = hmMode === "raw";
     ["lvl", "chg", "raw"].forEach(m => $("hm-" + m).setAttribute("aria-pressed", hmMode === m));
     $("hmTitle").textContent = raw ? "Julkaistu arvo" : lvl ? "Poikkeama trendistä" : `Muutos edellisestä ${set.freq === "M" ? "kuukaudesta" : "neljänneksestä"}`;
     $("hmNote").textContent = raw ? "Lähteen julkaisema luku sarjan omassa yksikössä. Nuoli: suunta edelliseen jaksoon."
