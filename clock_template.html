@@ -287,20 +287,27 @@ body { font-variant-numeric: tabular-nums; background: var(--bg); min-height: 10
 
 
 .timebar { display: flex; align-items: center; gap: 10px; margin-top: 14px; flex-wrap: wrap; }
-.phead .tb-top { margin-top: 0; flex: 1 1 260px; max-width: 400px; gap: 6px; flex-wrap: nowrap; align-self: center; }   /* ajankohta kartan ylapuolella: liikuttaessa ylaosan palkit nakyvat samalla */
-.tb-top .step { width: 26px; height: 26px; }
+.phead .tb-top { margin-top: 0; flex: 1 1 260px; max-width: 420px; gap: 6px; flex-wrap: nowrap; align-self: center; }   /* ajankohta kartan ylapuolella: liikuttaessa ylaosan palkit nakyvat samalla */
+.tb-top .step { width: 28px; height: 28px; }
 .tb-top .step svg { width: 10px; height: 10px; }
 .tb-top output { font-size: 0.78rem; min-width: 6ch; }
 .cfoot { display: flex; justify-content: flex-end; margin-top: 6px; }
 .timebar > label { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); }
-.timebar input[type=range] { flex: 1 1 200px; min-width: 0; -webkit-appearance: none; appearance: none; background: transparent; height: 20px; cursor: pointer; }
-.timebar input[type=range]::-webkit-slider-runnable-track { height: 2px; background: var(--fg); border-radius: 1px; }
-.timebar input[type=range]::-moz-range-track { height: 2px; background: var(--fg); border-radius: 1px; }
-.timebar input[type=range]::-webkit-slider-thumb { -webkit-appearance: none; width: 14px; height: 14px; margin-top: -6px; border-radius: 50%; background: var(--accent); border: 2px solid var(--plot); box-shadow: 0 0 0 1px var(--accent); }
-.timebar input[type=range]::-moz-range-thumb { width: 12px; height: 12px; border-radius: 50%; background: var(--accent); border: 2px solid var(--plot); box-shadow: 0 0 0 1px var(--accent); }
+/* aikajana: kuljettu osa tumma, loppu vaalea; alla vuosimerkit (#perAx) kahvan keskipisteen liikealueella */
+.pertrk { position: relative; flex: 1 1 200px; min-width: 0; align-self: center; }
+.timebar input[type=range] { display: block; width: 100%; margin: 0; -webkit-appearance: none; appearance: none; background: transparent; height: 20px; cursor: pointer; }
+.timebar input[type=range]::-webkit-slider-runnable-track { height: 2px; border-radius: 1px; background: linear-gradient(90deg, var(--fg) var(--pct, 100%), var(--line) var(--pct, 100%)); }
+.timebar input[type=range]::-moz-range-track { height: 2px; border-radius: 1px; background: var(--line); }
+.timebar input[type=range]::-moz-range-progress { height: 2px; border-radius: 1px; background: var(--fg); }
+.timebar input[type=range]::-webkit-slider-thumb { -webkit-appearance: none; box-sizing: border-box; width: 12px; height: 12px; margin-top: -5px; border-radius: 50%; background: var(--accent); border: 2px solid var(--plot); box-shadow: 0 0 0 1px var(--accent); }
+.timebar input[type=range]::-moz-range-thumb { box-sizing: border-box; width: 12px; height: 12px; border-radius: 50%; background: var(--accent); border: 2px solid var(--plot); box-shadow: 0 0 0 1px var(--accent); }
+.perax { position: absolute; left: 6px; right: 6px; top: 14px; height: 16px; pointer-events: none; }
+.perax i { position: absolute; top: 0; width: 1px; height: 3px; background: var(--muted); opacity: .5; }
+.perax i.l { height: 5px; opacity: .7; }
+.perax span { position: absolute; top: 7px; transform: translateX(-50%); font-size: 0.656rem; line-height: 1; color: var(--muted); font-variant-numeric: tabular-nums; white-space: nowrap; }
 .timebar input[type=range]:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
 .timebar output { font-family: var(--font-data); font-size: 0.875rem; font-weight: 600; min-width: 6.5ch; text-align: right; }
-.step { font: inherit; border: 1px solid var(--line); background: var(--plot); color: var(--fg); border-radius: 50%;
+.step { font: inherit; border: 1px solid var(--line); background: var(--plot); color: var(--fg); border-radius: 7px;
   width: 32px; height: 32px; cursor: pointer; display: inline-grid; place-items: center; padding: 0; }
 .step:hover { border-color: var(--muted); }
 .step:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
@@ -706,7 +713,7 @@ footer .flinks .lnk:hover { text-decoration-color: currentColor; }
   .lhead, .ind, .gh { column-gap: 6px; }
   .ind .per { font-size: 0.6875rem; }
   .ind .ph .pt-t, .gh .ph .pt-t, .lhead span:nth-child(5) { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); }
-  .timebar input[type=range] { flex-basis: 120px; }
+  .timebar .pertrk { flex-basis: 120px; }
   #clock text { font-size: 17px; }
   #tsContrib .fc text { font-size: 17px; }
   #clock .axl.top, #clock .axl.bot { display: none; }
@@ -752,7 +759,7 @@ footer .flinks .lnk:hover { text-decoration-color: currentColor; }
         <label for="per">Ajankohta</label>
         <button class="step play" id="play" type="button" aria-label="Toista ajassa" title="Toista ajassa">&#9654;</button>
         <button class="step" id="prev" type="button" aria-label="Edellinen jakso"><svg width="12" height="12" viewBox="0 0 12 12" aria-hidden="true"><path d="M7.5 2.5L4 6l3.5 3.5" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
-        <input type="range" id="per" min="0" max="0" value="0">
+        <div class="pertrk"><input type="range" id="per" min="0" max="0" value="0"><div class="perax" id="perAx" aria-hidden="true"></div></div>
         <button class="step" id="next" type="button" aria-label="Seuraava jakso"><svg width="12" height="12" viewBox="0 0 12 12" aria-hidden="true"><path d="M4.5 2.5L8 6l-3.5 3.5" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
         <output id="perOut" for="per"></output>
       </div></div>
@@ -1062,10 +1069,24 @@ footer .flinks .lnk:hover { text-decoration-color: currentColor; }
     $("tailsTg").title = `Näytä pisteiden kulku ${set.tail} ${set.freq === "M" ? "kuukauden" : "neljänneksen"} ajalta`;
     $("tailsLbl").textContent = `Kulku ${set.tail} ${set.freq === "M" ? "kk" : "nelj."}`;
     const r = $("per"); r.max = set.periods.length - 1; r.value = idx;
+    r.style.setProperty("--pct", (r.max > 0 ? idx / r.max * 100 : 100) + "%");
     $("perOut").textContent = fmtP(set.periods[idx]);
+    renderAx();
   }
+  // vuosimerkit aikajanan alle; vuosiluvut niin harvaan kuin leveys vaatii (vähintään ~38 px välein)
+  let axKey = "";
+  function renderAx() {
+    const ax = $("perAx"); if (!ax) return;
+    const P = set.periods, n = P.length - 1, w = ax.clientWidth, key = set.id + "|" + n + "|" + w; if (key === axKey) return; axKey = key;
+    const ys = P.map((p, i) => [p, i]).filter(([p]) => /-01$|Q1$/.test(p)).map(([p, i]) => [+p.slice(0, 4), i]);
+    if (!ys.length || !n || !w) { ax.innerHTML = ""; return; }
+    const pxY = w / n * (set.freq === "M" ? 12 : 4), step = [1, 2, 4, 5, 8, 10, 20].find(s => s * pxY >= 38) || 20, y0 = ys[0][0];
+    ax.innerHTML = ys.map(([y, i]) => { const l = (y - y0) % step === 0, x = (i / n * 100).toFixed(2) + "%";
+      return `<i${l ? ' class="l"' : ""} style="left:${x}"></i>` + (l ? `<span style="left:${x}">${y}</span>` : ""); }).join("");
+  }
+  addEventListener("resize", () => renderAx());
   $("tails").addEventListener("change", e => { showTails = e.target.checked; update(); });
-  $("per").addEventListener("input", e => { stopPlay(); idx = +e.target.value; update(); });
+  $("per").addEventListener("input", e => { stopPlay(); idx = +e.target.value; e.target.style.setProperty("--pct", idx / e.target.max * 100 + "%"); update(); });
   document.querySelectorAll(".xbtn[data-x]").forEach(b => b.onclick = () => { const p = $(b.dataset.x); p.hidden = !p.hidden;
     b.setAttribute("aria-expanded", String(!p.hidden)); b.title = p.hidden ? "Näytä selite" : "Piilota selite"; b.setAttribute("aria-label", b.title); });
   $("prev").onclick = () => { stopPlay(); if (idx > 0) { idx--; update(); } };
