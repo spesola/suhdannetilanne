@@ -1316,7 +1316,7 @@ footer .flinks .lnk:hover { text-decoration-color: currentColor; }
       cc = { id: "raw_" + s.id, title: `${s.label}: ${hasSa ? "kausitasoitettu" : "julkaistu arvo"}`,
              lines: ["__raw", ...(hasSa ? ["__sa"] : []), ...(hasTr ? ["__trend"] : []), "__avg"], dash: ["__trend"], dot: ["__avg"], thin: hasSa ? ["__raw"] : [],
              unit: "", dec: big ? 0 : 1, from: 2010,
-             note: [hasSa ? "Kausitasoitus oma laskelma" : s.raw_desc, s.unit].filter(Boolean).join(", ") + (hasTr ? ". " + (s.trend_note || "Kartta vertaa trendiin, ei keskiarvoon.") : ".") };
+             note: (s.ts_note || [hasSa ? "Kausitasoitus oma laskelma" : s.raw_desc, s.unit].filter(Boolean).join(", ")) + (hasTr ? ". " + (s.trend_note || "Kartta vertaa trendiin, ei keskiarvoon.") : ".") };
       set.colors = { ...(set.colors || {}), __sa: "var(--accent)", __raw: hasSa ? "var(--line)" : "var(--accent)", __trend: "var(--muted)", __avg: "var(--q-turn)" };
     }
     if (cc) [...cc.lines, ...(cc.stack || [])].filter(id => id.startsWith("raw:")).forEach(id => {   // raw:<sarja> = julkaistu arvo
@@ -2202,7 +2202,7 @@ footer .flinks .lnk:hover { text-decoration-color: currentColor; }
   const escH = t => t.replace(/&/g, "&amp;").replace(/</g, "&lt;");
   // lahderivin nimet linkeiksi: kuvion sarjojen lahteista (meta.links) ensimmainen kunkin lahteen linkki
   const SRC_ALIAS = { "Tilastokeskus": ["statfin"], "Eurostat": ["eurostat"], "Euroopan komissio": ["eurostat", "ameco"], "EKP": ["ecb"], "Suomen Pankki": ["bof"],
-    "Valtiokonttori": ["vk"], "Verohallinto": ["vero"], "Maailmanpankki": ["wb"], "FRED": ["fred"], "STOXX": ["stoxx"], "Caldara": ["xlsx"], "Fintraffic": ["lam", "rail"], "Google": ["gtrends"] };
+    "Valtiokonttori": ["vk"], "Verohallinto": ["vero"], "Maailmanpankki": ["wb"], "FRED": ["fred"], "STOXX": ["stoxx"], "Caldara": ["xlsx"], "Fintraffic": ["lam", "rail"], "Google Trends": ["gtrends"] };
   const SRC_RE = new RegExp("(" + Object.keys(SRC_ALIAS).sort((a, b) => b.length - a.length).join("|") + ")", "g");
   function chartLinks(c) {
     const L = (D.meta && D.meta.links) || {}, out = {}, seen = new Set();

@@ -885,7 +885,7 @@ for (set in cfg$sets) {
     lp <- r$date[nrow(r)]; rw <- raws[[s$id]]            # julkaistu arvo ennen esikasittelya
     list(id = s$id, label = s$label, list = if (is.null(s$list)) s$label else s$list,   # list: lyhyt nimi ryhman sisalla
          map = s$kname,                                                          # map: kartan lyhyt nimi useaa valittaessa
-         group = s$group, kind = s$kind, unit = s$unit, raw_desc = s$raw_desc,
+         group = s$group, kind = s$kind, unit = s$unit, raw_desc = s$raw_desc, ts_note = s$ts_note,   # ts_note: aikasarjakuvion oma selite
          invert = isTRUE(s$invert), in_composite = !isFALSE(s$in_composite), trend_label = s$trend_label, trend_note = s$trend_note,
          last = lp, last_raw = round(r$raw[nrow(r)], 2),
          level = align(r, "level"), change = align(r, "change"), raw = r3((if (is.null(s$raw_scale)) 1 else s$raw_scale) * rw$value[match(periods, rw$date)]),

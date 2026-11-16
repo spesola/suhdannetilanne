@@ -2935,7 +2935,7 @@
     },
     {
       "id": "hakuindeksi",
-      "label": "Taantuma- ja YT-haut",
+      "label": "Google-haut",
       "set": "suhdanne",
       "group": "Kokeelliset",
       "source": "gtrends",
@@ -2959,8 +2959,9 @@
       "invert": true,
       "in_composite": false,
       "unit": "keskihajontaa",
-      "kname": "Hakuindeksi",
-      "raw_desc": "Google-hakujen määrä Suomesta: hakusana taantuma sekä yt-neuvottelut ja muutosneuvottelut yhteensä (nimi vaihtui 2022). Kumpikin standardoitu ja keskiarvoistettu. Kausitasoitus oma laskelma. Hakujen kasvu heikentää indikaattoria"
+      "kname": "Google-haut",
+      "raw_desc": "Google-hakujen määrä Suomesta: hakusana taantuma sekä yt-neuvottelut ja muutosneuvottelut yhteensä (nimi vaihtui 2022). Kumpikin standardoitu ja keskiarvoistettu. Kausitasoitus oma laskelma. Hakujen kasvu heikentää indikaattoria",
+      "ts_note": "Google-hakujen määrä Suomesta, hakusanat taantuma sekä YT- ja muutosneuvottelut (nimi vaihtui 2022). Hakusanaryhmät standardoitu ja keskiarvoistettu, kausitasoitus oma laskelma, keskihajontaa. Käännetty: hakujen kasvu heikentää indikaattoria. Lähde: Google Trends"
     },
     {
       "id": "palv_vol",
