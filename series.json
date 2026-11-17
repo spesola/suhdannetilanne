@@ -2135,7 +2135,7 @@
             "jt_b9": "var(--fg)"
           },
           "note": "Neljän neljänneksen liukuva summa suhteessa BKT:hen. Paikallishallinto sisältää vuodesta 2023 hyvinvointialueet. Lähde: Tilastokeskus.",
-          "wide": true,
+          "size": "tt",
           "stack": [
             "jt_b9_val",
             "jt_b9_pai",

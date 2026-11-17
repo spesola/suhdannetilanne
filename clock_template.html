@@ -2466,7 +2466,7 @@ footer .flinks .lnk:hover { text-decoration-color: currentColor; }
           el("rect", { x: xs(i) - bw / 2, y: Math.min(yl(0), yl(v)), width: bw, height: Math.abs(yl(v) - yl(0)),
             fill: v >= 0 ? "var(--q-up)" : "var(--q-down)", "fill-opacity": 0.55 }, svg); });
       }
-      const ystep = n / (set.freq === "Q" ? 4 : 12) <= 7 ? 1 : big || c.size === "tt" ? 2 : 5;   // lyhyt jakso (alle 7 v): joka vuosi
+      const ystep = n / (set.freq === "Q" ? 4 : 12) <= 7 ? 1 : big || (c.size === "tt" && !narrow) ? 2 : 5;   // lyhyt jakso (alle 7 v): joka vuosi
       P.forEach((per, i) => { const yr = +per.slice(0, 4);
         if ((per.endsWith("-01") || per.endsWith("-Q1")) && yr % ystep === 0) {
           el("line", { x1: xs(i), x2: xs(i), y1: H2 - mb, y2: H2 - mb + 4, stroke: "var(--muted)" }, svg);
@@ -2588,7 +2588,7 @@ footer .flinks .lnk:hover { text-decoration-color: currentColor; }
           const vals = S.map(s => s[i]), mx = Math.max(Math.abs(g || 0), ...vals.map(v => Math.abs(v || 0)), 0.1);
           const bar = (v, col, cls) => { if (v == null) return `<span class="bb"></span>`; const w = Math.abs(v) / mx * 50;
             return `<span class="bb"><i class="${cls || ""}" style="--qc:${col};left:${v >= 0 ? 50 : 50 - w}%;width:${Math.max(w, 0.6)}%"></i></span>`; };
-          sv.textContent = fmtP(P[i]) + (su0 ? ", " + su0 : "");
+          sv.textContent = fP(P[i]) + (su0 ? ", " + su0 : "");
           bx.innerHTML = `<span class="bl bt">${lbl(c.lines[0])}</span>${bar(g, "var(--fg)")}<span class="bv bt">${sg(g, c.dec)}${u}</span><span class="sep"></span>` +
             c.stack.map((id, k) => `<span class="bl">${ser(id).label}</span>${bar(vals[k], stCol(c, k), isRes(id) ? "hx" : "")}<span class="bv">${sg(vals[k], c.dec)}</span>`).join(""); };
         draw(null); hooks.push(draw);
