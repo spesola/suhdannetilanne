@@ -45,8 +45,8 @@ if (document.documentElement.dataset.theme === "vapor") vaporFont();
 .hm td.hc { background: color-mix(in srgb, var(--hc) var(--hp), var(--surface)); }
 .hm td small.rv { display: block; font-size: 0.656rem; line-height: 1.1; margin-top: 1px; font-weight: 600; }
 .hm td small.rv.z { font-weight: 400; opacity: .55; }
-.cmenu .dl.ck { position: relative; padding-left: 26px; }
-.cmenu .dl.ck[aria-checked="true"]::before { content: ""; position: absolute; left: 10px; top: 50%; width: 9px; height: 5px; border: solid var(--accent); border-width: 0 0 1.6px 1.6px; transform: translateY(-70%) rotate(-45deg); }
+.cmenu .dl.ck { position: relative; padding-right: 30px; }   /* valintamerkki oikealle, teksti linjassa muiden kanssa */
+.cmenu .dl.ck[aria-checked="true"]::after { content: ""; position: absolute; right: 11px; top: 50%; width: 9px; height: 5px; border: solid var(--accent); border-width: 0 0 1.6px 1.6px; transform: translateY(-70%) rotate(-45deg); }
 .cmenu hr.msep { border: 0; border-top: 1px solid var(--line); margin: 4px 6px; }
 tr.pick:hover > td.hc, tr.pick:hover > td { filter: brightness(0.94); }
 tr.pick:hover > th { color: var(--accent); }
