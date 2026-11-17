@@ -451,6 +451,16 @@ body { font-variant-numeric: tabular-nums; background: var(--bg); min-height: 10
 #tsContrib .card > .cmenu, .zoom .card > .cmenu { top: 26px; }
 .ffoot { display: flex; flex-wrap: wrap; align-items: baseline; gap: 6px 16px; margin-top: 8px; }
 .ffoot > .fnote { margin: 0; flex: 1 1 260px; }
+.fnote.fx { cursor: pointer; }
+.fchev { display: inline-grid; place-items: center; width: 16px; height: 16px; margin: 0 4px 0 -3px; padding: 0; border: 0; border-radius: 4px; background: none; color: var(--muted); cursor: pointer; vertical-align: -3px; }
+.fchev svg { width: 10px; height: 10px; fill: none; stroke: currentColor; stroke-width: 1.6; stroke-linecap: round; stroke-linejoin: round; transition: transform .15s; }
+.fchev[aria-expanded="true"] svg { transform: rotate(90deg); }
+.fnote.fx:hover .fchev, .fchev:focus-visible { color: var(--fg); }
+.fchev:focus-visible { outline: 2px solid var(--accent); outline-offset: 1px; }
+.fpanel { margin-top: 8px; padding: 2px 0 2px 14px; border-left: 2px solid var(--line); max-width: 680px; }
+.fpanel[hidden] { display: none; }
+.fpanel .fnote, .fpanel .fupd { margin: 0 0 4px; }
+.fpanel .fupd { color: var(--muted); font-size: 0.78rem; }
 .ffoot > .fval, .fmeta > .fval { margin-left: auto; white-space: nowrap; }
 .cmenu { position: absolute; top: 40px; right: -6px; z-index: 30; min-width: 150px; background: var(--bg); border: 1px solid var(--line); border-radius: 8px; box-shadow: 0 6px 24px rgba(0,0,0,.12); padding: 4px; display: flex; flex-direction: column; }
 .cmenu[hidden] { display: none !important; }
@@ -2241,21 +2251,25 @@ footer .flinks .lnk:hover { text-decoration-color: currentColor; }
   }
   function dateDown(card) {
     const fv = card.querySelector(":scope > .fhead > .fval"); if (!fv || !fv.innerHTML.trim() || !card.querySelector(":scope > svg.fc") || (card._zc && card._zc.hdr)) return;
-    const last = card.lastElementChild;
+    let last = card.lastElementChild; if (last && last.classList.contains("fpanel")) last = last.previousElementSibling;   // avattava selite jaa alarivin alle
     if (last && last.classList.contains("fnote")) { const f = document.createElement("div"); f.className = "ffoot"; last.before(f); f.append(last, fv); }
     else if (last && last.classList.contains("fmeta")) last.appendChild(fv);
     else { const f = document.createElement("div"); f.className = "ffoot"; f.appendChild(fv); card.appendChild(f); }
   }
-  // huomautus: lahderivi nakyviin, selitys valikon "Näytä selite" -painikkeen taakse (PNG-kuvaan tulevat molemmat)
-  function noteInto(card, fm, note) {
+  // huomautus: lahderivi aina nakyvissa; sen edessa nuoli, joka avaa alle selitteen ja paivityspaivan (PNG-kuvaan tulevat selite ja lahde)
+  function noteInto(card, fm, note, upd) {
     const m = note.match(/^(.*?)\s*((?:Lähde|Lähteet):.*)$/s), expl = m ? m[1].trim() : "", src = m ? m[2] : note;
-    if (expl && expl.length > 0 && m) {
-      const pe = document.createElement("p"); pe.className = "fnote fexpl"; pe.textContent = expl; pe.hidden = true; card.appendChild(pe);
-      const b = document.createElement("button"); b.type = "button"; b.className = "dl"; b.textContent = "Näytä selite";
-      b.onclick = () => { pe.hidden = !pe.hidden; b.textContent = pe.hidden ? "Näytä selite" : "Piilota selite"; };
-      fm.insertBefore(b, fm.querySelector("button.dl"));
-    }
-    const ps = document.createElement("p"); ps.className = "fnote"; ps.textContent = src; linkSrc(ps, card._zc || {}); card.appendChild(ps);
+    const ps = document.createElement("p"); ps.className = "fnote fsrc"; ps.textContent = src; linkSrc(ps, card._zc || {}); card.appendChild(ps);
+    if (!expl && !upd) return;
+    const pn = document.createElement("div"); pn.className = "fpanel"; pn.hidden = true; pn.id = "fp" + Math.random().toString(36).slice(2, 9);
+    if (expl) { const pe = document.createElement("p"); pe.className = "fnote fexpl"; pe.textContent = expl; pn.appendChild(pe); }
+    if (upd) { const pu = document.createElement("p"); pu.className = "fupd"; pu.textContent = "Päivitetty " + new Date(upd + "T12:00:00").toLocaleDateString("fi-FI"); pn.appendChild(pu); }
+    const b = document.createElement("button"); b.type = "button"; b.className = "fchev"; b.setAttribute("aria-expanded", "false"); b.setAttribute("aria-controls", pn.id);
+    b.setAttribute("aria-label", "Näytä selite"); b.innerHTML = '<svg viewBox="0 0 10 10" aria-hidden="true"><path d="M3.5 2 7 5l-3.5 3"/></svg>';
+    const tog = () => { pn.hidden = !pn.hidden; b.setAttribute("aria-expanded", String(!pn.hidden)); b.setAttribute("aria-label", pn.hidden ? "Näytä selite" : "Piilota selite"); };
+    b.onclick = e => { e.stopPropagation(); tog(); };
+    ps.classList.add("fx"); ps.prepend(b); ps.addEventListener("click", e => { if (!e.target.closest("a, button")) tog(); });
+    card.appendChild(pn);
   }
   const fold1 = t => String(t).toLowerCase().replace(/[äå]/g, "a").replace(/ö/g, "o").split(/[^a-z0-9]+/).filter(Boolean);
   const slug1 = t => fold1(t)[0] || "", slugAll = t => fold1(t).slice(0, 6).join("-");
@@ -2421,7 +2435,7 @@ footer .flinks .lnk:hover { text-decoration-color: currentColor; }
       if (c.ts) card.querySelector(".fhead").appendChild(db); else fm.appendChild(db);   // aikasarjanakymassa kuten vasen kuvio: otsikkoriville
       addPng(db, card);
       if (fm.children.length) card.appendChild(fm);
-      if (c.note) noteInto(card, fm, c.note);
+      if (c.note) noteInto(card, fm, c.note, !c.ts && (D.meta.seen || {})[set.id + "/" + c.lines[0]]);
       tgt.appendChild(card); if (main) { lastMainH = H2; lastLower = !!c.lower; }
 
       // kuviokohtainen alkuvuosi: indeksit paikallisia (i), jaettu hover globaali (i + i0)
