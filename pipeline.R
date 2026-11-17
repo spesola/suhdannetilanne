@@ -1275,6 +1275,33 @@ out$meta$upcoming <- c(out$meta$upcoming, lapply(bcs_up, function(d) {
 if (length(out$meta$upcoming)) out$meta$upcoming <- out$meta$upcoming[order(vapply(out$meta$upcoming, function(r) r$date, ""))]
 if (max(as.Date(BCS_DATES)) < Sys.Date() + 20) { CHECKS <- c(CHECKS, "BCS_DATES: päivitä komission julkaisukalenteri (pipeline.R)"); out$meta$checks <- CHECKS }
 
+# Revisiot kasvutaulukkoon: verrataan edelliseen ajoon (paikallinen clock.json tai julkaistu sivu). Kun rivin sarjaan (_qq/_yy)
+# tulee uusi jakso, edellisen ajon arvot viimeisilta 8 jaksolta tallennetaan pohjaksi (rev); muuten pohja siirtyy ajosta toiseen.
+# Sivu nayttaa revision = nykyinen arvo - pohja samalla jaksolla. Ei ulkoisia hakuja (paitsi edellinen tila verkosta CI:ssa).
+PREV_URL <- Sys.getenv("PREV_URL", "https://suhdannetilanne.fi/clock.json")
+prev <- tryCatch(if (file.exists(OUT_PATH)) fromJSON(OUT_PATH, simplifyVector = FALSE) else fromJSON(get_text(PREV_URL), simplifyVector = FALSE),
+                 error = function(e) { message("  VAROITUS revisiot: edellistä tilaa ei saatu (", conditionMessage(e), ")"); NULL })
+if (!is.null(prev)) {
+  dir.create(CACHE_DIR, showWarnings = FALSE); writeLines(toJSON(prev, auto_unbox = TRUE, null = "null", digits = NA), file.path(CACHE_DIR, "clock_ed.json"))
+  nrev <- 0
+  for (si in seq_along(out$sets)) {
+    so <- out$sets[[si]]; if (!length(so$growth)) next
+    ps <- Filter(function(x) identical(x$id, so$id), prev$sets); if (!length(ps)) next; ps <- ps[[1]]
+    ids <- c(paste0(vapply(so$growth, function(r) r$id, ""), "_qq"), paste0(vapply(so$growth, function(r) r$id, ""), "_yy"))
+    pser <- setNames(ps$series, vapply(ps$series, function(x) x$id, ""))
+    for (k in seq_along(so$series)) {
+      s <- so$series[[k]]; if (!(s$id %in% ids) || is.null(pser[[s$id]])) next
+      p <- pser[[s$id]]; rv <- NULL
+      if (!identical(p$last, s$last)) {                               # uusi jakso: edellisen ajon arvot pohjaksi
+        pv <- vapply(p$values, function(v) if (is.null(v)) NA_real_ else as.numeric(v), 0)
+        j <- tail(which(!is.na(pv)), 8)
+        if (length(j)) { rv <- list(date = format(Sys.Date()), last = p$last, vals = as.list(setNames(round(pv[j], 3), unlist(ps$periods[j])))); nrev <- nrev + 1 }
+      } else if (!is.null(p$rev)) rv <- p$rev                         # ei uutta jaksoa: pohja eteenpain
+      if (!is.null(rv)) out$sets[[si]]$series[[k]]$rev <- rv
+    }
+  }
+  if (nrev) message("Revisiot: uusi pohja ", nrev, " sarjalle")
+}
 writeLines(toJSON(out, auto_unbox = TRUE, na = "null", null = "null", digits = NA), OUT_PATH)
 message("Kirjoitettu ", OUT_PATH)
 

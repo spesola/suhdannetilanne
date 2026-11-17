@@ -43,6 +43,11 @@ if (document.documentElement.dataset.theme === "vapor") vaporFont();
   --hover-line: color-mix(in srgb, var(--fg) 35%, transparent); --fc-zone: color-mix(in srgb, var(--fg) 3.5%, transparent); }
 /* lampokartat: vaaleissa teemoissa pelkka taytto, vaporwavessa taytto ja kehys */
 .hm td.hc { background: color-mix(in srgb, var(--hc) var(--hp), var(--surface)); }
+.hm td small.rv { display: block; font-size: 0.656rem; line-height: 1.1; margin-top: 1px; font-weight: 600; }
+.hm td small.rv.z { font-weight: 400; opacity: .55; }
+.cmenu .dl.ck { position: relative; padding-left: 26px; }
+.cmenu .dl.ck[aria-checked="true"]::before { content: ""; position: absolute; left: 10px; top: 50%; width: 9px; height: 5px; border: solid var(--accent); border-width: 0 0 1.6px 1.6px; transform: translateY(-70%) rotate(-45deg); }
+.cmenu hr.msep { border: 0; border-top: 1px solid var(--line); margin: 4px 6px; }
 tr.pick:hover > td.hc, tr.pick:hover > td { filter: brightness(0.94); }
 tr.pick:hover > th { color: var(--accent); }
 /* Petrooli-teema (valinnainen): petrooli, okra ja siniset */
@@ -814,9 +819,9 @@ footer .flinks .lnk:hover { text-decoration-color: currentColor; }
   <section class="grpair" id="growthSec" hidden>
     <div class="grleft"><div class="card grtab">
       <div class="phead"><h2 id="grTitle">Kasvu</h2>
-        <div class="hmctl"><div class="mini" role="group" aria-label="Kasvuvauhti"><button type="button" id="gr-yy" aria-pressed="true">v/v</button><button type="button" id="gr-qq" aria-pressed="false">q/q</button></div><span class="tdots"><button type="button" class="more" aria-haspopup="true" aria-expanded="false" aria-label="Taulukon toiminnot" title="Lataa"><svg viewBox="0 0 16 16" width="16" height="16" aria-hidden="true"><circle cx="3" cy="8" r="1.5"/><circle cx="8" cy="8" r="1.5"/><circle cx="13" cy="8" r="1.5"/></svg></button><div class="cmenu" hidden><button type="button" class="dl" id="gr-dl">Lataa CSV</button></div></span></div></div>
+        <div class="hmctl"><div class="mini" role="group" aria-label="Kasvuvauhti"><button type="button" id="gr-yy" aria-pressed="true">v/v</button><button type="button" id="gr-qq" aria-pressed="false">q/q</button></div><span class="tdots"><button type="button" class="more" aria-haspopup="true" aria-expanded="false" aria-label="Taulukon toiminnot" title="Toiminnot"><svg viewBox="0 0 16 16" width="16" height="16" aria-hidden="true"><circle cx="3" cy="8" r="1.5"/><circle cx="8" cy="8" r="1.5"/><circle cx="13" cy="8" r="1.5"/></svg></button><div class="cmenu" hidden><button type="button" class="dl ck" id="gr-rev" role="menuitemcheckbox" aria-checked="false">Näytä revisiot</button><hr class="msep"><button type="button" class="dl" id="gr-dl">Lataa CSV</button></div></span></div></div>
       <div class="hmwrap"><table class="hm" id="grTable"></table></div>
-      <p class="fnote">Muutos, %, työttömyysasteessa %-yks. Värin voimakkuus suhteessa sarjan keskihajontaan vuodesta 2015 (pl. 2020–2021), täysi väri kahdesta keskihajonnasta. Sininen piste: uusi havainto viimeisen 7 päivän aikana.<span id="grNeutral"> Hinnoissa ja palkoissa sininen väri.</span> Klikkaa riviä nähdäksesi kuviot.</p>
+      <p class="fnote">Muutos, %, työttömyysasteessa %-yks. Värin voimakkuus suhteessa sarjan keskihajontaan vuodesta 2015 (pl. 2020–2021), täysi väri kahdesta keskihajonnasta. Sininen piste: uusi havainto viimeisen 7 päivän aikana.<span id="grRevNote" hidden></span><span id="grNeutral"> Hinnoissa ja palkoissa sininen väri.</span> Klikkaa riviä nähdäksesi kuviot.</p>
     </div></div>
     <div class="grrow"><div class="grcol" id="grCharts"></div><div class="grside" id="grSide"></div></div>
   </section>
@@ -1492,15 +1497,18 @@ footer .flinks .lnk:hover { text-decoration-color: currentColor; }
   }
 
   /* ---------- kasvutaulukko (kansantalous) ---------- */
-  let grMode = "yy", grSel = "bkt";
+  let grMode = "yy", grSel = "bkt", grRev = false;
+  try { grRev = localStorage.getItem("grRev") === "1"; } catch (e) {}
   // aiheryhmat (series.json: tabs): ryhman riveilla yhteiset lisakuviot (tyottomat ja tyotunnit -> kaikki tyomarkkinakuviot), muilla rivin omat
   const curTab = () => set.tabs ? (set.tabs.find(x => x.rows.includes(grSel)) || null) : null;
   const tabRows = () => { const tb = curTab(); return tb ? set.growth.filter(r => tb.rows.includes(r.id)) : set.growth.filter(r => r.id === grSel); };
   $("gr-yy").onclick = () => { grMode = "yy"; renderGrowth(); };
   $("gr-qq").onclick = () => { grMode = "qq"; renderGrowth(); };
+  $("gr-rev").onclick = () => { grRev = !grRev; try { localStorage.setItem("grRev", grRev ? "1" : "0"); } catch (e) {} renderGrowth(); };
   function renderGrowth() {
     $("gr-yy").setAttribute("aria-pressed", grMode === "yy"); $("gr-qq").setAttribute("aria-pressed", grMode === "qq");
     $("grTitle").textContent = grMode === "yy" ? "Kasvu vuodentakaisesta" : "Kasvu edellisestä neljänneksestä";
+    $("gr-rev").setAttribute("aria-checked", String(grRev));
     const gw = $("growthSec").clientWidth || 0, N = gw > 1000 ? 12 : gw > 760 ? 10 : 8;   // leveydelta riippuen 8-12 neljannesta
     const ser = id => set.series.find(x => x.id === id), P = set.periods, n = P.length;
     const lastOf = id => { const a = ser(id + "_" + grMode).values; for (let k = n - 1; k >= 0; k--) if (a[k] != null) return k; return 0; };
@@ -1508,20 +1516,32 @@ footer .flinks .lnk:hover { text-decoration-color: currentColor; }
     if (!TR.some(r => r.id === grSel)) grSel = TR[0].id;
     const end = Math.max(...TR.map(r => lastOf(r.id)));                // uusin havainto milla tahansa valilehden rivilla
     const cols = P.slice(Math.max(0, end - N + 1), end + 1), i0 = Math.max(0, end - N + 1);
-    const rows = [...TR].sort((a, b) => (b.id === "bkt") - (a.id === "bkt"));
+    const rows = [...TR].sort((a, b) => (b.id === "bkt") - (a.id === "bkt")); let anyRev = false;
     let h = `<thead><tr><th></th>${cols.map(p => `<th title="${fmtP(p)}">${fmtP(p).replace(/\/20(\d\d)$/, "/$1")}</th>`).join("")}</tr></thead><tbody>`;
     rows.forEach(r => {
-      const all = ser(r.id + "_" + grMode).values, a = all.slice(i0, end + 1);
+      const S0 = ser(r.id + "_" + grMode), all = S0.values, a = all.slice(i0, end + 1), rv = grRev && S0.rev;
+      if (rv) anyRev = true;
       // voimakkuus: sarjan oma keskihajonta (alusta, pl. 2020-2021), taysi vari 2 keskihajonnasta
       const hx = all.filter((v, k) => v != null && !/^202[01]/.test(P[k])), mu = hx.reduce((s, v) => s + v, 0) / hx.length;
       const sd = Math.sqrt(hx.reduce((s, v) => s + (v - mu) ** 2, 0) / Math.max(1, hx.length - 1)) || 1;
-      h += `<tr data-id="${r.id}" class="pick${r.id === "bkt" ? " tot" : ""}${r.id === grSel ? " on" : ""}" tabindex="0"${r.id === grSel ? ' aria-current="true"' : ""} title="Näytä kuvassa"><th class="rl${r.sub ? " sub" : ""}" title="${r.label}">${innerWidth < 560 && r.sub ? r.label.replace(/ investoinnit$/, "") : r.label}${freshDot(seenOf(set.id, r.id), "Uusi havainto")}</th>` + a.map(v => {
+      h += `<tr data-id="${r.id}" class="pick${r.id === "bkt" ? " tot" : ""}${r.id === grSel ? " on" : ""}" tabindex="0"${r.id === grSel ? ' aria-current="true"' : ""} title="Näytä kuvassa"><th class="rl${r.sub ? " sub" : ""}" title="${r.label}">${innerWidth < 560 && r.sub ? r.label.replace(/ investoinnit$/, "") : r.label}${freshDot(seenOf(set.id, r.id), "Uusi havainto")}</th>` + a.map((v, k) => {
         if (v == null) return `<td class="na"></td>`;
+        // revisio: muutos edelliseen julkaisuun (pohja rev.vals), uusi jakso merkitaan; ilman pohjaa tyhja rivi (korkeus sama)
+        let rl = "", ta = "";
+        if (grRev) { const p = cols[k];
+          if (!rv) rl = `<small class="rv">&nbsp;</small>`;
+          else if (p > rv.last) rl = `<small class="rv z">uusi</small>`;
+          else if (rv.vals[p] == null) rl = `<small class="rv">&nbsp;</small>`;
+          else { const d = Math.round((v - rv.vals[p]) * 10) / 10;
+            rl = `<small class="rv${d === 0 ? " z" : ""}">${d > 0 ? "+" : ""}${fmtV(d, 1)}</small>`;
+            if (d !== 0) ta = ` data-tip="${r.label}, ${fmtP(p)}" data-sub="aiemmin ${+rv.vals[p].toFixed(1) > 0 ? "+" : ""}${fmtV(rv.vals[p], 1)}\nrevisio ${new Date(rv.date + "T12:00:00").toLocaleDateString("fi-FI")}"`; } }
         const t = Math.min(1, Math.abs(v) / (2 * sd)), base = r.neutral ? "var(--accent)" : (v >= 0) !== !!r.invert ? "var(--q-up)" : "var(--q-down)";
-        return `<td class="hc${t < 0.35 ? " lo" : ""}" style="--hc:${base};--hp:${Math.round(6 + (r.neutral ? 34 : 46) * t)}%;--hv:${Math.round(22 + 48 * t)}%">${+v.toFixed(1) > 0 ? "+" : ""}${fmtV(v, 1)}</td>`;
+        return `<td class="hc${t < 0.35 ? " lo" : ""}" style="--hc:${base};--hp:${Math.round(6 + (r.neutral ? 34 : 46) * t)}%;--hv:${Math.round(22 + 48 * t)}%"${ta}>${+v.toFixed(1) > 0 ? "+" : ""}${fmtV(v, 1)}${rl}</td>`;
       }).join("") + "</tr>" + (r.gap_after && r !== rows[rows.length - 1] ? `<tr class="gap" aria-hidden="true"><td colspan="${cols.length + 1}"></td></tr>` : "");
     });
     $("grTable").innerHTML = h + "</tbody>";
+    const rn = $("grRevNote"); rn.hidden = !grRev;
+    rn.textContent = anyRev ? " Pieni luku: revisio eli muutos edelliseen julkaisuun, %-yks." : " Revisiot näkyvät, kun riville julkaistaan seuraavan kerran uusi jakso.";
     const wr = $("grTable").parentElement; wr.scrollLeft = wr.scrollWidth;   // kapealla uusimmat neljannekset nakyviin
     $("grTable").querySelectorAll("tr.pick").forEach(tr => {
       const go = kb => { grSel = tr.dataset.id; renderGrowth(); drawCharts(); $("fcSec").hidden = !(set.forecast && grSel === "bkt"); if (location.hash !== hashFor()) history.pushState(null, "", hashFor());   // rivin vaihto historiaan: takaisin palaa edelliseen
@@ -1858,6 +1878,7 @@ footer .flinks .lnk:hover { text-decoration-color: currentColor; }
       scrollTo({ top: t.getBoundingClientRect().top + scrollY - bar - 16 }); }, 120); }
   // sivuston muutokset: uudet kuviot ja muut isommat lisaykset (kasin yllapidetty, uusin ensin); set + id -> linkki kuvioon
   const CHANGES = [
+    { d: "2026-11-17", t: "Kasvutaulukkoon revisiot: muutos edelliseen julkaisuun (taulukon valikosta)", set: "Reaalitalous" },
     { d: "2026-11-17", t: "Rahoitusasema alasektoreittain: erittely kuvion viereen", set: "Julkinen talous", id: "jt_b9_val" },
     { d: "2026-11-17", t: "Kuvioiden lähderiviltä aukeaa selite ja päivityspäivä" },
     { d: "2026-11-17", t: "Taulukon soluihin vihje, jossa taso, muutos ja päivityspäivä" },
