@@ -457,6 +457,8 @@ body { font-variant-numeric: tabular-nums; background: var(--bg); min-height: 10
 .fchev[aria-expanded="true"] svg { transform: rotate(90deg); }
 .fnote.fx:hover .fchev, .fchev:focus-visible { color: var(--fg); }
 .fchev:focus-visible { outline: 2px solid var(--accent); outline-offset: 1px; }
+.ffoot > .fpanel { flex: 0 0 100%; max-width: none; margin-top: 2px; }   /* oma rivi; tekstin leveys rajataan kappaleissa */
+.fpanel > * { max-width: 680px; }
 .fpanel { margin-top: 8px; padding: 2px 0 2px 14px; border-left: 2px solid var(--line); max-width: 680px; }
 .fpanel[hidden] { display: none; }
 .fpanel .fnote, .fpanel .fupd { margin: 0 0 4px; }
@@ -2257,6 +2259,13 @@ footer .flinks .lnk:hover { text-decoration-color: currentColor; }
       return `<a class="srcl" href="${lk[pr]}" target="_blank" rel="noopener">${nm}</a>`; });
     if (used.size) p.innerHTML = escH(t.slice(0, i)) + tail;
   }
+  // avattava selite alarivin (.ffoot) sisaan omalle rivilleen: rinnakkaisissa korteissa (subgrid, viisi rivia) ylimaarainen lapsi menisi paallekkain
+  function panelIn(card) {
+    const pn = card.querySelector(":scope > .fpanel"); if (!pn) return;
+    let f = card.querySelector(":scope > .ffoot");
+    if (!f) { const src = card.querySelector(":scope > .fsrc"); if (!src) return; f = document.createElement("div"); f.className = "ffoot"; src.before(f); f.appendChild(src); }
+    f.appendChild(pn);
+  }
   function dateDown(card) {
     const fv = card.querySelector(":scope > .fhead > .fval"); if (!fv || !fv.innerHTML.trim() || !card.querySelector(":scope > svg.fc") || (card._zc && card._zc.hdr)) return;
     let last = card.lastElementChild; if (last && last.classList.contains("fpanel")) last = last.previousElementSibling;   // avattava selite jaa alarivin alle
@@ -2289,7 +2298,7 @@ footer .flinks .lnk:hover { text-decoration-color: currentColor; }
   const siTag = (name, col, cls) => `<span class="si${cls ? " " + cls : ""}" style="--qc:${col}">${escH(name)}</span>`;
   function menuize(card) {
     if (card._menu) return;
-    dateDown(card);
+    dateDown(card); panelIn(card);
     const btns = [...card.querySelectorAll(":scope > .fhead > button.dl, :scope > .fmeta > button.dl")]; if (!btns.length) return;
     card._menu = true; card.classList.add("hasmenu");
     const mb = document.createElement("button"); mb.type = "button"; mb.className = "more"; mb.innerHTML = DOTS; mb.title = "Lataa tai suurenna";
