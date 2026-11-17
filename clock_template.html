@@ -171,21 +171,6 @@ body { font-variant-numeric: tabular-nums; background: var(--bg); min-height: 10
 @media (max-width: 860px) { .hero { grid-template-columns: minmax(0, 1fr); } }
 @media (min-width: 861px) { .hero:not(.haskpi):has(.hlead:not(:empty)) { display: flex; align-items: center; gap: 48px; }   /* vaihe ja jakauma samalla rivilla */
   .hero:not(.haskpi):has(.hlead:not(:empty)) .hsum { border-left: 1px solid var(--line); padding-left: 48px; } }
-/* uusimmat tiedot vaiheen oikealla puolella (suhdannenakyma, leveilla naytoilla) */
-.hnews { font-size: 0.875rem; }
-.hnews .nl { font-size: 0.78rem; color: var(--muted); margin: 0 0 8px; }
-.hnews .g { display: flex; gap: 14px; padding: 7px 0; border-top: 1px solid var(--line); line-height: 1.35; }
-.hnews .g:last-of-type { border-bottom: 1px solid var(--line); }
-.hnews .d { color: var(--muted); width: 42px; flex: none; font-variant-numeric: tabular-nums; }
-.hnews .g > div { display: flex; flex-direction: column; gap: 5px; min-width: 0; }
-.hnews a { color: var(--fg); text-decoration: none; }
-.hnews a:hover { text-decoration: underline; text-underline-offset: 3px; }
-.hnews .p { color: var(--muted); }
-.hnews .all { margin-top: 8px; font-size: 0.8rem; color: var(--muted); background: none; border: 0; padding: 0; cursor: pointer; font: inherit; font-size: 0.8rem; }
-.hnews .all:hover { color: var(--fg); }
-@media (min-width: 861px) { .hero.hasnews { display: grid; grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr); align-items: end; }
-  .hero.hasnews .hnews { grid-column: 2; grid-row: 1 / span 3; align-self: end; } }
-@media (max-width: 860px) { .hnews { display: none; } }
 /* avainluvut (reaalitalous, rahoitus) */
 .hero.haskpi { display: block; }
 .hero:not(.haskpi) .kpirow { display: none; }
@@ -797,7 +782,6 @@ footer .flinks .lnk:hover { text-decoration-color: currentColor; }
     <div class="hlead" id="hlead"></div>
     <div class="kpirow" id="kpiRow"></div>
     <div class="hsum"><div id="summary"></div></div>
-    <div class="hnews" id="hnews" hidden></div>
   </section>
 
   <section class="top" id="topSec">
@@ -1324,29 +1308,6 @@ footer .flinks .lnk:hover { text-decoration-color: currentColor; }
       hide() { lab.replaceChildren(); chip.setAttribute("visibility", "hidden"); }
     };
   }
-  // Uusimmat tiedot: julkaisuloki (meta.log) paivittain, enintaan viisi rivia. Ei analyysia, vain mita julkaistiin ja milta jaksolta.
-  // Ulkomaiset ja tekniset lahteet (FRED, viikkotase) jatetaan pois; kaikki loytyvat Julkaisut-nakymasta.
-  const NEWS_SKIP = /^FRED|viikkotase/i;
-  function renderNews() {
-    const box = $("hnews"), hero = box.closest(".hero"), on = !!(set.default && set.indicators);
-    hero.classList.toggle("hasnews", on); box.hidden = !on; if (!on) { box.innerHTML = ""; return; }
-    const sid = Object.fromEntries(D.sets.map(s => [s.label, s.id])), cap = s => s.charAt(0).toUpperCase() + s.slice(1);
-    const days = []; let n = 0;
-    for (const e of D.meta.log || []) { if (n >= 5) break;
-      const m = new Map();
-      for (const u of e.upd || []) { if (NEWS_SKIP.test(u.src)) continue;
-        const nm = cap(u.src.split(": ").slice(1).join(": ") || u.src), r = m.get(nm) || { nm, per: [], href: null };
-        if (!r.per.includes(u.period)) r.per.push(u.period);
-        if (!r.href) { const id = sid[u.set]; r.href = "#" + (HASH[id] || id) + (id === set.id && u.id ? "/" + u.id : ""); }
-        m.set(nm, r); }
-      const rows = [...m.values()].slice(0, 5 - n); if (!rows.length) continue;
-      n += rows.length; days.push({ d: e.date, rows }); }
-    if (!days.length) { hero.classList.remove("hasnews"); box.hidden = true; box.innerHTML = ""; return; }
-    box.innerHTML = `<p class="nl">Uusimmat tiedot</p>` + days.map(x => `<div class="g"><span class="d">${+x.d.slice(8, 10)}.${+x.d.slice(5, 7)}.</span><div>` +
-      x.rows.map(r => `<a href="${r.href}">${r.nm.replace(/&/g, "&amp;").replace(/</g, "&lt;")} <span class="p">${r.per.join(", ")}</span></a>`).join("") + `</div></div>`).join("") +
-      `<button type="button" class="all">Kaikki julkaisut ›</button>`;
-    box.querySelector(".all").onclick = () => $("updOpen").click(); }
-
   function renderTS() {
     const s = (sel && findItem(sel)) || comp(), dmy = d => `${+d.slice(8, 10)}.${+d.slice(5, 7)}.${d.slice(0, 4)}`;
     const lvlKind = s.kind === "level";   // esim. konkurssit: taso suhteessa omaan historiaan, ei trendia
@@ -1550,7 +1511,6 @@ footer .flinks .lnk:hover { text-decoration-color: currentColor; }
     const charts = set.view === "charts", clock = !!(set.indicators && set.indicators.length) && !set.growth;   // kasvunakyma: taulukko ja kuviot kartan sijaan
     $("topSec").hidden = !clock; $("tsSec").hidden = !clock; $("detail").hidden = charts; $("charts").hidden = !charts;
     if (clock) { renderMeta(); renderTime(); renderClock(); renderPanel(); } else { $("summary").innerHTML = ""; $("hlead").innerHTML = ""; }
-    renderNews();
     $("tiles").hidden = !(charts && set.tiles && set.tiles.length);
     $("growthSec").hidden = !(charts && set.growth); $("grMore").hidden = true;
     $("finSum").hidden = !(charts && set.summary && set.summary.length);
@@ -1943,7 +1903,6 @@ footer .flinks .lnk:hover { text-decoration-color: currentColor; }
       scrollTo({ top: t.getBoundingClientRect().top + scrollY - bar - 16 }); }, 120); }
   // sivuston muutokset: uudet kuviot ja muut isommat lisaykset (kasin yllapidetty, uusin ensin); set + id -> linkki kuvioon
   const CHANGES = [
-    { d: "2026-11-17", t: "Etusivulle uusimmat tiedot suhdannevaiheen viereen (leveillä näytöillä)" },
     { d: "2026-11-17", t: "Kokonaisindikaattorin aiemmat arviot talteen: kuviossa rengas, jos vaihe on myöhemmin muuttunut" },
     { d: "2026-11-17", t: "Päivittyneen sarjan merkki näyttää muutokset edellisen käynnin jälkeen" },
     { d: "2026-11-17", t: "Menetelmä: BKT-vertailuun viiveet ja käännepisteiden ajoitus" },
