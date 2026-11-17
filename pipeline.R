@@ -61,9 +61,45 @@ is_time_px <- function(vals) any(grepl("^\\d{4}(M\\d{2}|Q\\d)$", vals))   # kk t
 
 # StatFin rajoittaa kyselyja (noin 30 / 10 s): taulujen metatiedot muistiin ja pieni tauko kyselyjen valiin
 .px_meta <- new.env()
-fetch_statfin <- function(s) {
+px_base_of <- function(s) {
   base <- if (is.null(s$db)) STATFIN else sub("StatFin/$", paste0(s$db, "/"), STATFIN)   # db: esim. StatFin_Passiivi (arkistotaulut)
   if (!is.null(s$px_base)) base <- s$px_base                                             # muu PxWeb-palvelu (esim. Verohallinto)
+  base
+}
+# Muuttumattomat taulukot: PxWebin kansiolistaus kertoo kunkin taulukon paivitysajan (updated). Jos taulukko ei ole
+# paivittynyt edellisen haun jalkeen, edellinen vastaus luetaan levylta (cache/px) eika Tilastokeskukselle tehda kyselya.
+# Koskee kaikkia StatFin-hakuja (myos osasarjat ja kontribuutiolaskelmat). Varmistukset: PX_FULL=1 hakee kaiken,
+# yli PX_MAX_D paivaa vanha tallenne haetaan aina uudelleen, ja jos listaus ei vastaa, haetaan normaalisti.
+PX_DIR <- file.path(CACHE_DIR, "px"); PX_MAX_D <- 7
+.px_upd <- new.env(); PX_N <- c(haku = 0, levy = 0)
+px_updated <- function(base, table) {
+  dir <- dirname(table); key <- paste0(base, dir)
+  if (is.null(.px_upd[[key]])) .px_upd[[key]] <- tryCatch({
+      Sys.sleep(0.4); l <- fromJSON(get_text(paste0(base, if (dir == ".") "" else paste0(dir, "/"))), simplifyVector = FALSE)
+      setNames(vapply(l, function(x) if (is.null(x$updated)) NA_character_ else x$updated, ""), vapply(l, function(x) x$id, ""))
+    }, error = function(e) character(0))
+  u <- .px_upd[[key]][basename(table)]
+  if (length(u) == 1 && !is.na(u)) unname(u) else NULL
+}
+px_file <- function(base, s) {
+  f <- tempfile(); writeLines(paste(base, s$table, toJSON(s$pick[order(names(s$pick))], auto_unbox = TRUE)), f)
+  file.path(PX_DIR, paste0(unname(tools::md5sum(f)), ".csv"))
+}
+fetch_statfin <- function(s) {
+  base <- px_base_of(s)
+  upd <- if (identical(Sys.getenv("PX_FULL"), "1")) NULL else px_updated(base, s$table)
+  f <- px_file(base, s); fu <- paste0(f, ".u")
+  if (!is.null(upd) && file.exists(f) && file.exists(fu)) {
+    u <- readLines(fu, warn = FALSE)
+    if (identical(u[1], upd) && difftime(Sys.time(), as.POSIXct(u[2]), units = "days") < PX_MAX_D) {
+      PX_N["levy"] <<- PX_N["levy"] + 1; return(read.csv(f, colClasses = c("character", "numeric"))) }
+  }
+  x <- fetch_statfin_net(s, base); PX_N["haku"] <<- PX_N["haku"] + 1
+  if (!is.null(upd)) { dir.create(PX_DIR, recursive = TRUE, showWarnings = FALSE)
+    write.csv(x, f, row.names = FALSE); writeLines(c(upd, format(Sys.time(), "%Y-%m-%d %H:%M:%S")), fu) }
+  x
+}
+fetch_statfin_net <- function(s, base) {
   if (is.null(.px_meta[[s$table]])) {
     Sys.sleep(0.8); .px_meta[[s$table]] <- fromJSON(get_text(paste0(base, s$table)), simplifyVector = FALSE)$variables }
   vars <- .px_meta[[s$table]]
@@ -1250,6 +1286,7 @@ if (file.exists(TEMPLATE)) {
   writeLines(sub("__DATA__", json, tpl, fixed = TRUE), "suhdannetilanne.html", useBytes = TRUE)
   message("Kirjoitettu suhdannetilanne.html (avaa selaimessa)")
 }
+message(sprintf("StatFin: %d kyselyä, %d muuttumatonta hakua levyltä", PX_N[["haku"]], PX_N[["levy"]]))
 if (length(CHECKS) && identical(Sys.getenv("STRICT"), "1")) {
   message("STRICT: lopetetaan virhekoodilla tarkistushuomioiden vuoksi"); quit(status = 1)
 }

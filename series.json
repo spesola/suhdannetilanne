@@ -2951,6 +2951,13 @@
             "yt-neuvottelut",
             "muutosneuvottelut"
           ]
+        },
+        {
+          "hakusanat": [
+            "työttömyyskassa",
+            "työttömyyspäiväraha",
+            "työttömyyskorvaus"
+          ]
         }
       ],
       "file": "data/hakuindeksi.csv",
@@ -2960,8 +2967,8 @@
       "in_composite": false,
       "unit": "keskihajontaa",
       "kname": "Google-haut",
-      "raw_desc": "Google-hakujen määrä Suomesta: hakusana taantuma sekä yt-neuvottelut ja muutosneuvottelut yhteensä (nimi vaihtui 2022). Kumpikin standardoitu ja keskiarvoistettu. Kausitasoitus oma laskelma. Hakujen kasvu heikentää indikaattoria",
-      "ts_note": "Google-hakujen määrä Suomesta, hakusanat taantuma sekä YT- ja muutosneuvottelut (nimi vaihtui 2022). Hakusanaryhmät standardoitu ja keskiarvoistettu, kausitasoitus oma laskelma, keskihajontaa. Käännetty: hakujen kasvu heikentää indikaattoria. Lähde: Google Trends"
+      "raw_desc": "Google-hakujen määrä Suomesta: taantuma; YT- ja muutosneuvottelut; työttömyyskassa, -päiväraha ja -korvaus. Ryhmät standardoitu ja keskiarvoistettu. Kausitasoitus oma laskelma. Hakujen kasvu heikentää indikaattoria",
+      "ts_note": "Yhdistelmä Google-hauista kolmesta aiheesta: taantuma, YT- ja muutosneuvottelut sekä työttömyysturva (työttömyyskassa, -päiväraha ja -korvaus). Lukema on käännetty: hakujen lisääntyminen heikentää sitä. Kausitasoitettu, keskihajontaa. Lähde: Google Trends"
     },
     {
       "id": "palv_vol",

@@ -1400,26 +1400,32 @@ footer .flinks .lnk:hover { text-decoration-color: currentColor; }
       : lvl ? "Nuoli: suunta edelliseen jaksoon." : "Standardoitu.";
     // uusi havainto (viim. 7 pv): piste sarjan uusimman havainnon soluun
     const nwK = s => { if (s.comp || !seenOf(set.id, s.id)) return -1; const a = (raw ? s.raw : s.level) || []; for (let k = a.length - 1; k >= 0; k--) if (a[k] != null) return k; return -1; };
-    const nwA = (on, s) => on ? ` data-nw="1" aria-label="uusi havainto ${new Date(seenOf(set.id, s.id) + "T12:00:00").toLocaleDateString("fi-FI")}"` : "";
+    const nwA = (on, s) => on ? ` data-nw="1"` : "";
+    // oma vihje soluille: nimi, vaihe ja jakso, taso ja muutos; sarjan uusimmassa solussa paivityspaiva (meta.seen)
+    const lastK = s => { const a = (raw ? s.raw : s.level) || []; for (let k = a.length - 1; k >= 0; k--) if (a[k] != null) return k; return -1; };
+    const updTxt = (s, k) => { const d = !s.comp && (D.meta.seen || {})[set.id + "/" + s.id];
+      return d && k === lastK(s) ? "\npäivitetty " + new Date(d + "T12:00:00").toLocaleDateString("fi-FI", { weekday: "short", day: "numeric", month: "numeric", year: "numeric" }) : ""; };
+    const esc = x => String(x).replace(/&/g, "&amp;").replace(/"/g, "&quot;").replace(/</g, "&lt;");
+    const tipA = (s, k, sub, qc) => ` data-tip="${esc(s.label)}" data-sub="${esc(sub + updTxt(s, k))}"${qc ? ` data-qc="${qc}"` : ""}`;
     let anyNw = false;
-    const rawCell = (a, k, nw = "") => { const v = a ? a[k] : null, p = a && k > 0 ? a[k - 1] : null;
+    const rawCell = (a, k, nw = "", s = null) => { const v = a ? a[k] : null, p = a && k > 0 ? a[k - 1] : null;
       if (v == null) return `<td class="na">–</td>`;
       const rd = x => Math.abs(x) >= 1000 ? Math.round(x) : Math.round(x * 10) / 10;   // nuoli naytetyn tarkkuuden mukaan
       const ar = p == null || rd(v) === rd(p) ? "" : `<span class="ar">${rd(v) > rd(p) ? "▲" : "▼"}</span>`;
-      return `<td class="rawc"${nw}>${fmtRaw(v)}${ar}</td>`; };
-    const cell = (l, c, nw = "") => {
+      return `<td class="rawc"${nw}${s ? tipA(s, k, `${fmtP(set.periods[k])}: ${fmtRaw(v)}${s.unit ? " " + s.unit : ""}`) : ""}>${fmtRaw(v)}${ar}</td>`; };
+    const cell = (l, c, nw = "", s = null, k = -1) => {
       const v = lvl ? l : c;
       if (v == null) return `<td class="na">–</td>`;
       const t = Math.min(1, Math.abs(v) / 2.5), base = v >= 0 ? "var(--q-up)" : "var(--q-down)";
       const ar = !lvl || c == null ? "" : `<span class="ar">${c >= 0 ? "▲" : "▼"}</span>`;
-      return `<td class="hc${t < 0.35 ? " lo" : ""}" style="--hc:${base};--hp:${Math.round(8 + 52 * t)}%;--hv:${Math.round(22 + 48 * t)}%" title="taso ${l == null ? "–" : fmtN(l)}, muutos ${c == null ? "–" : fmtN(c)}"${nw}>${fmtN(v)}${ar}</td>`;
+      return `<td class="hc${t < 0.35 ? " lo" : ""}" style="--hc:${base};--hp:${Math.round(8 + 52 * t)}%;--hv:${Math.round(22 + 48 * t)}%" ${s ? tipA(s, k, (l != null && c != null ? `${Q[quad(l, c)].short} ${fmtP(set.periods[k])}` : fmtP(set.periods[k])) + `\ntaso ${l == null ? "–" : fmtN(l)}, muutos ${c == null ? "–" : fmtN(c)}`, l != null && c != null ? qcol(quad(l, c)) : "") : ""}${nw}>${fmtN(v)}${ar}</td>`;
     };
     let h = `<thead><tr><th></th>${cols.map(p => `<th>${fmtP(p)}</th>`).join("")}</tr></thead><tbody>`;
     const nm = s => s.comp ? s.label : (s.list || s.label);
     const row = s => { const fk = nwK(s); if (fk >= start && fk < start + cols.length) anyNw = true;
       return raw
-      ? `<tr><th class="rl${s.comp ? "" : " sub"}" title="${s.label}">${nm(s)}</th>${cols.map((_, k) => rawCell(s.raw, start + k, nwA(start + k === fk, s))).join("")}<td class="unit">${s.unit || ""}</td></tr>`
-      : `<tr><th class="rl${s.comp ? "" : " sub"}" title="${s.label}">${nm(s)}</th>${cols.map((_, k) => cell(s.level[start + k], s.change[start + k], nwA(start + k === fk, s))).join("")}</tr>`; };
+      ? `<tr><th class="rl${s.comp ? "" : " sub"}" title="${s.label}">${nm(s)}</th>${cols.map((_, k) => rawCell(s.raw, start + k, nwA(start + k === fk, s), s)).join("")}<td class="unit">${s.unit || ""}</td></tr>`
+      : `<tr><th class="rl${s.comp ? "" : " sub"}" title="${s.label}">${nm(s)}</th>${cols.map((_, k) => cell(s.level[start + k], s.change[start + k], nwA(start + k === fk, s), s, start + k)).join("")}</tr>`; };
     h += raw ? `<tr><th class="rl">${comp().label}</th>${cols.map(() => `<td class="na">–</td>`).join("")}<td class="unit"></td></tr>` : row(comp());
     const GR = [...(set.groups || []), ...new Set(set.indicators.map(x => x.group))].filter((g, i, a) => a.indexOf(g) === i);   // listan ryhmat ja jarjestys
     GR.forEach(g => { const m = set.indicators.filter(x => x.group === g); if (!m.length) return;
