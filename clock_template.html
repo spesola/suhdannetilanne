@@ -1405,9 +1405,9 @@ footer .flinks .lnk:hover { text-decoration-color: currentColor; }
     // oma vihje soluille: nimi, vaihe ja jakso, taso ja muutos; sarjan uusimmassa solussa paivityspaiva (meta.seen)
     const lastK = s => { const a = (raw ? s.raw : s.level) || []; for (let k = a.length - 1; k >= 0; k--) if (a[k] != null) return k; return -1; };
     const updTxt = (s, k) => { const d = !s.comp && (D.meta.seen || {})[set.id + "/" + s.id];
-      return d && k === lastK(s) ? "\nPäivitetty " + new Date(d + "T12:00:00").toLocaleDateString("fi-FI") : ""; };
+      return d && k === lastK(s) ? new Date(d + "T12:00:00").toLocaleDateString("fi-FI") + "\n" : ""; };
     const esc = x => String(x).replace(/&/g, "&amp;").replace(/"/g, "&quot;").replace(/</g, "&lt;");
-    const tipA = (s, k, sub, qc) => ` data-tip="${esc(s.label)}" data-sub="${esc(sub + updTxt(s, k))}"${qc ? ` data-qc="${qc}"` : ""}`;
+    const tipA = (s, k, sub) => ` data-tip="${esc(s.label)}" data-sub="${esc(updTxt(s, k) + sub)}"`;   // uusimmassa solussa ensin paivityspaiva
     let anyNw = false;
     const rawCell = (a, k, nw = "", s = null) => { const v = a ? a[k] : null, p = a && k > 0 ? a[k - 1] : null;
       if (v == null) return `<td class="na">–</td>`;
@@ -1419,7 +1419,7 @@ footer .flinks .lnk:hover { text-decoration-color: currentColor; }
       if (v == null) return `<td class="na">–</td>`;
       const t = Math.min(1, Math.abs(v) / 2.5), base = v >= 0 ? "var(--q-up)" : "var(--q-down)";
       const ar = !lvl || c == null ? "" : `<span class="ar">${c >= 0 ? "▲" : "▼"}</span>`;
-      return `<td class="hc${t < 0.35 ? " lo" : ""}" style="--hc:${base};--hp:${Math.round(8 + 52 * t)}%;--hv:${Math.round(22 + 48 * t)}%" ${s ? tipA(s, k, (l != null && c != null ? Q[quad(l, c)].short + "\n" : "") + `taso ${l == null ? "–" : fmtN(l)}, muutos ${c == null ? "–" : fmtN(c)}`, l != null && c != null ? qcol(quad(l, c)) : "") : ""}${nw}>${fmtN(v)}${ar}</td>`;
+      return `<td class="hc${t < 0.35 ? " lo" : ""}" style="--hc:${base};--hp:${Math.round(8 + 52 * t)}%;--hv:${Math.round(22 + 48 * t)}%" ${s ? tipA(s, k, `taso ${l == null ? "–" : fmtN(l)}, muutos ${c == null ? "–" : fmtN(c)}`) : ""}${nw}>${fmtN(v)}${ar}</td>`;
     };
     let h = `<thead><tr><th></th>${cols.map(p => `<th>${fmtP(p)}</th>`).join("")}</tr></thead><tbody>`;
     const nm = s => s.comp ? s.label : (s.list || s.label);
