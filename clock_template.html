@@ -879,7 +879,13 @@ footer .flinks .lnk:hover { text-decoration-color: currentColor; }
   const GVARS = ["--g1", "--g2", "--g3", "--g4", "--g5", "--g6"];
   const INFO = {};                                                  // alapalkin tietoikkunat (menetelma, lahteet)
   // uusi havainto viimeisen 7 paivan aikana (meta.seen: set/sarja -> paiva); merkki sarjan nimen peraan
-  const seenOf = (sid, id) => { const d = (D.meta.seen || {})[sid + "/" + id]; return d && (Date.now() - new Date(d + "T12:00:00")) / 864e5 < 7 ? d : null; };
+  // uusi edellisen kaynnin jalkeen: meta.seen (sarja -> uusimman havainnon paiva) tallennetaan selaimeen. Kaynti vaihtuu, kun
+  // edellisesta sivun avauksesta on yli 30 min; vertailupohja on edellisen kaynnin tila. Ensimmaisella kaynnilla 7 paivan saanto.
+  const SEEN0 = (() => { const cur = D.meta.seen || {}, now = Date.now();
+    try { const o = JSON.parse(localStorage.getItem("kaynti") || "null"), same = o && now - o.t < 18e5, base = o ? (same ? o.base : o.cur) : null;
+      localStorage.setItem("kaynti", JSON.stringify({ t: now, base, cur })); return base || null; } catch (e) { return null; } })();
+  const seenOf = (sid, id) => { const k = sid + "/" + id, d = (D.meta.seen || {})[k]; if (!d) return null;
+    return SEEN0 ? (SEEN0[k] !== d ? d : null) : (Date.now() - new Date(d + "T12:00:00")) / 864e5 < 7 ? d : null; };
   const freshDot = (d, what) => d ? ` <span class="fresh" title="${what} ${new Date(d + "T12:00:00").toLocaleDateString("fi-FI", { weekday: "short", day: "numeric", month: "numeric" })}"></span>` : "";
   const LIM = 2.5;
 
@@ -1303,7 +1309,7 @@ footer .flinks .lnk:hover { text-decoration-color: currentColor; }
     };
   }
   function renderTS() {
-    const s = (sel && findItem(sel)) || comp();
+    const s = (sel && findItem(sel)) || comp(), dmy = d => `${+d.slice(8, 10)}.${+d.slice(5, 7)}.${d.slice(0, 4)}`;
     const lvlKind = s.kind === "level";   // esim. konkurssit: taso suhteessa omaan historiaan, ei trendia
     const growthTS = s.kind === "growth" || (s.comp && set.indicators.every(x => x.kind === "growth"));
     $("tsTitle").textContent = s.label;
@@ -1311,7 +1317,8 @@ footer .flinks .lnk:hover { text-decoration-color: currentColor; }
       : growthTS ? "Kasvun ero omaan keskiarvoonsa keskihajontoina." : "Poikkeama pitkän aikavälin trendistä keskihajontoina.") +
       " Harmaa vyöhyke on tavanomainen vaihtelu, −1…+1. Viivan väri kertoo vaiheen, värit kuten yläosan palkissa. Klikkaa kuvaa vaihtaaksesi ajankohtaa." +
       (s.comp && s.prelim.length ? " Katkoviiva: ennakkoluku (" + s.prelim.map(r => { const m = [].concat(r.missing || []);
-        return `${fmtP(r.period)}: ${r.avail}/${r.n} sarjaa${m.length ? ", puuttuu " + m.join(", ").toLowerCase() : ""}`; }).join("; ") + "). Puuttuvan sarjan tilalla käytetään sen viimeisintä arvoa." : "");
+        return `${fmtP(r.period)}: ${r.avail}/${r.n} sarjaa${m.length ? ", puuttuu " + m.join(", ").toLowerCase() : ""}`; }).join("; ") + "). Puuttuvan sarjan tilalla käytetään sen viimeisintä arvoa." : "") +
+      (s.comp && set.composite.first ? ` Rengas: aiempi arvio, jos vaihe on sen jälkeen muuttunut tai taso tarkentunut yli 0,05. Seuranta alkoi ${dmy(set.composite.first.since)}.` : "");
     const pre = s.comp ? prelimIdx() : new Set();
     // oikea puoli: osatekijat (luottamus ym.), BKT-vertailu (kokonaisindikaattori) tai lahteen julkaisema arvo
     let cc = set.contribs && set.contribs[sel || "comp"];
@@ -1384,7 +1391,13 @@ footer .flinks .lnk:hover { text-decoration-color: currentColor; }
       el("line", { x1: xs(i - 1), y1: ys(a), x2: xs(i), y2: ys(b), stroke: qcol(quad(b, c)), "stroke-width": 2.6, "stroke-linecap": "round",
         ...(s.comp && pre.has(i) ? { "stroke-dasharray": "3 4" } : {}) }, svg);   // ennakkojakso katkoviivalla
     }
+    // aiempi arvio (putken composite.first): rengas, jos vaihe on muuttunut tai taso tarkentunut yli 0,05
+    const F0 = s.comp && set.composite.first && set.composite.first.p || {};
+    const fAt = i => { const f = F0[set.periods[i]], l = s.level[i], c = s.change[i]; if (!f || l == null || c == null) return null;
+      return quad(f.l, f.c) !== quad(l, c) || Math.abs(f.l - l) >= 0.05 ? f : null; };
+    const fLab = f => f.b ? `arvio ${dmy(f.d)}` : `ensimmäinen arvio ${dmy(f.d)}`;
     if (p) el("circle", { cx: xs(p.i), cy: ys(p.l), r: 4.5, fill: qcol(quad(p.l, p.c)), stroke: "var(--surface)", "stroke-width": 2 }, svg);
+    set.periods.forEach((per, i) => { const f = fAt(i); if (f) el("circle", { cx: xs(i), cy: ys(f.l), r: 6.5, fill: "none", stroke: qcol(quad(f.l, f.c)), "stroke-width": 1.8 }, svg); });   // rengas: aiempi arvio
     // hover-viiva seuraa hiirta ja on synkassa viereisen kuvan kanssa (chartHooks)
     const hov = el("line", { y1: mt, y2: H2 - mb, stroke: "var(--fg)", "stroke-opacity": 0.35, "stroke-width": 1, visibility: "hidden" }, svg);
     const hovDot = el("circle", { r: 4, fill: "var(--surface)", stroke: "var(--fg)", "stroke-width": 1.5, visibility: "hidden" }, svg);
@@ -1394,7 +1407,9 @@ footer .flinks .lnk:hover { text-decoration-color: currentColor; }
       const l = s.level[i], q = l == null || s.change[i] == null ? null : quad(l, s.change[i]);
       if (l != null) { hovDot.setAttribute("cx", xs(i)); hovDot.setAttribute("cy", ys(l)); hovDot.setAttribute("visibility", "visible"); }
       else hovDot.setAttribute("visibility", "hidden");
-      hmT.show(xs(i), l == null ? [] : [{ y: ys(l), col: q ? qcol(q) : "var(--fg)", t: `${fmtN(l)}${q ? " " + Q[q].name.toLowerCase() : ""}` }], fmtP(set.periods[i])); };
+      const f = fAt(i), fq = f && quad(f.l, f.c);
+      hmT.show(xs(i), l == null ? [] : [{ y: ys(l), col: q ? qcol(q) : "var(--fg)", t: `${fmtN(l)}${q ? " " + Q[q].name.toLowerCase() : ""}` }]
+        .concat(f ? [{ y: ys(f.l), col: qcol(fq), w: 500, t: `${fLab(f)}: ${fmtN(f.l)} ${Q[fq].name.toLowerCase()}` }] : []), fmtP(set.periods[i])); };
     chartHooks.push(moveHov); const sideHooks = { forEach: f => chartHooks.forEach(fn => { if (fn !== moveHov) f(fn); }) };   // aina ajantasaiset viereiset kuviot
     const hit = el("rect", { x: ml, y: mt, width: W2 - ml - mr, height: H2 - mt - mb, fill: "transparent" }, svg);
     hit.addEventListener("pointermove", e => {
@@ -1888,6 +1903,9 @@ footer .flinks .lnk:hover { text-decoration-color: currentColor; }
       scrollTo({ top: t.getBoundingClientRect().top + scrollY - bar - 16 }); }, 120); }
   // sivuston muutokset: uudet kuviot ja muut isommat lisaykset (kasin yllapidetty, uusin ensin); set + id -> linkki kuvioon
   const CHANGES = [
+    { d: "2026-11-17", t: "Kokonaisindikaattorin aiemmat arviot talteen: kuviossa rengas, jos vaihe on myöhemmin muuttunut" },
+    { d: "2026-11-17", t: "Päivittyneen sarjan merkki näyttää muutokset edellisen käynnin jälkeen" },
+    { d: "2026-11-17", t: "Menetelmä: BKT-vertailuun viiveet ja käännepisteiden ajoitus" },
     { d: "2026-11-17", t: "Kasvutaulukkoon revisiot: muutos edelliseen julkaisuun (taulukon valikosta)", set: "Reaalitalous" },
     { d: "2026-11-17", t: "Rahoitusasema alasektoreittain: erittely kuvion viereen", set: "Julkinen talous", id: "jt_b9_val" },
     { d: "2026-11-17", t: "Kuvioiden lähderiviltä aukeaa selite ja päivityspäivä" },
@@ -1961,14 +1979,18 @@ footer .flinks .lnk:hover { text-decoration-color: currentColor; }
       ix.forEach((i, k) => { const v = S.values[i]; if (v == null) { pen = false; return; } d += `${pen ? "L" : "M"}${X(k).toFixed(1)} ${Y(v).toFixed(1)}`; pen = true; });
       el("path", { d, fill: "none", stroke: col, "stroke-width": w, "stroke-dasharray": dash || "none", "stroke-linejoin": "round" }, svg); };
     line(B, "var(--fg)", 1.6); line(A, "var(--accent)", 2);
+    const tpAt = (S, i) => (S.tp || []).find(z => z.p === su.periods[i]);   // kaannepisteet (putken tp): huippu P, pohja T
+    [[B, "var(--fg)"], [A, "var(--accent)"]].forEach(([S, col]) => ix.forEach((i, k) => { if (tpAt(S, i) && S.values[i] != null)
+      el("circle", { cx: X(k), cy: Y(S.values[i]), r: 3.5, fill: col, stroke: "var(--bg)", "stroke-width": 1.5 }, svg); }));
+    const tpTxt = (S, i) => { const z = tpAt(S, i); return z ? (z.ty === "P" ? ", huippu" : ", pohja") : ""; };
     const f2 = v => v == null ? "–" : (v > 0 ? "+" : "") + v.toFixed(2).replace(".", ",").replace("-", "−");
     ix.forEach((i, k) => { const r = el("rect", { x: X(k) - (W - ml - mr) / (n - 1) / 2, y: mt, width: (W - ml - mr) / (n - 1), height: H - mt - mb, fill: "transparent" }, svg);
       r.dataset.tip = fmtP(su.periods[i].slice(0, 4) + "-Q" + Math.ceil(+su.periods[i].slice(5, 7) / 3));
-      r.dataset.sub = `Kokonaisindikaattori ${f2(A.values[i])}\nBKT:n trendipoikkeama ${f2(B.values[i])}`; });
+      r.dataset.sub = `Kokonaisindikaattori ${f2(A.values[i])}${tpTxt(A, i)}\nBKT:n trendipoikkeama ${f2(B.values[i])}${tpTxt(B, i)}`; });
     const fig = document.createElement("figure"); fig.className = "vfig";
     fig.innerHTML = '<h3>Kokonaisindikaattori ja BKT:n trendipoikkeama</h3><div class="lg"><span><i style="background:var(--accent)"></i>Kokonaisindikaattori, neljänneksen keskiarvo</span><span><i style="background:var(--fg)"></i>BKT:n trendipoikkeama</span></div>';
     fig.appendChild(svg);
-    const n2 = document.createElement("p"); n2.className = "fnote"; n2.textContent = "Standardoidut poikkeamat trendistä, keskihajontaa. Varjostettu: 2020–2021. Lähde: Tilastokeskus, omat laskelmat."; fig.appendChild(n2);
+    const n2 = document.createElement("p"); n2.className = "fnote"; n2.textContent = "Standardoidut poikkeamat trendistä, keskihajontaa. Pisteet ovat käännepisteitä. Varjostettu: 2020–2021. Lähde: Tilastokeskus, omat laskelmat."; fig.appendChild(n2);
     return fig;
   }
   $("infoClose").onclick = () => $("info").close();

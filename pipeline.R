@@ -70,7 +70,7 @@ px_base_of <- function(s) {
 # paivittynyt edellisen haun jalkeen, edellinen vastaus luetaan levylta (cache/px) eika Tilastokeskukselle tehda kyselya.
 # Koskee kaikkia StatFin-hakuja (myos osasarjat ja kontribuutiolaskelmat). Varmistukset: PX_FULL=1 hakee kaiken,
 # yli PX_MAX_D paivaa vanha tallenne haetaan aina uudelleen, ja jos listaus ei vastaa, haetaan normaalisti.
-PX_DIR <- file.path(CACHE_DIR, "px"); PX_MAX_D <- 7
+PX_DIR <- file.path(CACHE_DIR, "px"); PX_MAX_D <- 7; GT_MAX_D <- 7
 .px_upd <- new.env(); PX_N <- c(haku = 0, levy = 0)
 px_updated <- function(base, table) {
   dir <- dirname(table); key <- paste0(base, dir)
@@ -463,7 +463,7 @@ gt_korit <- function(s) {
 fetch_gtrends <- function(s) tryCatch(if (is.null(s$korit)) gt_fetch(s) else gt_korit(s), error = function(e) {
   if (file.exists(file.path(CACHE_DIR, paste0(s$id, ".csv")))) stop(e)
   message("  VAROITUS ", s$id, ": Google Trends ei vastannut, kaytetaan pohja-aineistoa ", s$file, " (", conditionMessage(e), ")")
-  STALE <<- c(STALE, s$id); read.csv(s$file, colClasses = c("character", "numeric")) })
+  STALE <<- c(STALE, s$id); structure(read.csv(s$file, colClasses = c("character", "numeric")), seed = TRUE) })   # seed: ei valimuistiin
 
 # Euroopan komission AMECO (Redisstat): vuosisarja, esim. NAWRU (rakenteellinen tyottomyys), mukana ennustevuodet
 AMECO_API <- "https://webgate.ec.europa.eu/ecfin/redisstat/api/dissemination/statistics/1.0/data/"
@@ -550,10 +550,16 @@ fetch_series <- function(s) {
               ecb = fetch_ecb, fred = fetch_fred, bof = fetch_bof, wb = fetch_wb, stop("Tuntematon lahde ", s$source))
   # valimuisti: onnistunut haku tallennetaan, epaonnistuessa kaytetaan edellista hakua
   cache <- file.path(CACHE_DIR, paste0(s$id, ".csv"))
-  d <- tryCatch({
+  # Google Trends: kuukausidata, ja tiheat haut johtavat estoon (HTTP 429). Haetaan vain, jos tallenne on yli GT_MAX_D paivaa
+  # vanha tai siita puuttuu paattynyt kuukausi.
+  if (identical(s$source, "gtrends") && file.exists(cache) && file.exists(paste0(cache, ".t")) && !identical(Sys.getenv("PX_FULL"), "1")) {
+    x <- read.csv(cache, colClasses = c("character", "numeric")); t0 <- as.POSIXct(readLines(paste0(cache, ".t"))[1])
+    pm <- format(seq(as.Date(format(Sys.Date(), "%Y-%m-01")), by = "-1 month", length.out = 2)[2], "%Y-%m")
+    if (difftime(Sys.time(), t0, units = "days") < GT_MAX_D && max(x$date) >= pm) { message("  ", s$id, ": tallenne ", format(t0, "%d.%m.%Y"), ", ei uutta hakua"); gt_ok <- x } }
+  d <- if (exists("gt_ok", inherits = FALSE)) gt_ok else tryCatch({
     x <- f(s); if (isTRUE(s$na0)) x$value[is.na(x$value)] <- 0   # na0: puuttuva = ei kuljetuksia (esim. "." meriliikenteen tavaralajeissa)
     dir.create(CACHE_DIR, showWarnings = FALSE)
-    write.csv(x, cache, row.names = FALSE); writeLines(format(Sys.time(), "%Y-%m-%d %H:%M:%S"), paste0(cache, ".t")); x
+    if (!isTRUE(attr(x, "seed"))) { write.csv(x, cache, row.names = FALSE); writeLines(format(Sys.time(), "%Y-%m-%d %H:%M:%S"), paste0(cache, ".t")) }; x
   }, error = function(e) {
     if (!file.exists(cache)) stop("Haku epaonnistui eika valimuistia ole: ", s$id, " (", conditionMessage(e), ")")
     # valimuistin ika haun aikaleimasta (tiedoston mtime voi muuttua valimuistin palautuksessa)
@@ -1015,6 +1021,38 @@ for (set in cfg$sets) {
       substr(both[1], 1, 4), substr(tail(both, 1), 1, 4),
       sub(".", ",", sprintf("%.2f", r_all), fixed = TRUE), sub(".", ",", sprintf("%.2f", r_ex), fixed = TRUE), sg)
     message(sprintf("  Kokonaisindikaattori vs BKT: r = %.2f (ilman 2020-21 %.2f)", r_all, r_ex))
+    # viiveet ja kaannepisteet (vaatii yhtenaisen neljannesjonon)
+    qi <- as.integer(substr(both, 1, 4)) * 4 + as.integer(substr(both, 7, 7))
+    if (all(diff(qi) == 1)) {
+      ca <- unname(cq[both]); cb <- g$level[match(both, g$date)]; nb <- length(ca)
+      lagc <- function(L) if (L >= 0) cor(ca[1:(nb - L)], cb[(1 + L):nb]) else cor(ca[(1 - L):nb], cb[1:(nb + L)])   # L > 0: indikaattori edella
+      rl <- vapply(-2:2, lagc, 0); names(rl) <- -2:2; Lb <- as.integer(names(rl)[which.max(rl)])
+      # kaannepiste: neljanneksen arvo on suurin tai pienin +-3 neljanneksen ikkunassa; perakkaiset samanlaiset yhdistetaan
+      tps <- function(x, k = 3) { o <- list()
+        for (i in (k + 1):(length(x) - k)) { w <- x[(i - k):(i + k)]; ty <- if (x[i] == max(w)) "P" else if (x[i] == min(w)) "T" else next
+          m <- length(o); if (m && o[[m]]$ty == ty) { if ((ty == "P" && x[i] > x[o[[m]]$i]) || (ty == "T" && x[i] < x[o[[m]]$i])) o[[m]] <- list(i = i, ty = ty) }
+          else o[[m + 1]] <- list(i = i, ty = ty) }
+        o }
+      ta <- tps(ca); tb <- tps(cb)
+      lead <- unlist(lapply(tb, function(b) { c <- Filter(function(a) a$ty == b$ty && abs(a$i - b$i) <= 4, ta)
+        if (!length(c)) return(NULL); j <- c[[which.min(vapply(c, function(a) abs(a$i - b$i), 0))]]$i; b$i - j }))
+      tpo <- function(o) lapply(o, function(z) list(p = qm(both[z$i]), ty = z$ty))
+      cser[[length(cser) - 1]]$tp <- tpo(ta); cser[[length(cser)]]$tp <- tpo(tb)
+      f2 <- function(x) sub(".", ",", sprintf("%.2f", x), fixed = TRUE)
+      nq <- function(k) if (k == 1) "yhden neljänneksen" else paste(c("kahden", "kolmen", "neljän")[k - 1], "neljänneksen")
+      ld <- if (!length(lead)) "" else {
+        md <- stats::median(lead); rg <- range(lead)
+        sprintf(paste0(" Indikaattorin %d käännepisteestä %d osuu BKT:n käännepisteeseen enintään vuoden etäisyydellä. Mediaaniviive on %s,",
+                       " ja indikaattori on enintään %s ja enintään %s.%s"),
+          length(ta), length(lead),
+          if (md == 0) "nolla" else sprintf("%s %s", nq(abs(md)), if (md > 0) "edellä" else "jäljessä"),
+          if (rg[1] < 0) paste(nq(-rg[1]), "jäljessä") else "samalla neljänneksellä", if (rg[2] > 0) paste(nq(rg[2]), "edellä") else "samalla neljänneksellä",
+          if (length(tb) > length(lead)) sprintf(" BKT:ssä on lisäksi %d lyhyttä käännettä, joita indikaattori ei erota.", length(tb) - length(lead)) else "") }
+      VALID_TXT <<- sub(" Vertailu tehdään", paste0(sprintf(" Korrelaatio on suurin, kun indikaattori on %s (%s); neljänneksen edellä %s ja jäljessä %s.",
+        if (Lb == 0) "samalla neljänneksellä" else sprintf("%s %s", nq(abs(Lb)), if (Lb > 0) "edellä" else "jäljessä"),
+        f2(max(rl)), f2(rl[["1"]]), f2(rl[["-1"]])), ld, " Käännepiste on neljännes, jonka arvo on suurin tai pienin seitsemän neljänneksen ikkunassa (kolme neljännestä kummallakin puolella).", " Vertailu tehdään"), VALID_TXT, fixed = TRUE)
+      message(sprintf("  viiveet %s; kaannepisteet %d/%d, viive %s", paste(sprintf("%s:%.2f", names(rl), rl), collapse = " "), length(lead), length(tb), paste(lead, collapse = ",")))
+    }
   }
 
   sets_out[[length(sets_out) + 1]] <- list(
@@ -1183,7 +1221,7 @@ out$meta$checks <- CHECKS
 # Tulevat julkaisut: Tilastokeskuksen julkaisukalenteri, rajattuna sivun kayttamiin tilastoihin.
 # ---------------------------------------------------------------------
 src_of <- function(s) { keep <- src_used; src_used <<- list(); src_walk(s); r <- src_used; src_used <<- keep
-  if (!length(r)) return(NA_character_); p <- names(r)[1]; paste0(SRC_NAMES[[p]]$.n, ": ", r[[p]][1]) }
+  if (!length(r)) return(NA_character_); p <- names(r)[1]; paste0(SRC_NAMES[[p]]$.n, ": ", sub(" ©.*$", "", r[[p]][1])) }   # tekijanoikeusmerkinta vain Lahteet-sivulle
 quad_of <- function(l, c) if (is.na(l) || is.na(c)) NA_character_ else if (l >= 0) (if (c >= 0) "up" else "turn") else (if (c < 0) "down" else "rec")
 base_id <- function(id) sub("_(qq|yy)$", "", sub("^h_", "", id))
 fmt_per <- function(p, q = FALSE) if (grepl("-Q", p)) paste0("Q", substr(p, 7, 7), "/", substr(p, 1, 4)) else if (q) paste0("Q", as.integer(substr(p, 6, 7)) %/% 3, "/", substr(p, 1, 4)) else paste0(as.integer(substr(p, 6, 7)), "/", substr(p, 1, 4))
@@ -1228,6 +1266,7 @@ for (sd in list(list(date = "2026-11-13", key = "bkt/x_khi_m"))) {
     log <- log[order(vapply(log, function(e) e$date, ""), decreasing = TRUE)] }
 }
 log <- Filter(function(e) as.Date(e$date) >= as.Date(today) - 60, log)
+for (i in seq_along(log)) log[[i]]$upd <- lapply(log[[i]]$upd, function(u) { u$src <- sub(" ©.*$", "", u$src); u })   # vanhat rivit, joissa merkinta oli nimessa
 # sarjan tunnus lokiriveille (sivulla rivin klikkaus vie kuvioon); vanhoille riveille haetaan lahteen tai nimen perusteella
 id_by <- function(set, f) { h <- Filter(function(a) identical(a$set, set) && f(a), log_state); if (length(h)) h[[1]]$id else NULL }
 for (i in seq_along(log)) {
@@ -1301,6 +1340,27 @@ if (!is.null(prev)) {
     }
   }
   if (nrev) message("Revisiot: uusi pohja ", nrev, " sarjalle")
+}
+# Kokonaisindikaattorin ensimmaiset arviot (reaaliaikainen tarkentuminen): kunkin kuukauden ensimmainen julkaistu taso ja muutos
+# talteen, ja tieto kulkee ajosta toiseen edellisen julkaisun mukana. Seuranta alkoi arkiston ensimmaisesta paivasta (15.11.2026):
+# sita ennen julkaistuille kuukausille pohjana on tuon paivan tila (b = 1), ei todellinen ensimmainen arvio.
+FIRST_INIT <- "https://raw.githubusercontent.com/spesola/suhdannetilanne/arkisto/2026/2026-11-15.json.gz"
+for (si in seq_along(out$sets)) {
+  so <- out$sets[[si]]; if (!identical(so$freq, "M") || is.null(so$composite)) next
+  pc <- NULL; if (!is.null(prev)) { ps <- Filter(function(x) identical(x$id, so$id), prev$sets); if (length(ps)) pc <- ps[[1]]$composite }
+  fs <- if (!is.null(pc$first)) pc$first else {
+    a <- tryCatch(local({ con <- gzcon(url(FIRST_INIT)); on.exit(close(con)); fromJSON(paste(readLines(con, encoding = "UTF-8", warn = FALSE), collapse = ""), simplifyVector = FALSE) }),
+                  error = function(e) { message("  VAROITUS ensimmaiset arviot: arkiston pohjaa ei saatu (", conditionMessage(e), ")"); NULL })
+    as0 <- if (is.null(a)) NULL else Filter(function(x) identical(x$id, so$id), a$sets)
+    if (!length(as0)) list(since = today, p = list()) else {
+      c0 <- as0[[1]]$composite; pp <- unlist(as0[[1]]$periods); o <- list()
+      for (i in seq_along(pp)) if (!is.null(c0$level[[i]]) && !is.null(c0$change[[i]])) o[[pp[i]]] <- list(l = c0$level[[i]], c = c0$change[[i]], d = "2026-11-15", b = 1)
+      list(since = "2026-11-15", p = o) } }
+  pp <- unlist(so$periods); lv <- so$composite$level; ch <- so$composite$change; nf <- 0
+  for (i in seq_along(pp)) if (!is.na(lv[i]) && !is.na(ch[i]) && is.null(fs$p[[pp[i]]])) { fs$p[[pp[i]]] <- list(l = lv[i], c = ch[i], d = today); nf <- nf + 1 }
+  keep <- tail(pp, 36); fs$p <- fs$p[names(fs$p) %in% keep]
+  out$sets[[si]]$composite$first <- fs
+  if (nf) message("Ensimmaiset arviot: ", nf, " uutta kuukautta (", so$id, ")")
 }
 writeLines(toJSON(out, auto_unbox = TRUE, na = "null", null = "null", digits = NA), OUT_PATH)
 message("Kirjoitettu ", OUT_PATH)
