@@ -1468,7 +1468,7 @@ footer .flinks .lnk:hover { text-decoration-color: currentColor; }
     $("clockTitle").textContent = growthClock ? "Kasvukartta" : "Suhdannekartta";
     $("clockDesc").textContent = growthClock
       ? `Pystyakseli: kasvun ero keskiarvoon. Vaaka-akseli: muutos edellisestä ${M_ ? "kuukaudesta" : "neljänneksestä"}. Keskihajontoina.`
-      : `Pystyakseli: sarjan poikkeama pitkän aikavälin trendistä. Vaaka-akseli: muutos edellisestä ${M_ ? "kuukaudesta" : "neljänneksestä"}. Keskihajontoina. Suurin piste on kokonaisindikaattori.`;
+      : `Pystyakseli: sarjan poikkeama pitkän aikavälin trendistä. Vaaka-akseli: muutos edellisestä ${M_ ? "kuukaudesta" : "neljänneksestä"}. Keskihajontoina.`;
     const pathIc = `<svg width="22" height="10" viewBox="0 0 22 10" aria-hidden="true"><polyline points="1,8 6,7 11,5 17,3" fill="none" stroke="var(--fg)" stroke-opacity="0.45" stroke-width="1.2"/><circle cx="6" cy="7" r="1.2" fill="var(--fg)" fill-opacity="0.4"/><circle cx="11" cy="5" r="1.2" fill="var(--fg)" fill-opacity="0.5"/><circle cx="17.5" cy="3.5" r="3.2" fill="var(--fg)"/></svg>`;
     $("clockLegend").innerHTML = "";   // selitteet pois: polku ja ontot pisteet selitetty menetelmissa
     $("listMeta").textContent = fmtP(set.periods[idx]);
