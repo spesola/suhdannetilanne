@@ -105,11 +105,6 @@ jobs:
           npx playwright install --with-deps chromium
           node tests/smoke.js public/index.html
 
-      # ulkoasun vertailu kiinteallä aineistolla (ei estä julkaisua): poikkeama tarkoittaa, että pohjakuvat pitää päivittää tai jokin on rikki
-      - name: Visuaalinen testi
-        continue-on-error: true
-        run: node tests/visual.js clock_template.html
-
       - name: Julkaise Cloudflareen
         id: deploy
         if: hashFiles('public/index.html') != ''

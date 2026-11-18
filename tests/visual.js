@@ -3,6 +3,7 @@
 //   node tests/visual.js [sivupohja]            vertaa; poikkeamat ja erokuvat hakemistoon tests/visual/out
 //   node tests/visual.js [sivupohja] --update   tallentaa nykyiset kuvat uusiksi pohjakuviksi (tarkoituksellisen muutoksen jälkeen)
 // Poistumiskoodi 1, jos jokin näkymä poikkeaa yli RAJA-osuuden pikseleistä tai kuvan koko muuttuu.
+// Ajetaan ennen julkaisua samassa ympäristössä, jossa pohjakuvat on tehty (selainversio ja fontit vaikuttavat pikseleihin).
 const { chromium } = require("playwright");
 const fs = require("fs"), path = require("path"), zlib = require("zlib"), os = require("os"), http = require("http");
 const ROOT = path.resolve(__dirname, ".."), DIR = path.join(__dirname, "visual"), OUT = path.join(DIR, "out");
