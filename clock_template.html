@@ -2148,7 +2148,7 @@ footer .flinks .lnk:hover { text-decoration-color: currentColor; }
         if (v[k] == null) return `<td class="na"></td>`;
         const e = v[k] - mu, tt = Math.min(1, Math.abs(e) / (2 * sd)), d = yd(k);
         const base = r.neutral ? "var(--accent)" : (e >= 0) !== !!r.inv ? "var(--q-up)" : "var(--q-down)";
-        const sub = `keskiarvo ${fmtV(mu, dec)}` + (d == null ? "" : `\nmuutos vuodessa ${+d.toFixed(dec) > 0 ? "+" : ""}${fmtV(d, dec)} %-yks.`);
+        const sub = d == null ? "" : `muutos vuodessa ${+d.toFixed(dec) > 0 ? "+" : ""}${fmtV(d, dec)} %-yks.`;
         return `<td class="hc${tt < 0.35 ? " lo" : ""}" style="--hc:${base};--hp:${Math.round(6 + (r.neutral ? 30 : 46) * tt)}%;--hv:${Math.round(22 + 48 * tt)}%" data-tip="${r.label}, ${fq(k)}" data-sub="${sub}">${r.sign && +v[k].toFixed(dec) > 0 ? "+" : ""}${fmtV(v[k], dec)}</td>`; }).join("") + "</tr>" +
         (r.gap_after && ri < rows.length - 1 ? `<tr class="gap" aria-hidden="true"><td colspan="${js.length + 1}"></td></tr>` : "");
     });
