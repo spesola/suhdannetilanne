@@ -2603,7 +2603,7 @@ footer .flinks .lnk:hover { text-decoration-color: currentColor; }
         let i = h == null ? (iDef != null ? iDef : L.length > 1 && !B && !S.length ? Math.min(...L.map(lastNN)) : lastNN(B || L[0]))   // oletus: valittu tai viimeisin yhteinen jakso
                          : Math.max(0, Math.min(n - 1, h - i0));
         if (h != null) { const has = j => L.some(a => a[j] != null) || S.some(s => s[j] != null) || (B && B[j] != null);   // harva (nelj.) sarja: lahin aiempi havainto
-          let j = i; while (j > 0 && i - j < 2 && !has(j)) j--; if (has(j)) i = j; }
+          let j = i; while (j > 0 && i - j < 3 && !has(j)) j--; if (has(j)) i = j; }   // kuukausiakselilla neljannessarja: enintaan kaksi kuukautta taaksepain
         const iD = i;                                                     // hover-kohta; otsikon tekstit pysyvät viimeisimmässä
         const lab = h != null;
         if (lab) { i = iDef != null ? iDef : L.length > 1 && !B && !S.length ? Math.min(...L.map(lastNN)) : lastNN(B || L[0]); h = null; }
@@ -2674,8 +2674,11 @@ footer .flinks .lnk:hover { text-decoration-color: currentColor; }
         (col ? $("grSide") : tgt).appendChild(side);                    // kasvunakyma: oma sivupalsta; muut: kuvion viereen (ei globaalia tilaa, joka jai voimaan nakymaa vaihdettaessa)
         const bx = side.querySelector(".brk"), sv = side.querySelector(".fval"), u = c.unit === "%" ? " %" : c.unit ? " " + c.unit : "";
         const sg = (v, d) => (v == null ? "–" : (!c.lvl && +v.toFixed(d) > 0 ? "+" : "") + fmtV(v, d));
+        let dLast = -1;
         const draw = h => {
-          const i = h == null ? lastNN(L[0]) : Math.max(0, Math.min(n - 1, h - i0)), g = L[0][i];
+          let i = h == null ? lastNN(L[0]) : Math.max(0, Math.min(n - 1, h - i0));
+          if (h != null) { let j = i; while (j > 0 && i - j < 3 && L[0][j] == null && S.every(s => s[j] == null)) j--; if (L[0][j] != null || S.some(s => s[j] != null)) i = j; }   // sama kohdistus kuin kuvion hoverissa
+          if (i === dLast) return; dLast = i; const g = L[0][i];
           const vals = S.map(s => s[i]), mx = Math.max(Math.abs(g || 0), ...vals.map(v => Math.abs(v || 0)), 0.1);
           const bar = (v, col, cls) => { if (v == null) return `<span class="bb"></span>`; const w = Math.abs(v) / mx * 50;
             return `<span class="bb"><i class="${cls || ""}" style="--qc:${col};left:${v >= 0 ? 50 : 50 - w}%;width:${Math.max(w, 0.6)}%"></i></span>`; };
@@ -2685,10 +2688,11 @@ footer .flinks .lnk:hover { text-decoration-color: currentColor; }
         draw(null); hooks.push(draw);
       }
       const hit = el("rect", { x: ml, y: mt, width: W2 - ml - mr, height: H2 - mt - mb, fill: "transparent" }, svg);
+      let rafH = 0, pend = null;                                        // hover kerran ruudunpaivitysta kohden
       hit.addEventListener("pointermove", e => { const r = svg.getBoundingClientRect();
-        const i = Math.max(0, Math.min(n - 1, Math.round(((e.clientX - r.left) / r.width * W2 - ml) / (W2 - ml - mr) * (n - 1))));
-        hooks.forEach(fn => fn(i + i0)); });
-      hit.addEventListener("pointerleave", () => hooks.forEach(fn => fn(null)));
+        pend = Math.max(0, Math.min(n - 1, Math.round(((e.clientX - r.left) / r.width * W2 - ml) / (W2 - ml - mr) * (n - 1)))) + i0;
+        if (!rafH) rafH = requestAnimationFrame(() => { rafH = 0; const v = pend; hooks.forEach(fn => fn(v)); }); });
+      hit.addEventListener("pointerleave", () => { if (rafH) cancelAnimationFrame(rafH); rafH = 0; hooks.forEach(fn => fn(null)); });
     });
     if (more) { $("grMore").hidden = !more.children.length; $("grMoreN").textContent = more.querySelectorAll(".fcard:not(.side)").length || ""; }
   }
