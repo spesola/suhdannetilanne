@@ -478,6 +478,8 @@ body { font-variant-numeric: tabular-nums; background: var(--bg); min-height: 10
 .fpanel > * { max-width: 680px; }
 .fpanel { margin-top: 8px; padding: 2px 0 2px 14px; border-left: 2px solid var(--line); max-width: 680px; }
 .fpanel[hidden] { display: none; }
+.tchev { display: grid; margin: 10px 0 0 -3px; }   /* taulukon alla pelkka nuoli */
+.tpanel { margin-top: 4px; }
 .fpanel .fnote, .fpanel .fupd { margin: 0 0 4px; }
 .fpanel .fupd { color: var(--muted); font-size: 0.78rem; }
 .ffoot > .fval, .fmeta > .fval { margin-left: auto; white-space: nowrap; }
@@ -833,7 +835,7 @@ footer .flinks .lnk:hover { text-decoration-color: currentColor; }
       <div class="phead"><h2 id="grTitle">Kasvu</h2>
         <div class="hmctl"><div class="mini" role="group" aria-label="Kasvuvauhti"><button type="button" id="gr-yy" aria-pressed="true">v/v</button><button type="button" id="gr-qq" aria-pressed="false">q/q</button></div><span class="tdots"><button type="button" class="more" aria-haspopup="true" aria-expanded="false" aria-label="Taulukon toiminnot" title="Toiminnot"><svg viewBox="0 0 16 16" width="16" height="16" aria-hidden="true"><circle cx="3" cy="8" r="1.5"/><circle cx="8" cy="8" r="1.5"/><circle cx="13" cy="8" r="1.5"/></svg></button><div class="cmenu" hidden><button type="button" class="dl ck" id="gr-rev" role="menuitemcheckbox" aria-checked="false">Näytä revisiot</button><hr class="msep"><button type="button" class="dl" id="gr-dl">Lataa CSV</button></div></span></div></div>
       <div class="hmwrap"><table class="hm" id="grTable"></table></div>
-      <p class="fnote">Muutos, %, työttömyysasteessa %-yks. Värin voimakkuus suhteessa sarjan keskihajontaan vuodesta 2015 (pl. 2020–2021), täysi väri kahdesta keskihajonnasta. Sininen piste: uusi havainto viimeisen 7 päivän aikana.<span id="grRevNote" hidden></span><span id="grNeutral"> Hinnoissa ja palkoissa sininen väri.</span> Klikkaa riviä nähdäksesi kuviot.</p>
+      <p class="fnote" id="grNote">Muutos, %, työttömyysasteessa %-yks. Värin voimakkuus suhteessa sarjan keskihajontaan vuodesta 2015 (pl. 2020–2021), täysi väri kahdesta keskihajonnasta. Sininen piste: uusi havainto edellisen käyntisi jälkeen.<span id="grRevNote" hidden></span><span id="grNeutral"> Hinnoissa ja palkoissa sininen väri.</span> Klikkaa riviä nähdäksesi kuviot.</p>
     </div></div>
     <div class="grrow"><div class="grcol" id="grCharts"></div><div class="grside" id="grSide"></div></div>
   </section>
@@ -1481,7 +1483,7 @@ footer .flinks .lnk:hover { text-decoration-color: currentColor; }
       h += `<tr class="hg"><th class="rl">${g}</th><td colspan="${cols.length + (raw ? 1 : 0)}"></td></tr>`; m.forEach(s => { h += row(s); }); });
     h += "</tbody>";
     $("hm").innerHTML = h;
-    if (anyNw) $("hmNote").textContent += " Sininen piste: uusi havainto viimeisen 7 päivän aikana.";
+    if (anyNw) $("hmNote").textContent += " Sininen piste: uusi havainto edellisen käyntisi jälkeen.";
   }
 
   function setTab(t) { tab = t;
@@ -2814,6 +2816,13 @@ footer .flinks .lnk:hover { text-decoration-color: currentColor; }
       scrollTo({ top: c.getBoundingClientRect().top + scrollY - bar - (nav ? nav.offsetHeight + 8 : 0) - 16 }); }, 350); }
   addEventListener("popstate", () => { if (applyHash()) renderAll(); goCard(); });
   addEventListener("hashchange", () => { if (applyHash()) renderAll(); goCard(); });
+  // taulukoiden selite: pelkka nuoli, joka avaa selitteen (sama paneeli kuin kuvioissa)
+  ["grNote", "hmNote"].forEach(id => { const p = $(id); if (!p) return;
+    const pn = document.createElement("div"); pn.className = "fpanel tpanel"; pn.hidden = true; pn.id = id + "B"; p.before(pn); pn.appendChild(p);
+    const b = document.createElement("button"); b.type = "button"; b.className = "fchev tchev"; b.setAttribute("aria-expanded", "false"); b.setAttribute("aria-controls", pn.id);
+    b.setAttribute("aria-label", "Näytä selite"); b.innerHTML = '<svg viewBox="0 0 10 10" aria-hidden="true"><path d="M3.5 2 7 5l-3.5 3"/></svg>';
+    b.onclick = () => { pn.hidden = !pn.hidden; b.setAttribute("aria-expanded", String(!pn.hidden)); b.setAttribute("aria-label", pn.hidden ? "Näytä selite" : "Piilota selite"); };
+    pn.before(b); });
   applyHash(); renderFoot(); renderAll();
   if (document.fonts && document.fonts.ready) document.fonts.ready.then(() => { if (set.growth && set.view === "charts") drawCharts(); goCard(); }); else goCard();   // fontin latauksen jalkeen korkeudet uudelleen
 })();
