@@ -2122,8 +2122,8 @@ footer .flinks .lnk:hover { text-decoration-color: currentColor; }
     if (c.note) noteInto(card, null, c.note, null, c);
     return card;
   }
-  // yleiskuvataulukko: neljannesvuosisarjojen tasot (esim. % BKT:sta) viimeisilta neljanneksilta; vari kertoo muutoksen
-  // vuodentakaisesta suhteessa sarjan tavanomaiseen vuosimuutokseen (pl. 2020-2021). inv: kasvu heikentaa, neutral: ei suuntaa.
+  // yleiskuvataulukko: neljannesvuosisarjojen tasot (esim. % BKT:sta) viimeisilta neljanneksilta; vari kertoo tason suhteessa
+  // sarjan keskiarvoon (voimakkuus keskihajonnoissa, taysi vari kahdesta). inv: korkea taso heikentaa, neutral: ei suuntaa.
   // Rivi vie kuvioon, jossa sarja on.
   function qtableCard(c, narrow, box) {
     const ser = id => set.series.find(x => x.id === id), P = set.periods, qi = P.map((p, k) => /-(03|06|09|12)$/.test(p) ? k : -1).filter(k => k >= 0);
@@ -2134,14 +2134,15 @@ footer .flinks .lnk:hover { text-decoration-color: currentColor; }
     const card = document.createElement("div"); card.className = "card fcard wide qcard";
     let h = `<div class="fhead"><h3>${c.title}</h3></div><div class="hmwrap"><table class="hm"><thead><tr><th></th>${js.map(k => `<th title="${fq(k)}">${fq(k).replace(/\/20(\d\d)$/, "/$1")}</th>`).join("")}</tr></thead><tbody>`;
     rows.forEach((r, ri) => {
-      const v = ser(r.id).values, yd = k => v[k] != null && k >= 12 && v[k - 12] != null ? v[k] - v[k - 12] : null;
-      const hx = qi.map(yd).filter((x, j) => x != null && !/^202[01]/.test(P[qi[j]])), mu = hx.reduce((s, x) => s + x, 0) / Math.max(1, hx.length);
-      const sd = Math.sqrt(hx.reduce((s, x) => s + (x - mu) ** 2, 0) / Math.max(1, hx.length - 1)) || 1, dec = r.dec ?? c.dec ?? 1;
+      // vari: taso suhteessa sarjan keskiarvoon (alusta, pl. 2020-2021; uusi alasektori vasta ensimmaisesta nollasta poikkeavasta arvosta)
+      const v = ser(r.id).values, k0 = qi.find(k => v[k] != null && v[k] !== 0) ?? 0;
+      const hx = qi.filter(k => k >= k0 && v[k] != null && !/^202[01]/.test(P[k])).map(k => v[k]), mu = hx.reduce((s, x) => s + x, 0) / Math.max(1, hx.length);
+      const sd = Math.sqrt(hx.reduce((s, x) => s + (x - mu) ** 2, 0) / Math.max(1, hx.length - 1)) || 1, dec = r.dec ?? c.dec ?? 1, yd = k => k >= 12 && v[k - 12] != null ? v[k] - v[k - 12] : null;
       h += `<tr class="pick${r.tot ? " tot" : ""}" data-id="${r.id}" tabindex="0" title="Näytä kuvio"><th class="rl${r.sub ? " sub" : ""}">${r.label}</th>` + js.map(k => {
         if (v[k] == null) return `<td class="na"></td>`;
-        const d = yd(k), tt = d == null ? 0 : Math.min(1, Math.abs(d) / (2 * sd));
-        const base = r.neutral || d == null ? "var(--accent)" : (d >= 0) !== !!r.inv ? "var(--q-up)" : "var(--q-down)";
-        const sub = d == null ? "" : `muutos vuodessa ${+d.toFixed(dec) > 0 ? "+" : ""}${fmtV(d, dec)} %-yks.`;
+        const e = v[k] - mu, tt = Math.min(1, Math.abs(e) / (2 * sd)), d = yd(k);
+        const base = r.neutral ? "var(--accent)" : (e >= 0) !== !!r.inv ? "var(--q-up)" : "var(--q-down)";
+        const sub = `keskiarvo ${fmtV(mu, dec)}` + (d == null ? "" : `\nmuutos vuodessa ${+d.toFixed(dec) > 0 ? "+" : ""}${fmtV(d, dec)} %-yks.`);
         return `<td class="hc${tt < 0.35 ? " lo" : ""}" style="--hc:${base};--hp:${Math.round(6 + (r.neutral ? 30 : 46) * tt)}%;--hv:${Math.round(22 + 48 * tt)}%" data-tip="${r.label}, ${fq(k)}" data-sub="${sub}">${r.sign && +v[k].toFixed(dec) > 0 ? "+" : ""}${fmtV(v[k], dec)}</td>`; }).join("") + "</tr>" +
         (r.gap_after && ri < rows.length - 1 ? `<tr class="gap" aria-hidden="true"><td colspan="${js.length + 1}"></td></tr>` : "");
     });

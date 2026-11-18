@@ -2236,7 +2236,7 @@
               "inv": true
             }
           ],
-          "note": "Neljän neljänneksen liukuvat summat suhteessa BKT:hen, velka neljänneksen lopussa. Väri kertoo, vahvistaako muutos vuodentakaisesta julkista taloutta vai heikentääkö se. Kunnat: paikallishallinto pl. hyvinvointialueet. Klikkaa riviä nähdäksesi kuvion. Lähde: Tilastokeskus."
+          "note": "Neljän neljänneksen liukuvat summat suhteessa BKT:hen, velka neljänneksen lopussa. Väri kertoo, onko taso julkisen talouden kannalta parempi vai heikompi kuin sarjan keskiarvo vuodesta 2000. Kunnat: paikallishallinto pl. hyvinvointialueet. Klikkaa riviä nähdäksesi kuvion. Lähde: Tilastokeskus."
         },
         {
           "id": "jt_b9",
