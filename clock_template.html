@@ -469,7 +469,7 @@ body { font-variant-numeric: tabular-nums; background: var(--bg); min-height: 10
 .ffoot { display: flex; flex-wrap: wrap; align-items: baseline; gap: 6px 16px; margin-top: 8px; }
 .ffoot > .fnote { margin: 0; flex: 1 1 260px; }
 .fnote.fx { cursor: pointer; }
-.fchev { display: inline-grid; place-items: center; width: 16px; height: 16px; margin: 0 4px 0 -3px; padding: 0; border: 0; border-radius: 4px; background: none; color: var(--muted); cursor: pointer; vertical-align: -3px; }
+.fchev { display: inline-grid; place-items: center; width: 16px; height: 16px; margin: 0 4px 0 -3px; padding: 0; border: 0; border-radius: 4px; background: none; color: var(--muted); cursor: pointer; vertical-align: -1.5px; }   /* nuolen keskikohta isojen kirjainten puolivaliin */
 .fchev svg { width: 10px; height: 10px; fill: none; stroke: currentColor; stroke-width: 1.6; stroke-linecap: round; stroke-linejoin: round; transition: transform .15s; }
 .fchev[aria-expanded="true"] svg { transform: rotate(90deg); }
 .fnote.fx:hover .fchev, .fchev:focus-visible { color: var(--fg); }
