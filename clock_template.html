@@ -1633,7 +1633,7 @@ footer .flinks .lnk:hover { text-decoration-color: currentColor; }
         `<stop offset="0" stop-color="var(--accent)" stop-opacity=".24"/><stop offset="1" stop-color="var(--accent)" stop-opacity="0"/></linearGradient></defs>` +
         `<path d="${area}" fill="url(#${gid})"/>${zl}<path class="ln" d="${d}" fill="none" stroke="var(--accent)" stroke-width="1.4" stroke-linejoin="round" vector-effect="non-scaling-stroke"/></svg>` : "";
       const vt = (t.sign ? sg(val, t.dec) : fmtV(val, t.dec)) + u(t.unit);
-      return `<div class="kpi"><div class="kpih"><span class="kpil">${t.label}</span><span class="kpip">${r ? fmtDay(r.date) : fmtP(P[k])}</span></div>
+      return `<div class="kpi"><div class="kpih"><span class="kpil">${t.label}</span><span class="kpip">${r ? fmtDay(r.date) : t.q ? "Q" + Math.ceil(+P[k].slice(5, 7) / 3) + "/" + P[k].slice(0, 4) : fmtP(P[k])}</span></div>
         <div class="kpiv">${vt}</div><div class="kpic">${ct}</div>${svg}<div class="kpiy"><span>${P[f0].slice(0, 4)}</span><span>${P[k].slice(0, 4)}</span></div></div>`; }).join("");
   }
   function renderGKpi() {                                               // ylaosan tunnusluku: BKT v/v ja q/q

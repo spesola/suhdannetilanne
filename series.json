@@ -2119,6 +2119,57 @@
       "default": false,
       "view": "charts",
       "from": 2000,
+      "kpis": [
+        {
+          "label": "Rahoitusasema",
+          "series": "jt_b9",
+          "dec": 1,
+          "unit": "% BKT",
+          "sign": true,
+          "cmp": {
+            "kind": "diff",
+            "label": "vuodessa",
+            "unit": "%-yks."
+          },
+          "q": true
+        },
+        {
+          "label": "Velka (EDP)",
+          "series": "jt_velka",
+          "dec": 1,
+          "unit": "% BKT",
+          "cmp": {
+            "kind": "diff",
+            "label": "vuodessa",
+            "unit": "%-yks."
+          },
+          "q": true
+        },
+        {
+          "label": "Menot",
+          "series": "jt_te",
+          "dec": 1,
+          "unit": "% BKT",
+          "cmp": {
+            "kind": "diff",
+            "label": "vuodessa",
+            "unit": "%-yks."
+          },
+          "q": true
+        },
+        {
+          "label": "Korkomenot",
+          "series": "jt_korko_bkt",
+          "dec": 1,
+          "unit": "% BKT",
+          "cmp": {
+            "kind": "diff",
+            "label": "vuodessa",
+            "unit": "%-yks."
+          },
+          "q": true
+        }
+      ],
       "charts": [
         {
           "id": "jt_yk",
@@ -2234,7 +2285,6 @@
           "from": 2000,
           "size": "half",
           "colors": {
-            "jt_te": "var(--q-down)",
             "jt_tr": "var(--accent)"
           },
           "note": "Julkisyhteisöt, neljän neljänneksen liukuva summa suhteessa BKT:hen. Erotus on rahoitusasema. Lähde: Tilastokeskus."
@@ -2253,7 +2303,7 @@
           "from": 2000,
           "size": "half",
           "colors": {
-            "jt_te_yy": "var(--q-down)",
+            "jt_te_yy": "var(--fg)",
             "jt_tr_yy": "var(--accent)"
           },
           "note": "Julkisyhteisöjen tulot ja menot käyvin hinnoin, neljän neljänneksen liukuvan summan muutos vuodentakaisesta. Lähde: Tilastokeskus."
