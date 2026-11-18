@@ -2231,17 +2231,12 @@
               "inv": true
             },
             {
-              "id": "jt_nv",
-              "label": "Nettovelka",
-              "inv": true
-            },
-            {
               "id": "jt_korko_bkt",
               "label": "Korkomenot",
               "inv": true
             }
           ],
-          "note": "Rahoitusasema, tulot, menot ja korkomenot neljän neljänneksen liukuvina summina suhteessa BKT:hen; velka ja nettovelka neljänneksen lopussa. Värin voimakkuus kertoo muutoksen vuodentakaisesta suhteessa sarjan tavanomaiseen vuosimuutokseen (pl. 2020–2021): värin suunta kertoo, vahvistaako muutos julkista taloutta vai heikentääkö se. Tuloissa ja veroasteessa väri on neutraali. Kunnat: paikallishallinto pl. hyvinvointialueet. Klikkaa riviä nähdäksesi kuvion. Lähde: Tilastokeskus."
+          "note": "Neljän neljänneksen liukuvat summat suhteessa BKT:hen, velka neljänneksen lopussa. Väri kertoo, vahvistaako muutos vuodentakaisesta julkista taloutta vai heikentääkö se. Kunnat: paikallishallinto pl. hyvinvointialueet. Klikkaa riviä nähdäksesi kuvion. Lähde: Tilastokeskus."
         },
         {
           "id": "jt_b9",
