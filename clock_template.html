@@ -99,7 +99,7 @@ html { background: var(--bg); }
 body { font-variant-numeric: tabular-nums; background: var(--bg); min-height: 100%; color: var(--fg); font-family: var(--font-body); font-size: 15px; line-height: 1.5;
   padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px));
   padding-block: 0 56px; }
-.wrap { max-width: 1180px; margin: 0 auto; display: flex; flex-direction: column; gap: 72px; }
+.wrap { max-width: 1180px; margin: 0 auto; display: flex; flex-direction: column; gap: 52px; }
 /* ylapalkki: koko levea, pysyy ylhaalla, lapikuultava ja sumentava */
 .topbar { position: sticky; top: 0; z-index: 50; display: flex; align-items: stretch; gap: 0 28px; min-height: 60px;
   margin: 0 calc(-1 * max(16px, env(safe-area-inset-right, 0px))) 36px calc(-1 * max(16px, env(safe-area-inset-left, 0px)));
@@ -112,7 +112,7 @@ body { font-variant-numeric: tabular-nums; background: var(--bg); min-height: 10
 :root[data-theme="vapor"] .topbar.scr::before { box-shadow: 0 8px 28px -12px rgba(143, 61, 255, .45); }
 .topbar .brandw { display: flex; align-items: baseline; gap: 18px; align-self: center; min-width: 0; }
 .topbar .sets { flex-wrap: nowrap; }
-@media (min-width: 861px) { .topbar { margin-bottom: 92px; } }      /* leveällä väljempi alku */
+@media (min-width: 861px) { .topbar { margin-bottom: 56px; } }      /* leveällä väljempi alku */
 /* valikko: paivitys, loki ja teemat yhden painikkeen takana */
 .smw { position: relative; align-self: center; }
 .smb { width: 34px; height: 34px; padding: 0; border-radius: 8px; border: 1px solid var(--line); background: transparent; color: var(--fg); display: grid; place-items: center; cursor: pointer; }
@@ -454,6 +454,9 @@ body { font-variant-numeric: tabular-nums; background: var(--bg); min-height: 10
 }
 .fgrid { display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); gap: 56px 48px; }
 .fcard { grid-column: span 2; }
+.card.fcard { border-top-color: var(--line); }   /* kuvio- ja taulukkokortit vaalealla viivalla; tummat viivat vain paarakenteessa */
+@media (hover: hover) { .fcard > .more, .fcard > .zb { opacity: 0; transition: opacity .15s; }
+  .fcard:hover > .more, .fcard:hover > .zb, .fcard:focus-within > .more, .fcard:focus-within > .zb { opacity: 1; } }   /* toiminnot nakyviin osoitettaessa */
 /* kuviokortit: ohut reuna */
 .card.fcard { position: relative; }
 .hasmenu > .fhead { padding-right: 30px; }
@@ -559,8 +562,9 @@ button.dl:hover { text-decoration-color: var(--fg); }
 .fhead > .dl { margin-left: auto; }
 .fmeta > .dl + .dl, .fhead > .dl + .dl { margin-left: 12px; }
 .step.play { font-size: 0.78rem; }
-.fsec { grid-column: 1 / -1; font-size: 1rem; line-height: 1.3; color: var(--fg); font-weight: 600; margin: 32px 0 -30px; scroll-margin-top: 64px; border-top: 1px solid var(--rule); padding-top: 14px; }
-.fsec:first-child, .secnav + .fsec { margin-top: 0; }
+.fsec { grid-column: 1 / -1; font-size: 0.75rem; line-height: 1.3; letter-spacing: .09em; text-transform: uppercase; color: var(--muted); font-weight: 600; margin: 40px 0 -30px; scroll-margin-top: 64px; }   /* osion nimi pienena tunnisteena, ei omaa viivaa */
+.fsec:first-child { margin-top: 0; }
+.secnav + .fsec { height: 0; margin: -28px 0 -34px; overflow: hidden; visibility: hidden; }   /* ensimmainen osio = ensimmainen valilehti: nimi piiloon, sijainti jaa vieritysta varten */
 .fsec[role="button"] { cursor: pointer; display: flex; align-items: center; gap: 10px; user-select: none; }
 .fsec .chev { color: var(--muted); display: flex; }
 .fsec .chev svg { fill: none; stroke: currentColor; stroke-width: 1.6; stroke-linecap: round; stroke-linejoin: round; transition: transform .2s; }
@@ -1922,6 +1926,7 @@ footer .flinks .lnk:hover { text-decoration-color: currentColor; }
       scrollTo({ top: t.getBoundingClientRect().top + scrollY - bar - 16 }); }, 120); }
   // sivuston muutokset: uudet kuviot ja muut isommat lisaykset (kasin yllapidetty, uusin ensin); set + id -> linkki kuvioon
   const CHANGES = [
+    { d: "2026-11-18", t: "Siistimpi ulkoasu: tiiviimmät välit, kevyemmät osio- ja korttiviivat, kortin toiminnot näkyvät osoitettaessa" },
     { d: "2026-11-18", t: "Rahoitusmarkkinat: rahoitusolot-taulukko sivun alkuun", set: "Rahoitusmarkkinat" },
     { d: "2026-11-18", t: "Pörssiosakkeiden markkina-arvo", set: "Rahoitusmarkkinat", id: "osake_mv" },
     { d: "2026-11-18", t: "Epävarmuusindeksit samaan kuvioon, Fed ohjauskorkokuvioon, Japani pois", set: "Rahoitusmarkkinat" },
@@ -2138,7 +2143,7 @@ footer .flinks .lnk:hover { text-decoration-color: currentColor; }
     const w = box.clientWidth || 1000, N = w > 1000 ? 12 : w > 760 ? 10 : 8, js = qi.slice(Math.max(0, lastQ - N + 1), lastQ + 1);
     const fq = k => c.monthly ? fmtP(P[k]) : "Q" + Math.ceil(+P[k].slice(5, 7) / 3) + "/" + P[k].slice(0, 4);
     const card = document.createElement("div"); card.className = "card fcard wide qcard";
-    let h = `<div class="fhead"><h3>${c.title}</h3></div><div class="hmwrap"><table class="hm"><thead><tr><th></th>${js.map(k => `<th title="${fq(k)}">${fq(k).replace(/\/20(\d\d)$/, "/$1")}</th>`).join("")}</tr></thead><tbody>`;
+    let h = `<div class="fhead"><h3>${c.title}</h3></div>${c.sub ? `<p class="fsub">${c.sub}</p>` : ""}<div class="hmwrap"><table class="hm"><thead><tr><th></th>${js.map(k => `<th title="${fq(k)}">${fq(k).replace(/\/20(\d\d)$/, "/$1")}</th>`).join("")}</tr></thead><tbody>`;
     rows.forEach((r, ri) => {
       // vari: taso suhteessa sarjan keskiarvoon (alusta, pl. 2020-2021; uusi alasektori vasta ensimmaisesta nollasta poikkeavasta arvosta)
       const v = ser(r.id).values, k0 = qi.find(k => v[k] != null && v[k] !== 0) ?? 0;

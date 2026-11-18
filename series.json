@@ -2235,7 +2235,7 @@
           "id": "jt_yk",
           "type": "qtable",
           "section": "Yleiskuva",
-          "title": "Julkinen talous neljänneksittäin, % BKT:stä",
+          "title": "Julkinen talous neljänneksittäin",
           "dec": 1,
           "rows": [
             {
@@ -2296,7 +2296,8 @@
               "inv": true
             }
           ],
-          "note": "Neljän neljänneksen liukuvat summat suhteessa BKT:hen, velka neljänneksen lopussa. Väri kertoo, onko taso julkisen talouden kannalta parempi vai heikompi kuin sarjan keskiarvo vuodesta 2000. Kunnat: paikallishallinto pl. hyvinvointialueet. Klikkaa riviä nähdäksesi kuvion. Lähde: Tilastokeskus."
+          "note": "Neljän neljänneksen liukuvat summat suhteessa BKT:hen, velka neljänneksen lopussa. Väri kertoo, onko taso julkisen talouden kannalta parempi vai heikompi kuin sarjan keskiarvo vuodesta 2000. Kunnat: paikallishallinto pl. hyvinvointialueet. Klikkaa riviä nähdäksesi kuvion. Lähde: Tilastokeskus.",
+          "sub": "% BKT:stä"
         },
         {
           "id": "jt_b9",
