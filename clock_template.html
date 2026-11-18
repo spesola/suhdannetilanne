@@ -1343,7 +1343,7 @@ footer .flinks .lnk:hover { text-decoration-color: currentColor; }
                 gs.map(g => ({ id: "__c_" + g, label: g, values: s.level.map((v, k) => v == null ? null : mem.filter(x => x.group === g).reduce((a, x) => a + lvlCF(x, k), 0) / n0) })));
       cc = { id: "comp_grp", title: "Kokonaisindikaattori: ryhmien osuudet", lines: ["__cline"], stack: gs.map(g => "__c_" + g), stackColors: gs.map(gcol),
              unit: "", stackUnit: "", dec: 2, from: 2010, lineColor: "var(--fg)",
-             note: `Kokonaisindikaattori on sarjojen keskiarvo; palkki = ryhmän sarjojen poikkeamien summa / ${n0}.` };
+             note: `Kokonaisindikaattori on sarjojen keskiarvo. Ryhmän palkki on sen sarjojen poikkeamien summa jaettuna kaikkien sarjojen määrällä (${n0}), joten palkit summautuvat kokonaisindikaattoriin. Lähde: omat laskelmat.` };
     }
     if (!cc && s.raw && s.raw.some(v => v != null)) {
       const hasTr = s.trend && s.trend.some(v => v != null);
@@ -1360,6 +1360,7 @@ footer .flinks .lnk:hover { text-decoration-color: currentColor; }
              lines: ["__raw", ...(hasSa ? ["__sa"] : []), ...(hasTr ? ["__trend"] : []), "__avg"], dash: ["__trend"], dot: ["__avg"], thin: hasSa ? ["__raw"] : [],
              unit: "", dec: big ? 0 : 1, from: 2010,
              note: (s.ts_note || [hasSa ? "Kausitasoitus oma laskelma" : s.raw_desc, s.unit].filter(Boolean).join(", ")) + (hasTr ? ". " + (s.trend_note || "Kartta vertaa trendiin, ei keskiarvoon.") : ".") };
+      if (s.src && !/Lähde|Lähteet/.test(cc.note)) cc.note += ` Lähde: ${s.src}.`;   // putki: sarjan lahde
       set.colors = { ...(set.colors || {}), __sa: "var(--accent)", __raw: hasSa ? "var(--line)" : "var(--accent)", __trend: "var(--muted)", __avg: "var(--q-turn)" };
     }
     if (cc) [...cc.lines, ...(cc.stack || [])].filter(id => id.startsWith("raw:")).forEach(id => {   // raw:<sarja> = julkaistu arvo
@@ -2101,7 +2102,7 @@ footer .flinks .lnk:hover { text-decoration-color: currentColor; }
     db.onclick = () => saveFile(`suhdannetilanne-${slug(c.title)}.csv`, toCSV([["Sarja", "Päivä", "Viimeisin", ...cols.map(k => COLH[k]), "Muutoksen yksikkö"],
       ...c.rows.map(r => [r.label, r.date, r.last, ...cols.map(k => r[k]), r.chg === "kp" ? "korkopistettä" : r.chg === "pct" ? "%" : "indeksi"])]));
     fm.appendChild(db); card.appendChild(fm);
-    if (c.note) { const p = document.createElement("p"); p.className = "fnote"; p.textContent = c.note; linkSrc(p, c); card.appendChild(p); }
+    if (c.note) noteInto(card, null, c.note, null, c);
     return card;
   }
   // hajontakuvio ajassa (esim. Beveridgen kayra): pisteet yhdistetty, uusimmat tummimpina
@@ -2171,7 +2172,7 @@ footer .flinks .lnk:hover { text-decoration-color: currentColor; }
     const db = document.createElement("button"); db.type = "button"; db.className = "dl"; db.textContent = "Lataa CSV";
     db.onclick = () => saveFile(`suhdannetilanne-${slug(c.title)}.csv`, toCSV([["Jakso", c.xlab, c.ylab], ...pts.map(i => [set.periods[i], X[i], Y[i]])]));
     fm.appendChild(db); addPng(db, card); card.appendChild(fm);
-    if (c.note) { const p = document.createElement("p"); p.className = "fnote"; p.textContent = c.note; linkSrc(p, c); card.appendChild(p); }
+    if (c.note) noteInto(card, null, c.note, null, c);
     return card;
   }
   function curveCard(c, narrow) {
@@ -2215,7 +2216,7 @@ footer .flinks .lnk:hover { text-decoration-color: currentColor; }
     const db = document.createElement("button"); db.type = "button"; db.className = "dl"; db.textContent = "Lataa CSV";
     db.onclick = () => saveFile(`suhdannetilanne-${slug(c.title)}.csv`, toCSV([["Maturiteetti", ...K.lines.map(l => `${l.label} ${l.date}`)], ...K.labels.map((m, i) => [m, ...K.lines.map(l => l.values[i])])]));
     fm.appendChild(db); addPng(db, card); card.appendChild(fm);
-    if (c.note) { const p = document.createElement("p"); p.className = "fnote"; p.textContent = c.note; linkSrc(p, c); card.appendChild(p); }
+    if (c.note) noteInto(card, null, c.note, null, c);
     return card;
   }
 
@@ -2254,7 +2255,7 @@ footer .flinks .lnk:hover { text-decoration-color: currentColor; }
     const db = document.createElement("button"); db.type = "button"; db.className = "dl"; db.textContent = "Lataa CSV";
     db.onclick = () => saveFile(`suhdannetilanne-${slug(c.title)}.csv`, toCSV([["Vuosi", ...K.groups.map(g => g.label + ", mrd. €")], ...K.years.map((y, i) => [y, ...K.groups.map(g => g.values[i])])]));
     fm.appendChild(db); addPng(db, card); card.appendChild(fm);
-    if (c.note) { const p = document.createElement("p"); p.className = "fnote"; p.textContent = c.note + ` Tilanne ${fmtD(K.updated)}.`; linkSrc(p, c); card.appendChild(p); }
+    if (c.note) noteInto(card, null, c.note + ` Tilanne ${fmtD(K.updated)}.`, null, c);
     return card;
   }
 
@@ -2332,9 +2333,10 @@ footer .flinks .lnk:hover { text-decoration-color: currentColor; }
     else { const f = document.createElement("div"); f.className = "ffoot"; f.appendChild(fv); card.appendChild(f); }
   }
   // huomautus: lahderivi aina nakyvissa; sen edessa nuoli, joka avaa alle selitteen ja paivityspaivan (PNG-kuvaan tulevat selite ja lahde)
-  function noteInto(card, fm, note, upd) {
-    const m = note.match(/^(.*?)\s*((?:Lähde|Lähteet):.*)$/s), expl = m ? m[1].trim() : "", src = m ? m[2] : note;
-    const ps = document.createElement("p"); ps.className = "fnote fsrc"; ps.textContent = src; linkSrc(ps, card._zc || {}); card.appendChild(ps);
+  function noteInto(card, fm, note, upd, c0) {
+    const m = note.match(/^(.*?)\s*((?:Lähde|Lähteet):.*)$/s); let expl = m ? m[1].trim() : "", src = m ? m[2] : note;
+    const m2 = src.match(/^((?:Lähde|Lähteet):[^.]*\.)\s+(\S.*)$/s); if (m2) { src = m2[1]; expl = (expl ? expl + " " : "") + m2[2]; }   // lahteen jalkeiset lauseet selitteeseen
+    const ps = document.createElement("p"); ps.className = "fnote fsrc"; ps.textContent = src; linkSrc(ps, c0 || card._zc || {}); card.appendChild(ps);
     if (!expl && !upd) return;
     const pn = document.createElement("div"); pn.className = "fpanel"; pn.hidden = true; pn.id = "fp" + Math.random().toString(36).slice(2, 9);
     if (expl) { const pe = document.createElement("p"); pe.className = "fnote fexpl"; pe.textContent = expl; pn.appendChild(pe); }
@@ -2510,7 +2512,11 @@ footer .flinks .lnk:hover { text-decoration-color: currentColor; }
       if (c.ts) card.querySelector(".fhead").appendChild(db); else fm.appendChild(db);   // aikasarjanakymassa kuten vasen kuvio: otsikkoriville
       addPng(db, card);
       if (fm.children.length) card.appendChild(fm);
-      if (c.note) noteInto(card, fm, c.note, !c.ts && (D.meta.seen || {})[set.id + "/" + c.lines[0]]);
+      if (c.note) {                                                     // selitteessa aina jotain: paivityspaiva, muuten viimeisin havainto
+        const upd = !c.ts && c.lines.map(id => (D.meta.seen || {})[set.id + "/" + id]).find(Boolean);
+        let li = -1; c.lines.forEach(id => { const v = (ser(id) || {}).values || []; for (let k = v.length - 1; k > li; k--) if (v[k] != null) { li = k; break; } });
+        const lp = li >= 0 ? (c.qlab ? "Q" + Math.ceil(+set.periods[li].slice(5, 7) / 3) + "/" + set.periods[li].slice(0, 4) : fmtP(set.periods[li])) : null;
+        noteInto(card, fm, !upd && lp && /^\s*(Lähde|Lähteet):/.test(c.note) ? `Viimeisin havainto ${lp}. ` + c.note : c.note, upd); }
       tgt.appendChild(card); if (main) { lastMainH = H2; lastLower = !!c.lower; }
 
       // kuviokohtainen alkuvuosi: indeksit paikallisia (i), jaettu hover globaali (i + i0)

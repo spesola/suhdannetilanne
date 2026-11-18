@@ -1222,6 +1222,10 @@ out$meta$checks <- CHECKS
 # ---------------------------------------------------------------------
 src_of <- function(s) { keep <- src_used; src_used <<- list(); src_walk(s); r <- src_used; src_used <<- keep
   if (!length(r)) return(NA_character_); p <- names(r)[1]; paste0(SRC_NAMES[[p]]$.n, ": ", sub(" ©.*$", "", r[[p]][1])) }   # tekijanoikeusmerkinta vain Lahteet-sivulle
+# suhdannenakyman sarjoille lahteen nimi aikasarjakuvion alaviitteeseen
+for (si in seq_along(out$sets)) for (j in seq_along(out$sets[[si]]$indicators)) {
+  s0 <- tryCatch(ser_cfg(out$sets[[si]]$indicators[[j]]$id), error = function(e) NULL)
+  if (!is.null(s0)) { sn <- src_of(s0); if (!is.na(sn)) out$sets[[si]]$indicators[[j]]$src <- sub(":.*$", "", sn) } }
 quad_of <- function(l, c) if (is.na(l) || is.na(c)) NA_character_ else if (l >= 0) (if (c >= 0) "up" else "turn") else (if (c < 0) "down" else "rec")
 base_id <- function(id) sub("_(qq|yy)$", "", sub("^h_", "", id))
 fmt_per <- function(p, q = FALSE) if (grepl("-Q", p)) paste0("Q", substr(p, 7, 7), "/", substr(p, 1, 4)) else if (q) paste0("Q", as.integer(substr(p, 6, 7)) %/% 3, "/", substr(p, 1, 4)) else paste0(as.integer(substr(p, 6, 7)), "/", substr(p, 1, 4))
