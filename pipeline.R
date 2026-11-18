@@ -1373,8 +1373,9 @@ for (si in seq_along(out$sets)) {
       for (i in seq_along(pp)) if (!is.null(c0$level[[i]]) && !is.null(c0$change[[i]])) o[[pp[i]]] <- list(l = c0$level[[i]], c = c0$change[[i]], d = "2026-11-15", b = 1)
       list(since = "2026-11-15", p = o) } }
   pp <- unlist(so$periods); lv <- so$composite$level; ch <- so$composite$change; nf <- 0
-  for (i in seq_along(pp)) if (!is.na(lv[i]) && !is.na(ch[i]) && is.null(fs$p[[pp[i]]])) { fs$p[[pp[i]]] <- list(l = lv[i], c = ch[i], d = today); nf <- nf + 1 }
-  keep <- tail(pp, 36); fs$p <- fs$p[names(fs$p) %in% keep]
+  keep <- tail(pp, 36)
+  for (i in which(pp %in% keep)) if (!is.na(lv[i]) && !is.na(ch[i]) && is.null(fs$p[[pp[i]]])) { fs$p[[pp[i]]] <- list(l = lv[i], c = ch[i], d = today); nf <- nf + 1 }
+  fs$p <- fs$p[names(fs$p) %in% keep]
   out$sets[[si]]$composite$first <- fs
   if (nf) message("Ensimmaiset arviot: ", nf, " uutta kuukautta (", so$id, ")")
 }
