@@ -2625,11 +2625,7 @@ footer .flinks .lnk:hover { text-decoration-color: currentColor; }
           hm.show(lab ? xs(iD) : null, it, fP(P[iD]));
         }
         if (S.length) {
-          const g = L[0][i], u = c.unit === "%" ? " %" : c.unit ? " " + c.unit : "";
-          const sgn = v => c.lvl ? "" : v > 0 ? "+" : "";                 // lvl: pinotut tasot, ei etumerkkia
-          const yy = c.yy && ser(c.yy) ? ser(c.yy).values[i] : null, yyT = yy != null ? ` (${yy > 0 ? "+" : ""}${fmtV(yy, 1)} % v/v)` : "";
-          if (valEl) valEl.innerHTML = `${fP(P[i])}: ` + c.lines.map((id, k) => { const v = L[k][i];   // useampi viiva: esim. YKHI ja KHI
-            return `${c.lines.length > 1 ? siTag(lbl(id), colOf[id], (c.dash || []).includes(id) ? "ds" : "") + " " : ""}<b>${sgn(v)}${fmtV(v, (c.decs || {})[id] ?? c.dec)}${u}</b>`; }).join(", ") + yyT;
+          if (valEl) valEl.innerHTML = "";                                   // pinotut: arvo nakyy erittelyssa ja hoverissa, ei alakulmaan
           const su = c.stackUnit != null ? c.stackUnit : "%-yks.";
           subEl.classList.toggle("lgd", !erit);
           subEl.hidden = erit; if (!erit) {                                 // pelkka selite: nimet ja varit; arvot nakyvat hoverissa kuvion sisalla
@@ -2669,7 +2665,7 @@ footer .flinks .lnk:hover { text-decoration-color: currentColor; }
         const side = document.createElement("div"); side.className = "card fcard side";
         const su0 = c.stackUnit != null ? c.stackUnit : "%-yks.";
         side.innerHTML = `<div class="fhead"><h3>Erittely</h3><span class="fval"></span></div><div class="brk"></div>`;
-        (sideLeft ? $("grSide") : tgt).appendChild(side);
+        (col ? $("grSide") : tgt).appendChild(side);                    // kasvunakyma: oma sivupalsta; muut: kuvion viereen (ei globaalia tilaa, joka jai voimaan nakymaa vaihdettaessa)
         const bx = side.querySelector(".brk"), sv = side.querySelector(".fval"), u = c.unit === "%" ? " %" : c.unit ? " " + c.unit : "";
         const sg = (v, d) => (v == null ? "–" : (!c.lvl && +v.toFixed(d) > 0 ? "+" : "") + fmtV(v, d));
         const draw = h => {
