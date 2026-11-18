@@ -1922,6 +1922,10 @@ footer .flinks .lnk:hover { text-decoration-color: currentColor; }
       scrollTo({ top: t.getBoundingClientRect().top + scrollY - bar - 16 }); }, 120); }
   // sivuston muutokset: uudet kuviot ja muut isommat lisaykset (kasin yllapidetty, uusin ensin); set + id -> linkki kuvioon
   const CHANGES = [
+    { d: "2026-11-18", t: "Rahoitusmarkkinat: rahoitusolot-taulukko sivun alkuun", set: "Rahoitusmarkkinat" },
+    { d: "2026-11-18", t: "Pörssiosakkeiden markkina-arvo", set: "Rahoitusmarkkinat", id: "osake_mv" },
+    { d: "2026-11-18", t: "Epävarmuusindeksit samaan kuvioon, Fed ohjauskorkokuvioon, Japani pois", set: "Rahoitusmarkkinat" },
+    { d: "2026-11-18", t: "Yksiviivaisista kuvioista arvorivi pois (arvot hoverissa)" },
     { d: "2026-11-18", t: "Uusi logo ja sivustokuvake: vaiheet kiertävät kehää kuten suhdannekartassa" },
     { d: "2026-11-18", t: "Julkinen talous: yleiskuvataulukko sivun alkuun", set: "Julkinen talous" },
     { d: "2026-11-18", t: "Rahoitusasema alasektoreittain: kunnat ja hyvinvointialueet erikseen", set: "Julkinen talous", id: "jt_b9_hva" },
@@ -2128,11 +2132,11 @@ footer .flinks .lnk:hover { text-decoration-color: currentColor; }
   // sarjan keskiarvoon (voimakkuus keskihajonnoissa, taysi vari kahdesta). inv: korkea taso heikentaa, neutral: ei suuntaa.
   // Rivi vie kuvioon, jossa sarja on.
   function qtableCard(c, narrow, box) {
-    const ser = id => set.series.find(x => x.id === id), P = set.periods, qi = P.map((p, k) => /-(03|06|09|12)$/.test(p) ? k : -1).filter(k => k >= 0);
+    const ser = id => set.series.find(x => x.id === id), P = set.periods, qi = P.map((p, k) => c.monthly || /-(03|06|09|12)$/.test(p) ? k : -1).filter(k => k >= 0);   // monthly: kaikki kuukaudet
     const rows = c.rows.filter(r => ser(r.id));
     const lastQ = Math.max(...rows.map(r => { const v = ser(r.id).values; for (let j = qi.length - 1; j >= 0; j--) if (v[qi[j]] != null) return j; return -1; }));
     const w = box.clientWidth || 1000, N = w > 1000 ? 12 : w > 760 ? 10 : 8, js = qi.slice(Math.max(0, lastQ - N + 1), lastQ + 1);
-    const fq = k => "Q" + Math.ceil(+P[k].slice(5, 7) / 3) + "/" + P[k].slice(0, 4);
+    const fq = k => c.monthly ? fmtP(P[k]) : "Q" + Math.ceil(+P[k].slice(5, 7) / 3) + "/" + P[k].slice(0, 4);
     const card = document.createElement("div"); card.className = "card fcard wide qcard";
     let h = `<div class="fhead"><h3>${c.title}</h3></div><div class="hmwrap"><table class="hm"><thead><tr><th></th>${js.map(k => `<th title="${fq(k)}">${fq(k).replace(/\/20(\d\d)$/, "/$1")}</th>`).join("")}</tr></thead><tbody>`;
     rows.forEach((r, ri) => {
@@ -2578,7 +2582,9 @@ footer .flinks .lnk:hover { text-decoration-color: currentColor; }
 
       // kuviokohtainen alkuvuosi: indeksit paikallisia (i), jaettu hover globaali (i + i0)
       const i0 = c.from ? Math.max(0, set.periods.indexOf(c.from + "-01")) : 0, P = set.periods.slice(i0), n = P.length;
-      const L = c.lines.map(id => ser(id).values.slice(i0)), B = c.bars ? ser(c.bars).values.slice(i0) : null;
+      const L = c.lines.map(id => { const a = ser(id).values.slice(i0); if (!c.std) return a;   // std: kukin sarja keskihajontoina omasta keskiarvostaan
+        const v = a.filter(x => x != null), mu = v.reduce((s, x) => s + x, 0) / v.length, sd = Math.sqrt(v.reduce((s, x) => s + (x - mu) ** 2, 0) / Math.max(1, v.length - 1)) || 1;
+        return a.map(x => x == null ? null : (x - mu) / sd); }), B = c.bars ? ser(c.bars).values.slice(i0) : null;
       const LW = c.lower && ser(c.lower.bars) ? ser(c.lower.bars).values.slice(i0) : null;
       const pb = LW ? mt + (H2 - mt - mb) * 0.66 : H2 - mb;               // paakuvion alareuna; alle jaa alapaneeli
       const S = (c.stack || []).map(id => ser(id).values.slice(i0));
@@ -2711,9 +2717,8 @@ footer .flinks .lnk:hover { text-decoration-color: currentColor; }
           subEl.innerHTML = c.lines.map(id => siTag(lbl(id) + ((c.y2 || []).includes(id) ? " (oik.)" : ""), colOf[id], (c.dash || []).includes(id) ? "ds" : "")).join(" ") +
             (c.avg ? ` <span class="sunit">(neljänneksen keskiarvo)</span>` : "");
         } else {
-          const a = L[0]; let j = i; while (j > 0 && a[j] == null) j--;
-          if (valEl) valEl.innerHTML = "";
-          subEl.innerHTML = `${fP(P[j])}: <b>${withU(a[j], c)}</b>`;
+          if (valEl) valEl.innerHTML = "";                                   // yksi viiva: ei arvoriviä, arvo hoverissa kuvion sisalla
+          subEl.innerHTML = ""; subEl.hidden = true;
         }
         if (c.hdr && valEl) {                                              // valitun rivin kasvu, sama kaikissa kuvioissa
           const gy = ser(c.hdr + "_yy").values, gq = ser(c.hdr + "_qq").values, has = j => gy[j] != null || gq[j] != null;

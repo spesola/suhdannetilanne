@@ -1573,6 +1573,80 @@
       "from": 2000,
       "charts": [
         {
+          "id": "r_olot",
+          "type": "qtable",
+          "monthly": true,
+          "section": "Rahoitusolot",
+          "title": "Rahoitusolot kuukausittain",
+          "dec": 2,
+          "rows": [
+            {
+              "id": "euribor3m",
+              "label": "3 kk Euribor, %",
+              "inv": true
+            },
+            {
+              "id": "reaali_lyh",
+              "label": "Reaalinen 3 kk Euribor, %",
+              "inv": true,
+              "sign": true
+            },
+            {
+              "id": "asuntokorko",
+              "label": "Uusien asuntolainojen korko, %",
+              "inv": true
+            },
+            {
+              "id": "yrityskorko",
+              "label": "Uusien yrityslainojen korko, %",
+              "inv": true
+            },
+            {
+              "id": "riskilisa",
+              "label": "Riskilisä Saksaan, %-yks.",
+              "inv": true,
+              "gap_after": true
+            },
+            {
+              "id": "kanta_kotit",
+              "label": "Lainakanta, kotitaloudet, v/v %",
+              "sign": true,
+              "dec": 1
+            },
+            {
+              "id": "kanta_yrit",
+              "label": "Lainakanta, yritykset, v/v %",
+              "sign": true,
+              "dec": 1,
+              "gap_after": true
+            },
+            {
+              "id": "osake_yy",
+              "label": "Pörssiosakkeiden arvo, v/v %",
+              "sign": true,
+              "dec": 1
+            },
+            {
+              "id": "clifs",
+              "label": "Rahoitusstressi (CLIFS)",
+              "inv": true
+            },
+            {
+              "id": "vstoxx",
+              "label": "Osakevolatiliteetti (VSTOXX)",
+              "inv": true,
+              "dec": 1
+            },
+            {
+              "id": "eer",
+              "label": "Euron efektiivinen kurssi",
+              "inv": true,
+              "dec": 1
+            }
+          ],
+          "note": "Väri kertoo, ovatko rahoitusolot tason perusteella tiukemmat vai väljemmät kuin sarjan keskiarvo vuodesta 2000 (lainakanta vuodesta 2011). Korot, riskilisä, rahoitusstressi, volatiliteetti ja vahva euro kiristävät; lainakannan ja osakkeiden arvon kasvu väljentää. Klikkaa riviä nähdäksesi kuvion. Lähteet: EKP, Suomen Pankki, STOXX."
+        },
+        {
           "id": "t_korot",
           "type": "table",
           "section": "Korot ja rahapolitiikka",
@@ -1660,20 +1734,22 @@
         },
         {
           "id": "lyhyt",
-          "title": "Ohjauskorko ja Euribor",
+          "title": "Ohjauskorot ja Euribor",
           "size": "half",
           "unit": "%",
           "dec": 2,
           "lines": [
             "euribor3m",
             "dfr",
+            "fed",
             "fwd1y",
             "fwd2y"
           ],
           "step": [
-            "dfr"
+            "dfr",
+            "fed"
           ],
-          "note": "Euribor kuukausikeskiarvo, forward-korot kuun viimeinen havainto. Lähde: EKP.",
+          "note": "Euribor kuukausikeskiarvo, forward-korot kuun viimeinen havainto. Fed: liittovaltion ohjauskoron vaihteluvälin yläraja. Lähteet: EKP, FRED.",
           "section": "Korot ja rahapolitiikka",
           "dash": [
             "fwd1y",
@@ -1681,7 +1757,8 @@
           ],
           "labels": {
             "fwd1y": "Markkinat: 1 v päästä",
-            "fwd2y": "Markkinat: 2 v päästä"
+            "fwd2y": "Markkinat: 2 v päästä",
+            "fed": "Fed (Yhdysvallat)"
           }
         },
         {
@@ -1709,38 +1786,15 @@
           "lines": [
             "fi10y",
             "de10y",
-            "us10y",
-            "jp10y"
+            "us10y"
           ],
           "labels": {
             "fi10y": "Suomi",
             "de10y": "Saksa"
           },
-          "note": "Kuukausikeskiarvot. Lähteet: EKP, FRED, OECD.",
+          "note": "Kuukausikeskiarvot. Lähteet: EKP, FRED.",
           "section": "Korot ja rahapolitiikka",
           "size": "half"
-        },
-        {
-          "id": "ohjausmaat",
-          "section": "Korot ja rahapolitiikka",
-          "title": "Ohjauskorot",
-          "size": "half",
-          "unit": "%",
-          "dec": 2,
-          "lines": [
-            "dfr",
-            "fed",
-            "jp_short"
-          ],
-          "step": [
-            "dfr"
-          ],
-          "labels": {
-            "dfr": "Euroalue (EKP:n talletuskorko)",
-            "fed": "Yhdysvallat",
-            "jp_short": "Japani"
-          },
-          "note": "Lähteet: EKP, FRED, OECD."
         },
         {
           "id": "ekp_tase",
@@ -2031,53 +2085,36 @@
           }
         },
         {
-          "id": "epu",
-          "title": "Talouspoliittinen epävarmuus",
+          "id": "epavarmuus",
+          "title": "Epävarmuus ja geopoliittinen riski, standardoitu",
           "unit": "",
-          "dec": 0,
+          "dec": 1,
+          "std": true,
           "lines": [
-            "epu"
-          ],
-          "note": "Lähde: Baker, Bloom ja Davis, FRED.",
-          "section": "Riskit ja epävarmuus",
-          "size": "half"
-        },
-        {
-          "id": "tpu",
-          "title": "Kauppapoliittinen epävarmuus",
-          "unit": "",
-          "dec": 0,
-          "lines": [
-            "tpu"
-          ],
-          "from": 2000,
-          "note": "Uutisiin perustuva indeksi (Yhdysvallat). Lähde: Caldara, Iacoviello ym.",
-          "section": "Riskit ja epävarmuus",
-          "size": "half"
-        },
-        {
-          "id": "gpr",
-          "title": "Geopoliittinen riski",
-          "unit": "",
-          "dec": 0,
-          "lines": [
+            "epu",
+            "tpu",
             "gpr",
             "gpr_fin"
           ],
-          "y2": [
+          "from": 2000,
+          "labels": {
+            "epu": "Talouspoliittinen epävarmuus",
+            "tpu": "Kauppapoliittinen epävarmuus",
+            "gpr": "Geopoliittinen riski, maailma",
+            "gpr_fin": "Geopoliittinen riski, Suomi"
+          },
+          "colors": {
+            "epu": "var(--fg)",
+            "tpu": "var(--accent)",
+            "gpr": "var(--q-turn)",
+            "gpr_fin": "var(--q-down)"
+          },
+          "dash": [
             "gpr_fin"
           ],
-          "labels": {
-            "gpr": "Maailma (1985–2019 = 100)",
-            "gpr_fin": "Suomi (% uutisista)"
-          },
-          "from": 2000,
-          "note": "3 kk liukuva keskiarvo. Uutisiin perustuva indeksi; Suomi: Suomen mainitsevien geopoliittisen riskin uutisten osuus kaikista uutisista. Lähde: Caldara ja Iacoviello.",
+          "note": "Uutisiin perustuvat indeksit, kukin suhteessa omaan keskiarvoonsa vuodesta 2000, keskihajontaa. Kauppapoliittinen epävarmuus perustuu Yhdysvaltain uutisiin. Geopoliittinen riski 3 kk liukuva keskiarvo; Suomi: Suomen mainitsevien geopoliittisen riskin uutisten osuus kaikista uutisista. Lähteet: Baker, Bloom ja Davis (FRED), Caldara ja Iacoviello ym.",
           "section": "Riskit ja epävarmuus",
-          "size": "half",
-          "decs": {
-            "gpr_fin": 2
-          }
+          "size": "half"
         },
         {
           "id": "vol",
@@ -2092,17 +2129,40 @@
           "note": "Optioiden hinnoista johdettu odotettu volatiliteetti, kuukausikeskiarvo. Lähteet: STOXX, Cboe (FRED).",
           "section": "Riskit ja epävarmuus",
           "size": "half"
+        },
+        {
+          "id": "osakkeet",
+          "title": "Pörssiosakkeiden markkina-arvo",
+          "unit": "",
+          "dec": 1,
+          "lines": [
+            "osake_mv",
+            "osake_yy"
+          ],
+          "y2": [
+            "osake_yy"
+          ],
+          "from": 2001,
+          "labels": {
+            "osake_mv": "Markkina-arvo, mrd. €",
+            "osake_yy": "Vuosimuutos, % (oik.)"
+          },
+          "colors": {
+            "osake_mv": "var(--fg)",
+            "osake_yy": "var(--accent)"
+          },
+          "note": "Suomalaisten yritysten pörssinoteerattujen osakkeiden markkina-arvo kuukauden lopussa. Muutokseen vaikuttavat hintojen lisäksi osakeannit ja listautumiset, joten se ei ole puhdas hintaindeksi. Lähde: Suomen Pankki.",
+          "section": "Riskit ja epävarmuus",
+          "size": "half"
         }
       ],
       "colors": {
         "euribor3m": "var(--fg)",
         "dfr": "var(--q-turn)",
         "us10y": "#b5523b",
-        "jp10y": "var(--g3)",
         "fwd1y": "var(--accent)",
         "fwd2y": "var(--g2)",
         "fed": "#b5523b",
-        "jp_short": "var(--g3)",
         "asuntokorko": "var(--accent)",
         "uudet_asunto": "var(--accent)",
         "kanta_kotit": "var(--accent)",
@@ -4546,29 +4606,11 @@
       "kind": "level"
     },
     {
-      "id": "jp10y",
-      "label": "Japani",
-      "set": "rahoitus",
-      "source": "fred",
-      "fred_id": "IRLTLT01JPM156N",
-      "handling": "none",
-      "kind": "level"
-    },
-    {
       "id": "fed",
       "label": "Yhdysvallat (Fed)",
       "set": "rahoitus",
       "source": "fred",
       "fred_id": "FEDFUNDS",
-      "handling": "none",
-      "kind": "level"
-    },
-    {
-      "id": "jp_short",
-      "label": "Japani",
-      "set": "rahoitus",
-      "source": "fred",
-      "fred_id": "IRSTCI01JPM156N",
       "handling": "none",
       "kind": "level"
     },
@@ -4779,6 +4821,27 @@
       "key": "M.A.0.C.A2A.A.A.U2.2250.ZZ.EUR.H.A.0.A.0.A.0",
       "roll": 12,
       "mult": 0.001,
+      "handling": "none",
+      "kind": "level"
+    },
+    {
+      "id": "osake_mv",
+      "label": "Markkina-arvo, mrd. €",
+      "set": "rahoitus",
+      "source": "bof",
+      "dataset": "BOF_CSEC_SHR_PUBL",
+      "key": "M.N.FI.W0.S1.S1.N.L.LE.F511._Z._Z.EUR._T.M.V.N._T",
+      "mult": 0.001,
+      "handling": "none",
+      "kind": "level"
+    },
+    {
+      "id": "osake_yy",
+      "label": "Markkina-arvon vuosimuutos, %",
+      "set": "rahoitus",
+      "source": "bof",
+      "dataset": "BOF_CSEC_SHR_PUBL",
+      "key": "M.N.FI.W0.S1.S1.N.L.LE.F511._Z._Z.PCCH._T.M.V.F12._T",
       "handling": "none",
       "kind": "level"
     },

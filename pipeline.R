@@ -47,7 +47,13 @@ idx_per <- function(i, freq) {
   else             sprintf("%04d-Q%d",  i %/% 4,  i %% 4 + 1)
 }
 
+# EKP: edellisen ajon kayttamat osoitteet haetaan ajon alussa rinnakkain (ECB_PRE); muut haut kuten ennenkin
+ECB_PRE <- new.env(); ECB_LOG <- character()
 get_text <- function(url) {
+  if (startsWith(url, ECB)) { ECB_LOG <<- c(ECB_LOG, url); if (!is.null(ECB_PRE[[url]])) return(ECB_PRE[[url]]) }
+  get_text_net(url)
+}
+get_text_net <- function(url) {
   px <- grepl("pxdata.stat.fi", url, fixed = TRUE)   # Tilastokeskus rajoittaa kyselytiheytta (429): odota rajoitusikkuna yli
   r <- RETRY("GET", url, timeout(40), times = if (px) 5 else 3, pause_base = if (px) 5 else 2, pause_min = if (px) 11 else 1, quiet = TRUE)
   stop_for_status(r)
@@ -712,6 +718,12 @@ clock_series <- function(d, s, freq) {
 cfg  <- fromJSON(CFG_PATH, simplifyVector = FALSE)
 r3   <- function(x) ifelse(is.na(x), NA, round(x, 3))
 
+ECB_URLS <- file.path(CACHE_DIR, "ecb_urls.txt")
+if (file.exists(ECB_URLS) && .Platform$OS.type == "unix") local({
+  u <- unique(readLines(ECB_URLS)); t0 <- Sys.time()
+  r <- parallel::mclapply(u, function(x) tryCatch(get_text_net(x), error = function(e) NULL), mc.cores = 4)
+  ok <- 0; for (k in seq_along(u)) if (is.character(r[[k]])) { assign(u[k], r[[k]], envir = ECB_PRE); ok <- ok + 1 }
+  message(sprintf("EKP: %d/%d hakua rinnakkain, %.0f s", ok, length(u), as.numeric(difftime(Sys.time(), t0, units = "secs")))) })
 sets_out <- list()
 # ---------------------------------------------------------------------
 # Tilannetaulukko: viimeisin arvo ja muutos 1 pv, 1 vk ja vuoden alusta
@@ -1078,7 +1090,7 @@ SRC_NAMES <- list(
                   ei_bsin_q_r2 = "kapasiteetin käyttöaste", sts_trtu_m = "vähittäiskaupan liikevaihto", sts_setu_m = "palvelujen liikevaihto",
                   prc_hicp_minr = "YKHI", prc_hicp_iw = "YKHI-painot", namq_10_gdp = "BKT vertailumaissa", namq_10_lp_ulc = "yksikkötyökustannukset",
                   bop_c6_q = "maksutase", ext_st_27_2020msbec = "tavarakauppa", gov_10q_ggnfa = "julkisyhteisöjen verotulot"),
-  bof      = list(.n = "Suomen Pankki", .all = "luotonanto ja lainojen korot"),
+  bof      = list(.n = "Suomen Pankki", .all = "luotonanto, lainojen korot ja pörssiosakkeet"),
   ecb      = list(.n = "EKP", FM = "markkinakorot", EST = "€STR", YC = "tuottokäyrä", IRS = "valtionlainojen korot", EXR = "valuuttakurssit",
                   CISS = "rahoitusstressi", CLIFS = "rahoitusstressi", BLS = "pankkien luotonantokysely", SPF = "ammattiennustajien kysely",
                   ILM = "Eurojärjestelmän viikkotase", BSI = "rahan määrä ja luotonanto"),
@@ -1366,6 +1378,7 @@ for (si in seq_along(out$sets)) {
   out$sets[[si]]$composite$first <- fs
   if (nf) message("Ensimmaiset arviot: ", nf, " uutta kuukautta (", so$id, ")")
 }
+if (length(ECB_LOG)) { dir.create(CACHE_DIR, showWarnings = FALSE); writeLines(unique(ECB_LOG), ECB_URLS) }   # seuraavan ajon esihaku
 writeLines(toJSON(out, auto_unbox = TRUE, na = "null", null = "null", digits = NA), OUT_PATH)
 message("Kirjoitettu ", OUT_PATH)
 
