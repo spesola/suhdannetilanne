@@ -201,7 +201,7 @@ body { font-variant-numeric: tabular-nums; background: var(--bg); min-height: 10
 .shead { display: flex; justify-content: space-between; gap: 8px; font-size: 0.78rem; color: var(--muted); }
 /* vaihe: iso nimi, rivit neliöinä (yksi neliö per sarja), valittuun kuukauteen siirtyneet kehystettyinä */
 .phx { width: 560px; max-width: 100%; }
-.phl { font-size: 0.78rem; color: var(--muted); margin: 0 0 2px; }
+.phl { font-size: 0.75rem; font-weight: 600; letter-spacing: .09em; text-transform: uppercase; color: var(--muted); margin: 0 0 4px; }   /* tunniste: sama kuin osion nimi ja alatunnisteen otsikot */
 .phb { display: flex; align-items: baseline; flex-wrap: wrap; gap: 4px 14px; margin: 0 0 18px; }
 .phb b { font-size: 3.1rem; font-weight: 600; letter-spacing: -0.03em; line-height: 1; color: var(--qc); }
 .phb em { font-style: normal; font-size: 0.875rem; color: var(--muted); }
@@ -565,7 +565,7 @@ button.dl:hover { text-decoration-color: var(--fg); }
 .fsec { grid-column: 1 / -1; font-size: 0.75rem; line-height: 1.3; letter-spacing: .09em; text-transform: uppercase; color: var(--muted); font-weight: 600; margin: 40px 0 -30px; scroll-margin-top: 64px; }   /* osion nimi pienena tunnisteena, ei omaa viivaa */
 .fsec:first-child { margin-top: 0; }
 .secnav + .fsec { height: 0; margin: -28px 0 -34px; overflow: hidden; visibility: hidden; }   /* ensimmainen osio = ensimmainen valilehti: nimi piiloon, sijainti jaa vieritysta varten */
-.fsec[role="button"] { cursor: pointer; display: flex; align-items: center; gap: 10px; user-select: none; }
+.fsec[role="button"] { cursor: pointer; display: flex; align-items: center; gap: 8px; user-select: none; font-size: 1rem; letter-spacing: 0; text-transform: none; color: var(--fg); border-top: 1px solid var(--line); padding-top: 14px; }   /* avattava osio: sama kuin Aikasarjat ja Taulukko */
 .fsec .chev { color: var(--muted); display: flex; }
 .fsec .chev svg { fill: none; stroke: currentColor; stroke-width: 1.6; stroke-linecap: round; stroke-linejoin: round; transition: transform .2s; }
 .fsec[aria-expanded="true"] .chev svg { transform: rotate(90deg); }
@@ -599,7 +599,6 @@ button.dl:hover { text-decoration-color: var(--fg); }
 /* erittely ja tunnusluvut: tiivis tukikortti, paakuvio saa tilan */
 .fcard.side { padding-top: 14px; }
 .fcard.side .fhead h3 { font-size: 1rem; }
-.fcard.side .fval { font-size: 0.78rem; }
 .fcard.side .brk { margin-top: 10px; gap: 6px 12px; font-size: 0.875rem; grid-template-columns: minmax(0, 1fr) 34% auto; }   /* kapea palsta: nimille enemman tilaa */
 .fcard.side .brk .bb { height: 12px; }
 .fcard.side .brk .bb::before { top: -2px; bottom: -2px; }
@@ -675,7 +674,7 @@ table.snap { width: 100%; border-collapse: collapse; font-size: 0.875rem; font-v
 @media (max-width: 560px) { .snap { font-size: 0.78rem; } .snap th, .snap td { padding: 6px 3px; } .snap thead th { white-space: normal; } .snap .dt { display: block; margin-left: 0; }
   .snap tbody th { overflow-wrap: anywhere; } .snap thead th:nth-child(3), .snap tbody td:nth-child(3) { display: none; } }
 .fhead h3 { font-family: var(--font-body); font-weight: 600; font-size: 1rem; margin: 0; text-wrap: balance; }
-.fval { font-family: var(--font-data); font-size: 0.875rem; color: var(--muted); font-variant-numeric: tabular-nums; }
+.fval { font-family: var(--font-data); font-size: 0.78rem; color: var(--muted); font-variant-numeric: tabular-nums; }
 .fval b { font-weight: 500; font-size: 1rem; color: var(--fg); }
 .fsub { color: var(--muted); font-size: 0.78rem; margin: 2px 0 0; min-height: 1.2em; }
 .fsub .si { white-space: nowrap; }
@@ -739,7 +738,7 @@ table.hm { border-collapse: separate; border-spacing: 2px; font-variant-numeric:
 footer { color: var(--muted); font-size: 0.875rem; line-height: 1.6; border-top: 1px solid var(--rule); padding: 28px 0 24px; margin-top: 48px;
   display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.7fr) minmax(0, 1fr); gap: 28px 40px; }
 footer p { margin: 0 0 8px; } footer p:last-child { margin-bottom: 0; }
-footer .fh { font-size: 0.6875rem; font-weight: 600; letter-spacing: 0.09em; text-transform: uppercase; color: var(--fg); margin: 0 0 12px; }
+footer .fh { font-size: 0.75rem; font-weight: 600; letter-spacing: 0.09em; text-transform: uppercase; color: var(--muted); margin: 0 0 12px; }
 footer .fbrand { display: flex; align-items: center; gap: 9px; color: var(--fg); font-weight: 700; font-size: 1rem; letter-spacing: -0.02em; margin-bottom: 14px; }
 footer .fbrand svg { width: 22px; height: 22px; flex: none; }
 footer .flinks { display: flex; flex-direction: column; align-items: flex-start; gap: 6px; }
@@ -1484,7 +1483,7 @@ footer .flinks .lnk:hover { text-decoration-color: currentColor; }
       if (v == null) return `<td class="na">–</td>`;
       const t = Math.min(1, Math.abs(v) / 2.5), base = v >= 0 ? "var(--q-up)" : "var(--q-down)";
       const ar = !lvl || c == null ? "" : `<span class="ar">${c >= 0 ? "▲" : "▼"}</span>`;
-      return `<td class="hc${t < 0.35 ? " lo" : ""}" style="--hc:${base};--hp:${Math.round(8 + 52 * t)}%;--hv:${Math.round(22 + 48 * t)}%" ${s ? tipA(s, k, `taso ${l == null ? "–" : fmtN(l)}, muutos ${c == null ? "–" : fmtN(c)}`) : ""}${nw}>${fmtN(v)}${ar}</td>`;
+      return `<td class="hc${t < 0.35 ? " lo" : ""}" style="--hc:${base};--hp:${Math.round(8 + 45 * t)}%;--hv:${Math.round(22 + 48 * t)}%" ${s ? tipA(s, k, `taso ${l == null ? "–" : fmtN(l)}, muutos ${c == null ? "–" : fmtN(c)}`) : ""}${nw}>${fmtN(v)}${ar}</td>`;
     };
     let h = `<thead><tr><th></th>${cols.map(p => `<th>${fmtP(p)}</th>`).join("")}</tr></thead><tbody>`;
     const nm = s => s.comp ? s.label : (s.list || s.label);
@@ -1584,7 +1583,7 @@ footer .flinks .lnk:hover { text-decoration-color: currentColor; }
             rl = `<small class="rv${d === 0 ? " z" : ""}">${d > 0 ? "+" : ""}${fmtV(d, 1)}</small>`;
             if (d !== 0) ta = ` data-tip="${r.label}, ${fmtP(p)}" data-sub="aiemmin ${+rv.vals[p].toFixed(1) > 0 ? "+" : ""}${fmtV(rv.vals[p], 1)}\nrevisio ${new Date(rv.date + "T12:00:00").toLocaleDateString("fi-FI")}"`; } }
         const t = Math.min(1, Math.abs(v) / (2 * sd)), base = r.neutral ? "var(--accent)" : (v >= 0) !== !!r.invert ? "var(--q-up)" : "var(--q-down)";
-        return `<td class="hc${t < 0.35 ? " lo" : ""}" style="--hc:${base};--hp:${Math.round(6 + (r.neutral ? 34 : 46) * t)}%;--hv:${Math.round(22 + 48 * t)}%"${ta}>${+v.toFixed(1) > 0 ? "+" : ""}${fmtV(v, 1)}${rl}</td>`;
+        return `<td class="hc${t < 0.35 ? " lo" : ""}" style="--hc:${base};--hp:${Math.round(6 + (r.neutral ? 30 : 40) * t)}%;--hv:${Math.round(22 + 48 * t)}%"${ta}>${+v.toFixed(1) > 0 ? "+" : ""}${fmtV(v, 1)}${rl}</td>`;
       }).join("") + "</tr>" + (r.gap_after && r !== rows[rows.length - 1] ? `<tr class="gap" aria-hidden="true"><td colspan="${cols.length + 1}"></td></tr>` : "");
     });
     $("grTable").innerHTML = h + "</tbody>";
@@ -2154,7 +2153,7 @@ footer .flinks .lnk:hover { text-decoration-color: currentColor; }
         const e = v[k] - mu, tt = Math.min(1, Math.abs(e) / (2 * sd)), d = yd(k);
         const base = r.neutral ? "var(--accent)" : (e >= 0) !== !!r.inv ? "var(--q-up)" : "var(--q-down)";
         const sub = d == null ? "" : `muutos vuodessa ${+d.toFixed(dec) > 0 ? "+" : ""}${fmtV(d, dec)} %-yks.`;
-        return `<td class="hc${tt < 0.35 ? " lo" : ""}" style="--hc:${base};--hp:${Math.round(6 + (r.neutral ? 30 : 46) * tt)}%;--hv:${Math.round(22 + 48 * tt)}%" data-tip="${r.label}, ${fq(k)}" data-sub="${sub}">${r.sign && +v[k].toFixed(dec) > 0 ? "+" : ""}${fmtV(v[k], dec)}</td>`; }).join("") + "</tr>" +
+        return `<td class="hc${tt < 0.35 ? " lo" : ""}" style="--hc:${base};--hp:${Math.round(6 + (r.neutral ? 26 : 40) * tt)}%;--hv:${Math.round(22 + 48 * tt)}%" data-tip="${r.label}, ${fq(k)}" data-sub="${sub}">${r.sign && +v[k].toFixed(dec) > 0 ? "+" : ""}${fmtV(v[k], dec)}</td>`; }).join("") + "</tr>" +
         (r.gap_after && ri < rows.length - 1 ? `<tr class="gap" aria-hidden="true"><td colspan="${js.length + 1}"></td></tr>` : "");
     });
     card.innerHTML = h + "</tbody></table></div>";
