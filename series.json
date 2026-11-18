@@ -2121,6 +2121,78 @@
       "from": 2000,
       "charts": [
         {
+          "id": "jt_yk",
+          "type": "qtable",
+          "section": "Yleiskuva",
+          "title": "Julkinen talous neljänneksittäin, % BKT:stä",
+          "dec": 1,
+          "rows": [
+            {
+              "id": "jt_b9",
+              "label": "Rahoitusasema",
+              "tot": true,
+              "sign": true
+            },
+            {
+              "id": "jt_b9_val",
+              "label": "Valtionhallinto",
+              "sub": true,
+              "sign": true
+            },
+            {
+              "id": "jt_b9_kun",
+              "label": "Kunnat",
+              "sub": true,
+              "sign": true
+            },
+            {
+              "id": "jt_b9_hva",
+              "label": "Hyvinvointialueet",
+              "sub": true,
+              "sign": true
+            },
+            {
+              "id": "jt_b9_ssr",
+              "label": "Sosiaaliturvarahastot",
+              "sub": true,
+              "sign": true,
+              "gap_after": true
+            },
+            {
+              "id": "jt_tr",
+              "label": "Tulot",
+              "neutral": true
+            },
+            {
+              "id": "jt_te",
+              "label": "Menot",
+              "inv": true
+            },
+            {
+              "id": "jt_veroaste",
+              "label": "Veroaste",
+              "neutral": true,
+              "gap_after": true
+            },
+            {
+              "id": "jt_velka",
+              "label": "Velka (EDP)",
+              "inv": true
+            },
+            {
+              "id": "jt_nv",
+              "label": "Nettovelka",
+              "inv": true
+            },
+            {
+              "id": "jt_korko_bkt",
+              "label": "Korkomenot",
+              "inv": true
+            }
+          ],
+          "note": "Rahoitusasema, tulot, menot ja korkomenot neljän neljänneksen liukuvina summina suhteessa BKT:hen; velka ja nettovelka neljänneksen lopussa. Värin voimakkuus kertoo muutoksen vuodentakaisesta suhteessa sarjan tavanomaiseen vuosimuutokseen (pl. 2020–2021): värin suunta kertoo, vahvistaako muutos julkista taloutta vai heikentääkö se. Tuloissa ja veroasteessa väri on neutraali. Kunnat: paikallishallinto pl. hyvinvointialueet. Klikkaa riviä nähdäksesi kuvion. Lähde: Tilastokeskus."
+        },
+        {
           "id": "jt_b9",
           "section": "Rahoitusasema",
           "title": "Rahoitusasema alasektoreittain, % BKT:stä",
@@ -2134,11 +2206,12 @@
           "colors": {
             "jt_b9": "var(--fg)"
           },
-          "note": "Neljän neljänneksen liukuva summa suhteessa BKT:hen. Paikallishallinto sisältää vuodesta 2023 hyvinvointialueet. Lähde: Tilastokeskus.",
+          "note": "Neljän neljänneksen liukuva summa suhteessa BKT:hen. Kunnat: paikallishallinto pl. hyvinvointialueet; sisältää myös Helsingin sosiaali- ja terveyspalvelut, joten jako ei vastaa täysin tehtäväjakoa. Hyvinvointialueet vuodesta 2023, jolloin sosiaali- ja terveyspalvelut siirtyivät kunnilta. Lähde: Tilastokeskus.",
           "size": "tt",
           "stack": [
             "jt_b9_val",
-            "jt_b9_pai",
+            "jt_b9_kun",
+            "jt_b9_hva",
             "jt_b9_ssr"
           ],
           "barSpan": 3,
@@ -2150,26 +2223,21 @@
         {
           "id": "jt_trte",
           "section": "Rahoitusasema",
-          "title": "Tulot, menot ja veroaste, % BKT:stä",
+          "title": "Tulot ja menot, % BKT:stä",
           "unit": "%",
           "dec": 1,
           "lines": [
             "jt_te",
-            "jt_tr",
-            "jt_veroaste"
+            "jt_tr"
           ],
           "connect": true,
           "from": 2000,
           "size": "half",
           "colors": {
             "jt_te": "var(--q-down)",
-            "jt_tr": "var(--accent)",
-            "jt_veroaste": "var(--g3)"
+            "jt_tr": "var(--accent)"
           },
-          "dash": [
-            "jt_veroaste"
-          ],
-          "note": "Julkisyhteisöt, neljän neljänneksen liukuva summa. Veroaste: verot ja pakolliset sosiaaliturvamaksut (D2, D5, D91, D611, D613). Lähteet: Tilastokeskus, Eurostat."
+          "note": "Julkisyhteisöt, neljän neljänneksen liukuva summa suhteessa BKT:hen. Erotus on rahoitusasema. Lähde: Tilastokeskus."
         },
         {
           "id": "jt_trteyy",
@@ -2189,6 +2257,29 @@
             "jt_tr_yy": "var(--accent)"
           },
           "note": "Julkisyhteisöjen tulot ja menot käyvin hinnoin, neljän neljänneksen liukuvan summan muutos vuodentakaisesta. Lähde: Tilastokeskus."
+        },
+        {
+          "id": "jt_tel",
+          "section": "Rahoitusasema",
+          "title": "Työeläkelaitosten sijoitustuotto, arvio, %",
+          "unit": "",
+          "dec": 1,
+          "lines": [
+            "jt_tel_ret"
+          ],
+          "stack": [
+            "jt_tel_hg",
+            "jt_tel_inc"
+          ],
+          "barSpan": 3,
+          "connect": true,
+          "from": 2005,
+          "size": "half",
+          "stackUnit": "%",
+          "colors": {
+            "jt_tel_ret": "var(--fg)"
+          },
+          "note": "Työeläkelaitosten ylijäämä syntyy pääosin sijoitustuotoista. Neljän neljänneksen summa, % edellisen neljänneksen rahoitusvaroista. Arvonmuutokset: rahoitusvarojen muutos vähennettynä nettosijoituksilla. Omaisuustulot: korot, osingot ja muut omaisuustulot (D.4). Kansantalouden tilinpitoon perustuva arvio, joka poikkeaa Telan julkaisemasta tuotosta kattavuuden ja laskentatavan vuoksi (esim. 2025: arvio 5,5 %, Tela 7,4 %). Lähde: Tilastokeskus, oma laskelma."
         },
         {
           "id": "jt_va",
@@ -2276,45 +2367,75 @@
           "note": "3 kk liukuvan summan muutos vuodentakaisesta. Työttömyysetuudet oikealla akselilla. Lähde: Verohallinto (tulorekisteri)."
         },
         {
-          "id": "jt_tel",
-          "section": "Tulot",
-          "title": "Työeläkelaitosten sijoitustuotto, arvio, %",
+          "id": "jt_me",
+          "section": "Menot",
+          "title": "Menot ja niiden rakenne, % BKT:stä",
           "unit": "",
           "dec": 1,
           "lines": [
-            "jt_tel_ret"
+            "jt_te"
           ],
           "stack": [
-            "jt_tel_hg",
-            "jt_tel_inc"
+            "jt_me_d62",
+            "jt_me_d632",
+            "jt_me_d1",
+            "jt_me_p2",
+            "jt_me_p5",
+            "jt_me_d4",
+            "jt_me_muu"
+          ],
+          "stackColors": [
+            "var(--g1)",
+            "color-mix(in srgb, var(--g1) 55%, var(--plot))",
+            "var(--g3)",
+            "color-mix(in srgb, var(--g3) 55%, var(--plot))",
+            "var(--g2)",
+            "var(--q-down)",
+            "color-mix(in srgb, var(--fg) 22%, var(--plot))"
+          ],
+          "resid": [
+            "jt_me_muu"
           ],
           "barSpan": 3,
           "connect": true,
-          "from": 2005,
-          "size": "half",
+          "from": 2000,
+          "wide": true,
           "stackUnit": "%",
-          "colors": {
-            "jt_tel_ret": "var(--fg)"
+          "labels": {
+            "jt_te": "Menot yhteensä"
           },
-          "note": "Neljän neljänneksen summa, % edellisen neljänneksen rahoitusvaroista. Arvonmuutokset: rahoitusvarojen muutos vähennettynä nettosijoituksilla. Omaisuustulot: korot, osingot ja muut omaisuustulot (D.4). Kansantalouden tilinpitoon perustuva arvio, joka poikkeaa Telan julkaisemasta tuotosta kattavuuden ja laskentatavan vuoksi (esim. 2025: arvio 5,5 %, Tela 7,4 %). Lähde: Tilastokeskus, oma laskelma."
+          "colors": {
+            "jt_te": "var(--fg)"
+          },
+          "lvl": true,
+          "note": "Julkisyhteisöjen sulautetut menot, neljän neljänneksen liukuva summa suhteessa BKT:hen. Sosiaalietuudet: rahamääräiset etuudet (mm. eläkkeet, työttömyysturva). Ostopalvelut: ostettuna markkinatuotantona annetut luontoisetuudet. Investoinnit: kiinteän pääoman bruttomuodostus. Muut menot: tukipalkkiot, muut tulonsiirrot ja pääomansiirrot. Lähde: Tilastokeskus."
         },
         {
-          "id": "jt_tt_n",
+          "id": "jt_jk",
           "section": "Menot",
-          "title": "Työttömyysetuuksien saajat, tuhatta",
+          "title": "Julkisten kulutusmenojen muutos menolajeittain",
+          "unit": "%",
+          "dec": 1,
           "lines": [
-            "jt_tt_n_ansio",
-            "jt_tt_n_kela"
+            "jt_jk_tot"
           ],
-          "colors": {
-            "jt_tt_n_ansio": "var(--accent)",
-            "jt_tt_n_kela": "var(--g2)"
-          },
-          "unit": "",
-          "dec": 0,
-          "from": 2022,
+          "stack": [
+            "jt_jk_d1",
+            "jt_jk_p2",
+            "jt_jk_d632",
+            "jt_jk_p51c",
+            "jt_jk_sales",
+            "jt_jk_muu"
+          ],
+          "barSpan": 3,
+          "connect": true,
+          "from": 2015,
           "size": "half",
-          "note": "Henkilöt, joille maksettiin etuutta kuukauden aikana, 3 kk liukuva keskiarvo. Lähde: Verohallinto (tulorekisteri)."
+          "colors": {
+            "jt_jk_tot": "var(--fg)"
+          },
+          "stackUnit": "%-yks.",
+          "note": "Käyvin hinnoin, neljän neljänneksen liukuvan summan muutos vuodentakaisesta. Ostopalvelut: ostettuna markkinatuotantona annetut luontoisetuudet (esim. palvelusetelit, yksityiset hoivapalvelut). Myyntitulot vähennetään kulutusmenoista. Muut erät: mm. tuotantoverot. Lähde: Tilastokeskus, oma laskelma."
         },
         {
           "id": "jt_tt_e",
@@ -2345,45 +2466,49 @@
           "note": "Veronalaiset työttömyysetuudet, 12 kk liukuva summa. Lähde: Verohallinto (tulorekisteri)."
         },
         {
-          "id": "jt_jk",
+          "id": "jt_tt_n",
           "section": "Menot",
-          "title": "Julkisten kulutusmenojen muutos menolajeittain",
-          "unit": "%",
-          "dec": 1,
+          "title": "Työttömyysetuuksien saajat, tuhatta",
           "lines": [
-            "jt_jk_tot"
+            "jt_tt_n_ansio",
+            "jt_tt_n_kela"
           ],
-          "stack": [
-            "jt_jk_d1",
-            "jt_jk_p2",
-            "jt_jk_d632",
-            "jt_jk_p51c",
-            "jt_jk_sales",
-            "jt_jk_muu"
-          ],
-          "barSpan": 3,
-          "connect": true,
-          "from": 2015,
-          "size": "half",
           "colors": {
-            "jt_jk_tot": "var(--fg)"
+            "jt_tt_n_ansio": "var(--accent)",
+            "jt_tt_n_kela": "var(--g2)"
           },
-          "stackUnit": "%-yks.",
-          "note": "Käyvin hinnoin, neljän neljänneksen liukuvan summan muutos vuodentakaisesta. Ostopalvelut: ostettuna markkinatuotantona annetut luontoisetuudet (esim. palvelusetelit, yksityiset hoivapalvelut). Myyntitulot vähennetään kulutusmenoista. Muut erät: mm. tuotantoverot. Lähde: Tilastokeskus, oma laskelma."
+          "unit": "",
+          "dec": 0,
+          "from": 2022,
+          "size": "half",
+          "note": "Henkilöt, joille maksettiin etuutta kuukauden aikana, 3 kk liukuva keskiarvo. Lähde: Verohallinto (tulorekisteri)."
         },
         {
-          "id": "jt_velka",
+          "id": "jt_nv",
           "section": "Velka",
-          "title": "Julkisyhteisöjen velka, % BKT:stä",
+          "title": "Velka ja nettovelka, % BKT:stä",
           "unit": "%",
           "dec": 1,
           "lines": [
-            "jt_velka"
+            "jt_velka",
+            "jt_nv",
+            "jt_nv_ptel"
           ],
           "connect": true,
           "from": 2000,
           "size": "half",
-          "note": "EDP-velka (julkisyhteisöjen sulautettu bruttovelka). Lähde: Tilastokeskus."
+          "labels": {
+            "jt_velka": "EDP-bruttovelka"
+          },
+          "colors": {
+            "jt_velka": "var(--accent)",
+            "jt_nv": "var(--fg)",
+            "jt_nv_ptel": "var(--q-turn)"
+          },
+          "dash": [
+            "jt_velka"
+          ],
+          "note": "EDP-bruttovelka: julkisyhteisöjen sulautettu bruttovelka. Nettovelka: velat miinus saamiset käteisrahassa ja talletuksissa, velkapapereissa ja lainoissa (F2–F4), rahoitustilinpidon taseet. Negatiivinen arvo on nettosaaminen. Lähde: Tilastokeskus."
         },
         {
           "id": "jt_dd",
@@ -2412,33 +2537,6 @@
             "jt_dd": "var(--fg)"
           },
           "note": "Muutos vuodentakaisesta. Perusjäämä: rahoitusasema ilman korkomenoja (alijäämä kasvattaa velkaa). Kasvu: nimellisen BKT:n kasvun vaikutus. Virta-varantokorjaus: velan muutoksen ja alijäämän erotus, mm. rahoitusvarojen hankinta (työeläkelaitosten ylijäämän sijoitukset, kassavarat). Lähde: Tilastokeskus, oma laskelma."
-        },
-        {
-          "id": "jt_nv",
-          "section": "Velka",
-          "title": "Nettovelka, % BKT:stä",
-          "unit": "%",
-          "dec": 1,
-          "lines": [
-            "jt_velka",
-            "jt_nv",
-            "jt_nv_ptel"
-          ],
-          "connect": true,
-          "from": 2000,
-          "size": "half",
-          "labels": {
-            "jt_velka": "EDP-bruttovelka"
-          },
-          "colors": {
-            "jt_velka": "var(--accent)",
-            "jt_nv": "var(--fg)",
-            "jt_nv_ptel": "var(--q-turn)"
-          },
-          "dash": [
-            "jt_velka"
-          ],
-          "note": "Nettovelka: velat miinus saamiset käteisrahassa ja talletuksissa, velkapapereissa ja lainoissa (F2–F4), rahoitustilinpidon taseet. Negatiivinen arvo on nettosaaminen. Lähde: Tilastokeskus."
         },
         {
           "id": "jt_korkobkt",
@@ -2482,34 +2580,6 @@
             "jt_fi10y": "10 v valtionlainan korko"
           },
           "note": "Implisiittinen korko: korkomenot 4 nelj. / velka vuotta aiemmin. Keskikorko: budjettitalouden velan korkomenot 12 kk / keskimääräinen velka. Lähteet: Tilastokeskus, Valtiokonttori, EKP."
-        },
-        {
-          "id": "jt_rg",
-          "section": "Velka",
-          "title": "Korko-kasvuero (r − g), %",
-          "unit": "%",
-          "dec": 1,
-          "lines": [
-            "jt_irate",
-            "jt_ngdp"
-          ],
-          "bars": "jt_rg",
-          "barsNeutral": true,
-          "barsName": "r − g",
-          "barsUnit": "%-yks.",
-          "barSpan": 3,
-          "connect": true,
-          "from": 2004,
-          "size": "half",
-          "colors": {
-            "jt_irate": "var(--fg)",
-            "jt_ngdp": "var(--accent)"
-          },
-          "labels": {
-            "jt_irate": "Implisiittinen korko (r)",
-            "jt_ngdp": "Nimellisen BKT:n kasvu (g)"
-          },
-          "note": "r: julkisyhteisöjen korkomenot neljältä neljännekseltä suhteessa velkaan vuotta aiemmin. g: nimellisen BKT:n vuosimuutos, neljän neljänneksen summat. Kun r − g on positiivinen, velkasuhde kasvaa ilman perusylijäämää. Lähde: Tilastokeskus."
         },
         {
           "id": "jt_mat",
@@ -7796,14 +7866,40 @@
       "kind": "level"
     },
     {
-      "id": "jt_b9_pai",
-      "label": "Paikallishallinto",
+      "id": "jt_b9_kun",
+      "label": "Kunnat",
       "set": "julkinen",
       "source": "statfin",
       "table": "jtume/11zf.px",
       "pick": {
         "taloustoimi_1_20180101": "B9",
-        "sektoriluokitus_7_20230101": "S1313",
+        "sektoriluokitus_7_20230101": "S13131",
+        "contentscode": "jtume-TASM"
+      },
+      "q_to_m": true,
+      "roll": 4,
+      "div": {
+        "source": "statfin",
+        "table": "ntp/132h.px",
+        "pick": {
+          "taloustoimi_1_20180101": "B1GMH",
+          "contentscode": "tasmcp"
+        },
+        "q_to_m": true,
+        "roll": 4
+      },
+      "handling": "none",
+      "kind": "level"
+    },
+    {
+      "id": "jt_b9_hva",
+      "label": "Hyvinvointialueet",
+      "set": "julkinen",
+      "source": "statfin",
+      "table": "jtume/11zf.px",
+      "pick": {
+        "taloustoimi_1_20180101": "B9",
+        "sektoriluokitus_7_20230101": "S13132",
         "contentscode": "jtume-TASM"
       },
       "q_to_m": true,
@@ -8540,6 +8636,253 @@
       "q_to_m": true,
       "roll": 4,
       "pct_lag": 4,
+      "handling": "none",
+      "kind": "level"
+    },
+    {
+      "id": "jt_me_d62",
+      "label": "Sosiaalietuudet",
+      "set": "julkinen",
+      "source": "statfin",
+      "table": "jtume/11zf.px",
+      "pick": {
+        "taloustoimi_1_20180101": "D62K",
+        "sektoriluokitus_7_20230101": "S13",
+        "contentscode": "jtume-TASM"
+      },
+      "q_to_m": true,
+      "roll": 4,
+      "div": {
+        "source": "statfin",
+        "table": "ntp/132h.px",
+        "pick": {
+          "taloustoimi_1_20180101": "B1GMH",
+          "contentscode": "tasmcp"
+        },
+        "q_to_m": true,
+        "roll": 4
+      },
+      "handling": "none",
+      "kind": "level"
+    },
+    {
+      "id": "jt_me_d632",
+      "label": "Ostopalvelut (luontoisetuudet)",
+      "set": "julkinen",
+      "source": "statfin",
+      "table": "jtume/11zf.px",
+      "pick": {
+        "taloustoimi_1_20180101": "D632K",
+        "sektoriluokitus_7_20230101": "S13",
+        "contentscode": "jtume-TASM"
+      },
+      "q_to_m": true,
+      "roll": 4,
+      "div": {
+        "source": "statfin",
+        "table": "ntp/132h.px",
+        "pick": {
+          "taloustoimi_1_20180101": "B1GMH",
+          "contentscode": "tasmcp"
+        },
+        "q_to_m": true,
+        "roll": 4
+      },
+      "handling": "none",
+      "kind": "level"
+    },
+    {
+      "id": "jt_me_d1",
+      "label": "Palkansaajakorvaukset",
+      "set": "julkinen",
+      "source": "statfin",
+      "table": "jtume/11zf.px",
+      "pick": {
+        "taloustoimi_1_20180101": "D1K",
+        "sektoriluokitus_7_20230101": "S13",
+        "contentscode": "jtume-TASM"
+      },
+      "q_to_m": true,
+      "roll": 4,
+      "div": {
+        "source": "statfin",
+        "table": "ntp/132h.px",
+        "pick": {
+          "taloustoimi_1_20180101": "B1GMH",
+          "contentscode": "tasmcp"
+        },
+        "q_to_m": true,
+        "roll": 4
+      },
+      "handling": "none",
+      "kind": "level"
+    },
+    {
+      "id": "jt_me_p2",
+      "label": "Välituotekäyttö",
+      "set": "julkinen",
+      "source": "statfin",
+      "table": "jtume/11zf.px",
+      "pick": {
+        "taloustoimi_1_20180101": "P2K",
+        "sektoriluokitus_7_20230101": "S13",
+        "contentscode": "jtume-TASM"
+      },
+      "q_to_m": true,
+      "roll": 4,
+      "div": {
+        "source": "statfin",
+        "table": "ntp/132h.px",
+        "pick": {
+          "taloustoimi_1_20180101": "B1GMH",
+          "contentscode": "tasmcp"
+        },
+        "q_to_m": true,
+        "roll": 4
+      },
+      "handling": "none",
+      "kind": "level"
+    },
+    {
+      "id": "jt_me_p5",
+      "label": "Investoinnit",
+      "set": "julkinen",
+      "source": "statfin",
+      "table": "jtume/11zf.px",
+      "pick": {
+        "taloustoimi_1_20180101": "P5K",
+        "sektoriluokitus_7_20230101": "S13",
+        "contentscode": "jtume-TASM"
+      },
+      "q_to_m": true,
+      "roll": 4,
+      "div": {
+        "source": "statfin",
+        "table": "ntp/132h.px",
+        "pick": {
+          "taloustoimi_1_20180101": "B1GMH",
+          "contentscode": "tasmcp"
+        },
+        "q_to_m": true,
+        "roll": 4
+      },
+      "handling": "none",
+      "kind": "level"
+    },
+    {
+      "id": "jt_me_d4",
+      "label": "Korot ja muut omaisuusmenot",
+      "set": "julkinen",
+      "source": "statfin",
+      "table": "jtume/11zf.px",
+      "pick": {
+        "taloustoimi_1_20180101": "D4KS",
+        "sektoriluokitus_7_20230101": "S13",
+        "contentscode": "jtume-TASM"
+      },
+      "q_to_m": true,
+      "roll": 4,
+      "div": {
+        "source": "statfin",
+        "table": "ntp/132h.px",
+        "pick": {
+          "taloustoimi_1_20180101": "B1GMH",
+          "contentscode": "tasmcp"
+        },
+        "q_to_m": true,
+        "roll": 4
+      },
+      "handling": "none",
+      "kind": "level"
+    },
+    {
+      "id": "jt_me_muu",
+      "label": "Muut menot",
+      "set": "julkinen",
+      "source": "sum",
+      "parts": [
+        {
+          "source": "statfin",
+          "table": "jtume/11zf.px",
+          "pick": {
+            "taloustoimi_1_20180101": "OTES",
+            "sektoriluokitus_7_20230101": "S13",
+            "contentscode": "jtume-TASM"
+          }
+        },
+        {
+          "source": "statfin",
+          "table": "jtume/11zf.px",
+          "pick": {
+            "taloustoimi_1_20180101": "D62K",
+            "sektoriluokitus_7_20230101": "S13",
+            "contentscode": "jtume-TASM"
+          },
+          "neg": true
+        },
+        {
+          "source": "statfin",
+          "table": "jtume/11zf.px",
+          "pick": {
+            "taloustoimi_1_20180101": "D632K",
+            "sektoriluokitus_7_20230101": "S13",
+            "contentscode": "jtume-TASM"
+          },
+          "neg": true
+        },
+        {
+          "source": "statfin",
+          "table": "jtume/11zf.px",
+          "pick": {
+            "taloustoimi_1_20180101": "D1K",
+            "sektoriluokitus_7_20230101": "S13",
+            "contentscode": "jtume-TASM"
+          },
+          "neg": true
+        },
+        {
+          "source": "statfin",
+          "table": "jtume/11zf.px",
+          "pick": {
+            "taloustoimi_1_20180101": "P2K",
+            "sektoriluokitus_7_20230101": "S13",
+            "contentscode": "jtume-TASM"
+          },
+          "neg": true
+        },
+        {
+          "source": "statfin",
+          "table": "jtume/11zf.px",
+          "pick": {
+            "taloustoimi_1_20180101": "P5K",
+            "sektoriluokitus_7_20230101": "S13",
+            "contentscode": "jtume-TASM"
+          },
+          "neg": true
+        },
+        {
+          "source": "statfin",
+          "table": "jtume/11zf.px",
+          "pick": {
+            "taloustoimi_1_20180101": "D4KS",
+            "sektoriluokitus_7_20230101": "S13",
+            "contentscode": "jtume-TASM"
+          },
+          "neg": true
+        }
+      ],
+      "q_to_m": true,
+      "roll": 4,
+      "div": {
+        "source": "statfin",
+        "table": "ntp/132h.px",
+        "pick": {
+          "taloustoimi_1_20180101": "B1GMH",
+          "contentscode": "tasmcp"
+        },
+        "q_to_m": true,
+        "roll": 4
+      },
       "handling": "none",
       "kind": "level"
     },

@@ -577,6 +577,16 @@ button.dl:hover { text-decoration-color: var(--fg); }
 @media (min-width: 761px) { .grpair table.hm { table-layout: fixed; } .grpair .hm thead th:first-child, .grpair .hm th.rl { width: 210px; } }   /* nimisarake kiintea, neljannekset jakavat loput */
 .grpair .hm th.rl { font-size: 0.875rem; padding-right: 8px; padding-left: 4px; }
 .grpair .hm th.rl.sub { padding-left: 12px; font-size: 0.78rem; }
+/* yleiskuvataulukko (julkinen talous): sama tiivis lammokartta kuin kasvutaulukossa */
+.qcard table.hm { border-spacing: 2px 3px; font-size: 0.78rem; width: 100%; }
+.qcard .hm thead th { padding: 2px 0; font-size: 0.78rem; }
+.qcard .hm td { min-width: 42px; padding: 6px 1px; cursor: pointer; }
+@media (min-width: 761px) { .qcard table.hm { table-layout: fixed; } .qcard .hm thead th:first-child, .qcard .hm th.rl { width: 210px; } }
+.qcard .hm th.rl { font-size: 0.875rem; padding-right: 8px; padding-left: 4px; cursor: pointer; }
+.qcard .hm th.rl.sub { padding-left: 16px; font-size: 0.78rem; }
+.qcard .hm tr.gap td { height: 8px; padding: 0; background: none; }
+.fcard.flash { animation: flash 1.2s ease; }
+@keyframes flash { 0%, 30% { box-shadow: 0 0 0 2px color-mix(in srgb, var(--accent) 45%, transparent); } 100% { box-shadow: 0 0 0 2px transparent; } }
 .grleft, .grside { display: flex; flex-direction: column; gap: 40px; min-width: 0; }
 .grside:empty { display: none; }
 .grcol { display: flex; flex-direction: column; gap: 28px; min-width: 0; }
@@ -1911,6 +1921,11 @@ footer .flinks .lnk:hover { text-decoration-color: currentColor; }
       scrollTo({ top: t.getBoundingClientRect().top + scrollY - bar - 16 }); }, 120); }
   // sivuston muutokset: uudet kuviot ja muut isommat lisaykset (kasin yllapidetty, uusin ensin); set + id -> linkki kuvioon
   const CHANGES = [
+    { d: "2026-11-18", t: "Julkinen talous: yleiskuvataulukko sivun alkuun", set: "Julkinen talous" },
+    { d: "2026-11-18", t: "Rahoitusasema alasektoreittain: kunnat ja hyvinvointialueet erikseen", set: "Julkinen talous", id: "jt_b9_hva" },
+    { d: "2026-11-18", t: "Menot ja niiden rakenne, % BKT:stä", set: "Julkinen talous", id: "jt_me_d62" },
+    { d: "2026-11-18", t: "Julkinen talous: päällekkäiset kuviot yhdistetty, sijoitustuotto rahoitusaseman yhteyteen", set: "Julkinen talous" },
+    { d: "2026-11-18", t: "Kaikkiin kuvioihin ja taulukoihin selitenuoli" },
     { d: "2026-11-17", t: "Kokonaisindikaattorin aiemmat arviot talteen: kuviossa rengas, jos vaihe on myöhemmin muuttunut" },
     { d: "2026-11-17", t: "Päivittyneen sarjan merkki näyttää muutokset edellisen käynnin jälkeen" },
     { d: "2026-11-17", t: "Menetelmä: BKT-vertailuun viiveet ja käännepisteiden ajoitus" },
@@ -2103,6 +2118,42 @@ footer .flinks .lnk:hover { text-decoration-color: currentColor; }
     const db = document.createElement("button"); db.type = "button"; db.className = "dl"; db.textContent = "Lataa CSV";
     db.onclick = () => saveFile(`suhdannetilanne-${slug(c.title)}.csv`, toCSV([["Sarja", "Päivä", "Viimeisin", ...cols.map(k => COLH[k]), "Muutoksen yksikkö"],
       ...c.rows.map(r => [r.label, r.date, r.last, ...cols.map(k => r[k]), r.chg === "kp" ? "korkopistettä" : r.chg === "pct" ? "%" : "indeksi"])]));
+    fm.appendChild(db); card.appendChild(fm);
+    if (c.note) noteInto(card, null, c.note, null, c);
+    return card;
+  }
+  // yleiskuvataulukko: neljannesvuosisarjojen tasot (esim. % BKT:sta) viimeisilta neljanneksilta; vari kertoo muutoksen
+  // vuodentakaisesta suhteessa sarjan tavanomaiseen vuosimuutokseen (pl. 2020-2021). inv: kasvu heikentaa, neutral: ei suuntaa.
+  // Rivi vie kuvioon, jossa sarja on.
+  function qtableCard(c, narrow, box) {
+    const ser = id => set.series.find(x => x.id === id), P = set.periods, qi = P.map((p, k) => /-(03|06|09|12)$/.test(p) ? k : -1).filter(k => k >= 0);
+    const rows = c.rows.filter(r => ser(r.id));
+    const lastQ = Math.max(...rows.map(r => { const v = ser(r.id).values; for (let j = qi.length - 1; j >= 0; j--) if (v[qi[j]] != null) return j; return -1; }));
+    const w = box.clientWidth || 1000, N = w > 1000 ? 12 : w > 760 ? 10 : 8, js = qi.slice(Math.max(0, lastQ - N + 1), lastQ + 1);
+    const fq = k => "Q" + Math.ceil(+P[k].slice(5, 7) / 3) + "/" + P[k].slice(0, 4);
+    const card = document.createElement("div"); card.className = "card fcard wide qcard";
+    let h = `<div class="fhead"><h3>${c.title}</h3></div><div class="hmwrap"><table class="hm"><thead><tr><th></th>${js.map(k => `<th title="${fq(k)}">${fq(k).replace(/\/20(\d\d)$/, "/$1")}</th>`).join("")}</tr></thead><tbody>`;
+    rows.forEach((r, ri) => {
+      const v = ser(r.id).values, yd = k => v[k] != null && k >= 12 && v[k - 12] != null ? v[k] - v[k - 12] : null;
+      const hx = qi.map(yd).filter((x, j) => x != null && !/^202[01]/.test(P[qi[j]])), mu = hx.reduce((s, x) => s + x, 0) / Math.max(1, hx.length);
+      const sd = Math.sqrt(hx.reduce((s, x) => s + (x - mu) ** 2, 0) / Math.max(1, hx.length - 1)) || 1, dec = r.dec ?? c.dec ?? 1;
+      h += `<tr class="pick${r.tot ? " tot" : ""}" data-id="${r.id}" tabindex="0" title="Näytä kuvio"><th class="rl${r.sub ? " sub" : ""}">${r.label}</th>` + js.map(k => {
+        if (v[k] == null) return `<td class="na"></td>`;
+        const d = yd(k), tt = d == null ? 0 : Math.min(1, Math.abs(d) / (2 * sd));
+        const base = r.neutral || d == null ? "var(--accent)" : (d >= 0) !== !!r.inv ? "var(--q-up)" : "var(--q-down)";
+        const sub = d == null ? "" : `muutos vuodessa ${+d.toFixed(dec) > 0 ? "+" : ""}${fmtV(d, dec)} %-yks.`;
+        return `<td class="hc${tt < 0.35 ? " lo" : ""}" style="--hc:${base};--hp:${Math.round(6 + (r.neutral ? 30 : 46) * tt)}%;--hv:${Math.round(22 + 48 * tt)}%" data-tip="${r.label}, ${fq(k)}" data-sub="${sub}">${r.sign && +v[k].toFixed(dec) > 0 ? "+" : ""}${fmtV(v[k], dec)}</td>`; }).join("") + "</tr>" +
+        (r.gap_after && ri < rows.length - 1 ? `<tr class="gap" aria-hidden="true"><td colspan="${js.length + 1}"></td></tr>` : "");
+    });
+    card.innerHTML = h + "</tbody></table></div>";
+    const wr = card.querySelector(".hmwrap"); requestAnimationFrame(() => { wr.scrollLeft = wr.scrollWidth; });
+    card.querySelectorAll("tr.pick").forEach(tr => { const go = () => {
+        const id = tr.dataset.id, tg = [...document.querySelectorAll(".fcard")].find(x => x !== card && x.offsetParent && x._zc && [...(x._zc.lines || []), ...(x._zc.stack || [])].includes(id));
+        if (!tg) return; tg.scrollIntoView({ behavior: REDUCED.matches ? "auto" : "smooth", block: "center" }); tg.classList.remove("flash"); void tg.offsetWidth; tg.classList.add("flash"); };
+      tr.onclick = go; tr.onkeydown = e => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); go(); } }; });
+    const fm = document.createElement("div"); fm.className = "fmeta";
+    const db = document.createElement("button"); db.type = "button"; db.className = "dl"; db.textContent = "Lataa CSV";
+    db.onclick = () => saveFile(`suhdannetilanne-${slug(c.title)}.csv`, toCSV([["Sarja", ...js.map(fq)], ...rows.map(r => [r.label, ...js.map(k => ser(r.id).values[k])])]));
     fm.appendChild(db); card.appendChild(fm);
     if (c.note) noteInto(card, null, c.note, null, c);
     return card;
@@ -2475,6 +2526,7 @@ footer .flinks .lnk:hover { text-decoration-color: currentColor; }
       if (c0.section && c0.section !== lastSec) {                        // valiotsikko osioiden valiin
         const h = document.createElement("h2"); h.className = "fsec"; h.textContent = c0.section; box.appendChild(h); lastSec = c0.section; }
       if (c0.type === "table") { tgt.appendChild(tableCard(c0, narrow)); return; }
+      if (c0.type === "qtable") { tgt.appendChild(qtableCard(c0, narrow, box)); return; }
       if (c0.type === "curve") { tgt.appendChild(curveCard(c0, narrow)); return; }
       if (c0.type === "profile") { if (c0.profile) tgt.appendChild(profileCard(c0, narrow)); return; }
       if (c0.type === "scatter") { if (col && nth++ === 0) tgt = box; tgt.appendChild(scatterCard(c0, narrow)); return; }
