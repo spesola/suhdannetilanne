@@ -2723,7 +2723,7 @@ footer .flinks .lnk:hover { text-decoration-color: currentColor; }
             (c.avg ? ` <span class="sunit">(neljänneksen keskiarvo)</span>` : "");
         } else {
           if (valEl) valEl.innerHTML = "";                                   // yksi viiva: ei arvoriviä, arvo hoverissa kuvion sisalla
-          subEl.innerHTML = ""; subEl.hidden = true;
+          subEl.innerHTML = "";                                            // tyhja rivi jaa paikalleen: rinnakkaisten korttien rivit (subgrid) pysyvat linjassa
         }
         if (c.hdr && valEl) {                                              // valitun rivin kasvu, sama kaikissa kuvioissa
           const gy = ser(c.hdr + "_yy").values, gq = ser(c.hdr + "_qq").values, has = j => gy[j] != null || gq[j] != null;
