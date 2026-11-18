@@ -2252,13 +2252,13 @@
             },
             {
               "id": "jt_b9_kun",
-              "label": "Kunnat",
+              "label": "Kuntahallinto",
               "sub": true,
               "sign": true
             },
             {
               "id": "jt_b9_hva",
-              "label": "Hyvinvointialueet",
+              "label": "Hyvinvointialuehallinto",
               "sub": true,
               "sign": true
             },
@@ -2296,7 +2296,7 @@
               "inv": true
             }
           ],
-          "note": "Neljän neljänneksen liukuvat summat suhteessa BKT:hen, velka neljänneksen lopussa. Väri kertoo, onko taso julkisen talouden kannalta parempi vai heikompi kuin sarjan keskiarvo vuodesta 2000. Kunnat: paikallishallinto pl. hyvinvointialueet. Klikkaa riviä nähdäksesi kuvion. Lähde: Tilastokeskus.",
+          "note": "Neljän neljänneksen liukuvat summat suhteessa BKT:hen, velka neljänneksen lopussa. Väri kertoo, onko taso julkisen talouden kannalta parempi vai heikompi kuin sarjan keskiarvo vuodesta 2000. Kuntahallinto sisältää Helsingin sosiaali- ja terveyspalvelut. Klikkaa riviä nähdäksesi kuvion. Lähde: Tilastokeskus.",
           "sub": "% BKT:stä"
         },
         {
@@ -2313,7 +2313,7 @@
           "colors": {
             "jt_b9": "var(--fg)"
           },
-          "note": "Neljän neljänneksen liukuva summa suhteessa BKT:hen. Kunnat: paikallishallinto pl. hyvinvointialueet; sisältää myös Helsingin sosiaali- ja terveyspalvelut, joten jako ei vastaa täysin tehtäväjakoa. Hyvinvointialueet vuodesta 2023, jolloin sosiaali- ja terveyspalvelut siirtyivät kunnilta. Lähde: Tilastokeskus.",
+          "note": "Neljän neljänneksen liukuva summa suhteessa BKT:hen. Kuntahallinto sisältää Helsingin sosiaali- ja terveyspalvelut, joten jako ei vastaa täysin tehtäväjakoa. Hyvinvointialuehallinto vuodesta 2023, jolloin sosiaali- ja terveyspalvelut siirtyivät kunnilta hyvinvointialueille. Lähde: Tilastokeskus.",
           "size": "tt",
           "stack": [
             "jt_b9_val",
@@ -6917,7 +6917,7 @@
     },
     {
       "id": "x_jb_s13131",
-      "label": "Kunnat ja kuntayhtymät",
+      "label": "Kuntahallinto",
       "set": "bkt",
       "chart_only": true,
       "source": "statfin",
@@ -6940,7 +6940,7 @@
     },
     {
       "id": "x_jb_s13132",
-      "label": "Hyvinvointialueet",
+      "label": "Hyvinvointialuehallinto",
       "set": "bkt",
       "chart_only": true,
       "source": "statfin",
@@ -7976,7 +7976,7 @@
     },
     {
       "id": "jt_b9_kun",
-      "label": "Kunnat",
+      "label": "Kuntahallinto",
       "set": "julkinen",
       "source": "statfin",
       "table": "jtume/11zf.px",
@@ -8002,7 +8002,7 @@
     },
     {
       "id": "jt_b9_hva",
-      "label": "Hyvinvointialueet",
+      "label": "Hyvinvointialuehallinto",
       "set": "julkinen",
       "source": "statfin",
       "table": "jtume/11zf.px",
@@ -9892,7 +9892,7 @@
     },
     {
       "id": "x_jinv_kun",
-      "label": "Kunnat",
+      "label": "Kuntahallinto",
       "set": "bkt",
       "chart_only": true,
       "roll": 4,
@@ -9907,7 +9907,7 @@
     },
     {
       "id": "x_jinv_hva",
-      "label": "Hyvinvointialueet",
+      "label": "Hyvinvointialuehallinto",
       "set": "bkt",
       "chart_only": true,
       "roll": 4,
