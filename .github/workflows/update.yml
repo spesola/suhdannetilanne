@@ -36,9 +36,19 @@ jobs:
       - id: r1
         if: ${{ !inputs.pika }}
         uses: r-lib/actions/setup-r@v2
-        timeout-minutes: 8
+        timeout-minutes: 12
         continue-on-error: true
         with: { use-public-rspm: true }
+
+      # aikarajan ylittanyt asennus voi jattaa apt/gdebi-prosessin kayntiin ja dpkg-lukon varatuksi: odotetaan, sitten lopetetaan
+      - name: Vapauta apt-lukko
+        if: ${{ !inputs.pika && steps.r1.outcome != 'success' }}
+        run: |
+          for i in $(seq 1 36); do sudo fuser /var/lib/dpkg/lock-frontend /var/lib/dpkg/lock >/dev/null 2>&1 || break; sleep 5; done
+          if sudo fuser /var/lib/dpkg/lock-frontend /var/lib/dpkg/lock >/dev/null 2>&1; then
+            echo "lukko yhä varattu, lopetetaan apt-prosessit"; sudo pkill -f gdebi || true; sudo pkill -f apt-get || true; sleep 3
+            sudo rm -f /var/lib/dpkg/lock-frontend /var/lib/dpkg/lock; sudo dpkg --configure -a || true
+          fi
 
       - name: R (uusi yritys)
         if: ${{ !inputs.pika && steps.r1.outcome != 'success' }}
