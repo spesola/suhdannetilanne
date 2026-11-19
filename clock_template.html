@@ -900,13 +900,19 @@ footer .flinks .lnk:hover { text-decoration-color: currentColor; }
   const GVARS = ["--g1", "--g2", "--g3", "--g4", "--g5", "--g6"];
   const INFO = {};                                                  // alapalkin tietoikkunat (menetelma, lahteet)
   // uusi havainto viimeisen 7 paivan aikana (meta.seen: set/sarja -> paiva); merkki sarjan nimen peraan
-  // uusi edellisen kaynnin jalkeen: meta.seen (sarja -> uusimman havainnon paiva) tallennetaan selaimeen. Kaynti vaihtuu, kun
-  // edellisesta sivun avauksesta on yli 30 min; vertailupohja on edellisen kaynnin tila. Ensimmaisella kaynnilla 7 paivan saanto.
-  const SEEN0 = (() => { const cur = D.meta.seen || {}, now = Date.now();
-    try { const o = JSON.parse(localStorage.getItem("kaynti") || "null"), same = o && now - o.t < 18e5, base = o ? (same ? o.base : o.cur) : null;
-      localStorage.setItem("kaynti", JSON.stringify({ t: now, base, cur })); return base || null; } catch (e) { return null; } })();
-  const seenOf = (sid, id) => { const k = sid + "/" + id, d = (D.meta.seen || {})[k]; if (!d) return null;
-    return SEEN0 ? (SEEN0[k] !== d ? d : null) : (Date.now() - new Date(d + "T12:00:00")) / 864e5 < 7 ? d : null; };
+  // uusi edellisen kaynnin jalkeen, nakymakohtaisesti: kunkin nakyman (set) sarjojen meta.seen-tila tallennetaan selaimeen, kun
+  // nakyma avataan. Kaynti vaihtuu, kun nakyman edellisesta avauksesta on yli 30 min; vertailupohja on nakyman edellisen kaynnin tila.
+  // Nakyman ensimmaisella avauksella 7 paivan saanto. (Aiemmin yksi yhteinen tila: minka tahansa nakyman avaus kuittasi kaikki.)
+  const SEENB = {};
+  const seenBase = sid => { if (sid in SEENB) return SEENB[sid];
+    const pre = sid + "/", cur = {}; let base = null;
+    for (const [k, v] of Object.entries(D.meta.seen || {})) if (k.startsWith(pre)) cur[k] = v;
+    try { const all = JSON.parse(localStorage.getItem("kaynnit") || "{}") || {}, o = all[sid], now = Date.now();
+      base = o ? (now - o.t < 18e5 ? o.base : o.cur) : null;
+      all[sid] = { t: now, base, cur }; localStorage.setItem("kaynnit", JSON.stringify(all)); localStorage.removeItem("kaynti"); } catch (e) { base = null; }
+    return (SEENB[sid] = base); };
+  const seenOf = (sid, id) => { const k = sid + "/" + id, d = (D.meta.seen || {})[k]; if (!d) return null; const B = seenBase(sid);
+    return B ? (B[k] !== d ? d : null) : (Date.now() - new Date(d + "T12:00:00")) / 864e5 < 7 ? d : null; };
   const freshDot = (d, what) => d ? ` <span class="fresh" title="${what} ${new Date(d + "T12:00:00").toLocaleDateString("fi-FI", { weekday: "short", day: "numeric", month: "numeric" })}"></span>` : "";
   const LIM = 2.5;
 
