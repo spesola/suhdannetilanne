@@ -818,7 +818,10 @@ for (set in cfg$sets) {
     periods <- idx_per(start_i:last_i, freq)
     # tilannetaulukot (type = "table") ja tuottokayra (type = "curve") lasketaan valmiiksi
     charts_out <- lapply(set$charts, function(c) {
-      if (identical(c$type, "table")) c$rows <- lapply(c$rows, function(r) c(r, snap_row(r$id, raws)))
+      if (identical(c$type, "table")) c$rows <- lapply(c$rows, function(r) { x <- c(r, snap_row(r$id, raws))
+        if (!is.null(r$yty)) { d <- get_any(r$yty, raws); v <- d$value[match(x$date, d$date)]   # lisasarake toisesta sarjasta samalta kuukaudelta (esim. vuoden alusta)
+          if (length(v) && !is.na(v)) x$ytyv <- round(v, 4) }
+        x })
       if (identical(c$type, "curve")) c$curve <- curve_data(c)
       if (identical(c$type, "profile")) c$profile <- profile_data(c)
       c })
