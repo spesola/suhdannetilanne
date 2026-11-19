@@ -2229,9 +2229,9 @@ footer .flinks .lnk:hover { text-decoration-color: currentColor; }
     const card = document.createElement("div"); card.className = "card fcard wide qcard";
     let h = `<div class="fhead"><h3>${c.title}</h3></div>${c.sub ? `<p class="fsub">${c.sub}</p>` : ""}<div class="hmwrap"><table class="hm"><thead><tr><th></th>${js.map(k => `<th title="${fq(k)}">${fq(k).replace(/\/20(\d\d)$/, "/$1")}</th>`).join("")}</tr></thead><tbody>`;
     rows.forEach((r, ri) => {
-      // vari: taso suhteessa sarjan keskiarvoon (alusta, pl. 2020-2021; uusi alasektori vasta ensimmaisesta nollasta poikkeavasta arvosta)
+      // vari: taso suhteessa sarjan keskiarvoon (alusta tai c.meanFrom, pl. 2020-2021; uusi alasektori vasta ensimmaisesta nollasta poikkeavasta arvosta)
       const v = ser(r.id).values, k0 = qi.find(k => v[k] != null && v[k] !== 0) ?? 0;
-      const hx = qi.filter(k => k >= k0 && v[k] != null && !/^202[01]/.test(P[k])).map(k => v[k]), mu = hx.reduce((s, x) => s + x, 0) / Math.max(1, hx.length);
+      const hx = qi.filter(k => k >= k0 && v[k] != null && !/^202[01]/.test(P[k]) && (!c.meanFrom || P[k] >= String(c.meanFrom))).map(k => v[k]), mu = hx.reduce((s, x) => s + x, 0) / Math.max(1, hx.length);
       const sd = Math.sqrt(hx.reduce((s, x) => s + (x - mu) ** 2, 0) / Math.max(1, hx.length - 1)) || 1, dec = r.dec ?? c.dec ?? 1, yd = k => k >= 12 && v[k - 12] != null ? v[k] - v[k - 12] : null;
       h += `<tr class="pick${r.tot ? " tot" : ""}" data-id="${r.id}" tabindex="0" title="Näytä kuvio"><th class="rl${r.sub ? " sub" : ""}">${r.label}</th>` + js.map(k => {
         if (v[k] == null) return `<td class="na"></td>`;

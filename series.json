@@ -2395,6 +2395,7 @@
           "title": "Verokertymät",
           "sub": "nettokertymä vuoden alusta, muutos % vuodentakaisesta",
           "dec": 1,
+          "meanFrom": 2019,
           "rows": [
             {
               "id": "jt_vk_ytd_yht",
@@ -2438,7 +2439,7 @@
               "sign": true
             }
           ],
-          "note": "Kassaperusteiset verokertymät kertymäkuukausittain, verovuodet yhteensä. Vuoden alusta: kertymä tammikuusta kertymäkuukauteen. Väri kertoo, onko muutos suurempi vai pienempi kuin sarjan keskiarvo. Lähde: Verohallinto."
+          "note": "Kassaperusteiset verokertymät kertymäkuukausittain, verovuodet yhteensä. Vuoden alusta: kertymä tammikuusta kertymäkuukauteen. Väri kertoo, onko muutos suurempi vai pienempi kuin sarjan keskiarvo vuodesta 2019. Lähde: Verohallinto."
         },
         {
           "id": "jt_va",
@@ -2496,7 +2497,7 @@
             "jt_vk_k_muut"
           ],
           "stackUnit": "%-yks.",
-          "from": 2015,
+          "from": 2019,
           "size": "half",
           "colors": {
             "jt_veroyy": "var(--fg)"
@@ -2504,7 +2505,7 @@
           "labels": {
             "jt_veroyy": "Verokertymä yhteensä, %"
           },
-          "note": "Nettokertymän 12 kk liukuvan summan muutos vuodentakaisesta ja verolajien vaikutus siihen (%-yks.). Lähde: Verohallinto."
+          "note": "Nettokertymän 12 kk liukuvan summan muutos vuodentakaisesta ja verolajien vaikutus siihen (%-yks.). Alkaa vuodesta 2019, koska valmisteverot ja autovero siirtyivät Verohallinnolle vuonna 2017. Lähde: Verohallinto."
         },
         {
           "id": "jt_trt",
