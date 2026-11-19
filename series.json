@@ -2388,6 +2388,59 @@
           "note": "Työeläkelaitosten ylijäämä syntyy pääosin sijoitustuotoista. Neljän neljänneksen summa, % edellisen neljänneksen rahoitusvaroista. Arvonmuutokset: rahoitusvarojen muutos vähennettynä nettosijoituksilla. Omaisuustulot: korot, osingot ja muut omaisuustulot (D.4). Kansantalouden tilinpitoon perustuva arvio, joka poikkeaa Telan julkaisemasta tuotosta kattavuuden ja laskentatavan vuoksi (esim. 2025: arvio 5,5 %, Tela 7,4 %). Lähde: Tilastokeskus, oma laskelma."
         },
         {
+          "id": "jt_vk_tab",
+          "type": "qtable",
+          "monthly": true,
+          "section": "Tulot",
+          "title": "Verokertymät",
+          "sub": "nettokertymä vuoden alusta, muutos % vuodentakaisesta",
+          "dec": 1,
+          "rows": [
+            {
+              "id": "jt_vk_ytd_yht",
+              "label": "Verolajit yhteensä",
+              "tot": true,
+              "sign": true
+            },
+            {
+              "id": "jt_vk_ytd_hlo",
+              "label": "Henkilöasiakkaiden tulovero",
+              "sign": true
+            },
+            {
+              "id": "jt_vk_ytd_yhtei",
+              "label": "Yhteisöjen tulovero",
+              "sign": true
+            },
+            {
+              "id": "jt_vk_ytd_alv",
+              "label": "Arvonlisävero",
+              "sign": true
+            },
+            {
+              "id": "jt_vk_ytd_sotu",
+              "label": "Työnantajan sairausvakuutusmaksu",
+              "sign": true
+            },
+            {
+              "id": "jt_vk_ytd_kiint",
+              "label": "Kiinteistövero",
+              "sign": true
+            },
+            {
+              "id": "jt_vk_ytd_valm",
+              "label": "Valmisteverot",
+              "sign": true
+            },
+            {
+              "id": "jt_vk_ytd_muut",
+              "label": "Muut verot",
+              "sign": true
+            }
+          ],
+          "note": "Kassaperusteiset verokertymät kertymäkuukausittain, verovuodet yhteensä. Vuoden alusta: kertymä tammikuusta kertymäkuukauteen. Väri kertoo, onko muutos suurempi vai pienempi kuin sarjan keskiarvo. Lähde: Verohallinto."
+        },
+        {
           "id": "jt_va",
           "section": "Tulot",
           "title": "Veroaste ja sen rakenne, % BKT:stä",
@@ -2427,27 +2480,31 @@
         {
           "id": "jt_veroyy",
           "section": "Tulot",
-          "title": "Verokertymien vuosimuutos, %",
+          "title": "Verokertymien vuosimuutos ja verolajien vaikutus",
           "unit": "%",
           "dec": 1,
           "lines": [
-            "jt_veroyy",
-            "jt_veroyy_hlo",
-            "jt_veroyy_alv",
-            "jt_veroyy_yht"
+            "jt_veroyy"
           ],
+          "stack": [
+            "jt_vk_k_hlo",
+            "jt_vk_k_yhtei",
+            "jt_vk_k_alv",
+            "jt_vk_k_sotu",
+            "jt_vk_k_kiint",
+            "jt_vk_k_valm",
+            "jt_vk_k_muut"
+          ],
+          "stackUnit": "%-yks.",
           "from": 2015,
           "size": "half",
           "colors": {
-            "jt_veroyy": "var(--fg)",
-            "jt_veroyy_hlo": "var(--accent)",
-            "jt_veroyy_alv": "var(--g3)",
-            "jt_veroyy_yht": "var(--g2)"
+            "jt_veroyy": "var(--fg)"
           },
-          "y2": [
-            "jt_veroyy_yht"
-          ],
-          "note": "12 kk liukuvan summan muutos vuodentakaisesta. Yhteisövero oikealla akselilla. Lähde: Verohallinto."
+          "labels": {
+            "jt_veroyy": "Verokertymä yhteensä, %"
+          },
+          "note": "Nettokertymän 12 kk liukuvan summan muutos vuodentakaisesta ja verolajien vaikutus siihen (%-yks.). Lähde: Verohallinto."
         },
         {
           "id": "jt_trt",
@@ -8085,7 +8142,135 @@
       "pct_lag": 12
     },
     {
-      "id": "jt_veroyy_hlo",
+      "id": "jt_vk_ytd_yht",
+      "label": "Verolajit yhteensä",
+      "set": "julkinen",
+      "source": "statfin",
+      "px_base": "https://vero2.stat.fi/PXWeb/api/v1/fi/Vero/",
+      "table": "Verotulojen_kehitys/010_verotall_tau_101.px",
+      "pick": {
+        "Verolaji": "0",
+        "Muuttuja": "netto",
+        "Verovuosi (ajanjakso, jolta veron peruste on syntynyt)": "YYYY",
+        "Tiedot": "Kumumuutos"
+      },
+      "handling": "none",
+      "kind": "level"
+    },
+    {
+      "id": "jt_vk_ytd_hlo",
+      "label": "Henkilöasiakkaiden tulovero",
+      "set": "julkinen",
+      "source": "statfin",
+      "px_base": "https://vero2.stat.fi/PXWeb/api/v1/fi/Vero/",
+      "table": "Verotulojen_kehitys/010_verotall_tau_101.px",
+      "pick": {
+        "Verolaji": "100",
+        "Muuttuja": "netto",
+        "Verovuosi (ajanjakso, jolta veron peruste on syntynyt)": "YYYY",
+        "Tiedot": "Kumumuutos"
+      },
+      "handling": "none",
+      "kind": "level"
+    },
+    {
+      "id": "jt_vk_ytd_yhtei",
+      "label": "Yhteisöjen tulovero",
+      "set": "julkinen",
+      "source": "statfin",
+      "px_base": "https://vero2.stat.fi/PXWeb/api/v1/fi/Vero/",
+      "table": "Verotulojen_kehitys/010_verotall_tau_101.px",
+      "pick": {
+        "Verolaji": "200",
+        "Muuttuja": "netto",
+        "Verovuosi (ajanjakso, jolta veron peruste on syntynyt)": "YYYY",
+        "Tiedot": "Kumumuutos"
+      },
+      "handling": "none",
+      "kind": "level"
+    },
+    {
+      "id": "jt_vk_ytd_alv",
+      "label": "Arvonlisävero",
+      "set": "julkinen",
+      "source": "statfin",
+      "px_base": "https://vero2.stat.fi/PXWeb/api/v1/fi/Vero/",
+      "table": "Verotulojen_kehitys/010_verotall_tau_101.px",
+      "pick": {
+        "Verolaji": "300",
+        "Muuttuja": "netto",
+        "Verovuosi (ajanjakso, jolta veron peruste on syntynyt)": "YYYY",
+        "Tiedot": "Kumumuutos"
+      },
+      "handling": "none",
+      "kind": "level"
+    },
+    {
+      "id": "jt_vk_ytd_sotu",
+      "label": "Työnantajan sairausvakuutusmaksu",
+      "set": "julkinen",
+      "source": "statfin",
+      "px_base": "https://vero2.stat.fi/PXWeb/api/v1/fi/Vero/",
+      "table": "Verotulojen_kehitys/010_verotall_tau_101.px",
+      "pick": {
+        "Verolaji": "400",
+        "Muuttuja": "netto",
+        "Verovuosi (ajanjakso, jolta veron peruste on syntynyt)": "YYYY",
+        "Tiedot": "Kumumuutos"
+      },
+      "handling": "none",
+      "kind": "level"
+    },
+    {
+      "id": "jt_vk_ytd_kiint",
+      "label": "Kiinteistövero",
+      "set": "julkinen",
+      "source": "statfin",
+      "px_base": "https://vero2.stat.fi/PXWeb/api/v1/fi/Vero/",
+      "table": "Verotulojen_kehitys/010_verotall_tau_101.px",
+      "pick": {
+        "Verolaji": "500",
+        "Muuttuja": "netto",
+        "Verovuosi (ajanjakso, jolta veron peruste on syntynyt)": "YYYY",
+        "Tiedot": "Kumumuutos"
+      },
+      "handling": "none",
+      "kind": "level"
+    },
+    {
+      "id": "jt_vk_ytd_valm",
+      "label": "Valmisteverot",
+      "set": "julkinen",
+      "source": "statfin",
+      "px_base": "https://vero2.stat.fi/PXWeb/api/v1/fi/Vero/",
+      "table": "Verotulojen_kehitys/010_verotall_tau_101.px",
+      "pick": {
+        "Verolaji": "600",
+        "Muuttuja": "netto",
+        "Verovuosi (ajanjakso, jolta veron peruste on syntynyt)": "YYYY",
+        "Tiedot": "Kumumuutos"
+      },
+      "handling": "none",
+      "kind": "level"
+    },
+    {
+      "id": "jt_vk_ytd_muut",
+      "label": "Muut verot",
+      "set": "julkinen",
+      "source": "statfin",
+      "px_base": "https://vero2.stat.fi/PXWeb/api/v1/fi/Vero/",
+      "table": "Verotulojen_kehitys/010_verotall_tau_101.px",
+      "pick": {
+        "Verolaji": "700",
+        "Muuttuja": "netto",
+        "Verovuosi (ajanjakso, jolta veron peruste on syntynyt)": "YYYY",
+        "Tiedot": "Kumumuutos"
+      },
+      "handling": "none",
+      "kind": "level"
+    },
+    {
+      "id": "jt_vk_k_hlo",
       "label": "Henkilöasiakkaiden tulovero",
       "set": "julkinen",
       "source": "statfin",
@@ -8098,13 +8283,25 @@
         "Tiedot": "Arvo"
       },
       "roll": 12,
+      "contrib_of": {
+        "source": "statfin",
+        "px_base": "https://vero2.stat.fi/PXWeb/api/v1/fi/Vero/",
+        "table": "Verotulojen_kehitys/010_verotall_tau_101.px",
+        "pick": {
+          "Verolaji": "0",
+          "Muuttuja": "netto",
+          "Verovuosi (ajanjakso, jolta veron peruste on syntynyt)": "YYYY",
+          "Tiedot": "Arvo"
+        },
+        "roll": 12
+      },
+      "contrib_lag": 12,
       "handling": "none",
-      "kind": "level",
-      "pct_lag": 12
+      "kind": "level"
     },
     {
-      "id": "jt_veroyy_yht",
-      "label": "Yhteisövero",
+      "id": "jt_vk_k_yhtei",
+      "label": "Yhteisöjen tulovero",
       "set": "julkinen",
       "source": "statfin",
       "px_base": "https://vero2.stat.fi/PXWeb/api/v1/fi/Vero/",
@@ -8116,12 +8313,24 @@
         "Tiedot": "Arvo"
       },
       "roll": 12,
+      "contrib_of": {
+        "source": "statfin",
+        "px_base": "https://vero2.stat.fi/PXWeb/api/v1/fi/Vero/",
+        "table": "Verotulojen_kehitys/010_verotall_tau_101.px",
+        "pick": {
+          "Verolaji": "0",
+          "Muuttuja": "netto",
+          "Verovuosi (ajanjakso, jolta veron peruste on syntynyt)": "YYYY",
+          "Tiedot": "Arvo"
+        },
+        "roll": 12
+      },
+      "contrib_lag": 12,
       "handling": "none",
-      "kind": "level",
-      "pct_lag": 12
+      "kind": "level"
     },
     {
-      "id": "jt_veroyy_alv",
+      "id": "jt_vk_k_alv",
       "label": "Arvonlisävero",
       "set": "julkinen",
       "source": "statfin",
@@ -8134,12 +8343,84 @@
         "Tiedot": "Arvo"
       },
       "roll": 12,
+      "contrib_of": {
+        "source": "statfin",
+        "px_base": "https://vero2.stat.fi/PXWeb/api/v1/fi/Vero/",
+        "table": "Verotulojen_kehitys/010_verotall_tau_101.px",
+        "pick": {
+          "Verolaji": "0",
+          "Muuttuja": "netto",
+          "Verovuosi (ajanjakso, jolta veron peruste on syntynyt)": "YYYY",
+          "Tiedot": "Arvo"
+        },
+        "roll": 12
+      },
+      "contrib_lag": 12,
       "handling": "none",
-      "kind": "level",
-      "pct_lag": 12
+      "kind": "level"
     },
     {
-      "id": "jt_veroyy_valm",
+      "id": "jt_vk_k_sotu",
+      "label": "Työnantajan sairausvakuutusmaksu",
+      "set": "julkinen",
+      "source": "statfin",
+      "px_base": "https://vero2.stat.fi/PXWeb/api/v1/fi/Vero/",
+      "table": "Verotulojen_kehitys/010_verotall_tau_101.px",
+      "pick": {
+        "Verolaji": "400",
+        "Muuttuja": "netto",
+        "Verovuosi (ajanjakso, jolta veron peruste on syntynyt)": "YYYY",
+        "Tiedot": "Arvo"
+      },
+      "roll": 12,
+      "contrib_of": {
+        "source": "statfin",
+        "px_base": "https://vero2.stat.fi/PXWeb/api/v1/fi/Vero/",
+        "table": "Verotulojen_kehitys/010_verotall_tau_101.px",
+        "pick": {
+          "Verolaji": "0",
+          "Muuttuja": "netto",
+          "Verovuosi (ajanjakso, jolta veron peruste on syntynyt)": "YYYY",
+          "Tiedot": "Arvo"
+        },
+        "roll": 12
+      },
+      "contrib_lag": 12,
+      "handling": "none",
+      "kind": "level"
+    },
+    {
+      "id": "jt_vk_k_kiint",
+      "label": "Kiinteistövero",
+      "set": "julkinen",
+      "source": "statfin",
+      "px_base": "https://vero2.stat.fi/PXWeb/api/v1/fi/Vero/",
+      "table": "Verotulojen_kehitys/010_verotall_tau_101.px",
+      "pick": {
+        "Verolaji": "500",
+        "Muuttuja": "netto",
+        "Verovuosi (ajanjakso, jolta veron peruste on syntynyt)": "YYYY",
+        "Tiedot": "Arvo"
+      },
+      "roll": 12,
+      "contrib_of": {
+        "source": "statfin",
+        "px_base": "https://vero2.stat.fi/PXWeb/api/v1/fi/Vero/",
+        "table": "Verotulojen_kehitys/010_verotall_tau_101.px",
+        "pick": {
+          "Verolaji": "0",
+          "Muuttuja": "netto",
+          "Verovuosi (ajanjakso, jolta veron peruste on syntynyt)": "YYYY",
+          "Tiedot": "Arvo"
+        },
+        "roll": 12
+      },
+      "contrib_lag": 12,
+      "handling": "none",
+      "kind": "level"
+    },
+    {
+      "id": "jt_vk_k_valm",
       "label": "Valmisteverot",
       "set": "julkinen",
       "source": "statfin",
@@ -8152,9 +8433,51 @@
         "Tiedot": "Arvo"
       },
       "roll": 12,
+      "contrib_of": {
+        "source": "statfin",
+        "px_base": "https://vero2.stat.fi/PXWeb/api/v1/fi/Vero/",
+        "table": "Verotulojen_kehitys/010_verotall_tau_101.px",
+        "pick": {
+          "Verolaji": "0",
+          "Muuttuja": "netto",
+          "Verovuosi (ajanjakso, jolta veron peruste on syntynyt)": "YYYY",
+          "Tiedot": "Arvo"
+        },
+        "roll": 12
+      },
+      "contrib_lag": 12,
       "handling": "none",
-      "kind": "level",
-      "pct_lag": 12
+      "kind": "level"
+    },
+    {
+      "id": "jt_vk_k_muut",
+      "label": "Muut verot",
+      "set": "julkinen",
+      "source": "statfin",
+      "px_base": "https://vero2.stat.fi/PXWeb/api/v1/fi/Vero/",
+      "table": "Verotulojen_kehitys/010_verotall_tau_101.px",
+      "pick": {
+        "Verolaji": "700",
+        "Muuttuja": "netto",
+        "Verovuosi (ajanjakso, jolta veron peruste on syntynyt)": "YYYY",
+        "Tiedot": "Arvo"
+      },
+      "roll": 12,
+      "contrib_of": {
+        "source": "statfin",
+        "px_base": "https://vero2.stat.fi/PXWeb/api/v1/fi/Vero/",
+        "table": "Verotulojen_kehitys/010_verotall_tau_101.px",
+        "pick": {
+          "Verolaji": "0",
+          "Muuttuja": "netto",
+          "Verovuosi (ajanjakso, jolta veron peruste on syntynyt)": "YYYY",
+          "Tiedot": "Arvo"
+        },
+        "roll": 12
+      },
+      "contrib_lag": 12,
+      "handling": "none",
+      "kind": "level"
     },
     {
       "id": "jt_trt_palk",

@@ -629,6 +629,10 @@ fetch_series <- function(s) {
     m <- merge(d, e, by = "date")
     d <- data.frame(date = m$date, value = m$value.x / m$value.y) }
   if (!is.null(s$mult)) d$value <- d$value * s$mult  # yksikonmuunnos (esim. milj. -> mrd. euroa)
+  if (!is.null(s$contrib_of)) {                     # vaikutus kokonaisen muutokseen, %-yks.: 100 * (X_t - X_t-L) / T_t-L (osat summautuvat kokonaisen muutokseen)
+    e <- fetch_series(c(s$contrib_of, list(id = paste0(s$id, "_tot"))))
+    m <- merge(d, e, by = "date"); m <- m[order(m$date), ]; n <- nrow(m); L <- if (is.null(s$contrib_lag)) 12 else s$contrib_lag
+    d <- data.frame(date = m$date, value = c(rep(NA, L), 100 * (m$value.x[(L + 1):n] - m$value.x[1:(n - L)]) / m$value.y[1:(n - L)])) }
   if (!is.null(s$pct_lag)) {                        # muutos %, edellisesta vuodesta (lag 4 nelj. / 12 kk)
     d <- d[order(d$date), ]; n <- nrow(d); L <- s$pct_lag
     d$value <- c(rep(NA, L), 100 * (d$value[(L + 1):n] / d$value[1:(n - L)] - 1)) }
