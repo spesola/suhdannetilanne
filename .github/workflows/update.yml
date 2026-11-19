@@ -102,7 +102,7 @@ jobs:
         if: hashFiles('public/index.html') != ''
         run: |
           npm install --no-save playwright@1.49.1
-          npx playwright install --with-deps chromium
+          npx playwright install --with-deps chromium || { sleep 30; sudo apt-get update -q; npx playwright install --with-deps chromium; }   # apt-peilin katkos: yksi uusi yritys
           node tests/smoke.js public/index.html
 
       - name: Julkaise Cloudflareen
