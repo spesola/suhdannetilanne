@@ -214,9 +214,10 @@ body { font-variant-numeric: tabular-nums; background: var(--bg); min-height: 10
 .phr:not(.cur) .sq i { opacity: .45; }
 .phr .sq i { cursor: pointer; transition: transform .1s; }
 .phr .sq i:hover { transform: scale(1.18); }
-.phx.pk .phr .sq i:not(.pk) { opacity: .16; }   /* valinta: muut neliöt himmenevät, valitut omassa tilassaan (ei lisäkehystä) */
+.phx.pk:not(.f) .phr .sq i:not(.pk), .phx.pk.f .phr.on .sq i:not(.pk) { opacity: .16; }   /* suodatuksessa himmennetty rivi ei himmene toiseen kertaan */   /* valinta: muut neliöt himmenevät, valitut omassa tilassaan (ei lisäkehystä) */
 .phx.pk .phr .sq i.pk { opacity: 1; }
 .phx.pk .phr .sq i.new:not(.pk) { box-shadow: none; }
+.phx.pk .phr .sq i.pk.st { box-shadow: inset 0 0 0 2px var(--qc); }   /* valittu, ei julkaistu: vahvempi reuna erottaa valitsemattomista */
 .phr .sq i.new { box-shadow: 0 0 0 1.5px var(--bg), 0 0 0 3px var(--fg); opacity: 1; }
 .phr:not(.cur) .sq i.new { background: color-mix(in srgb, var(--qc) 45%, var(--bg)); }
 .phr .n { font-variant-numeric: tabular-nums; color: var(--muted); } .phr.cur .n { color: var(--fg); font-weight: 600; }
