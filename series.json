@@ -31,7 +31,7 @@
           ],
           "lineColor": "var(--fg)",
           "from": 2016,
-          "note": "Kysymysten saldoluvut / 3. Lähde: EK, Euroopan komissio."
+          "note": "Kysymysten saldoluvut / 3. Lähteet: EK, Euroopan komissio."
         },
         "ek_rak": {
           "id": "luot_ek_rak",
@@ -49,7 +49,7 @@
           ],
           "lineColor": "var(--fg)",
           "from": 2016,
-          "note": "Kysymysten saldoluvut / 2. Lähde: EK, Euroopan komissio."
+          "note": "Kysymysten saldoluvut / 2. Lähteet: EK, Euroopan komissio."
         },
         "ek_palv": {
           "id": "luot_ek_palv",
@@ -68,7 +68,7 @@
           ],
           "lineColor": "var(--fg)",
           "from": 2016,
-          "note": "Kysymysten saldoluvut / 3. Lähde: EK, Euroopan komissio."
+          "note": "Kysymysten saldoluvut / 3. Lähteet: EK, Euroopan komissio."
         },
         "ek_kau": {
           "id": "luot_ek_kau",
@@ -87,7 +87,7 @@
           ],
           "lineColor": "var(--fg)",
           "from": 2016,
-          "note": "Kysymysten saldoluvut / 3. Lähde: EK, Euroopan komissio."
+          "note": "Kysymysten saldoluvut / 3. Lähteet: EK, Euroopan komissio."
         },
         "kul_luot": {
           "id": "luot_kul_luot",
@@ -1023,7 +1023,7 @@
                 "note": "Kausitasoitettu volyymi-indeksi, neljänneksen keskiarvo. Lähde: Eurostat."
               },
               {
-                "title": "Palveluvienti palveluryhmittäin, mrd €",
+                "title": "Palveluvienti palveluryhmittäin, mrd. €",
                 "lines": [
                   "x_pv_tot"
                 ],
@@ -1049,8 +1049,8 @@
                 "labels": {
                   "x_pv_tot": "Yhteensä"
                 },
-                "unit": "mrd €",
-                "stackUnit": "mrd €",
+                "unit": "mrd. €",
+                "stackUnit": "mrd. €",
                 "dec": 1,
                 "from": 2015,
                 "note": "Maksutaseen palveluvienti käypin hinnoin, neljän neljänneksen liukuva summa. Lähde: Eurostat (Suomen Pankki)."
@@ -1305,7 +1305,7 @@
                 "growth": true
               },
               {
-                "title": "Julkiset investoinnit alasektoreittain, mrd €",
+                "title": "Julkiset investoinnit alasektoreittain, mrd. €",
                 "lines": [
                   "x_jinv_yht"
                 ],
@@ -1322,8 +1322,8 @@
                 "colors": {
                   "x_jinv_yht": "var(--fg)"
                 },
-                "unit": "mrd €",
-                "stackUnit": "mrd €",
+                "unit": "mrd. €",
+                "stackUnit": "mrd. €",
                 "dec": 1,
                 "from": 2015,
                 "note": "Pääoman bruttomuodostus käypin hinnoin, neljän neljänneksen liukuva summa. Kunnat sisältää ennen vuotta 2023 myös sosiaali- ja terveyspalvelut. Sosiaaliturvarahastot eivät ole mukana. Lähde: Tilastokeskus."
@@ -2029,14 +2029,14 @@
         {
           "id": "velka",
           "section": "Luotonanto",
-          "title": "Kotitalouksien velkaantumisaste",
+          "title": "Kotitalouksien velkaantumisaste, %",
           "unit": "%",
           "dec": 1,
           "lines": [
             "velkaaste"
           ],
           "connect": true,
-          "note": "Lähde: Tilastokeskus.",
+          "note": "Velat suhteessa käytettävissä oleviin vuosituloihin. Lähde: Tilastokeskus.",
           "size": "half",
           "from": 2010
         },
@@ -2112,7 +2112,7 @@
           "dash": [
             "gpr_fin"
           ],
-          "note": "Uutisiin perustuvat indeksit, kukin suhteessa omaan keskiarvoonsa vuodesta 2000, keskihajontaa. Kauppapoliittinen epävarmuus perustuu Yhdysvaltain uutisiin. Geopoliittinen riski 3 kk liukuva keskiarvo; Suomi: Suomen mainitsevien geopoliittisen riskin uutisten osuus kaikista uutisista. Lähteet: Baker, Bloom ja Davis (FRED), Caldara ja Iacoviello ym.",
+          "note": "Uutisiin perustuvat indeksit, kukin suhteessa omaan keskiarvoonsa vuodesta 2000, keskihajontaa. Kauppapoliittinen epävarmuus perustuu Yhdysvaltain uutisiin. Geopoliittinen riski 3 kk liukuva keskiarvo; Suomi: Suomen mainitsevien geopoliittisen riskin uutisten osuus kaikista uutisista. Lähteet: Baker, Bloom ja Davis (FRED), Caldara, Iacoviello ym.",
           "section": "Riskit ja epävarmuus",
           "size": "half"
         },
@@ -2145,7 +2145,7 @@
           "from": 2001,
           "labels": {
             "osake_mv": "Markkina-arvo, mrd. €",
-            "osake_yy": "Vuosimuutos, % (oik.)"
+            "osake_yy": "Vuosimuutos, %"
           },
           "colors": {
             "osake_mv": "var(--fg)",
@@ -2546,7 +2546,7 @@
         {
           "id": "jt_tt_e",
           "section": "Menot",
-          "title": "Työttömyysetuudet, mrd € (12 kk summa)",
+          "title": "Työttömyysetuudet, mrd. € (12 kk summa)",
           "lines": [
             "jt_tt_e_tot"
           ],
@@ -2564,8 +2564,8 @@
           "labels": {
             "jt_tt_e_tot": "Yhteensä"
           },
-          "unit": "mrd €",
-          "stackUnit": "mrd €",
+          "unit": "mrd. €",
+          "stackUnit": "mrd. €",
           "dec": 2,
           "from": 2022,
           "size": "half",

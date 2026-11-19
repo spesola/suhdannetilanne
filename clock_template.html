@@ -624,7 +624,7 @@ button.dl:hover { text-decoration-color: var(--fg); }
 .fcsec .fnote a { color: inherit; }
 .snap.fct tr.avg th, .snap.fct tr.avg td { font-weight: 600; border-bottom: 0; border-top: 1px solid var(--fg); }
 .grmore .fhead h3 { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; min-width: 0; flex: 1 1 0; }   /* tasakorkeat kortit */
-.grmore .fsub { display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; min-height: 2.4em; }
+.grmore .fsub:not(.lgd) { display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; min-height: 2.4em; }
 .secnav { grid-column: 1 / -1; position: sticky; top: var(--barv, 60px); scroll-margin-top: var(--barv, 60px); z-index: 5; background: var(--bg); display: flex; gap: 6px; overflow-x: auto; scrollbar-width: none;
   padding: 10px 0; margin: -10px 0 -30px; border-bottom: 1px solid var(--line); min-width: 0; box-shadow: 0 0 0 100vmax var(--bg); clip-path: inset(0 -100vmax); }
 .secnav::-webkit-scrollbar { display: none; }
@@ -2703,7 +2703,7 @@ footer .flinks .lnk:hover { text-decoration-color: currentColor; }
           subEl.classList.toggle("lgd", !erit);
           subEl.hidden = erit; if (!erit) {                                 // pelkka selite: nimet ja varit; arvot nakyvat hoverissa kuvion sisalla
             subEl.innerHTML = [...c.lines.map(id => siTag(lbl(id), colOf[id], (c.dash || []).includes(id) ? "ds" : "")),
-              ...c.stack.map((id, k) => siTag(ser(id).label, stCol(c, k), isRes(id) ? "hx" : "sq"))].join(" ") + (su ? ` <span class="sunit">(${escH(su.replace(/\.$/, ""))})</span>` : "");
+              ...c.stack.map((id, k) => siTag(ser(id).label, stCol(c, k), isRes(id) ? "hx" : "sq"))].join(" ") + (su && !(c.title || "").includes(su.replace(/\.$/, "")) ? ` <span class="sunit">(${escH(su)})</span>` : "");   // yksikkö vain, jos se ei jo näy otsikossa
             if (valEl) valEl.innerHTML = ""; }
         } else if (c.bars) {
           const d = B[i]; if (valEl) valEl.innerHTML = `${fP(P[i])}: ${c.barsName || "ero"} <b style="color:${c.barsNeutral ? "var(--fg)" : d >= 0 ? "var(--q-up)" : "var(--q-down)"}">${d > 0 ? "+" : ""}${fmtV(d, c.dec)} ${c.barsUnit || "%-yks."}</b>`;
@@ -2830,7 +2830,7 @@ footer .flinks .lnk:hover { text-decoration-color: currentColor; }
     const open = new Set(), hs = [...document.querySelectorAll(".rfold")];
     const sync = () => hs.forEach(h => { const on = open.has(h.dataset.k); h.parentElement.classList.toggle("folded", !on); h.setAttribute("aria-expanded", on); });
     hs.forEach(h => { const tog = () => { const k = h.dataset.k; open.has(k) ? open.delete(k) : open.add(k); sync();
-        if (open.has(k)) { if (k === "fc") renderFc(); else drawCharts(); } };   // piilossa piirretyt kuviot uudelleen oikeaan leveyteen
+        if (open.has(k) && h.offsetParent) { if (k === "fc") renderFc(); else drawCharts(); } };   // piilossa piirretyt kuviot uudelleen oikeaan leveyteen
       h.onclick = tog; h.onkeydown = e => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); tog(); } }; });
     sync();
   })();
