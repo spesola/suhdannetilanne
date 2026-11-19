@@ -2655,7 +2655,6 @@
           "barSpan": 3,
           "connect": true,
           "from": 2000,
-          "wide": true,
           "stackUnit": "%",
           "labels": {
             "jt_veroaste": "Veroaste"
