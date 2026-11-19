@@ -288,7 +288,7 @@ body { font-variant-numeric: tabular-nums; background: var(--bg); min-height: 10
 #clock text { font-family: var(--font-body); }
 .pt { cursor: pointer; }
 .pt .lbl { opacity: 0; transition: opacity .12s; pointer-events: none; }
-.pt.sel .lbl, .pt.comp .lbl { opacity: 1; }   /* hover: nimi ja arvot vihjeessa, ei erillista nimea */
+.pt.sel .lbl { opacity: 1; }   /* hover: nimi ja arvot vihjeessa, ei erillista nimea */
 .tg { display: inline-flex; align-items: center; gap: 6px; font-size: 0.875rem; color: var(--muted); cursor: pointer; }
 .tg input { appearance: none; -webkit-appearance: none; width: 28px; height: 16px; border-radius: 8px; background: var(--line); position: relative; margin: 0; cursor: pointer; transition: background .15s; flex: none; }
 .tg input::after { content: ""; position: absolute; top: 2px; left: 2px; width: 12px; height: 12px; border-radius: 50%; background: #fff; box-shadow: 0 1px 2px rgba(0,0,0,.2); transition: transform .15s; }
@@ -1121,7 +1121,7 @@ footer .flinks .lnk:hover { text-decoration-color: currentColor; }
       const p = at(s, idx); if (!p) return;
       // vari: vaihevari, paitsi valintatilassa valitsemattomat neutraalin harmaina; yksittaisen valitun polku sen vaihevarilla
       const single = !(sel && sel.startsWith("g:"));   // yksitellen valitut: kullekin oma polku; koko ryhma vain Kulku-kytkimella
-      if (!s.comp) col = !selMode || hi(s) ? qcol(quad(p.l, p.c)) : "var(--dim)";
+      if (!s.comp) col = !selMode || hi(s) ? qcol(quad(p.l, p.c)) : "var(--dim)"; else col = qcol(quad(p.l, p.c));   // kokonaisindikaattori ja sen polku vaihevärissä
       const tailCol = s.comp ? col : hi(s) && single ? col : "var(--muted)";
       const off = qf && (quad(p.l, p.c) !== qf || (!s.comp && !s.isGroup && !s.in_composite)) && !hi(s);
       const dim = false;                                                // valitsemattomat neutraalin harmaina (vari yllä), ei himmennysta
@@ -1135,8 +1135,9 @@ footer .flinks .lnk:hover { text-decoration-color: currentColor; }
         pts.slice(0, -1).forEach((q, k) => el("circle", { cx: q[0], cy: q[1], r: (s.comp ? 1.7 : 1.6) * K, fill: tailCol, "fill-opacity": 0.2 + 0.4 * k / pts.length }, g));
       }
       const [hx, hy] = pts[pts.length - 1];
-      const r = ((s.comp ? 8 : s.isGroup ? 7 : 4.5) + (hi(s) ? 1.5 : 0)) * K;
-      const hd = el("circle", { cx: hx, cy: hy, r, fill: s.comp ? "var(--fg)" : col, stroke: "var(--plot)", "stroke-width": 1.5 }, g), mvE = [hd]; g._hd = [hx, hy];
+      const r = ((s.comp ? 11 : s.isGroup ? 7 : 4.5) + (hi(s) ? 1.5 : 0)) * K;   // kokonaisindikaattori: kehän säde (nimen paikka)
+      const hd = el("circle", { cx: hx, cy: hy, r: s.comp ? 7.5 * K : r, fill: col, stroke: "var(--plot)", "stroke-width": s.comp ? 2 : 1.5 }, g), mvE = [hd]; g._hd = [hx, hy];
+      if (s.comp) mvE.push(el("circle", { cx: hx, cy: hy, r: 11 * K, fill: "none", stroke: "var(--fg)", "stroke-width": 1.2 }, g));   // kokonaisindikaattori: ohut tumma kehä erottaa sarjoista ilman nimeä
       if (sel === s.id && !s.comp) mvE.push(el("circle", { class: "ring", cx: hx, cy: hy, r: r + 3.5 * K, fill: "none", stroke: "var(--fg)", "stroke-width": 1.4 }, g));   // kohdistettu sarja
       const right = hx + r + 8 + s.label.length * 6.6 < W - M;   // nimi oikealle, jos mahtuu kehyksen sisaan
       const lbl = el("text", { class: "lbl", x: hx + (right ? r + 6 : -r - 6), y: hy - 10, "text-anchor": right ? "start" : "end",
@@ -1144,7 +1145,7 @@ footer .flinks .lnk:hover { text-decoration-color: currentColor; }
       lbl.textContent = many && hi(s) ? (s.map || s.list || s.label) : s.label;   // useita valittuna: lyhyet nimet
       if (glide && prevP[s.id]) { const dx = prevP[s.id][0] - hx, dy = prevP[s.id][1] - hy;   // alkuun edellisen kuukauden kohtaan
         if (Math.abs(dx) + Math.abs(dy) > 0.5) [...mvE, lbl].forEach(e => { e.style.transform = `translate(${dx.toFixed(1)}px, ${dy.toFixed(1)}px)`; mv.push(e); }); }
-      if (s.comp) { lbl.setAttribute("font-weight", 600); placed.push(lbl); }   // kokonaisindikaattorin nimi aina nakyvissa
+      if (s.comp) lbl.setAttribute("font-weight", 600);                 // kokonaisindikaattorin nimi hoverissa kuten muilla
       if (sel === s.id) lbl.setAttribute("font-weight", 600);
       const pq = quad(p.l, p.c);
       g.dataset.tip = s.label; g.dataset.side = "1"; g.dataset.qc = qcol(pq);
@@ -1153,7 +1154,7 @@ footer .flinks .lnk:hover { text-decoration-color: currentColor; }
       if (hi(s)) placed.push(lbl);
       g.addEventListener("click", () => s.comp || s.isGroup ? select(s.id) : pick(s.id));
       g.addEventListener("mouseenter", () => { if (svg.lastChild !== g) svg.appendChild(g); hlRow(s.id);
-        if (!s.comp && !hi(s)) declutter([lbl], [...svg.querySelectorAll(".pt.hl .lbl, .pt.sel .lbl, .pt.comp .lbl")].filter(t => t !== lbl)); });   // hover-nimi muiden nimien ohi   // paalle, ettei nimi jaa muiden pisteiden alle
+        if (!s.comp && !hi(s)) declutter([lbl], [...svg.querySelectorAll(".pt.hl .lbl, .pt.sel .lbl")].filter(t => t !== lbl)); });   // hover-nimi muiden nimien ohi   // paalle, ettei nimi jaa muiden pisteiden alle
       g.addEventListener("mouseleave", () => hlRow(null));
     });
     placed.forEach(t => svg.appendChild(t.parentNode));   // valittujen nimet muiden pisteiden paalle
@@ -1345,7 +1346,7 @@ footer .flinks .lnk:hover { text-decoration-color: currentColor; }
     const svg = $("clock");
     svg.querySelectorAll(".pt.hl").forEach(g => g.classList.remove("hl"));
     ids.forEach(id => { const g = svg.querySelector(`.pt[data-id="${CSS.escape(id)}"]`); if (g) { g.classList.add("hl"); svg.appendChild(g); } });
-    declutter([...svg.querySelectorAll(".pt.hl .lbl, .pt.sel .lbl, .pt.comp .lbl")]);   // nakyvat nimet eivat mene paallekkain
+    declutter([...svg.querySelectorAll(".pt.hl .lbl, .pt.sel .lbl")]);   // nakyvat nimet eivat mene paallekkain
   }
   function hlRow(id) {
     document.querySelectorAll("#list .ind.hl").forEach(r => r.classList.remove("hl"));
