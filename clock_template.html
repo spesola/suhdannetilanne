@@ -776,6 +776,30 @@ footer .flinks .lnk:hover { text-decoration-color: currentColor; }
   #ts text { font-size: 18px; }
 }
 @media (max-width: 560px), (pointer: coarse) { .ind, .gh { min-height: 44px; } }
+/* ---------- liike: kuviot piirtyvät esiin, kortit nousevat, alleviivat liukuvat, vaiheneliöt syttyvät, uusin havainto sykähtää, vaiheviiva ---------- */
+.wipe { clip-path: inset(-2px var(--wr, 100%) -2px 0); }
+.wipe.go { clip-path: inset(-2px 0 -2px 0); transition: clip-path .75s cubic-bezier(.3, .6, .25, 1); }
+.fcard.rv { opacity: 0; transform: translateY(8px); }
+.fcard.rvin { opacity: 1; transform: none; transition: opacity .45s ease-out, transform .45s cubic-bezier(.2, .7, .3, 1); }
+@media print { .fcard.rv { opacity: 1; transform: none; } .wipe { clip-path: none; } }
+.pls { fill: none; stroke-width: 1.5; vector-effect: non-scaling-stroke; transform-box: fill-box; transform-origin: center; pointer-events: none; animation: pls 1s ease-out both; }
+@keyframes pls { from { transform: scale(1); opacity: .7; } to { transform: scale(3.4); opacity: 0; } }
+.sets { position: relative; }
+.sul { position: absolute; left: 0; top: 0; height: 2px; width: 0; background: var(--fg); pointer-events: none; opacity: 0; }
+.sul.on { opacity: 1; }
+.sul.mv { transition: transform .32s cubic-bezier(.3, .7, .3, 1), width .32s cubic-bezier(.3, .7, .3, 1); }
+.secnav .sul { height: 1.5px; }
+.sets.hasul button[aria-pressed="true"], .secnav.hasul button.on { border-bottom-color: transparent; }
+:root[data-theme="vapor"] .sul { background: var(--vgrad); }
+:root[data-theme="vapor"] .sets.hasul button[aria-pressed="true"] { border-image: none; }
+.phx.anim .phr .sq i { animation: sqIn .3s cubic-bezier(.2, .7, .3, 1) both; animation-delay: calc(var(--k, 0) * 16ms); }
+@keyframes sqIn { from { transform: scale(.35); opacity: 0; } }
+.pt .fd { animation: fdIn .35s ease-out both; }
+@keyframes fdIn { from { opacity: 0; } }
+.topbar::after { content: ""; position: absolute; left: 0; right: 0; bottom: -1px; height: 2px; z-index: -1; pointer-events: none; background: var(--phase, transparent); opacity: .85;
+  transform-origin: left; animation: phLine 1s cubic-bezier(.3, .6, .25, 1) .2s both; }
+@keyframes phLine { from { transform: scaleX(0); } }
+@media (prefers-reduced-motion: reduce) { .pls, .phx.anim .phr .sq i, .pt .fd, .topbar::after { animation: none; } .fcard.rv { opacity: 1; transform: none; } .wipe { clip-path: none; } }
 @media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
 </style>
 
@@ -939,6 +963,41 @@ footer .flinks .lnk:hover { text-decoration-color: currentColor; }
     for (const k in attrs) e.setAttribute(k, attrs[k]); if (parent) parent.appendChild(e); return e; };
   const quad = (l, c) => l >= 0 ? (c >= 0 ? "up" : "turn") : (c < 0 ? "down" : "rec");
   const qcol = q => `var(${Q[q].v})`;
+  /* ---------- liike (pois, jos käyttäjä on vähentänyt liikettä) ---------- */
+  const RMQ = matchMedia("(prefers-reduced-motion: reduce)"), motion = () => !RMQ.matches;
+  const ANIM = new Map();                                            // kerran animoidut: näkymä + kortin otsikko -> "done" tai "pend" (odottaa vieritystä; uudelleenpiirretty kortti perii tilan)
+  let rvIO = null, animQ = 0;
+  function pulse(svg) {                                              // uusin havainto: laajeneva rengas kerran
+    (svg._ends || []).slice(0, 3).forEach(d => { if (d.getAttribute("visibility") === "hidden" || !d.getAttribute("cx")) return;
+      const r = el("circle", { class: "pls", cx: d.getAttribute("cx"), cy: d.getAttribute("cy"), r: d.getAttribute("r"), stroke: d.getAttribute("fill") }, svg);
+      r.addEventListener("animationend", () => r.remove(), { once: true }); }); }
+  function wipeIn(svg, f) {                                          // piirtyminen vasemmalta oikealle; f = vasemman marginaalin osuus (akselin luvut näkyvät heti)
+    if (!svg || !motion()) return;
+    svg.style.setProperty("--wr", ((1 - (f || 0)) * 100).toFixed(1) + "%"); svg.classList.remove("go"); svg.classList.add("wipe");
+    getComputedStyle(svg).clipPath;                                  // alkutila voimaan ennen siirtymää
+    requestAnimationFrame(() => requestAnimationFrame(() => svg.classList.add("go")));
+    const done = e => { if (e && e.target !== svg) return; svg.removeEventListener("transitionend", done); clearTimeout(svg._wt); svg.classList.remove("wipe", "go"); pulse(svg); };
+    svg.addEventListener("transitionend", done); clearTimeout(svg._wt); svg._wt = setTimeout(done, 1200); }
+  function animIn() {                                                // uudet kortit: näkyvissä olevat piirtyvät, alempana olevat nousevat esiin vieritettäessä
+    animQ = 0; if (!motion()) return;
+    const vh = innerHeight;
+    ["charts", "grCharts", "grSide", "grMoreGrid"].forEach(id => { const box = $(id); if (!box || box.offsetParent === null) return;
+      box.querySelectorAll(".fcard").forEach(card => { if (card.offsetParent === null) return;
+        const h = card.querySelector("h3"), key = set.id + "|" + (h ? h.textContent : ""); if (ANIM.get(key) === "done" || card.classList.contains("rv")) return;
+        const svg = card.querySelector("svg.fc[data-wf]"), r = card.getBoundingClientRect();
+        if (r.top < vh - 40 && r.bottom > 0) { ANIM.set(key, "done"); wipeIn(svg, +(svg && svg.dataset.wf)); return; }
+        ANIM.set(key, "pend"); card.dataset.ak = key; card.classList.add("rv");
+        if (!rvIO) rvIO = new IntersectionObserver(es => es.forEach(e => { if (!e.isIntersecting) return; const c = e.target; rvIO.unobserve(c);
+          ANIM.set(c.dataset.ak, "done"); c.classList.add("rvin"); c.classList.remove("rv"); const s = c.querySelector("svg.fc[data-wf]"); wipeIn(s, +(s && s.dataset.wf));
+          setTimeout(() => c.classList.remove("rvin"), 600); }), { rootMargin: "0px 0px -40px 0px" });
+        rvIO.observe(card); }); }); }
+  const queueAnim = () => { if (!animQ) animQ = requestAnimationFrame(animIn); };
+  function placeUL(nav, b) {                                         // liukuva alleviiva aktiivisen painikkeen alle
+    if (!nav) return; let u = nav.querySelector(":scope > .sul");
+    if (!u) { u = document.createElement("span"); u.className = "sul"; u.setAttribute("aria-hidden", "true"); nav.appendChild(u); nav.classList.add("hasul"); }
+    if (!b || !b.offsetWidth) { u.classList.remove("on"); return; }
+    u.style.width = b.offsetWidth + "px"; u.style.transform = `translate(${b.offsetLeft}px, ${b.offsetTop + b.offsetHeight - u.offsetHeight}px)`;
+    if (!u.classList.contains("on")) { u.classList.add("on"); requestAnimationFrame(() => u.classList.toggle("mv", motion())); } }
   const gcol = g => `var(${GVARS[Math.max(0, set.groups.indexOf(g)) % GVARS.length]})`;
   const fmtP = p => p.includes("Q") ? p.slice(5) + "/" + p.slice(0, 4) : (+p.slice(5)) + "/" + p.slice(0, 4);
   const thou = s => s.replace(/^\d{4,}/, m => m.replace(/\B(?=(\d{3})+$)/g, "\u00a0"));   // tuhaterotin myos nelinumeroisiin
@@ -989,12 +1048,13 @@ footer .flinks .lnk:hover { text-decoration-color: currentColor; }
     $("headline").textContent = "Suhdannetilanne";   // sivuston nimi pysyy, valilehti kertoo osion
     $("sub").textContent = `Päivitetty ${gen.toLocaleDateString("fi-FI")}.`;
     $("updOpen").onclick = openUpd;
-    const box = $("sets"); box.innerHTML = "";
+    const box = $("sets"); box.querySelectorAll(":scope > button").forEach(b => b.remove());   // alleviiva jää paikalleen ja liukuu uuteen kohtaan
     D.sets.forEach(s => { const b = document.createElement("button"); b.type = "button"; b.innerHTML = `<span class="lg">${s.label}</span><span class="sh">${SHORT[s.id] || s.label}</span>`;
       b.setAttribute("aria-pressed", s.id === set.id); b.onclick = () => { if (s.id === set.id) return;
         stopPlay(); set = s; idx = defIdx(s); sel = null; picked.clear(); qf = null;
         if (s.growth) grSel = "bkt";
-        writeHash(); renderAll(); }; box.appendChild(b); });
+        writeHash(); renderAll(); }; box.insertBefore(b, box.querySelector(":scope > .sul")); });
+    requestAnimationFrame(() => placeUL(box, box.querySelector('button[aria-pressed="true"]')));
   }
 
   /* ---------- kello ---------- */
@@ -1018,8 +1078,11 @@ footer .flinks .lnk:hover { text-decoration-color: currentColor; }
   const W = 600, M = 40, S = (W - 2 * M) / (2 * LIM);
   const X = c => M + (clip(c) + LIM) * S, Y = l => M + (LIM - clip(l)) * S;
 
+  let clkLast = null;                                               // edellinen piirto: pisteet liukuvat, kun kuukausi vaihtuu
   function renderClock() {
-    const svg = $("clock"); svg.innerHTML = "";
+    const svg = $("clock"), prevP = {}; svg.querySelectorAll(".pt").forEach(g => { if (g._hd) prevP[g.dataset.id] = g._hd; });
+    const glide = motion() && clkLast && clkLast.set === set && clkLast.idx !== idx, mv = []; clkLast = { set, idx };
+    svg.innerHTML = "";
     const K = svg.clientWidth && svg.clientWidth < 420 ? 1.6 : 1;   // kapealla naytolla pisteet suuremmiksi
     const mid = W / 2, inner = W - 2 * M;
     // tausta: valkoinen ruudukko ilman vaihesavyja; pisteiden vari kertoo vaiheen
@@ -1067,18 +1130,20 @@ footer .flinks .lnk:hover { text-decoration-color: currentColor; }
       for (let k = from; k <= p.i; k++)
         if (s.level[k] != null && s.change[k] != null) pts.push([X(s.change[k]), Y(s.level[k])]);
       if (pts.length > 1) {
-        el("polyline", { points: pts.map(q => q.join(",")).join(" "), fill: "none", stroke: tailCol,
+        el("polyline", { ...(glide ? { class: "fd" } : {}), points: pts.map(q => q.join(",")).join(" "), fill: "none", stroke: tailCol,
           "stroke-width": s.comp || s.isGroup ? 1.2 : 1.1, "stroke-opacity": s.comp ? 0.45 : 0.4, "stroke-linejoin": "round", "stroke-linecap": "round" }, g);
         pts.slice(0, -1).forEach((q, k) => el("circle", { cx: q[0], cy: q[1], r: (s.comp ? 1.7 : 1.6) * K, fill: tailCol, "fill-opacity": 0.2 + 0.4 * k / pts.length }, g));
       }
       const [hx, hy] = pts[pts.length - 1];
       const r = ((s.comp ? 8 : s.isGroup ? 7 : 4.5) + (hi(s) ? 1.5 : 0)) * K;
-      el("circle", { cx: hx, cy: hy, r, fill: s.comp ? "var(--fg)" : col, stroke: "var(--plot)", "stroke-width": 1.5 }, g);
-      if (sel === s.id && !s.comp) el("circle", { class: "ring", cx: hx, cy: hy, r: r + 3.5 * K, fill: "none", stroke: "var(--fg)", "stroke-width": 1.4 }, g);   // kohdistettu sarja
+      const hd = el("circle", { cx: hx, cy: hy, r, fill: s.comp ? "var(--fg)" : col, stroke: "var(--plot)", "stroke-width": 1.5 }, g), mvE = [hd]; g._hd = [hx, hy];
+      if (sel === s.id && !s.comp) mvE.push(el("circle", { class: "ring", cx: hx, cy: hy, r: r + 3.5 * K, fill: "none", stroke: "var(--fg)", "stroke-width": 1.4 }, g));   // kohdistettu sarja
       const right = hx + r + 8 + s.label.length * 6.6 < W - M;   // nimi oikealle, jos mahtuu kehyksen sisaan
       const lbl = el("text", { class: "lbl", x: hx + (right ? r + 6 : -r - 6), y: hy - 10, "text-anchor": right ? "start" : "end",
         "font-size": s.isGroup ? 12.5 : 12, "font-weight": s.isGroup ? 600 : 500, fill: "var(--fg)", stroke: "var(--surface)", "stroke-width": 4, "paint-order": "stroke" }, g);
       lbl.textContent = many && hi(s) ? (s.map || s.list || s.label) : s.label;   // useita valittuna: lyhyet nimet
+      if (glide && prevP[s.id]) { const dx = prevP[s.id][0] - hx, dy = prevP[s.id][1] - hy;   // alkuun edellisen kuukauden kohtaan
+        if (Math.abs(dx) + Math.abs(dy) > 0.5) [...mvE, lbl].forEach(e => { e.style.transform = `translate(${dx.toFixed(1)}px, ${dy.toFixed(1)}px)`; mv.push(e); }); }
       if (s.comp) { lbl.setAttribute("font-weight", 600); placed.push(lbl); }   // kokonaisindikaattorin nimi aina nakyvissa
       if (sel === s.id) lbl.setAttribute("font-weight", 600);
       const pq = quad(p.l, p.c);
@@ -1093,6 +1158,8 @@ footer .flinks .lnk:hover { text-decoration-color: currentColor; }
     });
     placed.forEach(t => svg.appendChild(t.parentNode));   // valittujen nimet muiden pisteiden paalle
     declutter(placed);
+    if (mv.length) { svg.getBoundingClientRect(); const tr = playT ? "transform .15s linear" : "transform .4s cubic-bezier(.3, .7, .3, 1)";
+      requestAnimationFrame(() => mv.forEach(e => { e.style.transition = tr; e.style.transform = ""; })); }
   }
   // nimien tormaysten esto: ylhaalta alas, paallekkainen nimi siirtyy rivin alemmas (alkuperainen paikka talteen)
   function declutter(labels, fixed) {
@@ -1159,7 +1226,7 @@ footer .flinks .lnk:hover { text-decoration-color: currentColor; }
   $("next").onclick = () => { stopPlay(); if (idx < set.periods.length - 1) { idx++; update(); } };
 
   /* ---------- yhteenveto ja luettelo ---------- */
-  let phLeg = false;
+  let phLeg = false, panLast = null;
   function renderPanel() {
     const counts = { up: 0, turn: 0, down: 0, rec: 0 }; let n = 0;
     const mv = { up: [], turn: [], down: [], rec: [] }, stay = { up: [], turn: [], down: [], rec: [] };   // valittuun kuukauteen vaihetta vaihtaneet
@@ -1175,6 +1242,8 @@ footer .flinks .lnk:hover { text-decoration-color: currentColor; }
     $("hlead").innerHTML = "";
 
     $("summary").innerHTML = `<div class="phx${qf ? " f" : ""}${QORDER.some(q => stay[q].concat(mv[q]).some(x => picked.has(x.s.id))) ? " pk" : ""}">${hdr}<div class="phrs">${QORDER.map(q => `<button type="button" class="phr${q === cq ? " cur" : ""}${qf === q ? " on" : ""}" data-q="${q}" style="--qc:${qcol(q)};--N:${Math.max(1, ...Object.values(counts))}" aria-pressed="${qf === q}" aria-label="${Q[q].name}: ${counts[q]}. Klikkaa suodattaaksesi."><span class="nm">${Q[q].short}</span><span class="sq">${stay[q].map(x => `<i data-id="${x.s.id}" data-tip="${escH(x.s.label)}"${x.st >= 0 ? ` data-sub="${fmtP(set.periods[x.st])}"` : ""}${picked.has(x.s.id) || x.st >= 0 ? ` class="${[picked.has(x.s.id) ? "pk" : "", x.st >= 0 ? "st" : ""].filter(Boolean).join(" ")}"` : ""}></i>`).join("")}${mv[q].map(x => `<i class="new${picked.has(x.s.id) ? " pk" : ""}" data-id="${x.s.id}" data-tip="${escH(x.s.label)}" data-sub="${Q[x.q0].short} → ${Q[q].short.toLowerCase()} ${fmtP(set.periods[idx])}"></i>`).join("")}</span><span class="n">${counts[q]}</span></button>`).join("")}</div><div class="phn"><button type="button" class="phleg" aria-expanded="${phLeg}" aria-controls="phLegB" aria-label="Selitteet" title="Selitteet"><svg viewBox="0 0 10 10" aria-hidden="true"><path d="M3.5 2 7 5l-3.5 3"/></svg></button><span class="phlb${phLeg ? "" : " off"}" id="phLegB"><span><i></i>muutos edellisestä ${set.freq === "M" ? "kuukaudesta" : "neljänneksestä"}</span><span><i class="st"></i>ei julkaistu</span></span></div></div>`;   // rivi aina paikallaan, ettei sivu hypi   // yksi neliö = yksi sarja
+    { const sqA = motion() && !playT && (!panLast || panLast.set !== set || panLast.idx !== idx); panLast = { set, idx };   // neliöt syttyvät porrastetusti, kun kuukausi vaihtuu (ei suodatuksessa eikä toistossa)
+      const x = $("summary").querySelector(".phx"); if (sqA && x) { x.querySelectorAll(".sq i").forEach((e, k) => e.style.setProperty("--k", k)); x.classList.add("anim"); } }
     { const lb = $("summary").querySelector(".phleg");                 // selitteet nuolen takana; tila sailyy kuukautta vaihdettaessa
       lb.onclick = () => { phLeg = !phLeg; lb.setAttribute("aria-expanded", String(phLeg)); $("phLegB").classList.toggle("off", !phLeg); }; }
     $("summary").querySelectorAll("[data-q]").forEach(b => b.onclick = e => {
@@ -1399,6 +1468,7 @@ footer .flinks .lnk:hover { text-decoration-color: currentColor; }
     const solo = false, W2 = 560, H2 = 300,   // puolen leveyden sarake kartan alla
     ml = 40, mr = 14, mt = 12, mb = 33;
     svg.setAttribute("viewBox", `0 0 ${W2} ${H2}`);
+    if (!ANIM.has("ts|" + set.id) && svg.getBoundingClientRect().width) { ANIM.set("ts|" + set.id, "done"); wipeIn(svg, ml / W2); }
     const n = set.periods.length, xs = i => ml + i * (W2 - ml - mr) / (n - 1);
     const vals = s.level.filter(v => v != null);
     const lim = Math.max(2.5, Math.ceil(Math.max(...vals.map(Math.abs)) * 2) / 2);
@@ -1648,6 +1718,7 @@ footer .flinks .lnk:hover { text-decoration-color: currentColor; }
       const vt = (t.sign ? sg(val, t.dec) : fmtV(val, t.dec)) + u(t.unit);
       return `<div class="kpi"><div class="kpih"><span class="kpil">${t.label}</span><span class="kpip">${r ? fmtDay(r.date) : t.q ? "Q" + Math.ceil(+P[k].slice(5, 7) / 3) + "/" + P[k].slice(0, 4) : fmtP(P[k])}</span></div>
         <div class="kpiv">${vt}</div><div class="kpic">${ct}</div>${svg}<div class="kpiy"><span>${P[f0].slice(0, 4)}</span><span>${P[k].slice(0, 4)}</span></div></div>`; }).join("");
+    if (!ANIM.has("kpi|" + set.id)) { ANIM.set("kpi|" + set.id, "done"); $("kpiRow").querySelectorAll(".kpi > svg").forEach(s => wipeIn(s, 0)); }   // kipinät piirtyvät kerran
   }
   function renderGKpi() {                                               // ylaosan tunnusluku: BKT v/v ja q/q
     const sy = set.series.find(x => x.id === "bkt_yy"), sq = set.series.find(x => x.id === "bkt_qq"); if (!sy) { $("summary").innerHTML = ""; return; }
@@ -1790,7 +1861,8 @@ footer .flinks .lnk:hover { text-decoration-color: currentColor; }
     const hs = [...$("charts").querySelectorAll(":scope > .fsec")], k = Math.max(0, hs.findIndex(h => h.dataset.name === openSec[set.id]));
     nav.querySelectorAll("button").forEach((b, j) => { const on = j === k; b.setAttribute("aria-pressed", on);
       if (on && !b.classList.contains("on") && nav.scrollWidth > nav.clientWidth) nav.scrollTo({ left: b.offsetLeft - nav.offsetLeft - 24, behavior: "smooth" });
-      b.classList.toggle("on", on); }); }
+      b.classList.toggle("on", on); });
+    placeUL(nav, nav.querySelector("button.on")); }
 
 
   /* ---------- CSV-lataus: puolipiste ja desimaalipilkku (Excel fi), UTF-8 BOM ---------- */
@@ -1934,6 +2006,8 @@ footer .flinks .lnk:hover { text-decoration-color: currentColor; }
       scrollTo({ top: t.getBoundingClientRect().top + scrollY - bar - 16 }); }, 120); }
   // sivuston muutokset: uudet kuviot ja muut isommat lisaykset (kasin yllapidetty, uusin ensin); set + id -> linkki kuvioon
   const CHANGES = [
+    { d: "2026-11-19", t: "Liike: kuviot piirtyvät esiin, kortit nousevat vieritettäessä, suhdannekartan pisteet liukuvat kuukausien välillä, alleviivat liukuvat, vaiheviiva yläpalkin alla" },
+    { d: "2026-11-19", t: "Uusi-merkit näkymäkohtaisesti; julkisen talouden alasektorit kuntahallinto ja hyvinvointialuehallinto" },
     { d: "2026-11-18", t: "Siistimpi ulkoasu: tiiviimmät välit, kevyemmät osio- ja korttiviivat, kortin toiminnot näkyvät osoitettaessa" },
     { d: "2026-11-18", t: "Rahoitusmarkkinat: rahoitusolot-taulukko sivun alkuun", set: "Rahoitusmarkkinat" },
     { d: "2026-11-18", t: "Pörssiosakkeiden markkina-arvo", set: "Rahoitusmarkkinat", id: "osake_mv" },
@@ -2456,6 +2530,7 @@ footer .flinks .lnk:hover { text-decoration-color: currentColor; }
     [box, $("grMoreGrid")].forEach(x => x && x.querySelectorAll(".fcard").forEach(menuize));
     [box, $("grMoreGrid")].forEach(x => x && (x.classList.contains("fgrid") ? [x] : [...x.querySelectorAll(".fgrid")]).forEach(pairRows));
     if (box.id === "charts") secFold(box);
+    queueAnim();
     return r;
   }
   // pitkan sivun osiot allekkain; valilehdet vierittavat osioon ja korostavat nakyvissa olevan osion (scrollspy)
@@ -2568,7 +2643,7 @@ footer .flinks .lnk:hover { text-decoration-color: currentColor; }
       const W2 = c.w || (big ? 960 : half ? 560 : 420), H2 = c.height || (big ? 300 : half ? 270 : (c.wide ? 270 : 230)), fs = c.w ? 11 : big ? 11 : half ? 12 : 13;
       const Y2 = c.y2 || [], isY2 = k => Y2.includes(c.lines[k]);   // toissijainen (oikea) akseli eri tason sarjoille
       const ml = big ? 44 : 52, mr = 10 + (c.bars || c.stack ? W2 / set.periods.length / 2 : 0) + (Y2.length ? 34 : 0), mt = 10, mb = big ? 33 : 39;
-      const svg = el("svg", { class: "fc", viewBox: `0 0 ${W2} ${H2}`, role: "img", "aria-label": c.title }, card);
+      const svg = el("svg", { class: "fc", viewBox: `0 0 ${W2} ${H2}`, role: "img", "aria-label": c.title }, card); svg.dataset.wf = (ml / W2).toFixed(3);
       const fm = document.createElement("div"); fm.className = "fmeta";
       if (c.lines.length > 1 || c.bars || c.stack) {
         // erittelyn rinnalla pinon selite piilotetaan (erittely toimii selitteena), mutta se pysyy PNG-kuvaa varten
@@ -2664,7 +2739,7 @@ footer .flinks .lnk:hover { text-decoration-color: currentColor; }
           "stroke-dasharray": (c.dot || []).includes(id) ? "1.5 3" : (c.dash || []).includes(id) ? "5 3" : "none",
           "stroke-linecap": (c.dot || []).includes(id) ? "round" : "butt", "stroke-linejoin": "round" }, svg); });
       const cur = el("line", { y1: mt, y2: H2 - mb, stroke: "var(--muted)", "stroke-width": 1, "stroke-dasharray": "2 3" }, svg);
-      const dots = L.map((a, k) => el("circle", { r: big ? 3.5 : 4, fill: colOf[c.lines[k]], stroke: "var(--surface)", "stroke-width": 1.5 }, svg));
+      const dots = L.map((a, k) => el("circle", { r: big ? 3.5 : 4, fill: colOf[c.lines[k]], stroke: "var(--surface)", "stroke-width": 1.5 }, svg)); svg._ends = dots;
       let zpan = null;
       if (c.zside) { const row = document.createElement("div"); row.className = "zrow"; svg.before(row); row.appendChild(svg);
         zpan = document.createElement("div"); zpan.className = "zpanel"; zpan.setAttribute("aria-live", "polite"); row.appendChild(zpan); }
@@ -2896,6 +2971,9 @@ footer .flinks .lnk:hover { text-decoration-color: currentColor; }
     b.setAttribute("aria-label", "Näytä selite"); b.innerHTML = '<svg viewBox="0 0 10 10" aria-hidden="true"><path d="M3.5 2 7 5l-3.5 3"/></svg>';
     b.onclick = () => { pn.hidden = !pn.hidden; b.setAttribute("aria-expanded", String(!pn.hidden)); b.setAttribute("aria-label", pn.hidden ? "Näytä selite" : "Piilota selite"); };
     pn.before(b); });
+  { const s0 = D.sets.find(s => s.composite && s.indicators), sv = set;   // vaiheviiva yläpalkin alle: kokonaisindikaattorin nykyinen vaihe
+    if (s0) { set = s0; const p = at(comp(), defIdx(s0)); if (p) document.documentElement.style.setProperty("--phase", qcol(quad(p.l, p.c))); set = sv; } }
+  addEventListener("resize", () => { placeUL($("sets"), $("sets").querySelector('button[aria-pressed="true"]')); const nv = document.querySelector("#charts .secnav"); if (nv) placeUL(nv, nv.querySelector("button.on")); });
   applyHash(); renderFoot(); renderAll();
   if (document.fonts && document.fonts.ready) document.fonts.ready.then(() => { if (set.growth && set.view === "charts") drawCharts(); goCard(); }); else goCard();   // fontin latauksen jalkeen korkeudet uudelleen
 })();
