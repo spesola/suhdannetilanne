@@ -1869,7 +1869,8 @@
           },
           "note": "Kuukausikeskiarvot. Lähteet: EKP, FRED.",
           "section": "Korot ja rahapolitiikka",
-          "size": "half"
+          "size": "half",
+          "more": true
         },
         {
           "id": "ekp_tase",
@@ -1889,7 +1890,8 @@
             "ekp_lain": "var(--g3)"
           },
           "note": "Kuukauden viimeinen viikkotase. Lähde: EKP.",
-          "size": "half"
+          "size": "half",
+          "more": true
         },
         {
           "id": "ea_m2c",
@@ -1907,7 +1909,8 @@
             "ea_m2": "var(--fg)",
             "ea_m3": "var(--accent)"
           },
-          "note": "Kausitasoitettu. Lähde: EKP."
+          "note": "Kausitasoitettu. Lähde: EKP.",
+          "more": true
         },
         {
           "id": "t_fx",
@@ -2113,7 +2116,8 @@
           "connect": true,
           "note": "Velat suhteessa käytettävissä oleviin vuosituloihin. Lähde: Tilastokeskus.",
           "size": "half",
-          "from": 2010
+          "from": 2010,
+          "more": true
         },
         {
           "id": "bls",
@@ -2140,7 +2144,8 @@
             "bls_e_d": "var(--accent)",
             "bls_h_d": "var(--q-down)"
           },
-          "note": "Nettoprosentti, neljän neljänneksen liukuva keskiarvo. Lähde: EKP."
+          "note": "Nettoprosentti, neljän neljänneksen liukuva keskiarvo. Lähde: EKP.",
+          "more": true
         },
         {
           "id": "clifs",
@@ -2203,7 +2208,8 @@
           "from": 2000,
           "note": "Optioiden hinnoista johdettu odotettu volatiliteetti, kuukausikeskiarvo. Lähteet: STOXX, Cboe (FRED).",
           "section": "Riskit ja epävarmuus",
-          "size": "half"
+          "size": "half",
+          "more": true
         },
         {
           "id": "osakkeet",
@@ -2228,7 +2234,8 @@
           },
           "note": "Suomalaisten yritysten pörssinoteerattujen osakkeiden markkina-arvo kuukauden lopussa. Muutokseen vaikuttavat hintojen lisäksi osakeannit ja listautumiset, joten se ei ole puhdas hintaindeksi. Lähde: Suomen Pankki.",
           "section": "Riskit ja epävarmuus",
-          "size": "half"
+          "size": "half",
+          "more": true
         }
       ],
       "colors": {
@@ -2460,7 +2467,8 @@
           "colors": {
             "jt_tel_ret": "var(--fg)"
           },
-          "note": "Työeläkelaitosten ylijäämä syntyy pääosin sijoitustuotoista. Neljän neljänneksen summa, % edellisen neljänneksen rahoitusvaroista. Arvonmuutokset: rahoitusvarojen muutos vähennettynä nettosijoituksilla. Omaisuustulot: korot, osingot ja muut omaisuustulot (D.4). Kansantalouden tilinpitoon perustuva arvio, joka poikkeaa Telan julkaisemasta tuotosta kattavuuden ja laskentatavan vuoksi (esim. 2025: arvio 5,5 %, Tela 7,4 %). Lähde: Tilastokeskus, oma laskelma."
+          "note": "Työeläkelaitosten ylijäämä syntyy pääosin sijoitustuotoista. Neljän neljänneksen summa, % edellisen neljänneksen rahoitusvaroista. Arvonmuutokset: rahoitusvarojen muutos vähennettynä nettosijoituksilla. Omaisuustulot: korot, osingot ja muut omaisuustulot (D.4). Kansantalouden tilinpitoon perustuva arvio, joka poikkeaa Telan julkaisemasta tuotosta kattavuuden ja laskentatavan vuoksi (esim. 2025: arvio 5,5 %, Tela 7,4 %). Lähde: Tilastokeskus, oma laskelma.",
+          "more": true
         },
         {
           "id": "jt_vk_tab",
@@ -2739,7 +2747,8 @@
           },
           "note": "Neljän neljänneksen liukuva summa suhteessa BKT:hen. Muut verot: tuotanto- ja tuontiverot pl. arvonlisävero (mm. valmisteverot, kiinteistövero) sekä pääomaverot. Sosiaaliturvamaksut: todelliset maksut, pl. laskennalliset. Lähteet: Eurostat, Tilastokeskus.",
           "lvl": true,
-          "size": "half"
+          "size": "half",
+          "more": true
         },
         {
           "id": "jt_trt",
@@ -2762,7 +2771,8 @@
           "y2": [
             "jt_trt_tt"
           ],
-          "note": "3 kk liukuvan summan muutos vuodentakaisesta. Työttömyysetuudet oikealla akselilla. Lähde: Verohallinto (tulorekisteri)."
+          "note": "3 kk liukuvan summan muutos vuodentakaisesta. Työttömyysetuudet oikealla akselilla. Lähde: Verohallinto (tulorekisteri).",
+          "more": true
         },
         {
           "id": "jt_me",
@@ -2833,7 +2843,8 @@
             "jt_jk_tot": "var(--fg)"
           },
           "stackUnit": "%-yks.",
-          "note": "Käyvin hinnoin, neljän neljänneksen liukuvan summan muutos vuodentakaisesta. Ostopalvelut: ostettuna markkinatuotantona annetut luontoisetuudet (esim. palvelusetelit, yksityiset hoivapalvelut). Myyntitulot vähennetään kulutusmenoista. Muut erät: mm. tuotantoverot. Lähde: Tilastokeskus, oma laskelma."
+          "note": "Käyvin hinnoin, neljän neljänneksen liukuvan summan muutos vuodentakaisesta. Ostopalvelut: ostettuna markkinatuotantona annetut luontoisetuudet (esim. palvelusetelit, yksityiset hoivapalvelut). Myyntitulot vähennetään kulutusmenoista. Muut erät: mm. tuotantoverot. Lähde: Tilastokeskus, oma laskelma.",
+          "more": true
         },
         {
           "id": "jt_tt_e",
@@ -2861,7 +2872,8 @@
           "dec": 2,
           "from": 2022,
           "size": "half",
-          "note": "Veronalaiset työttömyysetuudet, 12 kk liukuva summa. Lähde: Verohallinto (tulorekisteri)."
+          "note": "Veronalaiset työttömyysetuudet, 12 kk liukuva summa. Lähde: Verohallinto (tulorekisteri).",
+          "more": true
         },
         {
           "id": "jt_tt_n",
@@ -2879,7 +2891,8 @@
           "dec": 0,
           "from": 2022,
           "size": "half",
-          "note": "Henkilöt, joille maksettiin etuutta kuukauden aikana, 3 kk liukuva keskiarvo. Lähde: Verohallinto (tulorekisteri)."
+          "note": "Henkilöt, joille maksettiin etuutta kuukauden aikana, 3 kk liukuva keskiarvo. Lähde: Verohallinto (tulorekisteri).",
+          "more": true
         },
         {
           "id": "jt_nv",
@@ -2997,7 +3010,8 @@
             "jt_vk_dur": "var(--accent)",
             "jt_vk_fix": "var(--g2)"
           },
-          "note": "Keskimaturiteetti: velan keskimääräinen jäljellä oleva laina-aika. Lähde: Valtiokonttori."
+          "note": "Keskimaturiteetti: velan keskimääräinen jäljellä oleva laina-aika. Lähde: Valtiokonttori.",
+          "more": true
         },
         {
           "id": "jt_eraant",
@@ -3019,7 +3033,8 @@
               "label": "Muu velka"
             }
           ],
-          "note": "Budjettitalouden nykyisen velan kuoletukset vuosittain ilman uutta lainanottoa. Kuluvan vuoden luku sisältää vain jäljellä olevat kuoletukset. Lähde: Valtiokonttori."
+          "note": "Budjettitalouden nykyisen velan kuoletukset vuosittain ilman uutta lainanottoa. Kuluvan vuoden luku sisältää vain jäljellä olevat kuoletukset. Lähde: Valtiokonttori.",
+          "more": true
         }
       ]
     }

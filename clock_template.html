@@ -614,6 +614,9 @@ button.dl:hover { text-decoration-color: var(--fg); }
 .grmore { margin-top: 0; }
 /* BKT-ennusteet (sivun loppu) */
 .rfold { margin: 0; }
+.smore { grid-column: 1 / -1; }   /* osion toissijaiset kuviot "Lisää"-otsikon alle */
+.smore > .fsec { margin: 8px 0 0; }
+.smore > .smg { margin-top: 26px; }
 .fsec .fcnt { font-size: 0.875rem; font-weight: 400; color: var(--muted); margin-left: 2px; }
 .rfold + .fgrid { margin-top: 26px; }
 .grmore.folded > .fgrid, .fcsec.folded > .fgrid { display: none; }
@@ -2255,8 +2258,10 @@ footer .flinks .lnk:hover { text-decoration-color: currentColor; }
     card.innerHTML = h + "</tbody></table></div>";
     const wr = card.querySelector(".hmwrap"); requestAnimationFrame(() => { wr.scrollLeft = wr.scrollWidth; });
     card.querySelectorAll("tr.pick").forEach(tr => { const go = () => {
-        const id = tr.dataset.id, tg = [...document.querySelectorAll(".fcard")].find(x => x !== card && x.offsetParent && x._zc && [...(x._zc.lines || []), ...(x._zc.stack || [])].includes(id));
-        if (!tg) return; tg.scrollIntoView({ behavior: REDUCED.matches ? "auto" : "smooth", block: "center" }); tg.classList.remove("flash"); void tg.offsetWidth; tg.classList.add("flash"); };
+        const id = tr.dataset.id, find = vis => [...document.querySelectorAll(".fcard")].find(x => x !== card && (!vis || x.offsetParent) && x._zc && [...(x._zc.lines || []), ...(x._zc.stack || [])].includes(id));
+        let tg = find(true);
+        if (!tg) { const hid = find(false), h = hid && hid.closest(".smore"); if (h) { h.querySelector(".rfold").click(); setTimeout(go, 120); } return; }   // kuvio taitettuna: avaa Lisää ja yritä uudelleen
+        tg.scrollIntoView({ behavior: REDUCED.matches ? "auto" : "smooth", block: "center" }); tg.classList.remove("flash"); void tg.offsetWidth; tg.classList.add("flash"); };
       tr.onclick = go; tr.onkeydown = e => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); go(); } }; });
     const fm = document.createElement("div"); fm.className = "fmeta";
     const db = document.createElement("button"); db.type = "button"; db.className = "dl"; db.textContent = "Lataa CSV";
@@ -2540,10 +2545,11 @@ footer .flinks .lnk:hover { text-decoration-color: currentColor; }
       zb.innerHTML = '<svg viewBox="0 0 16 16" width="15" height="15" aria-hidden="true"><path d="M9.5 2.5h4v4M13.5 2.5 9 7M6.5 13.5h-4v-4M2.5 13.5 7 9"/></svg>';
       zb.onclick = e => { e.stopPropagation(); closeMenus(); openZoom(card._zc); }; mb.after(zb); card.classList.add("haszoom"); }
   }
+  const moreOpen = new Set();                                          // avatut osioiden Lisää-osiot (näkymä|osio)
   function renderCharts(box = $("charts"), only = null) {
     const r = renderCharts0(box, only);
     [box, $("grMoreGrid")].forEach(x => x && x.querySelectorAll(".fcard").forEach(menuize));
-    [box, $("grMoreGrid")].forEach(x => x && (x.classList.contains("fgrid") ? [x] : [...x.querySelectorAll(".fgrid")]).forEach(pairRows));
+    [box, $("grMoreGrid")].forEach(x => x && (x.classList.contains("fgrid") ? [x, ...x.querySelectorAll(".smg")] : [...x.querySelectorAll(".fgrid")]).forEach(pairRows));
     if (box.id === "charts") secFold(box);
     queueAnim();
     return r;
@@ -2629,12 +2635,20 @@ footer .flinks .lnk:hover { text-decoration-color: currentColor; }
     const more = col ? $("grMoreGrid") : null; if (more) more.innerHTML = "";
     let tgt = box;
     const SET = set, MSET = set.mperiods ? { ...set, periods: set.mperiods, series: set.mseries || [], freq: "M" } : null, SER = ser;
+    const smc = {};                                                       // osion "Lisää"-ruudukot (series.json: more)
+    const secMore = sec => { if (smc[sec]) return smc[sec];
+      const k = set.id + "|" + sec, w = document.createElement("div"); w.className = "smore";
+      w.innerHTML = `<h3 class="fsec rfold" role="button" tabindex="0" aria-expanded="${moreOpen.has(k)}"><span class="chev" aria-hidden="true"><svg viewBox="0 0 12 12" width="14" height="14"><path d="M4 2.5 7.5 6 4 9.5"/></svg></span>Lisää<span class="fcnt"></span></h3><div class="fgrid smg"${moreOpen.has(k) ? "" : " hidden"}></div>`;
+      const h = w.firstChild, tog = () => { if (moreOpen.has(k)) moreOpen.delete(k); else moreOpen.add(k); const y = scrollY; drawCharts(); scrollTo(0, y); };
+      h.onclick = tog; h.onkeydown = e => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); tog(); } };
+      box.appendChild(w); return (smc[sec] = w.lastChild); };
     charts.forEach(c0 => {
       const mon = !!(c0.monthly && MSET), set = mon ? MSET : SET, ser = mon ? (id => set.series.find(x => x.id === id)) : SER;
       const hooks = mon ? [] : chartHooks;                               // kuukausikuvio: oma hover, ei neljannesvuosikuvioiden tahdissa
       if (col && nth > 0) tgt = more;                                    // valitun rivin lisakuviot ylaparin alle
       if (c0.section && c0.section !== lastSec) {                        // valiotsikko osioiden valiin
         const h = document.createElement("h2"); h.className = "fsec"; h.textContent = c0.section; box.appendChild(h); lastSec = c0.section; }
+      if (!col && !only) tgt = c0.more && c0.section ? secMore(c0.section) : box;   // toissijaiset kuviot osion Lisää-osioon
       if (c0.type === "table") { tgt.appendChild(tableCard(c0, narrow)); return; }
       if (c0.type === "qtable") { tgt.appendChild(qtableCard(c0, narrow, box)); return; }
       if (c0.type === "curve") { tgt.appendChild(curveCard(c0, narrow)); return; }
@@ -2865,6 +2879,7 @@ footer .flinks .lnk:hover { text-decoration-color: currentColor; }
       hit.addEventListener("pointerleave", () => { if (rafH) cancelAnimationFrame(rafH); rafH = 0; hooks.forEach(fn => fn(null)); });
     });
     if (more) { $("grMore").hidden = !more.children.length; $("grMoreN").textContent = more.querySelectorAll(".fcard:not(.side)").length || ""; }
+    Object.values(smc).forEach(g => { g.previousElementSibling.querySelector(".fcnt").textContent = g.querySelectorAll(".fcard:not(.side)").length || ""; });
   }
 
   let lastNarrow = null, lastK = null, rzT = null;
