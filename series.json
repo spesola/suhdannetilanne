@@ -2388,7 +2388,7 @@
           "colors": {
             "jt_b9": "var(--fg)"
           },
-          "note": "Neljän neljänneksen liukuva summa suhteessa BKT:hen. Kuntahallinto sisältää Helsingin sosiaali- ja terveyspalvelut, joten jako ei vastaa täysin tehtäväjakoa. Hyvinvointialuehallinto vuodesta 2023, jolloin sosiaali- ja terveyspalvelut siirtyivät kunnilta hyvinvointialueille. Lähde: Tilastokeskus.",
+          "note": "Neljän neljänneksen liukuva summa suhteessa BKT:hen. Kuntahallinto sisältää Helsingin sosiaali- ja terveyspalvelut, laaja paikallishallinto ennen vuotta 2023. Lähde: Tilastokeskus.",
           "size": "tt",
           "stack": [
             "jt_b9_val",
