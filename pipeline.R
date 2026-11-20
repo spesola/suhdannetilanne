@@ -856,6 +856,18 @@ for (set in cfg$sets) {
       raws[[paste0(s$id, "_yy")]] <- data.frame(date = ry$date, value = dl(vy, lag))
       ser[[length(ser) + 1]] <- list(id = paste0(s$id, "_qq"), label = paste(s$label, "q/q"))
       ser[[length(ser) + 1]] <- list(id = paste0(s$id, "_yy"), label = paste(s$label, "v/v"))
+      # arvo ja hinta (kansantalouden tilinpito, volyymi viitevuoden hinnoin): kayvin hinnoin samasta taulusta,
+      # hinta = implisiittisen hintaindeksin (arvo / volyymi) muutos; taulukon Arvo- ja Hinta-valinnat
+      if (identical(s$table, "ntp/132h.px") && grepl("vv2015$", s$pick$contentscode)) {
+        cpk <- function(cc, suf) { s3 <- s; s3$id <- paste0(s$id, suf); s3$pick <- modifyList(s$pick, list(contentscode = sub("vv2015$", "cp", cc))); fetch_series(s3) }
+        cq <- cpk(s$pick$contentscode, "_cpq"); cy <- cpk(if (is.null(s$yy_pick)) s$pick$contentscode else s$yy_pick$contentscode, "_cpy")
+        defl <- function(cp, vv, k) { m <- merge(cp, vv, by = "date"); m <- m[order(m$date), ]; data.frame(date = m$date, value = dl(m$value.x / m$value.y, k)) }
+        raws[[paste0(s$id, "_cqq")]] <- data.frame(date = cq$date, value = dl(cq$value, 1))
+        raws[[paste0(s$id, "_cyy")]] <- data.frame(date = cy$date, value = dl(cy$value, lag))
+        raws[[paste0(s$id, "_pqq")]] <- defl(cq, data.frame(date = r$date, value = v), 1)
+        raws[[paste0(s$id, "_pyy")]] <- defl(cy, ry, lag)
+        for (k in c("cqq", "cyy", "pqq", "pyy")) ser[[length(ser) + 1]] <- list(id = paste0(s$id, "_", k), label = paste(s$label, k))
+      }
       # in_table = false: sarja vain kuvioihin (esim. reaaliansiot ansiotason kuviossa), ei taulukkoon eika kelloon
       if (!isFALSE(s$in_table))
         rows[[length(rows) + 1]] <- list(id = s$id, label = s$label, group = s$group, neutral = isTRUE(s$neutral), invert = isTRUE(s$invert), sub = isTRUE(s$sub), gap_after = isTRUE(s$gap_after))
