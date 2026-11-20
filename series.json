@@ -544,6 +544,66 @@
               "stackUnit": "%-yks.",
               "dec": 1,
               "note": "Toimialojen arvonlisäyksen kontribuutiot BKT:n vuosikasvuun edellisen vuoden hinnoin, työpäiväkorjattu. Muut toimialat: maatalous, informaatio ja viestintä, rahoitus, liike-elämän palvelut ja muut palvelut. Jäännös sisältää tuoteverot miinus tukipalkkiot. Lähde: Tilastokeskus, oma laskelma."
+            },
+            "__np_kul": {
+              "title": "Yksityisen kulutuksen nimellinen kasvu: volyymi ja hinta",
+              "line": "x_np_kul_nom",
+              "stack": [
+                "x_np_kul_vol",
+                "x_np_kul_pr"
+              ],
+              "unit": "%",
+              "stackUnit": "%-yks.",
+              "dec": 1,
+              "note": "Vuosimuutos, työpäiväkorjattu. Hinta: nimellisen ja volyymin muutoksen erotus. Lähde: Tilastokeskus."
+            },
+            "__np_jul": {
+              "title": "Julkisen kulutuksen nimellinen kasvu: volyymi ja hinta",
+              "line": "x_np_jul_nom",
+              "stack": [
+                "x_np_jul_vol",
+                "x_np_jul_pr"
+              ],
+              "unit": "%",
+              "stackUnit": "%-yks.",
+              "dec": 1,
+              "note": "Vuosimuutos, työpäiväkorjattu. Hinta: nimellisen ja volyymin muutoksen erotus. Lähde: Tilastokeskus."
+            },
+            "__np_inv": {
+              "title": "Investointien nimellinen kasvu: volyymi ja hinta",
+              "line": "x_np_inv_nom",
+              "stack": [
+                "x_np_inv_vol",
+                "x_np_inv_pr"
+              ],
+              "unit": "%",
+              "stackUnit": "%-yks.",
+              "dec": 1,
+              "note": "Vuosimuutos, työpäiväkorjattu. Hinta: nimellisen ja volyymin muutoksen erotus. Lähde: Tilastokeskus."
+            },
+            "__np_vie": {
+              "title": "Viennin nimellinen kasvu: volyymi ja hinta",
+              "line": "x_np_vie_nom",
+              "stack": [
+                "x_np_vie_vol",
+                "x_np_vie_pr"
+              ],
+              "unit": "%",
+              "stackUnit": "%-yks.",
+              "dec": 1,
+              "note": "Vuosimuutos, työpäiväkorjattu. Hinta: nimellisen ja volyymin muutoksen erotus. Lähde: Tilastokeskus."
+            },
+            "__np_tuo": {
+              "title": "Tuonnin nimellinen kasvu: volyymi ja hinta",
+              "line": "x_np_tuo_nom",
+              "stack": [
+                "x_np_tuo_vol",
+                "x_np_tuo_pr"
+              ],
+              "unit": "%",
+              "stackUnit": "%-yks.",
+              "dec": 1,
+              "note": "Vuosimuutos, työpäiväkorjattu. Hinta: nimellisen ja volyymin muutoksen erotus. Lähde: Tilastokeskus."
             }
           },
           "views": {
@@ -837,6 +897,9 @@
                 "contrib": "bkt_kulutus"
               },
               {
+                "contrib": "__np_kul"
+              },
+              {
                 "contrib": "__hhi"
               },
               {
@@ -894,11 +957,17 @@
               },
               {
                 "contrib": "__jb"
+              },
+              {
+                "contrib": "__np_jul"
               }
             ],
             "bkt_inv": [
               {
                 "contrib": "bkt_inv"
+              },
+              {
+                "contrib": "__np_inv"
               },
               {
                 "title": "Investointiaste, % BKT:stä",
@@ -942,6 +1011,9 @@
             "bkt_vienti": [
               {
                 "contrib": "bkt_vienti"
+              },
+              {
+                "contrib": "__np_vie"
               },
               {
                 "title": "Talouden ilmapiiri: Suomi ja vientimaat",
@@ -1113,6 +1185,9 @@
             "bkt_tuonti": [
               {
                 "contrib": "bkt_tuonti"
+              },
+              {
+                "contrib": "__np_tuo"
               },
               {
                 "title": "Vienti- ja tuontihinnat (2015=100)",
@@ -2112,7 +2187,7 @@
           "dash": [
             "gpr_fin"
           ],
-          "note": "Uutisiin perustuvat indeksit, kukin suhteessa omaan keskiarvoonsa vuodesta 2000, keskihajontaa. Kauppapoliittinen epävarmuus perustuu Yhdysvaltain uutisiin. Geopoliittinen riski 3 kk liukuva keskiarvo; Suomi: Suomen mainitsevien geopoliittisen riskin uutisten osuus kaikista uutisista. Lähteet: Baker, Bloom ja Davis (FRED), Caldara, Iacoviello ym.",
+          "note": "Uutisiin perustuvat indeksit, 3 kk liukuvat keskiarvot, kukin suhteessa omaan keskiarvoonsa vuodesta 2000, keskihajontaa. Kauppapoliittinen epävarmuus perustuu Yhdysvaltain uutisiin. Geopoliittinen riski, Suomi: Suomen mainitsevien geopoliittisen riskin uutisten osuus kaikista uutisista. Lähteet: Baker, Bloom ja Davis (FRED), Caldara, Iacoviello ym.",
           "section": "Riskit ja epävarmuus",
           "size": "half"
         },
@@ -4936,6 +5011,7 @@
       "label": "Talouspoliittinen epävarmuus (Eurooppa)",
       "source": "fred",
       "fred_id": "EUEPUINDXM",
+      "ma": 3,
       "handling": "none",
       "kind": "level"
     },
@@ -4949,6 +5025,7 @@
       "sheet": "TPU_MONTHLY",
       "date_col": "DATE",
       "value_col": "TPU",
+      "ma": 3,
       "handling": "none",
       "kind": "level",
       "optional": true
@@ -6972,6 +7049,141 @@
       "set": "bkt",
       "chart_only": true,
       "source": "gdp_np",
+      "part": "price"
+    },
+    {
+      "id": "x_np_kul_nom",
+      "label": "Nimelliset yksityiset kulutusmenot",
+      "set": "bkt",
+      "chart_only": true,
+      "source": "gdp_np",
+      "tt": "P3KS14_S15",
+      "part": "nom"
+    },
+    {
+      "id": "x_np_kul_vol",
+      "label": "Volyymi",
+      "set": "bkt",
+      "chart_only": true,
+      "source": "gdp_np",
+      "tt": "P3KS14_S15",
+      "part": "vol"
+    },
+    {
+      "id": "x_np_kul_pr",
+      "label": "Hinta (yksityisen kulutuksen deflaattori)",
+      "set": "bkt",
+      "chart_only": true,
+      "source": "gdp_np",
+      "tt": "P3KS14_S15",
+      "part": "price"
+    },
+    {
+      "id": "x_np_jul_nom",
+      "label": "Nimelliset julkiset kulutusmenot",
+      "set": "bkt",
+      "chart_only": true,
+      "source": "gdp_np",
+      "tt": "P3KS13",
+      "part": "nom"
+    },
+    {
+      "id": "x_np_jul_vol",
+      "label": "Volyymi",
+      "set": "bkt",
+      "chart_only": true,
+      "source": "gdp_np",
+      "tt": "P3KS13",
+      "part": "vol"
+    },
+    {
+      "id": "x_np_jul_pr",
+      "label": "Hinta (julkisen kulutuksen deflaattori)",
+      "set": "bkt",
+      "chart_only": true,
+      "source": "gdp_np",
+      "tt": "P3KS13",
+      "part": "price"
+    },
+    {
+      "id": "x_np_inv_nom",
+      "label": "Nimelliset investoinnit",
+      "set": "bkt",
+      "chart_only": true,
+      "source": "gdp_np",
+      "tt": "P51K",
+      "part": "nom"
+    },
+    {
+      "id": "x_np_inv_vol",
+      "label": "Volyymi",
+      "set": "bkt",
+      "chart_only": true,
+      "source": "gdp_np",
+      "tt": "P51K",
+      "part": "vol"
+    },
+    {
+      "id": "x_np_inv_pr",
+      "label": "Hinta (investointien deflaattori)",
+      "set": "bkt",
+      "chart_only": true,
+      "source": "gdp_np",
+      "tt": "P51K",
+      "part": "price"
+    },
+    {
+      "id": "x_np_vie_nom",
+      "label": "Nimellinen vienti",
+      "set": "bkt",
+      "chart_only": true,
+      "source": "gdp_np",
+      "tt": "P6K",
+      "part": "nom"
+    },
+    {
+      "id": "x_np_vie_vol",
+      "label": "Volyymi",
+      "set": "bkt",
+      "chart_only": true,
+      "source": "gdp_np",
+      "tt": "P6K",
+      "part": "vol"
+    },
+    {
+      "id": "x_np_vie_pr",
+      "label": "Hinta (viennin hinta)",
+      "set": "bkt",
+      "chart_only": true,
+      "source": "gdp_np",
+      "tt": "P6K",
+      "part": "price"
+    },
+    {
+      "id": "x_np_tuo_nom",
+      "label": "Nimellinen tuonti",
+      "set": "bkt",
+      "chart_only": true,
+      "source": "gdp_np",
+      "tt": "P7R",
+      "part": "nom"
+    },
+    {
+      "id": "x_np_tuo_vol",
+      "label": "Volyymi",
+      "set": "bkt",
+      "chart_only": true,
+      "source": "gdp_np",
+      "tt": "P7R",
+      "part": "vol"
+    },
+    {
+      "id": "x_np_tuo_pr",
+      "label": "Hinta (tuonnin hinta)",
+      "set": "bkt",
+      "chart_only": true,
+      "source": "gdp_np",
+      "tt": "P7R",
       "part": "price"
     },
     {
@@ -11542,7 +11754,7 @@
     },
     {
       "id": "x_jinv_val",
-      "label": "Valtio",
+      "label": "Valtionhallinto",
       "set": "bkt",
       "chart_only": true,
       "roll": 4,

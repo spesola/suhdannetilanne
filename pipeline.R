@@ -308,15 +308,16 @@ fetch_hhi_ctrb <- function(s) {
 
 # BKT:n nimellinen vuosikasvu jaettuna volyymiin ja hintaan (deflaattori), tyopaivakorjattu; hinta = nimellinen - volyymi
 .gnp <- new.env()
-fetch_gdp_np <- function(s) {
-  if (is.null(.gnp$res)) {
-    g <- function(cc) { d <- fetch_statfin(list(table = "ntp/132h.px", pick = list(taloustoimi_1_20180101 = "B1GMH", contentscode = cc))); setNames(d$value, d$date) }
+fetch_gdp_np <- function(s) {                      # tt: taloustoimi (oletus BKT; myos kysyntaerat, esim. P6K vienti)
+  tt <- if (is.null(s$tt)) "B1GMH" else s$tt
+  if (is.null(.gnp[[tt]])) {
+    g <- function(cc) { d <- fetch_statfin(list(table = "ntp/132h.px", pick = list(taloustoimi_1_20180101 = tt, contentscode = cc))); setNames(d$value, d$date) }
     cp <- g("tyopcp"); vv <- g("tyopvv2015"); dates <- sort(intersect(names(cp), names(vv)))
     L <- function(x) c(rep(NA, 4), head(x, -4)); a <- cp[dates]; b <- vv[dates]
     nom <- 100 * (a / L(a) - 1); vol <- 100 * (b / L(b) - 1)
-    .gnp$res <- data.frame(date = dates, nom = unname(nom), vol = unname(vol), price = unname(nom - vol))
+    .gnp[[tt]] <- data.frame(date = dates, nom = unname(nom), vol = unname(vol), price = unname(nom - vol))
   }
-  d <- .gnp$res; data.frame(date = d$date, value = d[[s$part]])
+  d <- .gnp[[tt]]; data.frame(date = d$date, value = d[[s$part]])
 }
 
 # saumaus: sama sarja useasta taulusta (esim. perusvuoden vaihtuessa), osat jarjestyksessa, myohempi osa voittaa

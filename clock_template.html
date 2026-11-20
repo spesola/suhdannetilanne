@@ -674,7 +674,8 @@ table.snap { width: 100%; border-collapse: collapse; font-size: 0.875rem; font-v
 .tcard .snap tr.pick { cursor: pointer; }
 .tcard .snap tr.pick:hover th, .tcard .snap tr.pick:focus-visible th { color: var(--accent); }
 .tcard .snap tr.pick:focus-visible { outline: 2px solid var(--accent); outline-offset: -2px; }
-.tcard .snap tr.on th { color: var(--accent); font-weight: 600; box-shadow: inset 2px 0 0 var(--accent); padding-left: 8px; }
+.tcard .snap tr.pick th { padding-left: 8px; }   /* tila valintapalkille kaikilla riveillä: valinta ei muuta sarakeleveyksiä */
+.tcard .snap tr.on th { color: var(--accent); box-shadow: inset 2px 0 0 var(--accent); }
 @media (max-width: 560px) { .snap { font-size: 0.78rem; } .snap th, .snap td { padding: 6px 3px; } .snap thead th { white-space: normal; } .snap .dt { display: block; margin-left: 0; }
   .snap tbody th { overflow-wrap: anywhere; } .snap thead th:nth-child(3), .snap tbody td:nth-child(3) { display: none; } }
 .fhead h3 { font-family: var(--font-body); font-weight: 600; font-size: 1rem; margin: 0; text-wrap: balance; }
@@ -2008,6 +2009,8 @@ footer .flinks .lnk:hover { text-decoration-color: currentColor; }
       scrollTo({ top: t.getBoundingClientRect().top + scrollY - bar - 16 }); }, 120); }
   // sivuston muutokset: uudet kuviot ja muut isommat lisaykset (kasin yllapidetty, uusin ensin); set + id -> linkki kuvioon
   const CHANGES = [
+    { d: "2026-11-20", t: "Kysyntäerien nimellinen kasvu: volyymi ja hinta (yksityinen ja julkinen kulutus, investoinnit, vienti, tuonti)", set: "Reaalitalous" },
+    { d: "2026-11-20", t: "Epävarmuusindeksit 3 kk liukuvina keskiarvoina; korjauksia kuvioiden selitteisiin" },
     { d: "2026-11-19", t: "Verokertymät verolajeittain (vuoden alusta) ja verolajien vaikutus verokertymän vuosimuutokseen", set: "Julkinen talous" },
     { d: "2026-11-19", t: "Liike: kuviot piirtyvät esiin, kortit nousevat vieritettäessä, suhdannekartan pisteet liukuvat kuukausien välillä, alleviivat liukuvat, vaiheviiva yläpalkin alla" },
     { d: "2026-11-19", t: "Uusi-merkit näkymäkohtaisesti; julkisen talouden alasektorit kuntahallinto ja hyvinvointialuehallinto" },
@@ -2589,13 +2592,13 @@ footer .flinks .lnk:hover { text-decoration-color: currentColor; }
       if (Array.isArray(vw))                                // useampi kuvio: ensimmainen ylapariin, muut alle
         return vw.map((v, k) => { const cbv = v.contrib && ((c.contribs || {})[v.contrib] || (v.contrib === "bkt" ? c.contrib : null));
           return v.type === "scatter" ? { ...v, id: `${c.id}_${k}` }
-          : v.growth ? { ...c, id: `${c.id}_${k}`, title: `${gRow.label}: kasvu`, lines: [grSel + "_yy"], bars: grSel + "_qq" }   // rivin kasvukuvio
+          : v.growth ? { ...c, id: `${c.id}_${k}`, title: `${gRow.label}: kasvu`, lines: [grSel + "_yy"], bars: grSel + "_qq", note: "Lähde: Tilastokeskus." }   // rivin kasvukuvio
           : v.contrib ? (cbv && ser(cbv.line) ? fromCb(cbv, `${c.id}_${k}`) : null)
           : ({ ...c, ...v, id: `${c.id}_${k}`, bars: v.bars, stack: v.stack, size: "half", wide: false, w: undefined, height: undefined }); }).filter(Boolean);
       if (vw) return { ...c, ...vw, bars: undefined, stack: undefined };
       const cb = (c.contribs && c.contribs[gRow.id]) || (gRow.id === "bkt" ? c.contrib : null);
       return cb && ser(cb.line) ? fromCb(cb)
-        : { ...c, title: `${gRow.label}: kasvu`, lines: [grSel + "_yy"], bars: grSel + "_qq" }; };
+        : { ...c, title: `${gRow.label}: kasvu`, lines: [grSel + "_yy"], bars: grSel + "_qq", note: "Lähde: Tilastokeskus." }; };
     // valilehti: valitun rivin paakuvio ylapariin, valilehden kaikkien rivien lisakuviot ruudukkoon (kukin kerran)
     let charts = only ? only : !gRow ? set.charts : set.charts.flatMap(c => { if (c.id !== "bktkasvu") return c;
       const own = [].concat(rowCharts(c, gRow)), seen = new Set(), extra = [];
@@ -2662,7 +2665,7 @@ footer .flinks .lnk:hover { text-decoration-color: currentColor; }
       const db = document.createElement("button"); db.type = "button"; db.className = "dl"; db.textContent = "Lataa CSV"; db.title = "Lataa kuvan data";
       db.onclick = () => chartCSV(c);
       card._zc = { ...c, colors: Object.fromEntries([...c.lines].map(id => [id, colOf[id]])) };   // suurennus: samat varit
-      if (c.lines.length > 1 || (c.stack && c.stack.length)) { const lg = fm.querySelector(".legend"); if (lg && (!c.bars || !c.hdr)) lg.classList.add("hide"); }   // nimet varikoodattuina alaotsikossa
+      if (c.lines.length > 1 || (c.stack && c.stack.length) || c.bars) { const lg = fm.querySelector(".legend"); if (lg && (!c.bars || !c.hdr)) lg.classList.add("hide"); }   // nimet varikoodattuina alaotsikossa
       if (c.ts) card.querySelector(".fhead").appendChild(db); else fm.appendChild(db);   // aikasarjanakymassa kuten vasen kuvio: otsikkoriville
       addPng(db, card);
       if (fm.children.length) card.appendChild(fm);
@@ -2701,7 +2704,10 @@ footer .flinks .lnk:hover { text-decoration-color: currentColor; }
       }
       if (c.ref != null) {                                                // kynnysviiva (esim. Sahmin saanto 0,5)
         el("line", { x1: ml, x2: W2 - mr, y1: ys(c.ref), y2: ys(c.ref), stroke: "var(--fg)", "stroke-opacity": 0.55, "stroke-dasharray": "4 3", "stroke-width": 1 }, svg);
-        el("text", { x: W2 - mr - 4, y: ys(c.ref) - 5, "text-anchor": "end", "font-size": fs, fill: "var(--muted)", stroke: "var(--surface)", "stroke-width": 3, "paint-order": "stroke" }, svg).textContent = c.refLabel || `kynnys ${fmtV(c.ref, 1)}`;
+        const rt = c.refLabel || `kynnys ${fmtV(c.ref, 1)}`, rw = rt.length * fs * 0.56, ry = ys(c.ref) - 5 - fs * 0.35;   // nimi siihen kohtaan, jossa viivat ovat kauimpana (ei päätepisteiden päälle)
+        const gap = x0 => { let g = Infinity; for (let k = 0; k < n; k++) { const x = xs(k); if (x < x0 - 6 || x > x0 + rw + 6) continue; L.forEach(a => { if (a[k] != null) g = Math.min(g, Math.abs(ys(a[k]) - ry)); }); } return g; };
+        const rx = [ml + 4, (ml + W2 - mr - rw) / 2, W2 - mr - 14 - rw].reduce((b, x) => gap(x) > gap(b) + 2 ? x : b);
+        el("text", { x: rx, y: ys(c.ref) - 5, "text-anchor": "start", "font-size": fs, fill: "var(--muted)", stroke: "var(--surface)", "stroke-width": 3, "paint-order": "stroke" }, svg).textContent = rt;
       }
       let yl = null;
       if (LW) {                                                           // alapaneeli: palkit omalla asteikolla
@@ -2789,8 +2795,10 @@ footer .flinks .lnk:hover { text-decoration-color: currentColor; }
         if (S.length) {
           if (valEl) valEl.innerHTML = "";                                   // pinotut: arvo nakyy erittelyssa ja hoverissa, ei alakulmaan
           const su = c.stackUnit != null ? c.stackUnit : "%-yks.";
-          subEl.classList.toggle("lgd", !erit);
-          subEl.hidden = erit; if (!erit) {                                 // pelkka selite: nimet ja varit; arvot nakyvat hoverissa kuvion sisalla
+          subEl.classList.toggle("lgd", !erit || c.lines.length > 1);
+          subEl.hidden = erit && c.lines.length < 2;
+          if (erit && c.lines.length > 1) subEl.innerHTML = c.lines.map(id => siTag(lbl(id), colOf[id], (c.dash || []).includes(id) ? "ds" : "")).join(" ");   // erittelyn rinnalla vain viivojen selite (esim. KHI ja YKHI)
+          if (!erit) {                                 // pelkka selite: nimet ja varit; arvot nakyvat hoverissa kuvion sisalla
             subEl.innerHTML = [...c.lines.map(id => siTag(lbl(id), colOf[id], (c.dash || []).includes(id) ? "ds" : "")),
               ...c.stack.map((id, k) => siTag(ser(id).label, stCol(c, k), isRes(id) ? "hx" : "sq"))].join(" ") + (su && !(c.title || "").includes(su.replace(/\.$/, "")) ? ` <span class="sunit">(${escH(su)})</span>` : "");   // yksikkö vain, jos se ei jo näy otsikossa
             if (valEl) valEl.innerHTML = ""; }
