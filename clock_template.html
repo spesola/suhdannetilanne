@@ -513,17 +513,18 @@ body { font-variant-numeric: tabular-nums; background: var(--bg); min-height: 10
 .updd { width: min(520px, calc(100vw - 24px)); height: min(580px, calc(100vh - 48px)); padding: 18px 0 0; overflow: hidden; }
 .updd[open] { display: flex; flex-direction: column; }
 .updd:focus { outline: none; }
-#upd .zbar { position: absolute; right: 12px; top: 10px; margin: 0; z-index: 2; }
-#upd .zbar button { font-size: 0; width: 30px; height: 30px; padding: 0; border: 0; border-radius: 6px; position: relative; }
-#upd .zbar button::before, #upd .zbar button::after { content: ""; position: absolute; left: 8px; top: 14px; width: 14px; height: 1.5px; background: var(--muted); transform: rotate(45deg); }
-#upd .zbar button::after { transform: rotate(-45deg); }
-#upd .zbar button:hover { background: color-mix(in srgb, var(--fg) 6%, transparent); }
-#upd .zbar button:hover::before, #upd .zbar button:hover::after { background: var(--fg); }
+dialog.updd .zbar { position: absolute; right: 12px; top: 10px; margin: 0; z-index: 2; }
+dialog.updd .zbar button { font-size: 0; width: 30px; height: 30px; padding: 0; border: 0; border-radius: 6px; position: relative; }
+dialog.updd .zbar button::before, dialog.updd .zbar button::after { content: ""; position: absolute; left: 8px; top: 14px; width: 14px; height: 1.5px; background: var(--muted); transform: rotate(45deg); }
+dialog.updd .zbar button::after { transform: rotate(-45deg); }
+dialog.updd .zbar button:hover { background: color-mix(in srgb, var(--fg) 6%, transparent); }
+dialog.updd .zbar button:hover::before, dialog.updd .zbar button:hover::after { background: var(--fg); }
 .updd .updg { display: flex; flex-direction: column; flex: 1; min-height: 0; padding: 0; }
 .utabs { position: relative; flex: none; display: flex; gap: 22px; margin: 0 20px; padding-right: 40px; border-bottom: 1px solid var(--line); }
 .utabs button { font: inherit; font-size: 0.95rem; background: none; border: 0; padding: 0 0 9px; color: var(--muted); border-bottom: 2px solid transparent; margin-bottom: -1px; cursor: pointer; }
 .utabs button:hover { color: var(--fg); }
 .utabs button.on { color: var(--fg); border-bottom-color: var(--fg); }
+.updd .utabs h2 { font-size: 0.95rem; font-weight: 400; margin: 0 0 -1px; padding: 0 0 9px; border-bottom: 2px solid var(--fg); }
 .utabs.hasul button.on { border-bottom-color: transparent; }
 .updd .updg > section { flex: 1; min-height: 0; overflow-y: auto; overscroll-behavior: contain; scrollbar-width: thin; padding: 2px 20px 18px; }
 .updd .unote { font-size: 0.72rem; color: var(--muted); margin: 10px 0 0; }
@@ -540,11 +541,8 @@ body { font-variant-numeric: tabular-nums; background: var(--bg); min-height: 10
 .updd .updg .ui span:last-child { font-size: 0.76rem; }
 .updd .updg .ui .pm { color: var(--muted); font-family: inherit; font-size: inherit; }
 .updd .updg .ui .tm { color: var(--accent); }
-.chgd { width: min(620px, calc(100vw - 24px)); }
-.updg.one { grid-template-columns: minmax(0, 1fr); }
 .updg { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 16px 48px; padding: 0 4px 6px; }
 @media (max-width: 700px) { .updg { grid-template-columns: minmax(0, 1fr); } }
-.updg h2 { font-size: 1rem; font-weight: 600; margin: 0 0 4px; padding-bottom: 8px; border-bottom: 1px solid var(--rule); }
 .updg .ud { font-size: 0.78rem; color: var(--muted); margin: 14px 0 2px; }
 .updg .ud.now { color: var(--fg); font-weight: 600; }
 #hm td[data-nw] { position: relative; }
@@ -924,8 +922,8 @@ footer .flinks .lnk:hover { text-decoration-color: currentColor; }
   <dialog class="zoom updd" id="upd" aria-label="Julkaisut" tabindex="-1"><div class="zbar"><button type="button" id="updClose" aria-label="Sulje" title="Sulje">Sulje</button></div>
     <div class="updg"><div class="utabs" role="tablist" aria-label="Julkaisut"><button type="button" role="tab" id="updT1" aria-controls="updS1">Tulevat julkaisut</button><button type="button" role="tab" id="updT2" aria-controls="updS2">Loki</button></div>
       <section id="updS1" role="tabpanel" aria-labelledby="updT1"><div id="updNext"></div></section><section id="updS2" role="tabpanel" aria-labelledby="updT2" hidden><div id="updLog"></div></section></div></dialog>
-  <dialog class="zoom updd chgd" id="chg" aria-label="Sivuston muutokset"><div class="zbar"><button type="button" id="chgClose">Sulje</button></div>
-    <div class="updg one"><section><h2>Sivuston muutokset</h2><div id="chgList"></div></section></div></dialog>
+  <dialog class="zoom updd" id="chg" aria-labelledby="chgT" tabindex="-1"><div class="zbar"><button type="button" id="chgClose" aria-label="Sulje" title="Sulje">Sulje</button></div>
+    <div class="updg"><div class="utabs"><h2 id="chgT">Sivuston muutokset</h2></div><section><div id="chgList"></div></section></div></dialog>
   <dialog class="zoom infod" id="info" aria-labelledby="infoT"><div class="zbar"><button type="button" id="infoClose">Sulje</button></div><h2 id="infoT"></h2><div class="ibody" id="infoB"></div></dialog>
   <dialog class="zoom" id="zoom" aria-label="Suurennettu kuvio"><div class="zbar"><button type="button" id="zoomClose">Sulje</button></div><div class="fgrid" id="zoomBody"></div></dialog>
 
@@ -2005,15 +2003,17 @@ footer .flinks .lnk:hover { text-decoration-color: currentColor; }
     return b; }
   // suurennus: kuvio piirretaan uudelleen isompana dialogiin (tekstit pysyvat normaalikokoisina, hover toimii)
   // loki (uudet havainnot ja vaihemuutokset) ja Tilastokeskuksen tulevat julkaisut
+  // julkaisu- ja muutosikkunoiden yhteiset: kuukausi väliotsikkona, päivä numerona ja viikonpäivänä
+  const MON = ["tammi", "helmi", "maalis", "huhti", "touko", "kesä", "heinä", "elo", "syys", "loka", "marras", "joulu"];
+  const monHdrF = () => { let lm = null; const yNow = new Date().getFullYear();
+    return d => { const k = d.getFullYear() * 12 + d.getMonth(); if (k === lm) return ""; lm = k;
+      return `<p class="umon">${MON[d.getMonth()]}kuu${d.getFullYear() !== yNow ? " " + d.getFullYear() : ""}</p>`; }; };
+  const dayEl = (d, now) => `<div class="dday${now ? " now" : ""}"${now ? ' title="Tänään"' : ""}><b>${d.getDate()}</b><span>${d.toLocaleDateString("fi-FI", { weekday: "short" })}</span></div>`;
   function openUpd() {
-    const dd = d => d.toLocaleDateString("fi-FI", { weekday: "short", day: "numeric", month: "numeric" });
     const today = new Date().toDateString(), now = Date.now() - 6 * 36e5;
     const up = (D.meta.upcoming || []).filter(r => new Date(r.date).getTime() >= now), byDay = new Map();
     up.forEach(r => { const d = new Date(r.date), k = d.toDateString(); if (!byDay.has(k)) byDay.set(k, { d, items: [] }); byDay.get(k).items.push(r); });
-    const MON = ["tammi", "helmi", "maalis", "huhti", "touko", "kesä", "heinä", "elo", "syys", "loka", "marras", "joulu"], yNow = new Date().getFullYear();
-    let lm = null; const monHdr = d => { const k = d.getFullYear() * 12 + d.getMonth(); if (k === lm) return ""; lm = k;   // kuukausi väliotsikkona
-      return `<p class="umon">${MON[d.getMonth()]}kuu${d.getFullYear() !== yNow ? " " + d.getFullYear() : ""}</p>`; };
-    const day = (d, now) => `<div class="dday${now ? " now" : ""}"${now ? ' title="Tänään"' : ""}><b>${d.getDate()}</b><span>${d.toLocaleDateString("fi-FI", { weekday: "short" })}</span></div>`;
+    let monHdr = monHdrF(); const day = dayEl;
     const ttl = s => { s = s.replace(/\s\d{4},/, ","); const m = s.match(/^(.*?),\s*((?:tammi|helmi|maalis|huhti|touko|kesä|heinä|elo|syys|loka|marras|joulu)kuu|\d\. (?:vuosi)?neljännes)(.*)$/);
       return m ? `${escH(m[1] + m[3])} <span class="pm">· ${escH(m[2])}</span>` : escH(s); };   // tilastojakso harmaana
     $("updNext").innerHTML = up.length ? `<p class="unote">Julkaisut klo 8.00, ellei toisin mainita.</p>` + [...byDay.values()].map(g => monHdr(g.d) + `<div class="dg">${day(g.d, g.d.toDateString() === today)}<div>` +
@@ -2021,7 +2021,7 @@ footer .flinks .lnk:hover { text-decoration-color: currentColor; }
         return `<div class="ui"><a href="${r.url}" target="_blank" rel="noopener">${ttl(r.title)}</a>${tm === "08.00" ? "" : `<span class="tm">${tm}</span>`}</div>`; }).join("") + "</div></div>").join("")
       : `<p class="none">Ei tiedossa olevia julkaisuja.</p>`;
     const L = D.meta.log || [], qn = q => `<i style="--qc:${qcol(q)}"></i>${Q[q].short}`;
-    lm = null;
+    monHdr = monHdrF();
     $("updLog").innerHTML = L.length ? L.map(e => { const d = new Date(e.date + "T12:00:00");
       const sets = D.sets.map(s => s.label).filter(l => (e.upd || []).some(u => u.set === l) || (e.phase || []).some(p => p.set === l));   // valilehtien jarjestyksessa
       (e.upd || []).forEach(u => { if (!sets.includes(u.set)) sets.push(u.set); });
@@ -2122,10 +2122,13 @@ footer .flinks .lnk:hover { text-decoration-color: currentColor; }
   ];
   function openChg() {
     const g = new Map(); CHANGES.forEach(c => { if (!g.has(c.d)) g.set(c.d, []); g.get(c.d).push(c); });
-    $("chgList").innerHTML = [...g].map(([d, cs]) => `<p class="ud">${new Date(d + "T12:00:00").toLocaleDateString("fi-FI", { day: "numeric", month: "numeric", year: "numeric" })}</p>` +
-      cs.map(c => logRow(c, escH(c.t), c.set ? escH(c.set) : "")).join("")).join("");
+    const monHdr = monHdrF(), today = new Date().toDateString(), ord = [...D.sets.map(s => s.label), undefined];   // välilehtien järjestys, yleiset viimeisenä
+    $("chgList").innerHTML = [...g].map(([ds, cs]) => { const d = new Date(ds + "T12:00:00");
+      return monHdr(d) + `<div class="dg">${dayEl(d, d.toDateString() === today)}<div>` +
+        ord.filter(l => cs.some(c => c.set === l)).map(l => `<p class="us">${escH(l || "Koko sivusto")}</p>` +
+          cs.filter(c => c.set === l).map(c => logRow(c, escH(l && c.t.startsWith(l + ": ") ? c.t[l.length + 2].toUpperCase() + c.t.slice(l.length + 3) : c.t), "")).join("")).join("") + "</div></div>"; }).join("");
     $("chgList").querySelectorAll("[data-go]").forEach(b => b.onclick = () => { $("chg").close(); goTo(b.dataset.go); });
-    $("chg").showModal(); $("chgClose").focus();
+    $("chg").showModal(); $("chg").focus();
   }
   $("chgClose").onclick = () => $("chg").close();
   $("chg").addEventListener("click", e => { if (e.target === $("chg")) $("chg").close(); });
