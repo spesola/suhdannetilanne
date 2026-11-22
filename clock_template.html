@@ -509,7 +509,24 @@ body { font-variant-numeric: tabular-nums; background: var(--bg); min-height: 10
 @keyframes zfade { from { opacity: 0; } }
 @media (prefers-reduced-motion: reduce) { .zoom[open], .zoom[open]::backdrop { animation: none; } }
 .zoom .zbar { display: flex; justify-content: flex-end; margin-bottom: 2px; }
-.updd { width: min(940px, calc(100vw - 24px)); }
+.updd { width: min(640px, calc(100vw - 24px)); }
+/* julkaisut: välilehdet, päivämäärä vasemmalla, ei raskaita viivoja */
+.updd .updg { display: block; }
+.utabs { position: relative; display: flex; gap: 22px; margin: 0 0 16px; border-bottom: 1px solid var(--line); }
+.utabs button { font: inherit; font-size: 0.95rem; background: none; border: 0; padding: 0 0 9px; color: var(--muted); border-bottom: 2px solid transparent; margin-bottom: -1px; cursor: pointer; }
+.utabs button:hover { color: var(--fg); }
+.utabs button.on { color: var(--fg); border-bottom-color: var(--fg); }
+.utabs.hasul button.on { border-bottom-color: transparent; }
+.utabs .sul { margin-top: -1px; }
+.updd .dg { display: grid; grid-template-columns: 92px minmax(0, 1fr); gap: 0 18px; padding: 10px 0; border-top: 1px solid var(--grid); }
+.updd .dg:first-child { border-top: 0; padding-top: 0; }
+.updd .updg .dg > .ud { margin: 4px 0 0; font-size: 0.78rem; color: var(--muted); }
+.updd .updg .dg > .ud.now { color: var(--fg); font-weight: 600; }
+.updd .updg .us { font-size: 0.7rem; font-weight: 500; letter-spacing: .06em; text-transform: uppercase; color: var(--muted); margin: 8px 0 2px; }
+.updd .updg .dg > div > .us:first-child { margin-top: 3px; }
+.updd .updg .ui, .updd .updg button.ui { border: 0; padding: 4px 0; }
+.updd .updg .ui span:last-child { font-size: 0.8rem; }
+@media (max-width: 560px) { .updd .dg { grid-template-columns: 64px minmax(0, 1fr); gap: 0 12px; } }
 .chgd { width: min(620px, calc(100vw - 24px)); }
 .updg.one { grid-template-columns: minmax(0, 1fr); }
 .updg { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 16px 48px; padding: 0 4px 6px; }
@@ -892,7 +909,8 @@ footer .flinks .lnk:hover { text-decoration-color: currentColor; }
   <section class="card" id="finSum" hidden></section>
   <section class="fgrid" id="charts" hidden></section>
   <dialog class="zoom updd" id="upd" aria-label="Julkaisut"><div class="zbar"><button type="button" id="updClose">Sulje</button></div>
-    <div class="updg"><section><h2>Tulevat julkaisut</h2><div id="updNext"></div></section><section><h2>Loki</h2><div id="updLog"></div></section></div></dialog>
+    <div class="updg"><div class="utabs" role="tablist" aria-label="Julkaisut"><button type="button" role="tab" id="updT1" aria-controls="updS1">Tulevat julkaisut</button><button type="button" role="tab" id="updT2" aria-controls="updS2">Loki</button></div>
+      <section id="updS1" role="tabpanel" aria-labelledby="updT1"><div id="updNext"></div></section><section id="updS2" role="tabpanel" aria-labelledby="updT2" hidden><div id="updLog"></div></section></div></dialog>
   <dialog class="zoom updd chgd" id="chg" aria-label="Sivuston muutokset"><div class="zbar"><button type="button" id="chgClose">Sulje</button></div>
     <div class="updg one"><section><h2>Sivuston muutokset</h2><div id="chgList"></div></section></div></dialog>
   <dialog class="zoom infod" id="info" aria-labelledby="infoT"><div class="zbar"><button type="button" id="infoClose">Sulje</button></div><h2 id="infoT"></h2><div class="ibody" id="infoB"></div></dialog>
@@ -1979,21 +1997,26 @@ footer .flinks .lnk:hover { text-decoration-color: currentColor; }
     const today = new Date().toDateString(), now = Date.now() - 6 * 36e5;
     const up = (D.meta.upcoming || []).filter(r => new Date(r.date).getTime() >= now), byDay = new Map();
     up.forEach(r => { const d = new Date(r.date), k = d.toDateString(); if (!byDay.has(k)) byDay.set(k, { d, items: [] }); byDay.get(k).items.push(r); });
-    $("updNext").innerHTML = up.length ? [...byDay.values()].map(g => `<p class="ud${g.d.toDateString() === today ? " now" : ""}">${g.d.toDateString() === today ? "Tänään, " : ""}${dd(g.d)}</p>` +
-      g.items.map(r => `<div class="ui"><a href="${r.url}" target="_blank" rel="noopener">${escH(r.title.replace(/\s\d{4},/, ","))}</a><span>${new Date(r.date).toLocaleTimeString("fi-FI", { hour: "2-digit", minute: "2-digit" })}</span></div>`).join("")).join("")
+    $("updNext").innerHTML = up.length ? [...byDay.values()].map(g => `<div class="dg"><p class="ud${g.d.toDateString() === today ? " now" : ""}">${g.d.toDateString() === today ? "Tänään, " : ""}${dd(g.d)}</p><div>` +
+      g.items.map(r => `<div class="ui"><a href="${r.url}" target="_blank" rel="noopener">${escH(r.title.replace(/\s\d{4},/, ","))}</a><span>${new Date(r.date).toLocaleTimeString("fi-FI", { hour: "2-digit", minute: "2-digit" })}</span></div>`).join("") + "</div></div>").join("")
       : `<p class="none">Ei tiedossa olevia julkaisuja.</p>`;
     const L = D.meta.log || [], qn = q => `<i style="--qc:${qcol(q)}"></i>${Q[q].short}`;
     $("updLog").innerHTML = L.length ? L.map(e => { const d = new Date(e.date + "T12:00:00");
       const sets = D.sets.map(s => s.label).filter(l => (e.upd || []).some(u => u.set === l) || (e.phase || []).some(p => p.set === l));   // valilehtien jarjestyksessa
       (e.upd || []).forEach(u => { if (!sets.includes(u.set)) sets.push(u.set); });
-      return `<p class="ud">${d.toLocaleDateString("fi-FI", { weekday: "short", day: "numeric", month: "numeric", year: "numeric" })}</p>` +
+      return `<div class="dg"><p class="ud">${d.toLocaleDateString("fi-FI", { weekday: "short", day: "numeric", month: "numeric", year: "numeric" })}</p><div>` +
         sets.map(l => `<p class="us">${escH(l || "Muut")}</p>` +
           (e.upd || []).filter(u => u.set === l).map(u => logRow(u, escH(u.src), u.period)).join("") +
-          (e.phase || []).filter(p => p.set === l).map(p => logRow(p, escH(p.label), `${qn(p.from)} → ${qn(p.to)}`)).join("")).join(""); }).join("")
+          (e.phase || []).filter(p => p.set === l).map(p => logRow(p, escH(p.label), `${qn(p.from)} → ${qn(p.to)}`)).join("")).join("") + "</div></div>"; }).join("")
       : `<p class="none">Loki täyttyy seuraavista päivityksistä alkaen.</p>`;
     $("updLog").querySelectorAll("[data-go]").forEach(b => b.onclick = () => { $("upd").close(); goTo(b.dataset.go); });
-    $("upd").showModal(); $("updClose").focus();
+    $("upd").showModal(); updTab(updK); $("updClose").focus();
   }
+  let updK = 1;                                                        // julkaisut-ikkunan välilehti (1 tulevat, 2 loki)
+  function updTab(k) { updK = k; [1, 2].forEach(i => { const b = $("updT" + i); b.classList.toggle("on", i === k); b.setAttribute("aria-selected", i === k); b.tabIndex = i === k ? 0 : -1; $("updS" + i).hidden = i !== k; });
+    placeUL(document.querySelector("#upd .utabs"), $("updT" + k)); }
+  $("updT1").onclick = () => updTab(1); $("updT2").onclick = () => updTab(2);
+  document.querySelector("#upd .utabs").addEventListener("keydown", e => { if (e.key === "ArrowRight" || e.key === "ArrowLeft") { updTab(updK === 1 ? 2 : 1); $("updT" + updK).focus(); } });
   // lokirivi linkiksi: sarjan tunnuksesta nakyma, osio ja kuvio
   const logRow = (r, name, right) => { const h = r.id ? targetOf(r.set, r.id) : null;
     return h ? `<button type="button" class="ui go" data-go="${h}" title="Siirry kuvioon"><span>${name}</span><span>${right}</span></button>` : `<div class="ui"><span>${name}</span><span>${right}</span></div>`; };
