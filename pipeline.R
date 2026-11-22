@@ -1362,7 +1362,7 @@ if (!is.null(prev)) {
   for (si in seq_along(out$sets)) {
     so <- out$sets[[si]]; if (!length(so$growth)) next
     ps <- Filter(function(x) identical(x$id, so$id), prev$sets); if (!length(ps)) next; ps <- ps[[1]]
-    ids <- c(paste0(vapply(so$growth, function(r) r$id, ""), "_qq"), paste0(vapply(so$growth, function(r) r$id, ""), "_yy"))
+    ids <- as.vector(outer(vapply(so$growth, function(r) r$id, ""), c("_qq", "_yy", "_cqq", "_cyy", "_pqq", "_pyy"), paste0))   # volyymi, arvo ja hinta
     pser <- setNames(ps$series, vapply(ps$series, function(x) x$id, ""))
     for (k in seq_along(so$series)) {
       s <- so$series[[k]]; if (!(s$id %in% ids) || is.null(pser[[s$id]])) next
