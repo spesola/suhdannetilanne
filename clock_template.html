@@ -509,24 +509,37 @@ body { font-variant-numeric: tabular-nums; background: var(--bg); min-height: 10
 @keyframes zfade { from { opacity: 0; } }
 @media (prefers-reduced-motion: reduce) { .zoom[open], .zoom[open]::backdrop { animation: none; } }
 .zoom .zbar { display: flex; justify-content: flex-end; margin-bottom: 2px; }
-.updd { width: min(640px, calc(100vw - 24px)); }
-/* julkaisut: välilehdet, päivämäärä vasemmalla, ei raskaita viivoja */
-.updd .updg { display: block; }
-.utabs { position: relative; display: flex; gap: 22px; margin: 0 0 16px; border-bottom: 1px solid var(--line); }
+/* julkaisut: kiinteän kokoinen ikkuna, välilehdet ylhäällä, sisältö vierittyy; päivä numerona, kuukausi väliotsikkona */
+.updd { width: min(520px, calc(100vw - 24px)); height: min(580px, calc(100vh - 48px)); padding: 18px 0 0; overflow: hidden; }
+.updd[open] { display: flex; flex-direction: column; }
+.updd:focus { outline: none; }
+#upd .zbar { position: absolute; right: 12px; top: 10px; margin: 0; z-index: 2; }
+#upd .zbar button { font-size: 0; width: 30px; height: 30px; padding: 0; border: 0; border-radius: 6px; position: relative; }
+#upd .zbar button::before, #upd .zbar button::after { content: ""; position: absolute; left: 8px; top: 14px; width: 14px; height: 1.5px; background: var(--muted); transform: rotate(45deg); }
+#upd .zbar button::after { transform: rotate(-45deg); }
+#upd .zbar button:hover { background: color-mix(in srgb, var(--fg) 6%, transparent); }
+#upd .zbar button:hover::before, #upd .zbar button:hover::after { background: var(--fg); }
+.updd .updg { display: flex; flex-direction: column; flex: 1; min-height: 0; padding: 0; }
+.utabs { position: relative; flex: none; display: flex; gap: 22px; margin: 0 20px; padding-right: 40px; border-bottom: 1px solid var(--line); }
 .utabs button { font: inherit; font-size: 0.95rem; background: none; border: 0; padding: 0 0 9px; color: var(--muted); border-bottom: 2px solid transparent; margin-bottom: -1px; cursor: pointer; }
 .utabs button:hover { color: var(--fg); }
 .utabs button.on { color: var(--fg); border-bottom-color: var(--fg); }
 .utabs.hasul button.on { border-bottom-color: transparent; }
-.utabs .sul { margin-top: -1px; }
-.updd .dg { display: grid; grid-template-columns: 92px minmax(0, 1fr); gap: 0 18px; padding: 10px 0; border-top: 1px solid var(--grid); }
-.updd .dg:first-child { border-top: 0; padding-top: 0; }
-.updd .updg .dg > .ud { margin: 4px 0 0; font-size: 0.78rem; color: var(--muted); }
-.updd .updg .dg > .ud.now { color: var(--fg); font-weight: 600; }
-.updd .updg .us { font-size: 0.7rem; font-weight: 500; letter-spacing: .06em; text-transform: uppercase; color: var(--muted); margin: 8px 0 2px; }
-.updd .updg .dg > div > .us:first-child { margin-top: 3px; }
-.updd .updg .ui, .updd .updg button.ui { border: 0; padding: 4px 0; }
-.updd .updg .ui span:last-child { font-size: 0.8rem; }
-@media (max-width: 560px) { .updd .dg { grid-template-columns: 64px minmax(0, 1fr); gap: 0 12px; } }
+.updd .updg > section { flex: 1; min-height: 0; overflow-y: auto; overscroll-behavior: contain; scrollbar-width: thin; padding: 2px 20px 18px; }
+.updd .unote { font-size: 0.72rem; color: var(--muted); margin: 10px 0 0; }
+.updd .umon { font-size: 0.7rem; font-weight: 600; letter-spacing: .09em; text-transform: uppercase; color: var(--muted); margin: 16px 0 2px; }
+.updd .updg .dg { display: grid; grid-template-columns: 40px minmax(0, 1fr); gap: 0 14px; padding: 11px 0; border-top: 1px solid var(--grid); }
+.updd .updg .umon + .dg { border-top: 0; padding-top: 6px; }
+.updd .dday { line-height: 1; padding-top: 2px; }
+.updd .dday b { display: block; font-size: 1.2rem; font-weight: 500; font-variant-numeric: tabular-nums; letter-spacing: -.01em; }
+.updd .dday span { display: block; font-size: 0.66rem; color: var(--muted); margin-top: 4px; text-transform: uppercase; letter-spacing: .05em; }
+.updd .dday.now b, .updd .dday.now span { color: var(--accent); }
+.updd .updg .us { font-size: 0.68rem; font-weight: 500; letter-spacing: .06em; text-transform: uppercase; color: var(--muted); margin: 8px 0 1px; }
+.updd .updg .dg > div > .us:first-child { margin-top: 2px; }
+.updd .updg .ui, .updd .updg button.ui { border: 0; padding: 3px 0; font-size: 0.84rem; align-items: baseline; }
+.updd .updg .ui span:last-child { font-size: 0.76rem; }
+.updd .updg .ui .pm { color: var(--muted); font-family: inherit; font-size: inherit; }
+.updd .updg .ui .tm { color: var(--accent); }
 .chgd { width: min(620px, calc(100vw - 24px)); }
 .updg.one { grid-template-columns: minmax(0, 1fr); }
 .updg { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 16px 48px; padding: 0 4px 6px; }
@@ -908,7 +921,7 @@ footer .flinks .lnk:hover { text-decoration-color: currentColor; }
   <section class="fcsec" id="fcSec" hidden><h2 class="fsec rfold" data-k="fc" role="button" tabindex="0" aria-expanded="false"><span class="chev" aria-hidden="true"><svg viewBox="0 0 12 12" width="14" height="14"><path d="M4 2.5 7.5 6 4 9.5"/></svg></span>Ennusteet</h2><div class="fgrid" id="fcGrid"></div></section>
   <section class="card" id="finSum" hidden></section>
   <section class="fgrid" id="charts" hidden></section>
-  <dialog class="zoom updd" id="upd" aria-label="Julkaisut"><div class="zbar"><button type="button" id="updClose">Sulje</button></div>
+  <dialog class="zoom updd" id="upd" aria-label="Julkaisut" tabindex="-1"><div class="zbar"><button type="button" id="updClose" aria-label="Sulje" title="Sulje">Sulje</button></div>
     <div class="updg"><div class="utabs" role="tablist" aria-label="Julkaisut"><button type="button" role="tab" id="updT1" aria-controls="updS1">Tulevat julkaisut</button><button type="button" role="tab" id="updT2" aria-controls="updS2">Loki</button></div>
       <section id="updS1" role="tabpanel" aria-labelledby="updT1"><div id="updNext"></div></section><section id="updS2" role="tabpanel" aria-labelledby="updT2" hidden><div id="updLog"></div></section></div></dialog>
   <dialog class="zoom updd chgd" id="chg" aria-label="Sivuston muutokset"><div class="zbar"><button type="button" id="chgClose">Sulje</button></div>
@@ -1997,20 +2010,28 @@ footer .flinks .lnk:hover { text-decoration-color: currentColor; }
     const today = new Date().toDateString(), now = Date.now() - 6 * 36e5;
     const up = (D.meta.upcoming || []).filter(r => new Date(r.date).getTime() >= now), byDay = new Map();
     up.forEach(r => { const d = new Date(r.date), k = d.toDateString(); if (!byDay.has(k)) byDay.set(k, { d, items: [] }); byDay.get(k).items.push(r); });
-    $("updNext").innerHTML = up.length ? [...byDay.values()].map(g => `<div class="dg"><p class="ud${g.d.toDateString() === today ? " now" : ""}">${g.d.toDateString() === today ? "Tänään, " : ""}${dd(g.d)}</p><div>` +
-      g.items.map(r => `<div class="ui"><a href="${r.url}" target="_blank" rel="noopener">${escH(r.title.replace(/\s\d{4},/, ","))}</a><span>${new Date(r.date).toLocaleTimeString("fi-FI", { hour: "2-digit", minute: "2-digit" })}</span></div>`).join("") + "</div></div>").join("")
+    const MON = ["tammi", "helmi", "maalis", "huhti", "touko", "kesä", "heinä", "elo", "syys", "loka", "marras", "joulu"], yNow = new Date().getFullYear();
+    let lm = null; const monHdr = d => { const k = d.getFullYear() * 12 + d.getMonth(); if (k === lm) return ""; lm = k;   // kuukausi väliotsikkona
+      return `<p class="umon">${MON[d.getMonth()]}kuu${d.getFullYear() !== yNow ? " " + d.getFullYear() : ""}</p>`; };
+    const day = (d, now) => `<div class="dday${now ? " now" : ""}"${now ? ' title="Tänään"' : ""}><b>${d.getDate()}</b><span>${d.toLocaleDateString("fi-FI", { weekday: "short" })}</span></div>`;
+    const ttl = s => { s = s.replace(/\s\d{4},/, ","); const m = s.match(/^(.*?),\s*((?:tammi|helmi|maalis|huhti|touko|kesä|heinä|elo|syys|loka|marras|joulu)kuu|\d\. (?:vuosi)?neljännes)(.*)$/);
+      return m ? `${escH(m[1] + m[3])} <span class="pm">· ${escH(m[2])}</span>` : escH(s); };   // tilastojakso harmaana
+    $("updNext").innerHTML = up.length ? `<p class="unote">Julkaisut klo 8.00, ellei toisin mainita.</p>` + [...byDay.values()].map(g => monHdr(g.d) + `<div class="dg">${day(g.d, g.d.toDateString() === today)}<div>` +
+      g.items.map(r => { const tm = new Date(r.date).toLocaleTimeString("fi-FI", { hour: "2-digit", minute: "2-digit" });
+        return `<div class="ui"><a href="${r.url}" target="_blank" rel="noopener">${ttl(r.title)}</a>${tm === "08.00" ? "" : `<span class="tm">${tm}</span>`}</div>`; }).join("") + "</div></div>").join("")
       : `<p class="none">Ei tiedossa olevia julkaisuja.</p>`;
     const L = D.meta.log || [], qn = q => `<i style="--qc:${qcol(q)}"></i>${Q[q].short}`;
+    lm = null;
     $("updLog").innerHTML = L.length ? L.map(e => { const d = new Date(e.date + "T12:00:00");
       const sets = D.sets.map(s => s.label).filter(l => (e.upd || []).some(u => u.set === l) || (e.phase || []).some(p => p.set === l));   // valilehtien jarjestyksessa
       (e.upd || []).forEach(u => { if (!sets.includes(u.set)) sets.push(u.set); });
-      return `<div class="dg"><p class="ud">${d.toLocaleDateString("fi-FI", { weekday: "short", day: "numeric", month: "numeric", year: "numeric" })}</p><div>` +
+      return monHdr(d) + `<div class="dg">${day(d, d.toDateString() === today)}<div>` +
         sets.map(l => `<p class="us">${escH(l || "Muut")}</p>` +
           (e.upd || []).filter(u => u.set === l).map(u => logRow(u, escH(u.src), u.period)).join("") +
           (e.phase || []).filter(p => p.set === l).map(p => logRow(p, escH(p.label), `${qn(p.from)} → ${qn(p.to)}`)).join("")).join("") + "</div></div>"; }).join("")
       : `<p class="none">Loki täyttyy seuraavista päivityksistä alkaen.</p>`;
     $("updLog").querySelectorAll("[data-go]").forEach(b => b.onclick = () => { $("upd").close(); goTo(b.dataset.go); });
-    $("upd").showModal(); updTab(updK); $("updClose").focus();
+    $("upd").showModal(); updTab(updK); $("upd").focus();   // kohdistus ikkunaan: ei korostusrengasta painikkeeseen hiirellä avattaessa
   }
   let updK = 1;                                                        // julkaisut-ikkunan välilehti (1 tulevat, 2 loki)
   function updTab(k) { updK = k; [1, 2].forEach(i => { const b = $("updT" + i); b.classList.toggle("on", i === k); b.setAttribute("aria-selected", i === k); b.tabIndex = i === k ? 0 : -1; $("updS" + i).hidden = i !== k; });
