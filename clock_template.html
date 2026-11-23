@@ -1838,6 +1838,9 @@ a.ubr, button.ubr { cursor: pointer; } a.ubr:hover .t, button.ubr:hover .t { tex
     if (!EK) { box.innerHTML = ""; return; }
     const E = set.detail[EK], mon = E.freq === "M", P = mon ? set.mperiods || [] : set.periods, SS = mon ? set.mseries || [] : set.series;   // kuukausierittely kuukausiakselilla
     const val = id => (SS.find(x => x.id === id) || {}).values || [];
+    // revisio: pohja edellisen julkaisun tasoista (rev.vals jaksotunnisteella), muutos lasketaan pohjasta samalla tavalla
+    const revOf = id => { const o = SS.find(x => x.id === id); return grRev && o && o.rev ? o.rev : null; };
+    const baseOf = rv => P.map(p => rv && rv.vals[p] != null ? rv.vals[p] : null);
     const btn = (k, on, tx) => `<button type="button" data-k="${k}" aria-pressed="${on}">${tx}</button>`;
     const MODE = { yy: "v/v", qq: "q/q" }, MODEL = { yy: "muutos vuodentakaisesta", qq: "muutos edellisestä neljänneksestä" };
     let rows, neu, inv = false, level = false, unit = "%", ctl, sub, note, setM, setY;
@@ -1847,10 +1850,9 @@ a.ubr, button.ubr { cursor: pointer; } a.ubr:hover .t, button.ubr:hover .t { tex
       const lag = st.md === "qq" ? 1 : mon ? 12 : 4;
       level = M.calc === "level"; inv = !!M.invert; neu = !!M.neutral; unit = M.unit || "%";
       // calc: pct (muutos %), diff (erotus), given (sarja on jo muutos, esim. KHI:n vuosimuutos), level (taso ilman varia); rivin from: arvot vasta tasta jaksosta (sarjakatko)
-      rows = E.rows.map((r, i) => { const a = val(`d_${EK}_${M.k}_${st.md}_${i}`);
-        let v = level || M.calc === "given" ? a : a.map((x, k) => k >= lag && x != null && a[k - lag] != null ? (M.calc === "diff" ? x - a[k - lag] : a[k - lag] ? 100 * (x / a[k - lag] - 1) : null) : null);
-        if (r.from) v = v.map((x, k) => P[k] < r.from ? null : x);
-        return { r, v }; });
+      const tf = a => level || M.calc === "given" ? a : a.map((x, k) => k >= lag && x != null && a[k - lag] != null ? (M.calc === "diff" ? x - a[k - lag] : a[k - lag] ? 100 * (x / a[k - lag] - 1) : null) : null);
+      rows = E.rows.map((r, i) => { const id = `d_${EK}_${M.k}_${st.md}_${i}`, rv = revOf(id), cut = a => r.from ? a.map((x, k) => P[k] < r.from ? null : x) : a;
+        return { r, v: cut(tf(val(id))), rv, bv: rv ? cut(tf(baseOf(rv))) : null }; });
       const md = Object.keys(M.modes);
       ctl = (E.measures.length > 1 ? `<div class="mini" role="group" aria-label="Mittari" id="eraM">${E.measures.map(x => btn(x.k, x.k === M.k, x.label)).join("")}</div>` : "") +
         (md.length > 1 ? `<div class="mini" role="group" aria-label="Muutos" id="eraY">${md.map(k => btn(k, k === st.md, MODE[k])).join("")}</div>` : "");
@@ -1860,10 +1862,10 @@ a.ubr, button.ubr { cursor: pointer; } a.ubr:hover .t, button.ubr:hover .t { tex
     } else {                                                           // kansantalouden tilinpito: volyymi, arvo ja hinta; v/v tyopaivakorjatusta, q/q kausitasoitetusta
       const lag = grMode === "yy" ? 4 : 1;
       const chg = a => a.map((v, k) => k >= lag && v != null && a[k - lag] != null && a[k - lag] !== 0 ? 100 * (v / a[k - lag] - 1) : null);
-      rows = E.rows.map(r => { const g = cc => val(`d_${EK}_${r.code}_${cc}`);
-        const vol = g(grMode === "yy" ? "tyopvv2015" : "kausitvv2015"), cp = g(grMode === "yy" ? "tyopcp" : "kausitcp");
-        const L = { v: vol, c: cp, p: cp.map((x, i) => x != null && vol[i] ? x / vol[i] : null) };
-        return { r, v: chg(L[grMeas]) }; });
+      const pick = (vol, cp) => ({ v: vol, c: cp, p: cp.map((x, i) => x != null && vol[i] ? x / vol[i] : null) })[grMeas];
+      rows = E.rows.map(r => { const iv = `d_${EK}_${r.code}_${grMode === "yy" ? "tyopvv2015" : "kausitvv2015"}`, ic = `d_${EK}_${r.code}_${grMode === "yy" ? "tyopcp" : "kausitcp"}`;
+        const rvv = revOf(iv), rvc = revOf(ic), rv = rvv && rvc ? rvv : null;
+        return { r, v: chg(pick(val(iv), val(ic))), rv, bv: rv ? chg(pick(baseOf(rvv), baseOf(rvc))) : null }; });
       neu = grMeas === "p";
       ctl = `<div class="mini" role="group" aria-label="Mittari" id="eraM">${btn("v", grMeas === "v", "Volyymi")}${btn("c", grMeas === "c", "Arvo")}${btn("p", grMeas === "p", "Hinta")}</div>
           <div class="mini" role="group" aria-label="Muutos" id="eraY">${btn("yy", grMode === "yy", "v/v")}${btn("qq", grMode === "qq", "q/q")}</div>`;
@@ -1881,18 +1883,27 @@ a.ubr, button.ubr { cursor: pointer; } a.ubr:hover .t, button.ubr:hover .t { tex
       if (x.r.gap) h += `<tr class="gap" aria-hidden="true"><td colspan="${cols.length + 1}"></td></tr>`;
       h += `<tr class="${[x.r.total ? "tot" : "", x.r.code && x.r.code === hl ? "on" : ""].filter(Boolean).join(" ")}"><th class="rl${ind ? " sub" : ""}${ind > 1 ? " sub2" : ""}" title="${escH(x.r.label)}">${escH(x.r.label)}</th>` +
         x.v.slice(i0, end + 1).map((v, j) => { if (v == null) return `<td class="na"></td>`;
-          const tip = ` title="${escH(x.r.label)}, ${fmtP(cols[j])}"`;
-          if (level) return `<td class="rawc"${tip}>${fmtV(v, 1)}</td>`;
+          let tip = ` title="${escH(x.r.label)}, ${fmtP(cols[j])}"`, rl = "";
+          if (grRev) { const p = cols[j], o = x.bv ? x.bv[i0 + j] : null;   // revisio kuten kasvutaulukossa: pieni luku solun alle
+            if (!x.rv) rl = `<small class="rv">&nbsp;</small>`;
+            else if (p > x.rv.last) rl = `<small class="rv z">uusi</small>`;
+            else if (o == null) rl = `<small class="rv">&nbsp;</small>`;
+            else { const d = Math.round((v - o) * 10) / 10; rl = `<small class="rv${d === 0 ? " z" : ""}">${d > 0 ? "+" : ""}${fmtV(d, 1)}</small>`;
+              if (d !== 0) tip = ` data-tip="${escH(x.r.label)}, ${fmtP(p)}" data-sub="aiemmin ${!level && +o.toFixed(1) > 0 ? "+" : ""}${fmtV(o, 1)}\nrevisio ${new Date(x.rv.date + "T12:00:00").toLocaleDateString("fi-FI")}"`; } }
+          if (level) return `<td class="rawc"${tip}>${fmtV(v, 1)}${rl}</td>`;
           const tt = Math.min(1, Math.abs(v) / (2 * sd)), base = neu ? "var(--accent)" : (v >= 0) !== inv ? "var(--q-up)" : "var(--q-down)";
-          return `<td class="hc${tt < 0.35 ? " lo" : ""}" style="--hc:${base};--hp:${Math.round(6 + (neu ? 30 : 40) * tt)}%;--hv:${Math.round(22 + 48 * tt)}%"${tip}>${+v.toFixed(1) > 0 ? "+" : ""}${fmtV(v, 1)}</td>`; }).join("") + "</tr>"; });
+          return `<td class="hc${tt < 0.35 ? " lo" : ""}" style="--hc:${base};--hp:${Math.round(6 + (neu ? 30 : 40) * tt)}%;--hv:${Math.round(22 + 48 * tt)}%"${tip}>${+v.toFixed(1) > 0 ? "+" : ""}${fmtV(v, 1)}${rl}</td>`; }).join("") + "</tr>"; });
+    const anyRev = rows.some(x => x.rv);
+    if (grRev) note = (anyRev ? "Pieni luku: revisio eli muutos edelliseen julkaisuun. " : "Revisiot näkyvät, kun sarjaan julkaistaan seuraavan kerran uusi jakso. ") + note;
     box.innerHTML = `<p class="eback"><button type="button" class="lnk" id="eraBack">← Kasvutaulukko</button></p>
       <div class="phead"><div><h2>${escH(E.title)}</h2><p class="grsub">${sub}</p></div>
-        <div class="hmctl">${ctl}</div></div>
+        <div class="hmctl">${ctl}<div class="mini" role="group" aria-label="Revisiot"><button type="button" id="eraRev" aria-pressed="${grRev}" title="Näytä muutos edelliseen julkaisuun">Revisio</button></div></div></div>
       <div class="hmwrap"><table class="hm">${h}</tbody></table></div>
       <button type="button" class="fchev tchev" id="eraNoteT" aria-expanded="${eraNoteOpen}" aria-controls="eraNoteB" aria-label="${eraNoteOpen ? "Piilota selite" : "Näytä selite"}"><svg viewBox="0 0 10 10" aria-hidden="true"><path d="M3.5 2 7 5l-3.5 3"/></svg></button><div class="fpanel tpanel" id="eraNoteB"${eraNoteOpen ? "" : " hidden"}><p class="fnote">${note}</p></div>`;
     $("eraNoteT").onclick = () => { eraNoteOpen = !eraNoteOpen; $("eraNoteB").hidden = !eraNoteOpen; $("eraNoteT").setAttribute("aria-expanded", String(eraNoteOpen)); $("eraNoteT").setAttribute("aria-label", eraNoteOpen ? "Piilota selite" : "Näytä selite"); };
     const wr = box.querySelector(".hmwrap"); wr.scrollLeft = wr.scrollWidth;   // kapealla uusimmat neljannekset nakyviin
     $("eraBack").onclick = e => eraGo("bkt", { back: true, kb: !e.detail });
+    $("eraRev").onclick = () => { grRev = !grRev; try { localStorage.setItem("grRev", grRev ? "1" : "0"); } catch (e) {} renderGrowth(); $("eraRev").focus({ preventScroll: true }); };
     [["eraM", setM], ["eraY", setY]].forEach(([g, f]) => { const el = $(g); if (!el) return;
       el.querySelectorAll("button").forEach(b => b.onclick = () => { f(b.dataset.k); renderGrowth(); const n = $(g) && $(g).querySelector(`[data-k="${b.dataset.k}"]`); if (n) n.focus({ preventScroll: true }); }); });
   }
@@ -2236,6 +2247,7 @@ a.ubr, button.ubr { cursor: pointer; } a.ubr:hover .t, button.ubr:hover .t { tex
       scrollTo({ top: t.getBoundingClientRect().top + scrollY - bar - 16 }); }, 120); }
   // sivuston muutokset: uudet kuviot ja muut isommat lisaykset (kasin yllapidetty, uusin ensin); set + id -> linkki kuvioon
   const CHANGES = [
+    { d: "2026-11-23", t: "Erittelysivuille revisiot: muutos edelliseen julkaisuun (Revisio-valinta)", set: "Reaalitalous" },
     { d: "2026-11-23", t: "Erittelysivut myös kuluttajahinnoille hyödykeryhmittäin, asuntojen hinnoille alueittain ja julkisille kulutusmenoille alasektoreittain", set: "Reaalitalous" },
     { d: "2026-11-23", t: "Erittelysivut myös BKT:lle toimialoittain, työtunneille, työttömyysasteelle ja ansiotasolle; erittelysivulla aiheen kaikki kuviot näkyvissä", set: "Reaalitalous" },
     { d: "2026-11-23", t: "Erittelysivut: yksityisen kulutuksen, investointien, viennin ja tuonnin osaerät avautuvat kasvutaulukon riviltä", set: "Reaalitalous" },

@@ -1443,16 +1443,21 @@ if (!is.null(prev)) {
     so <- out$sets[[si]]; if (!length(so$growth)) next
     ps <- Filter(function(x) identical(x$id, so$id), prev$sets); if (!length(ps)) next; ps <- ps[[1]]
     ids <- as.vector(outer(vapply(so$growth, function(r) r$id, ""), c("_qq", "_yy", "_cqq", "_cyy", "_pqq", "_pyy"), paste0))   # volyymi, arvo ja hinta
-    pser <- setNames(ps$series, vapply(ps$series, function(x) x$id, ""))
-    for (k in seq_along(so$series)) {
-      s <- so$series[[k]]; if (!(s$id %in% ids) || is.null(pser[[s$id]])) next
-      p <- pser[[s$id]]; rv <- NULL
-      if (!identical(p$last, s$last)) {                               # uusi jakso: edellisen ajon arvot pohjaksi
-        pv <- vapply(p$values, function(v) if (is.null(v)) NA_real_ else as.numeric(v), 0)
-        j <- tail(which(!is.na(pv)), 8)
-        if (length(j)) { rv <- list(date = format(Sys.Date()), last = p$last, vals = as.list(setNames(round(pv[j], 3), unlist(ps$periods[j])))); nrev <- nrev + 1 }
-      } else if (!is.null(p$rev)) rv <- p$rev                         # ei uutta jaksoa: pohja eteenpain
-      if (!is.null(rv)) out$sets[[si]]$series[[k]]$rev <- rv
+    # erittelysivujen tasosarjat (d_): pohjaksi pidempi jakso, jotta muutokset voidaan laskea pohjasta (v/v tarvitsee vuoden taaksepain)
+    for (kind in c("series", "mseries")) {
+      pl <- ps[[kind]]; if (!length(pl) || !length(so[[kind]])) next
+      pper <- unlist(if (kind == "series") ps$periods else ps$mperiods); nk <- if (kind == "series") 8 else 12
+      pser <- setNames(pl, vapply(pl, function(x) x$id, ""))
+      for (k in seq_along(so[[kind]])) {
+        s <- so[[kind]][[k]]; dl <- startsWith(s$id, "d_"); if (!(s$id %in% ids || dl) || is.null(pser[[s$id]])) next
+        p <- pser[[s$id]]; rv <- NULL
+        if (!identical(p$last, s$last)) {                             # uusi jakso: edellisen ajon arvot pohjaksi
+          pv <- vapply(p$values, function(v) if (is.null(v)) NA_real_ else as.numeric(v), 0)
+          j <- tail(which(!is.na(pv)), if (dl) nk + (if (kind == "series") 4 else 12) else 8)
+          if (length(j)) { rv <- list(date = format(Sys.Date()), last = p$last, vals = as.list(setNames(round(pv[j], 3), pper[j]))); nrev <- nrev + 1 }
+        } else if (!is.null(p$rev)) rv <- p$rev                       # ei uutta jaksoa: pohja eteenpain
+        if (!is.null(rv)) out$sets[[si]][[kind]][[k]]$rev <- rv
+      }
     }
   }
   if (nrev) message("Revisiot: uusi pohja ", nrev, " sarjalle")
