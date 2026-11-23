@@ -2807,7 +2807,7 @@
           "barSpan": 3,
           "connect": true,
           "from": 2000,
-          "wide": true,
+          "size": "tt",
           "stackUnit": "%",
           "labels": {
             "jt_te": "Menot yhteensä"

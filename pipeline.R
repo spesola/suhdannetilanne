@@ -1330,7 +1330,7 @@ for (k in names(log_state)) {
 out$meta$seen <- lapply(Filter(function(a) !is.na(a$since), log_state), function(a) a$since)
 upd_walk <- function(x) { if (!is.list(x)) return(character()); r <- character()
   if (identical(x$source, "statfin") && !is.null(x$table)) r <- c(r, SRC_TUPD[[paste0("px:", px_base_of(x), x$table)]])
-  if (identical(x$source, "eurostat") && !is.null(x$ds)) r <- c(r, SRC_TUPD[[paste0("es:", x$ds)]])
+  if (identical(x$source, "eurostat") && !is.null(x$ds) && grepl("^ei_bs", x$ds)) r <- c(r, SRC_TUPD[[paste0("es:", x$ds)]])   # paivitysaika koskee koko aineistoa: vain luottamusindikaattorit, joissa kaikki maat julkaistaan samana paivana
   for (y in x) if (is.list(y)) r <- c(r, upd_walk(y)); r[!is.na(r)] }
 out$meta$srcupd <- Filter(Negate(is.null), lapply(Filter(function(a) is.na(a$since), log_state), function(a) {
   s <- tryCatch(ser_cfg(a$id), error = function(e) NULL); r <- if (is.null(s)) character() else upd_walk(s); if (length(r)) max(r) else NULL }))
