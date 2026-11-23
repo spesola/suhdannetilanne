@@ -860,34 +860,34 @@ footer .flinks .lnk:hover { text-decoration-color: currentColor; }
   transform-origin: left; animation: phLine 1s cubic-bezier(.3, .6, .25, 1) .2s both; }
 @keyframes phLine { from { transform: scaleX(0); } }
 /* etusivun päivitykset: päivittyneet / tulossa, nuolilla vaihto (menneet vasemmalla, tulevat oikealla) */
-.ubox { align-self: stretch; min-width: 0; font-size: 0.84rem; display: flex; flex-direction: column; }   /* otsikko SUHDANNEVAIHE-tekstin tasolle, linkki alareunaan */
+.ubox { align-self: stretch; justify-self: end; width: 100%; max-width: 360px; min-width: 0; font-size: 0.84rem; display: flex; flex-direction: column; }   /* otsikko SUHDANNEVAIHE-tekstin tasolle, linkki alareunaan */
 .hero.haskpi .ubox { display: none; }
-.ubh { display: flex; align-items: center; gap: 6px; margin: -4px 0 4px; }   /* otsikon teksti samalle perusviivalle kuin SUHDANNEVAIHE */
-.ubh .k { font-size: 0.7rem; font-weight: 600; letter-spacing: .09em; text-transform: uppercase; color: var(--muted); margin-right: auto; }
-.ubh .step { width: 24px; height: 24px; border-radius: 6px; }
-.ubh .step:disabled { opacity: .35; cursor: default; border-color: var(--line); }
-.ubl { min-height: calc(4 * 29px); }
-@media (min-width: 861px) { .ubl { min-height: calc(6 * 29px); } }
-.ubl.sw { animation: ubIn .26s ease-out; }
-.ubl.sw.bk { animation-name: ubInB; }
-@keyframes ubIn { from { opacity: 0; transform: translateX(10px); } }
-@keyframes ubInB { from { opacity: 0; transform: translateX(-10px); } }
-.ubr { display: grid; grid-template-columns: 62px minmax(0, 1fr) auto; gap: 10px; align-items: baseline; width: 100%; padding: 5px 0; border: 0; border-top: 1px solid var(--grid);
-  background: none; font: inherit; color: inherit; text-align: left; text-decoration: none; line-height: 1.4; }
-.ubr:first-child { border-top: 0; }
+.ubh { font-size: 0.75rem; font-weight: 600; letter-spacing: .09em; text-transform: uppercase; color: var(--muted); margin: 0 0 6px; }   /* sama kuin SUHDANNEVAIHE */
+.hero:has(> .ubox:not([hidden])) { align-items: stretch; }   /* aikajana ja vaihe samasta yläreunasta */
+/* aikajana: pystyviiva, menneet täytettyinä pisteinä, tulevat onttoina, jakajana tämä päivä */
+.ubl { list-style: none; margin: 0; padding: 0 0 0 18px; position: relative; }
+.ubl::before { content: ""; position: absolute; left: 4px; top: 8px; bottom: 8px; width: 1px; background: var(--line); }
+.ubl > li { position: relative; }
+.ubl > li.past::before, .ubl > li.fu::before { content: ""; position: absolute; left: -18px; top: 8px; width: 9px; height: 9px; border-radius: 50%; box-sizing: border-box; background: var(--muted); }
+.ubl > li.fu::before { background: var(--bg); border: 1.5px solid var(--muted); }
+.ubl > li.now { padding: 7px 0; }
+.ubl > li.now span { display: flex; align-items: center; gap: 8px; margin-left: -22px; font-size: 0.76rem; font-weight: 600; color: var(--accent); font-variant-numeric: tabular-nums; }
+.ubl > li.now span::before { content: ""; width: 9px; height: 9px; margin-left: 1px; border-radius: 50%; background: var(--accent); box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent) 22%, transparent); flex: none; }
+.ubl > li.now span::after { content: ""; flex: 1; height: 1px; background: color-mix(in srgb, var(--accent) 40%, transparent); }
+.ubr { display: grid; grid-template-columns: 62px minmax(0, 1fr) auto; gap: 8px; align-items: baseline; width: 100%; padding: 3px 0; border: 0;
+  background: none; font: inherit; color: inherit; text-align: left; text-decoration: none; line-height: 1.45; }
 a.ubr, button.ubr { cursor: pointer; } a.ubr:hover .t, button.ubr:hover .t { text-decoration: underline; text-underline-offset: 3px; }
 .ubr:focus-visible { outline: 2px solid var(--accent); outline-offset: 1px; }
 .ubr .d { color: var(--muted); font-size: 0.76rem; white-space: nowrap; font-variant-numeric: tabular-nums; }
-.ubr .d.now { color: var(--accent); }
 .ubr .t { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.ubl > li.past .t { color: color-mix(in srgb, var(--fg) 72%, var(--bg)); }
 .ubr .t .fresh { margin: 0 0 0 7px; }
-.ubr .p { color: var(--muted); font-size: 0.76rem; white-space: nowrap; font-variant-numeric: tabular-nums; }
+.ubr .p { color: var(--muted); font-size: 0.72rem; white-space: nowrap; font-variant-numeric: tabular-nums; }
 .ubr .p.tm { color: var(--accent); }
-.ubf { display: flex; justify-content: flex-end; margin-top: auto; padding-top: 4px; }
+.ubf { display: flex; justify-content: flex-end; margin-top: auto; padding-top: 6px; }
 .ubf button { font: inherit; font-size: 0.76rem; color: var(--muted); background: none; border: 0; padding: 2px 0; cursor: pointer; }
 .ubf button:hover { color: var(--fg); }
-@media (max-width: 860px) { .ubox { align-self: stretch; margin-top: 8px; } }
-@media (prefers-reduced-motion: reduce) { .ubl.sw { animation: none; } }
+@media (max-width: 860px) { .ubox { align-self: stretch; justify-self: stretch; max-width: none; margin-top: 8px; } }
 @media (prefers-reduced-motion: reduce) { .pls, .phx.anim .phr .sq i, .pt .fd, .topbar::after { animation: none; } .fcard.rv { opacity: 1; transform: none; } .wipe { clip-path: none; } }
 @media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
 </style>
@@ -1701,43 +1701,33 @@ a.ubr, button.ubr { cursor: pointer; } a.ubr:hover .t, button.ubr:hover .t { tex
   }
 
   // etusivun päivityslaatikko: viimeksi päivittyneet (loki) ja tulevat julkaisut; uusi-merkki katsotaan kirjaamatta käyntiä
-  let ubK = 0; try { ubK = localStorage.getItem("ubox") === "1" ? 1 : 0; } catch (e) {}
   const seenPeek = (sid, id) => { const k = sid + "/" + id, d = (D.meta.seen || {})[k]; if (!d) return false; let B = null;
     if (sid in SEENB) B = SEENB[sid]; else try { const o = (JSON.parse(localStorage.getItem("kaynnit") || "{}") || {})[sid]; B = o ? (Date.now() - o.t < 18e5 ? o.base : o.cur) : null; } catch (e) {}
     return B ? B[k] !== d : (Date.now() - new Date(d + "T12:00:00")) / 864e5 < 7; };
-  const UBN_ = () => matchMedia("(min-width: 861px)").matches ? 6 : 4;   // leveällä laatikko täyttää vaiheen korkeuden
-  function renderUbox(on, dir) {
-    const UBN = UBN_();
+  // etusivun julkaisuaikajana: viimeksi päivittyneet (loki) jakajan yläpuolella, tulevat julkaisut alapuolella; jakajassa tämä päivä
+  function renderUbox(on) {
     const el = $("ubox"); el.hidden = !on; if (!on) { el.innerHTML = ""; return; }
-    const W = ["su", "ma", "ti", "ke", "to", "pe", "la"], today = new Date().toDateString();
-    const dc = (d, show) => `<span class="d${d.toDateString() === today ? " now" : ""}">${show ? (d.toDateString() === today ? "tänään" : `${W[d.getDay()]} ${d.getDate()}.${d.getMonth() + 1}.`) : ""}</span>`;
-    let rows = [];
-    if (ubK === 0) {
-      for (const e of D.meta.log || []) { const d = new Date(e.date + "T12:00:00"), nm = new Set(); let first = true;
-        for (const u of e.upd || []) { let n = u.src.includes(": ") ? u.src.slice(u.src.indexOf(": ") + 2) : u.src; n = n.charAt(0).toUpperCase() + n.slice(1);
-          if (nm.has(n)) continue; nm.add(n); if (rows.length >= UBN) break;
-          const s = D.sets.find(x => x.label === u.set), h = u.id ? targetOf(u.set, u.id) : null, fr = s && u.id && seenPeek(s.id, u.id);
-          const inner = `${dc(d, first)}<span class="t">${escH(n)}${fr ? '<span class="fresh" title="Uusi edellisen käyntisi jälkeen"></span>' : ""}</span><span class="p">${escH(u.period || "")}</span>`;
-          rows.push(h ? `<button type="button" class="ubr" data-go="${h}" title="Siirry kuvioon">${inner}</button>` : `<div class="ubr">${inner}</div>`); first = false; }
-        if (rows.length >= UBN) break; }
-    } else {
-      const now = Date.now() - 6 * 36e5; let pk = null;
-      for (const r of (D.meta.upcoming || []).filter(r => new Date(r.date).getTime() >= now).slice(0, UBN)) {
-        const d = new Date(r.date), k = d.toDateString(), tm = d.toLocaleTimeString("fi-FI", { hour: "2-digit", minute: "2-digit" });
-        const m = r.title.replace(/\s\d{4}(?=,|$)/, "").match(/^(.*?),\s*(?:(?:tammi|helmi|maalis|huhti|touko|kesä|heinä|elo|syys|loka|marras|joulu)kuu|\d\. (?:vuosi)?neljännes)/);
-        rows.push(`<a class="ubr" href="${r.url}" target="_blank" rel="noopener" title="${escH(r.title)}">${dc(d, k !== pk)}<span class="t">${escH(m ? m[1] : r.title)}</span><span class="p tm">${tm === "08.00" ? "" : "klo " + tm.replace(".00", "")}</span></a>`); pk = k; }
-    }
-    if (!rows.length) rows = [`<div class="ubr"><span class="d"></span><span class="t" style="color:var(--muted)">${ubK ? "Ei tiedossa olevia julkaisuja" : "Ei päivityksiä"}</span><span></span></div>`];
-    el.innerHTML = `<div class="ubh"><span class="k" id="ubT">${ubK ? "Tulossa" : "Päivittyneet"}</span>` +
-      `<button type="button" class="step" id="ubP" aria-label="Päivittyneet" title="Päivittyneet"${ubK ? "" : " disabled"}><svg width="12" height="12" viewBox="0 0 12 12" aria-hidden="true"><path d="M7.5 2.5L4 6l3.5 3.5" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></button>` +
-      `<button type="button" class="step" id="ubN" aria-label="Tulossa" title="Tulossa"${ubK ? " disabled" : ""}><svg width="12" height="12" viewBox="0 0 12 12" aria-hidden="true"><path d="M4.5 2.5L8 6l-3.5 3.5" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></button></div>` +
-      `<div class="ubl${dir && motion() ? " sw" + (dir < 0 ? " bk" : "") : ""}" aria-live="polite" aria-labelledby="ubT">${rows.join("")}</div>` +
-      `<div class="ubf"><button type="button" id="ubAll">Kaikki julkaisut →</button></div>`;
-    const sw = k => { if (k === ubK) return; ubK = k; try { localStorage.setItem("ubox", String(k)); } catch (e) {} renderUbox(true, k ? 1 : -1); $(k ? "ubP" : "ubN").focus(); };
-    $("ubP").onclick = () => sw(0); $("ubN").onclick = () => sw(1);
-    el.onkeydown = e => { if (e.target.closest(".ubh") && (e.key === "ArrowLeft" || e.key === "ArrowRight")) { e.preventDefault(); sw(e.key === "ArrowRight" ? 1 : 0); } };
+    const W = ["su", "ma", "ti", "ke", "to", "pe", "la"], NP = 3, NF = 3, td = new Date(), today = td.toDateString();
+    const dl = d => `${W[d.getDay()]} ${d.getDate()}.${d.getMonth() + 1}.`;
+    const past = [];                                                   // uusimmat ensin lokista, nimi kerran; näytetään vanhin ylimpänä
+    for (const e of D.meta.log || []) { const d = new Date(e.date + "T12:00:00"), nm = new Set();
+      for (const u of e.upd || []) { let n = u.src.includes(": ") ? u.src.slice(u.src.indexOf(": ") + 2) : u.src; n = n.charAt(0).toUpperCase() + n.slice(1);
+        if (nm.has(n)) continue; nm.add(n); past.push({ d, n, u }); if (past.length >= NP) break; }
+      if (past.length >= NP) break; }
+    past.reverse();
+    const now = Date.now() - 6 * 36e5, fut = (D.meta.upcoming || []).filter(r => new Date(r.date).getTime() >= now).slice(0, NF);
+    let pk = null, h = "";
+    past.forEach(({ d, n, u }) => { const k = d.toDateString(), s = D.sets.find(x => x.label === u.set), go = u.id ? targetOf(u.set, u.id) : null, fr = s && u.id && seenPeek(s.id, u.id);
+      const inner = `<span class="d">${k !== pk ? dl(d) : ""}</span><span class="t">${escH(n)}${fr ? '<span class="fresh" title="Uusi edellisen käyntisi jälkeen"></span>' : ""}</span><span class="p">${escH(u.period || "")}</span>`;
+      h += go ? `<li class="past"><button type="button" class="ubr" data-go="${go}" title="Siirry kuvioon">${inner}</button></li>` : `<li class="past"><div class="ubr">${inner}</div></li>`; pk = k; });
+    h += `<li class="now" aria-label="Tänään ${dl(td)}"><span>${dl(td)}</span></li>`; pk = today;
+    fut.forEach(r => { const d = new Date(r.date), k = d.toDateString(), tm = d.toLocaleTimeString("fi-FI", { hour: "2-digit", minute: "2-digit" });
+      const m = r.title.replace(/\s\d{4}(?=,|$)/, "").match(/^(.*?),\s*(?:(?:tammi|helmi|maalis|huhti|touko|kesä|heinä|elo|syys|loka|marras|joulu)kuu|\d\. (?:vuosi)?neljännes)/);
+      h += `<li class="fu"><a class="ubr" href="${r.url}" target="_blank" rel="noopener" title="${escH(r.title)}"><span class="d">${k !== pk ? dl(d) : ""}</span><span class="t">${escH(m ? m[1] : r.title)}</span><span class="p tm">${tm === "08.00" ? "" : "klo " + tm.replace(".00", "")}</span></a></li>`; pk = k; });
+    if (!fut.length) h += `<li class="fu"><div class="ubr"><span class="d"></span><span class="t" style="color:var(--muted)">Ei tiedossa olevia julkaisuja</span><span></span></div></li>`;
+    el.innerHTML = `<p class="ubh">Julkaisut</p><ol class="ubl">${h}</ol><div class="ubf"><button type="button" id="ubAll">Kaikki julkaisut →</button></div>`;
     el.querySelectorAll("[data-go]").forEach(b => b.onclick = () => goTo(b.dataset.go));
-    $("ubAll").onclick = () => { updK = ubK ? 1 : 2; openUpd(); };
+    $("ubAll").onclick = () => { updK = 1; openUpd(); };
   }
 
   function update() {
@@ -2252,6 +2242,7 @@ a.ubr, button.ubr { cursor: pointer; } a.ubr:hover .t, button.ubr:hover .t { tex
       scrollTo({ top: t.getBoundingClientRect().top + scrollY - bar - 16 }); }, 120); }
   // sivuston muutokset: uudet kuviot ja muut isommat lisaykset (kasin yllapidetty, uusin ensin); set + id -> linkki kuvioon
   const CHANGES = [
+    { d: "2026-11-23", t: "Etusivulle julkaisuaikajana: viimeksi päivittyneet ja tulevat julkaisut samalla janalla, jakajana tämä päivä", set: "Suhdannetilanne" },
     { d: "2026-11-23", t: "Kuvioissa viivojen nimet suoraan viivan päässä selitteen sijaan (2–5 viivaa)" },
     { d: "2026-11-23", t: "Erittelysivuille revisiot: muutos edelliseen julkaisuun (Revisio-valinta)", set: "Reaalitalous" },
     { d: "2026-11-23", t: "Erittelysivut myös kuluttajahinnoille hyödykeryhmittäin, asuntojen hinnoille alueittain ja julkisille kulutusmenoille alasektoreittain", set: "Reaalitalous" },
