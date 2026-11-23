@@ -244,7 +244,9 @@ body { font-variant-numeric: tabular-nums; background: var(--bg); min-height: 10
 :root[data-theme="vapor"] .wp-up { --wvGp: 28%; --wvA: #0f2c47; --wvB: #15394a; --wvC: #1c4a47; --wvG: #9fe3d0; --wvGo: .28; }
 :root[data-theme="vapor"] .wp-turn { --wvGp: 28%; --wvA: #241f45; --wvB: #4a2f3a; --wvC: #6a3f26; --wvG: #ffb347; --wvGo: .28; }
 :root[data-theme="vapor"] .wp-down { --wvGp: 28%; --wvA: #0c0b1e; --wvB: #1c1430; --wvC: #3d1a2e; --wvG: #ff7a6b; --wvGo: .28; }
-.wv { display: block; width: 100%; height: auto; overflow: visible; -webkit-mask: linear-gradient(90deg, transparent 0, #000 6%, #000 94%, transparent 100%); mask: linear-gradient(90deg, transparent 0, #000 6%, #000 94%, transparent 100%); }
+.wv { display: block; width: 100%; height: auto; overflow: visible; }
+.phx.wvx { width: 100%; }
+.hero.wvon .ubf { margin-top: 8px; }   /* linkki listan alle, taivaan puolelle */
 .hero.wvon { position: relative; isolation: isolate; }
 .wvsky { position: absolute; z-index: -1; left: var(--wvL, 0); width: var(--wvW, 100%); top: var(--wvT, 0); height: var(--wvH, 0); pointer-events: none;
   background: radial-gradient(440px 270px at var(--gx, 50%) var(--gy, 50%), color-mix(in srgb, var(--wvG) var(--wvGp), transparent), transparent 70%), linear-gradient(var(--wvA), var(--wvB) 55%, var(--wvC));
@@ -1378,9 +1380,9 @@ a.ubr, button.ubr { cursor: pointer; } a.ubr:hover .t, button.ubr:hover .t { tex
     const { w, h, mid } = WV, A = wvArcLen(), sq = 8, gap = 4, st = sq + gap, cq = o.cq;
     let d = ""; for (let i = 0; i <= 240; i++) { const u = -.02 + 1.04 * i / 240; d += (i ? "L" : "M") + wvX(u).toFixed(1) + " " + wvY(u).toFixed(1); }
     const sun = wvSunAt(o.sun.u, o.sun.s), f0 = o.from ? wvSunAt(o.from.u, o.from.s) : sun;
-    let g = `<defs><clipPath id="wvHa"><rect y="-40" width="${w}" height="${mid + 40}"/></clipPath><clipPath id="wvHb"><rect y="${mid}" width="${w}" height="${h - mid + 20}"/></clipPath></defs><g>`;
+    let g = `<defs><linearGradient id="wvFg"><stop offset="0" stop-color="#fff" stop-opacity="0"/><stop offset=".06" stop-color="#fff"/><stop offset=".94" stop-color="#fff"/><stop offset="1" stop-color="#fff" stop-opacity="0"/></linearGradient><mask id="wvF" maskUnits="userSpaceOnUse" x="-20" y="-80" width="${w + 40}" height="${h + 160}"><rect y="-80" width="${w}" height="${h + 160}" fill="url(#wvFg)"/></mask><clipPath id="wvHa"><rect y="-40" width="${w}" height="${mid + 40}"/></clipPath><clipPath id="wvHb"><rect y="${mid}" width="${w}" height="${h - mid + 20}"/></clipPath></defs><g>`;
     [.25, .5, .75].forEach(u => g += `<line class="wvph" x1="${wvX(u)}" x2="${wvX(u)}" y1="0" y2="${h}"/>`);
-    g += `<path class="wvc" d="${d}" clip-path="url(#wvHb)"/><path class="wvc hi" d="${d}" clip-path="url(#wvHa)"/>`;
+    g += `<g mask="url(#wvF)"><path class="wvc" d="${d}" clip-path="url(#wvHb)"/><path class="wvc hi" d="${d}" clip-path="url(#wvHa)"/></g>`;   // häivytys vain käyrään, ei merkkeihin
     let k = 0;   // indikaattorit käyrän alle, vaiheittain tasavälein; ryhmä keskitetään jäsenten keskikohtaan, järjestys säilyy
     [["rec", 0, .25], ["up", .25, .5], ["turn", .5, .75], ["down", .75, 1]].forEach(([q, a, b]) => {
       const L = o.items.filter(x => x.q === q).sort((x, y) => x.u - y.u); if (!L.length) return;
@@ -1402,7 +1404,7 @@ a.ubr, button.ubr { cursor: pointer; } a.ubr:hover .t, button.ubr:hover .t { tex
     const hero = document.querySelector(".hero"), sm = $("summary"), svg = sm && sm.querySelector("svg.wv"); if (!hero) return;
     hero.classList.toggle("wvon", !!svg); if (!svg) return;
     const r = svg.getBoundingClientRect(); if (!r.width) return; const k = r.width / WV.w, hz = r.top + WV.mid * k;
-    const ub = hero.querySelector(".ubox:not([hidden]) .ubl"), wrap = svg.parentElement;
+    const ub = hero.querySelector(".ubox:not([hidden]) .ubf") || hero.querySelector(".ubox:not([hidden]) .ubl"), wrap = svg.parentElement;
     if (depth < 4) { let m2 = 0; if (ub) { const u = ub.getBoundingClientRect(); if (u.left >= r.right - 1) m2 = Math.max(0, wvMt + u.bottom + 18 - hz); }
       if (Math.abs(m2 - wvMt) > 1) { wvMt = m2; wrap.style.marginTop = m2 + "px"; return wvLayout(depth + 1); } }
     const h = hero.getBoundingClientRect(), T = 64, top = h.top - T;
@@ -1412,7 +1414,7 @@ a.ubr, button.ubr { cursor: pointer; } a.ubr:hover .t, button.ubr:hover .t { tex
   }
   function wvGlow(p) { const hero = document.querySelector(".hero"); p = p || wvGlow.p; if (!hero || !wvGeo || !p) return; wvGlow.p = p;
     hero.style.setProperty("--gx", (wvGeo.x + p.x * wvGeo.k).toFixed(1) + "px"); hero.style.setProperty("--gy", (wvGeo.y + p.y * wvGeo.k).toFixed(1) + "px"); }
-  { let q = 0; const ro = new ResizeObserver(() => { cancelAnimationFrame(q); q = requestAnimationFrame(() => wvLayout()); });
+  { let q = 0; const ro = new ResizeObserver(() => { cancelAnimationFrame(q); q = requestAnimationFrame(() => { const hero = document.querySelector(".hero"); if (hero && hero.classList.contains("wvon") && wvWant() !== WV.w) update(); else wvLayout(); }); });
     const obs = () => { const hero = document.querySelector(".hero"), ub = $("ubox"); if (hero) ro.observe(hero); if (ub) ro.observe(ub); };
     if (document.readyState === "loading") addEventListener("DOMContentLoaded", obs); else obs(); }
   function wvPlay(o) {                                                // aurinko ja valo liukuvat edellisestä kohdasta, vanha taivas häipyy
@@ -1426,7 +1428,9 @@ a.ubr, button.ubr { cursor: pointer; } a.ubr:hover .t, button.ubr:hover .t { tex
       wvGlow(p); if (t < 1) wvRaf = requestAnimationFrame(step); };
     wvGlow(wvSunAt(o.from.u, o.from.s)); wvRaf = requestAnimationFrame(step);
   }
+  const wvWant = () => { const sm = $("summary"); return sm && sm.clientWidth >= 680 ? 780 : 600; };   // leveässä palstassa loivempi ja leveämpi aalto
   function waveData(stay, mv, counts, cq, cp) {
+    { const nw = wvWant(); if (nw !== WV.w) { WV.w = nw; wvArc = null; } }
     const C = comp(), P = set.periods, ok = k => C.level[k] != null && C.change[k] != null, sOf = k => Math.hypot(C.level[k], C.change[k]);
     const hist = []; let k0 = -1; for (let k = 0; k <= cp.i; k++) if (ok(k)) { hist.push(sOf(k)); if (k0 < 0) k0 = k; }
     const s = Math.hypot(cp.l, cp.c), srt = hist.slice().sort((a, b) => a - b), med = srt[Math.floor((srt.length - 1) / 2)];
