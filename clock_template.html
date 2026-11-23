@@ -247,6 +247,12 @@ body { font-variant-numeric: tabular-nums; background: var(--bg); min-height: 10
 .wv { display: block; width: 100%; height: auto; overflow: visible; }
 .phx.wvx { width: 100%; }
 .hero.wvon .ubf { margin-top: 8px; }
+.hero.wvon { grid-template-columns: minmax(0, 1fr); }   /* aalto koko leveydelle, seuraava julkaisu oikeaan yläkulmaan */
+.hero.wvon .ubox { position: absolute; top: 4px; right: 0; width: auto; max-width: 300px; align-items: flex-end; text-align: right; }
+.hero.wvon .wvx > .phl, .hero.wvon .wvx > .phb { margin-right: min(320px, 32%); }
+.ubnx { color: var(--fg); text-decoration: none; margin-top: 2px; } .ubnx:hover { text-decoration: underline; } .ubnx .d { color: var(--muted); margin-right: 6px; font-variant-numeric: tabular-nums; }
+.ubnk { font: inherit; font-size: 0.78rem; color: var(--muted); background: none; border: 0; padding: 4px 0 0; cursor: pointer; } .ubnk:hover { color: var(--fg); text-decoration: underline; }
+@media (max-width: 860px) { .hero.wvon .ubox { position: static; align-items: flex-start; text-align: left; max-width: none; } .hero.wvon .wvx > .phl, .hero.wvon .wvx > .phb { margin-right: 0; } }
 body:has(.hero.wvon) .topbar::after { display: none; }   /* vaiheviiva turha, kun taivas kertoo vaiheen */   /* linkki listan alle, taivaan puolelle */
 .hero.wvon { position: relative; isolation: isolate; }
 .wvsky { position: absolute; z-index: -1; left: var(--wvL, 0); width: var(--wvW, 100%); top: var(--wvT, 0); height: var(--wvH, 0); pointer-events: none;
@@ -1382,7 +1388,7 @@ a.ubr, button.ubr { cursor: pointer; } a.ubr:hover .t, button.ubr:hover .t { tex
   const wvLu = (a, b, e) => pmod(a + (pmod(b - a + .5, 1) - .5) * e, 1);   // lyhin reitti syklin ympäri: laskusta elpymiseen eteenpäin reunan yli
   function wvSunAt(u, s) { const r = wvR(s), [x, y] = wvAt(u, 9 + r); return { x, y, r }; }
   function waveBlock(o) {
-    const { w, h, mid } = WV, A = wvArcLen(), sq = 8, gap = 4, st = sq + gap, cq = o.cq;
+    const { w, h, mid } = WV, A = wvArcLen(), sq = w >= 1000 ? 10 : 8, gap = 4, st = sq + gap, cq = o.cq;
     let d = ""; for (let i = 0; i <= 240; i++) { const u = -.02 + 1.04 * i / 240; d += (i ? "L" : "M") + wvX(u).toFixed(1) + " " + wvY(u).toFixed(1); }
     const pv = o.prev, f0 = wvSunAt(o.sunF.u, o.sunF.s), plan = o.plan = { sq: [], tr: [] };
     let g = `<defs><linearGradient id="wvFg"><stop offset="0" stop-color="#fff" stop-opacity="0"/><stop offset=".06" stop-color="#fff"/><stop offset=".94" stop-color="#fff"/><stop offset="1" stop-color="#fff" stop-opacity="0"/></linearGradient><mask id="wvF" maskUnits="userSpaceOnUse" x="-20" y="-80" width="${w + 40}" height="${h + 160}"><rect y="-80" width="${w}" height="${h + 160}" fill="url(#wvFg)"/></mask><clipPath id="wvHa"><rect y="-40" width="${w}" height="${mid + 40}"/></clipPath><clipPath id="wvHb"><rect y="${mid}" width="${w}" height="${h - mid + 20}"/></clipPath></defs><g>`;
@@ -1443,7 +1449,7 @@ a.ubr, button.ubr { cursor: pointer; } a.ubr:hover .t, button.ubr:hover .t { tex
     const step = now => { const t = Math.min(1, (now - t0) / D); apply(o.fast ? t : 1 - Math.pow(1 - t, 3)); if (t < 1) wvRaf = requestAnimationFrame(step); };
     apply(0); wvRaf = requestAnimationFrame(step);
   }
-  const wvWant = () => { const sm = $("summary"); return sm && sm.clientWidth >= 680 ? 780 : 600; };   // leveässä palstassa loivempi ja leveämpi aalto
+  const wvWant = () => { const sm = $("summary"), cw = sm && sm.clientWidth || Math.min(1180, document.documentElement.clientWidth - 32); return cw >= 1000 ? 1180 : cw >= 680 ? 780 : 600; };   // piilossa (leveys 0) arvio sisältöpalstasta   // leveässä palstassa loivempi ja leveämpi aalto
   function waveData(stay, mv, counts, cq, cp) {
     { const nw = wvWant(); if (nw !== WV.w) { WV.w = nw; wvArc = null; } }
     const C = comp(), P = set.periods, ok = k => C.level[k] != null && C.change[k] != null, sOf = k => Math.hypot(C.level[k], C.change[k]);
@@ -1480,7 +1486,8 @@ a.ubr, button.ubr { cursor: pointer; } a.ubr:hover .t, button.ubr:hover .t { tex
       hdr = `<p class="phl">Suhdannevaihe</p><p class="phb" style="--qc:${qcol(cq)}"><b>${Q[cq].short}</b><em>${fmtP(set.periods[k])} alkaen</em></p>`; }
     $("hlead").innerHTML = "";
 
-    const WV_ON = LUONNOS && cp, wvd = WV_ON ? waveData(stay, mv, counts, cq, cp) : null;   // luonnos: suhdanneaalto neliörivien tilalle
+    const WV_ON = LUONNOS && cp; if (WV_ON) document.querySelector(".hero").classList.add("wvon");   // asettelu ennen leveyden mittausta
+    const wvd = WV_ON ? waveData(stay, mv, counts, cq, cp) : null;   // luonnos: suhdanneaalto neliörivien tilalle
     $("summary").innerHTML = WV_ON ? `<div class="phx wvx${qf ? " f" : ""}">${hdr}${waveBlock(wvd)}</div>` : `<div class="phx${qf ? " f" : ""}${QORDER.some(q => stay[q].concat(mv[q]).some(x => picked.has(x.s.id))) ? " pk" : ""}">${hdr}<div class="phrs">${QORDER.map(q => `<button type="button" class="phr${q === cq ? " cur" : ""}${qf === q ? " on" : ""}" data-q="${q}" style="--qc:${qcol(q)};--N:${Math.max(1, ...Object.values(counts))}" aria-pressed="${qf === q}" aria-label="${Q[q].name}: ${counts[q]}. Klikkaa suodattaaksesi."><span class="nm">${Q[q].short}</span><span class="sq">${stay[q].map(x => `<i data-id="${x.s.id}" data-tip="${escH(x.s.label)}"${x.st >= 0 ? ` data-sub="${fmtP(set.periods[x.st])}"` : ""}${picked.has(x.s.id) || x.st >= 0 ? ` class="${[picked.has(x.s.id) ? "pk" : "", x.st >= 0 ? "st" : ""].filter(Boolean).join(" ")}"` : ""}></i>`).join("")}${mv[q].map(x => `<i class="new${picked.has(x.s.id) ? " pk" : ""}" data-id="${x.s.id}" data-tip="${escH(x.s.label)}" data-sub="${Q[x.q0].short} → ${Q[q].short.toLowerCase()} ${fmtP(set.periods[idx])}"></i>`).join("")}</span><span class="n">${counts[q]}</span></button>`).join("")}</div><div class="phn"><button type="button" class="phleg" aria-expanded="${phLeg}" aria-controls="phLegB" aria-label="Selitteet" title="Selitteet"><svg viewBox="0 0 10 10" aria-hidden="true"><path d="M3.5 2 7 5l-3.5 3"/></svg></button><span class="phlb${phLeg ? "" : " off"}" id="phLegB"><span><i></i>muutos edellisestä ${set.freq === "M" ? "kuukaudesta" : "neljänneksestä"}</span><span><i class="st"></i>ei julkaistu</span></span></div></div>`;   // rivi aina paikallaan, ettei sivu hypi   // yksi neliö = yksi sarja
     { const sqA = motion() && !playT && (!panLast || panLast.set !== set || panLast.idx !== idx); panLast = { set, idx };   // neliöt syttyvät porrastetusti, kun kuukausi vaihtuu (ei suodatuksessa eikä toistossa)
       const x = $("summary").querySelector(".phx"); if (sqA && x) { x.querySelectorAll(".sq i").forEach((e, k) => e.style.setProperty("--k", k)); x.classList.add("anim"); } }
@@ -1879,7 +1886,9 @@ a.ubr, button.ubr { cursor: pointer; } a.ubr:hover .t, button.ubr:hover .t { tex
       const m = r.title.replace(/\s\d{4}(?=,|$)/, "").match(/^(.*?),\s*(?:(?:tammi|helmi|maalis|huhti|touko|kesä|heinä|elo|syys|loka|marras|joulu)kuu|\d\. (?:vuosi)?neljännes)/);
       h += `<li class="fu"><a class="ubr" href="${r.url}" target="_blank" rel="noopener" title="${escH(r.title)}"><span class="d">${k !== pk ? dl(d) : ""}</span><span class="t">${escH(m ? m[1] : r.title)}</span><span class="p tm">${tm === "08.00" ? "" : "klo " + tm.replace(".00", "")}</span></a></li>`; pk = k; });
     if (!fut.length) h += `<li class="fu"><div class="ubr"><span class="d"></span><span class="t" style="color:var(--muted)">Ei tiedossa olevia julkaisuja</span><span></span></div></li>`;
-    el.innerHTML = `<p class="ubh">Julkaisut</p><ol class="ubl">${h}</ol><div class="ubf"><button type="button" id="ubAll">Kaikki julkaisut →</button></div>`;
+    if (LUONNOS) { const r = fut[0], d = r && new Date(r.date), m = r && r.title.replace(/\s\d{4}(?=,|$)/, "").match(/^(.*?),\s*(?:(?:tammi|helmi|maalis|huhti|touko|kesä|heinä|elo|syys|loka|marras|joulu)kuu|\d\. (?:vuosi)?neljännes)/);   // luonnos: vain seuraava julkaisu
+      el.innerHTML = `<p class="ubh">Seuraava julkaisu</p>${r ? `<a class="ubnx" href="${r.url}" target="_blank" rel="noopener" title="${escH(r.title)}"><span class="d">${dl(d)}</span>${escH(m ? m[1] : r.title)}</a>` : `<span class="ubnx" style="color:var(--muted)">Ei tiedossa</span>`}<button type="button" id="ubAll" class="ubnk">Kaikki julkaisut →</button>`; }
+    else el.innerHTML = `<p class="ubh">Julkaisut</p><ol class="ubl">${h}</ol><div class="ubf"><button type="button" id="ubAll">Kaikki julkaisut →</button></div>`;
     el.querySelectorAll("[data-go]").forEach(b => b.onclick = () => goTo(b.dataset.go));
     $("ubAll").onclick = () => { updK = 1; openUpd(); };
   }
