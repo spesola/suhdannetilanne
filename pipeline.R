@@ -151,38 +151,44 @@ fetch_statfin_net <- function(s, base) {
   data.frame(date = sub("Q", "-Q", sub("M", "-", ord)), value = as.numeric(unlist(v))[seq_along(ord)])
 }
 
-# Erittelysivut: monta luokkaa ja sisaltoa yhdella kyselylla (esim. 132h osaerat x volyymi/kaypa x tyopaivakorjattu/kausitasoitettu).
-# Palauttaa listan "<koodi>|<sisalto>" -> data.frame(date, value). Levyvalimuisti kuten fetch_statfin (taulukon updated-aika).
-fetch_px_multi <- function(table, dim, codes, ccs, base = STATFIN) {
+# Erittelysivut: yksi kysely, jossa usean muuttujan useita arvoja (sel: muuttuja -> koodit; aika aina kokonaan; valitsematon muuttuja = ensimmainen arvo).
+# Palauttaa kuution (arvot, luokat); sarja poimitaan px_extract-funktiolla. Levyvalimuisti kuten fetch_statfin (taulukon updated-aika).
+nz <- function(a, b) if (is.null(a)) b else a
+fetch_px_cube <- function(table, sel, base = STATFIN) {
   upd <- if (identical(Sys.getenv("PX_FULL"), "1")) NULL else px_updated(base, table)
   u0 <- px_updated(base, table); if (!is.null(u0)) SRC_TUPD[[paste0("px:", base, table)]] <- upd_day(u0)
-  f <- tempfile(); writeLines(paste(base, table, dim, paste(codes, collapse = ","), paste(ccs, collapse = ",")), f)
-  fc <- file.path(PX_DIR, paste0("m_", unname(tools::md5sum(f)), ".rds")); fu <- paste0(fc, ".u")
+  f <- tempfile(); writeLines(paste(base, table, toJSON(sel[order(names(sel))], auto_unbox = FALSE)), f)
+  fc <- file.path(PX_DIR, paste0("c_", unname(tools::md5sum(f)), ".rds")); fu <- paste0(fc, ".u")
   if (!is.null(upd) && file.exists(fc) && file.exists(fu)) { u <- readLines(fu, warn = FALSE)
     if (identical(u[1], upd) && difftime(Sys.time(), as.POSIXct(u[2]), units = "days") < PX_MAX_D) { PX_N["levy"] <<- PX_N["levy"] + 1; return(readRDS(fc)) } }
   if (is.null(.px_meta[[table]])) { Sys.sleep(0.8); .px_meta[[table]] <- fromJSON(get_text(paste0(base, table)), simplifyVector = FALSE)$variables }
   vars <- .px_meta[[table]]; Sys.sleep(0.8)
   q <- lapply(vars, function(v) { vals <- unlist(v$values)
     if (is_time_px(vals)) return(list(code = v$code, selection = list(filter = "all", values = list("*"))))
-    sel <- if (v$code == dim) codes else if (v$code == "contentscode") ccs else vals[1]
-    miss <- setdiff(sel, vals); if (length(miss)) stop("StatFin ", table, ": ", v$code, " ei sisalla: ", paste(miss, collapse = ", "))
-    list(code = v$code, selection = list(filter = "item", values = as.list(sel))) })
+    s <- if (!is.null(sel[[v$code]])) as.character(unlist(sel[[v$code]])) else vals[1]
+    miss <- setdiff(s, vals); if (length(miss)) stop("StatFin ", table, ": ", v$code, " ei sisalla: ", paste(miss, collapse = ", "))
+    list(code = v$code, selection = list(filter = "item", values = as.list(s))) })
   body <- toJSON(list(query = q, response = list(format = "json-stat2")), auto_unbox = TRUE)
   r <- RETRY("POST", paste0(base, table), body = body, content_type_json(), timeout(60), times = 5, pause_base = 5, pause_min = 11, quiet = TRUE)
   stop_for_status(r); PX_N["haku"] <<- PX_N["haku"] + 1
   js <- fromJSON(content(r, "text", encoding = "UTF-8"), simplifyVector = FALSE)
   ids <- unlist(js$id); sz <- unlist(js$size)
-  cats <- lapply(ids, function(d) { ix <- unlist(js$dimension[[d]]$category$index); names(ix)[order(ix)] })
-  v <- js$value; v[vapply(v, is.null, logical(1))] <- NA; v <- as.numeric(unlist(v))
-  arr <- array(v, dim = rev(sz))                   # json-stat: viimeinen ulottuvuus nopeimmin vaihtuva
-  ti <- which(vapply(cats, is_time_px, logical(1))); di <- match(dim, ids); ci <- match("contentscode", ids)
-  dates <- sub("Q", "-Q", sub("M", "-", cats[[ti]]))
-  out <- list()
-  for (a in seq_along(cats[[di]])) for (b in seq_along(cats[[ci]])) {
-    idx <- as.list(rep(1, length(ids))); idx[[di]] <- a; idx[[ci]] <- b; idx[[ti]] <- seq_along(dates)
-    vals <- do.call(`[`, c(list(arr), rev(idx)))
-    out[[paste(cats[[di]][a], cats[[ci]][b], sep = "|")]] <- data.frame(date = dates, value = as.numeric(vals)) }
-  if (!is.null(upd)) { dir.create(PX_DIR, recursive = TRUE, showWarnings = FALSE); saveRDS(out, fc); writeLines(c(upd, format(Sys.time(), "%Y-%m-%d %H:%M:%S")), fu) }
+  cats <- setNames(lapply(ids, function(d) { ix <- unlist(js$dimension[[d]]$category$index); names(ix)[order(ix)] }), ids)
+  v <- js$value; v[vapply(v, is.null, logical(1))] <- NA
+  C <- list(arr = array(as.numeric(unlist(v)), dim = rev(sz)), ids = ids, cats = cats)   # json-stat: viimeinen ulottuvuus nopeimmin vaihtuva
+  if (!is.null(upd)) { dir.create(PX_DIR, recursive = TRUE, showWarnings = FALSE); saveRDS(C, fc); writeLines(c(upd, format(Sys.time(), "%Y-%m-%d %H:%M:%S")), fu) }
+  C
+}
+px_extract <- function(C, pick) {
+  ti <- which(vapply(C$cats, is_time_px, logical(1)))
+  idx <- lapply(seq_along(C$ids), function(k) if (k == ti) seq_along(C$cats[[k]]) else { w <- pick[[C$ids[k]]]
+    if (is.null(w)) 1 else { m <- match(as.character(w), C$cats[[k]]); if (is.na(m)) stop("px_extract: ", C$ids[k], " = ", w); m } })
+  data.frame(date = sub("Q", "-Q", sub("M", "-", C$cats[[ti]])), value = as.numeric(do.call(`[`, c(list(C$arr), rev(idx)))))
+}
+# kansantalouden tilinpidon osaerat: dim-luokat x sisallot (fix: muut kiinteat valinnat); "<koodi>|<sisalto>" -> data.frame
+fetch_px_multi <- function(table, dim, codes, ccs, fix = list()) {
+  sel <- c(fix, setNames(list(codes, ccs), c(dim, "contentscode"))); C <- fetch_px_cube(table, sel); out <- list()
+  for (a in codes) for (b in ccs) out[[paste(a, b, sep = "|")]] <- px_extract(C, c(fix, setNames(list(a, b), c(dim, "contentscode"))))
   out
 }
 
@@ -962,8 +968,19 @@ for (set in cfg$sets) {
     # erittelysivut (series.json: detail): rivin osaerat neljana versiona (volyymi ja kaypa, tyopaivakorjattu ja kausitasoitettu);
     # sivulla v/v tyopaivakorjatusta, q/q kausitasoitetusta, hinta = kaypa / volyymi
     DET_CC <- c("tyopvv2015", "tyopcp", "kausitvv2015", "kausitcp"); det_out <- list()
-    for (ek in names(set$detail)) { E <- set$detail[[ek]]; codes <- vapply(E$rows, function(r) r$code, "")
-      X <- tryCatch(fetch_px_multi(E$table, E$dim, codes, DET_CC), error = function(e) { message("  VAROITUS erittely ", ek, ": ", conditionMessage(e)); NULL })
+    for (ek in names(set$detail)) { E <- set$detail[[ek]]; codes <- vapply(E$rows, function(r) nz(r$code, ""), "")
+      if (!is.null(E$measures)) {                 # yleinen erittely: mittarit x muutostavat x rivit, kukin oma valintansa (base < mittari < muutostapa < rivi)
+        cb <- list()
+        for (m in E$measures) for (md in names(m$modes)) for (i in seq_along(E$rows)) {
+          pk <- modifyList(modifyList(modifyList(nz(E$base, list()), nz(m$pick, list())), nz(m$modes[[md]]$pick, list())), nz(E$rows[[i]]$pick, list()))
+          cb[[length(cb) + 1]] <- list(id = sprintf("d_%s_%s_%s_%d", ek, m$k, md, i - 1), pick = pk, label = E$rows[[i]]$label) }
+        vs <- unique(unlist(lapply(cb, function(x) names(x$pick))))
+        sel <- setNames(lapply(vs, function(v) unique(unlist(lapply(cb, function(x) x$pick[[v]])))), vs)
+        C <- tryCatch(fetch_px_cube(E$table, sel), error = function(e) { message("  VAROITUS erittely ", ek, ": ", conditionMessage(e)); NULL })
+        if (is.null(C)) { CHECKS <- c(CHECKS, sprintf("Erittely %s: haku epaonnistui", ek)); next }
+        for (x in cb) { raws[[x$id]] <- px_extract(C, x$pick); ser[[length(ser) + 1]] <- list(id = x$id, label = x$label) }
+        det_out[[ek]] <- E; next }
+      X <- tryCatch(fetch_px_multi(E$table, E$dim, codes, DET_CC, nz(E$base, list())), error = function(e) { message("  VAROITUS erittely ", ek, ": ", conditionMessage(e)); NULL })
       if (is.null(X)) { CHECKS <- c(CHECKS, sprintf("Erittely %s: haku epaonnistui", ek)); next }
       for (r in E$rows) for (cc in DET_CC) { k <- paste(r$code, cc, sep = "|"); if (is.null(X[[k]])) next
         id <- paste0("d_", ek, "_", r$code, "_", cc); raws[[id]] <- X[[k]]; ser[[length(ser) + 1]] <- list(id = id, label = paste0(r$label, " (", cc, ")")) }

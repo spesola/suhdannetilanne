@@ -1748,6 +1748,435 @@
               "indent": 1
             }
           ]
+        },
+        "bkt": {
+          "title": "BKT ja toimialat",
+          "table": "ntp/132g.px",
+          "dim": "toimiala_79_20180101",
+          "base": {
+            "taloustoimi_1_20180101": "B1GPH"
+          },
+          "note": "Bruttoarvonlisäys perushintaan toimialoittain. BKT markkinahintaan sisältää lisäksi tuoteverot miinus tuotetukipalkkiot.",
+          "rows": [
+            {
+              "code": "SSS",
+              "label": "Bruttoarvonlisäys yhteensä",
+              "total": true
+            },
+            {
+              "code": "A",
+              "label": "Maa-, metsä- ja kalatalous"
+            },
+            {
+              "code": "C",
+              "label": "Teollisuus"
+            },
+            {
+              "code": "C16_C17",
+              "label": "Metsäteollisuus",
+              "indent": 1
+            },
+            {
+              "code": "C19TC22",
+              "label": "Kemianteollisuus",
+              "indent": 1
+            },
+            {
+              "code": "C24_C25_C28TC30_C33",
+              "label": "Metalliteollisuus",
+              "indent": 1
+            },
+            {
+              "code": "C26_C27",
+              "label": "Sähkö- ja elektroniikkateollisuus",
+              "indent": 1
+            },
+            {
+              "code": "D_E",
+              "label": "Energia- ja vesihuolto"
+            },
+            {
+              "code": "F",
+              "label": "Rakentaminen"
+            },
+            {
+              "code": "GTT",
+              "label": "Palvelut"
+            },
+            {
+              "code": "G",
+              "label": "Kauppa",
+              "indent": 1
+            },
+            {
+              "code": "H",
+              "label": "Kuljetus ja varastointi",
+              "indent": 1
+            },
+            {
+              "code": "I",
+              "label": "Majoitus- ja ravitsemistoiminta",
+              "indent": 1
+            },
+            {
+              "code": "J",
+              "label": "Informaatio ja viestintä",
+              "indent": 1
+            },
+            {
+              "code": "K",
+              "label": "Rahoitus ja vakuutus",
+              "indent": 1
+            },
+            {
+              "code": "L",
+              "label": "Kiinteistöala",
+              "indent": 1
+            },
+            {
+              "code": "M_N",
+              "label": "Liike-elämän palvelut",
+              "indent": 1
+            },
+            {
+              "code": "OTQ",
+              "label": "Julkinen hallinto, koulutus, terveys ja sosiaali",
+              "indent": 1
+            },
+            {
+              "code": "RTU",
+              "label": "Muut palvelut",
+              "indent": 1
+            },
+            {
+              "code": "0XS13",
+              "label": "Yksityiset sektorit",
+              "gap": true
+            },
+            {
+              "code": "0S13",
+              "label": "Julkiset sektorit"
+            }
+          ]
+        },
+        "tyotunnit": {
+          "title": "Työtunnit ja työlliset toimialoittain",
+          "table": "ntp/11tj.px",
+          "note": "Kansantalouden tilinpidon työllisyys ja työtunnit (kotimaa). Työvoimatutkimuksen luvut voivat poiketa.",
+          "src": "Tilastokeskus, neljännesvuositilinpito (ntp/11tj)",
+          "base": {
+            "taloustoimi_1_20180101": "E2"
+          },
+          "measures": [
+            {
+              "k": "h",
+              "label": "Työtunnit",
+              "pick": {
+                "taloustoimi_1_20180101": "E2"
+              },
+              "calc": "pct",
+              "modes": {
+                "yy": {
+                  "pick": {
+                    "contentscode": "TYOP"
+                  }
+                },
+                "qq": {
+                  "pick": {
+                    "contentscode": "ntp-KAUSIT"
+                  }
+                }
+              }
+            },
+            {
+              "k": "e",
+              "label": "Työlliset",
+              "pick": {
+                "taloustoimi_1_20180101": "E1"
+              },
+              "calc": "pct",
+              "modes": {
+                "yy": {
+                  "pick": {
+                    "contentscode": "TYOP"
+                  }
+                },
+                "qq": {
+                  "pick": {
+                    "contentscode": "ntp-KAUSIT"
+                  }
+                }
+              }
+            }
+          ],
+          "rows": [
+            {
+              "label": "Kaikki toimialat",
+              "pick": {
+                "toimiala_79_20180101": "SSS"
+              },
+              "total": true
+            },
+            {
+              "label": "Maa-, metsä- ja kalatalous",
+              "pick": {
+                "toimiala_79_20180101": "A"
+              }
+            },
+            {
+              "label": "Teollisuus ja energia",
+              "pick": {
+                "toimiala_79_20180101": "BTE"
+              }
+            },
+            {
+              "label": "Teollisuus",
+              "pick": {
+                "toimiala_79_20180101": "C"
+              },
+              "indent": 1
+            },
+            {
+              "label": "Rakentaminen",
+              "pick": {
+                "toimiala_79_20180101": "F"
+              }
+            },
+            {
+              "label": "Kauppa, kuljetus, majoitus ja ravitsemis",
+              "pick": {
+                "toimiala_79_20180101": "GTI"
+              }
+            },
+            {
+              "label": "Informaatio ja viestintä",
+              "pick": {
+                "toimiala_79_20180101": "J"
+              }
+            },
+            {
+              "label": "Rahoitus ja vakuutus",
+              "pick": {
+                "toimiala_79_20180101": "K"
+              }
+            },
+            {
+              "label": "Kiinteistöala",
+              "pick": {
+                "toimiala_79_20180101": "L"
+              }
+            },
+            {
+              "label": "Liike-elämän palvelut",
+              "pick": {
+                "toimiala_79_20180101": "M_N"
+              }
+            },
+            {
+              "label": "Julkinen hallinto, koulutus, terveys ja sosiaali",
+              "pick": {
+                "toimiala_79_20180101": "OTQ"
+              }
+            },
+            {
+              "label": "Muut palvelut",
+              "pick": {
+                "toimiala_79_20180101": "RTU"
+              }
+            },
+            {
+              "label": "Yksityiset sektorit",
+              "pick": {
+                "toimiala_79_20180101": "0XS13"
+              },
+              "gap": true
+            },
+            {
+              "label": "Julkiset sektorit",
+              "pick": {
+                "toimiala_79_20180101": "0S13"
+              }
+            }
+          ]
+        },
+        "tyottomat": {
+          "title": "Työttömyysaste väestöryhmittäin",
+          "table": "tyti/137h.px",
+          "note": "Työvoimatutkimus, alkuperäiset (kausitasoittamattomat) neljännesvuositiedot, joten vertailu vuodentakaiseen neljännekseen.",
+          "src": "Tilastokeskus, työvoimatutkimus (tyti/137h)",
+          "base": {
+            "contentscode": "tyti-Tyottomyysaste",
+            "sukupuoli_9_20180101": "SSS",
+            "ikaryhma_19_20190101": "15-74"
+          },
+          "measures": [
+            {
+              "k": "d",
+              "label": "Muutos",
+              "calc": "diff",
+              "invert": true,
+              "unit": "%-yks.",
+              "modes": {
+                "yy": {}
+              },
+              "sub": "Työttömyysaste"
+            },
+            {
+              "k": "l",
+              "label": "Taso",
+              "calc": "level",
+              "unit": "%",
+              "modes": {
+                "yy": {}
+              },
+              "sub": "Työttömyysaste"
+            }
+          ],
+          "rows": [
+            {
+              "label": "15–74-vuotiaat",
+              "pick": {
+                "sukupuoli_9_20180101": "SSS",
+                "ikaryhma_19_20190101": "15-74"
+              },
+              "total": true
+            },
+            {
+              "label": "Miehet",
+              "pick": {
+                "sukupuoli_9_20180101": "1",
+                "ikaryhma_19_20190101": "15-74"
+              },
+              "indent": 1
+            },
+            {
+              "label": "Naiset",
+              "pick": {
+                "sukupuoli_9_20180101": "2",
+                "ikaryhma_19_20190101": "15-74"
+              },
+              "indent": 1
+            },
+            {
+              "label": "15–24-vuotiaat",
+              "pick": {
+                "sukupuoli_9_20180101": "SSS",
+                "ikaryhma_19_20190101": "15-24"
+              },
+              "gap": true
+            },
+            {
+              "label": "25–34-vuotiaat",
+              "pick": {
+                "sukupuoli_9_20180101": "SSS",
+                "ikaryhma_19_20190101": "25-34"
+              }
+            },
+            {
+              "label": "35–44-vuotiaat",
+              "pick": {
+                "sukupuoli_9_20180101": "SSS",
+                "ikaryhma_19_20190101": "35-44"
+              }
+            },
+            {
+              "label": "45–54-vuotiaat",
+              "pick": {
+                "sukupuoli_9_20180101": "SSS",
+                "ikaryhma_19_20190101": "45-54"
+              }
+            },
+            {
+              "label": "55–64-vuotiaat",
+              "pick": {
+                "sukupuoli_9_20180101": "SSS",
+                "ikaryhma_19_20190101": "55-64"
+              }
+            }
+          ]
+        },
+        "palkat": {
+          "title": "Ansiotaso sektoreittain",
+          "table": "ati/14um.px",
+          "note": "Ansiotasoindeksi (2015=100), vuosimuutos. Kunnat ilman Helsingin hyvinvointipalveluja, hyvinvointialueet niiden kanssa; kuntien ja hyvinvointialueiden sarjat alkavat vuodesta 2023.",
+          "src": "Tilastokeskus, ansiotasoindeksi (ati/14um)",
+          "base": {
+            "contentscode": "ati_2015_100",
+            "palk_muo_2_20120101": "0",
+            "sukupuoli_9_20180101": "SSS",
+            "tyonantajasekt_3_20190528": "SSS"
+          },
+          "measures": [
+            {
+              "k": "v",
+              "label": "Vuosimuutos",
+              "calc": "pct",
+              "modes": {
+                "yy": {}
+              },
+              "neutral": true,
+              "sub": "Ansiotasoindeksi"
+            }
+          ],
+          "rows": [
+            {
+              "label": "Koko kansantalous",
+              "pick": {
+                "tyonantajasekt_3_20190528": "SSS"
+              },
+              "total": true
+            },
+            {
+              "label": "Yritykset",
+              "pick": {
+                "tyonantajasekt_3_20190528": "11-12"
+              },
+              "indent": 1
+            },
+            {
+              "label": "Julkisyhteisöt",
+              "pick": {
+                "tyonantajasekt_3_20190528": "13"
+              },
+              "indent": 1
+            },
+            {
+              "label": "Valtio",
+              "pick": {
+                "tyonantajasekt_3_20190528": "1311"
+              },
+              "indent": 2
+            },
+            {
+              "label": "Kunnat",
+              "pick": {
+                "tyonantajasekt_3_20190528": "1313p"
+              },
+              "indent": 2
+            },
+            {
+              "label": "Hyvinvointialueet",
+              "pick": {
+                "tyonantajasekt_3_20190528": "1313s"
+              },
+              "indent": 2
+            },
+            {
+              "label": "Sopimuspalkat",
+              "pick": {
+                "tyonantajasekt_3_20190528": "SSS",
+                "contentscode": "spi_2015_100"
+              },
+              "gap": true
+            },
+            {
+              "label": "Reaaliansiot",
+              "pick": {
+                "tyonantajasekt_3_20190528": "SSS",
+                "contentscode": "real_2015_100"
+              }
+            }
+          ]
         }
       }
     },
