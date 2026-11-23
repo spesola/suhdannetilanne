@@ -1110,7 +1110,7 @@ a.ubr, button.ubr { cursor: pointer; } a.ubr:hover .t, button.ubr:hover .t { tex
   const qcol = q => `var(${Q[q].v})`;
   /* ---------- liike (pois, jos käyttäjä on vähentänyt liikettä) ---------- */
   const RMQ = matchMedia("(prefers-reduced-motion: reduce)"), motion = () => !RMQ.matches;
-  const LUONNOS = new URLSearchParams(location.search).has("luonnos"); let PHMAP = null;   // luonnos (?luonnos): kokonaisindikaattorin laskuvaiheiden varjostus aikasarjoihin, ei vielä käytössä
+  const LUONNOS = new URLSearchParams(location.search).has("luonnos"), VAIHEET = new URLSearchParams(location.search).has("vaiheet"); let PHMAP = null;   // luonnos (?luonnos): kokonaisindikaattorin laskuvaiheiden varjostus aikasarjoihin, ei vielä käytössä
   const ANIM = new Map();                                            // kerran animoidut: näkymä + kortin otsikko -> "done" tai "pend" (odottaa vieritystä; uudelleenpiirretty kortti perii tilan)
   let rvIO = null, animQ = 0;
   function pulse(svg) {                                              // uusin havainto: laajeneva rengas kerran
@@ -3073,7 +3073,7 @@ a.ubr, button.ubr { cursor: pointer; } a.ubr:hover .t, button.ubr:hover .t { tex
       // viivojen nimet suoraan viivan paahan selitteen sijaan (2-5 viivaa, ei pinoja, palkkeja eika kahta akselia); oikea marginaali nimien levyiseksi.
       // Kapealla ja hyvin pitkilla nimilla selite sailyy, ettei piirtoalue kavene liikaa.
       const dlw = 10 + Math.max(...c.lines.map(id => lbl(id).length)) * fs * 0.56;
-      const direct = !narrow && !c.ts && c.lines.length >= 2 && c.lines.length <= 5 && !c.stack && !c.bars && !Y2.length && !c.lower && dlw < W2 * 0.3;
+      const direct = !narrow && !c.ts && c.lines.length >= 2 && c.lines.length <= 4 && !c.stack && !c.bars && !Y2.length && !c.lower && dlw < W2 * 0.2;   // piirtoalue ei kavennu yli viidenneksen
       if (direct) mr += dlw;
       const svg = el("svg", { class: "fc", viewBox: `0 0 ${W2} ${H2}`, role: "img", "aria-label": c.title }, card); svg.dataset.wf = (ml / W2).toFixed(3);
       const fm = document.createElement("div"); fm.className = "fmeta";
@@ -3127,7 +3127,7 @@ a.ubr, button.ubr { cursor: pointer; } a.ubr:hover .t, button.ubr:hover .t { tex
         el("text", { x: ml - 6, y: ys(vv) + 4, "text-anchor": "end", "font-size": fs, fill: "var(--muted)" }, svg).textContent =
           c.ts && !c.rawv && !c.lvl && Number.isInteger(vv) ? tick(vv) : fmtV(vv, stepDec(step));
       }
-      if (LUONNOS && !c.ts && n > 40 && PHMAP) {                        // LUONNOS: kokonaisindikaattorin laskuvaiheet taustalle
+      if (VAIHEET && !c.ts && n > 40 && PHMAP) {                        // ?vaiheet: kokonaisindikaattorin laskuvaiheet taustalle
         const ph = per => PHMAP[per] || (/-Q\d$/.test(per) ? PHMAP[per.slice(0, 4) + "-" + String(+per.slice(6) * 3).padStart(2, "0")] : null);
         const dx = (W2 - ml - mr) / (n - 1); let s0 = -1;
         const k0 = P.findIndex(per => ph(per)); if (k0 > 0) { const xe = xs(k0) - dx / 2;   // ennen kokonaisindikaattorin alkua: ei luokitusta
