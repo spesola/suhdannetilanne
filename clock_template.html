@@ -643,9 +643,9 @@ tr.pick:hover th.rl .ego, tr.pick:focus-visible th.rl .ego { opacity: 1; }
 .era .hm tr.on th.rl { color: var(--accent); }
 @media (min-width: 761px) { .grpair .era table.hm thead th:first-child, .grpair .era .hm th.rl { width: 260px; } }
 @media (max-width: 560px) { .grpair .era .hm th.rl { min-width: 128px; max-width: 150px; } .grpair .era .hm th.rl.sub2 { padding-left: 18px; } }
-.era.ein { animation: eraIn .35s ease-out; }
+.era.ein, .grleft.ein { animation: eraIn .35s ease-out; }
 @keyframes eraIn { from { opacity: 0; transform: translateY(6px); } }
-@media (prefers-reduced-motion: reduce) { .era.ein { animation: none; } }
+@media (prefers-reduced-motion: reduce) { .era.ein, .grleft.ein { animation: none; } }
 .grleft, .grside { display: flex; flex-direction: column; gap: 40px; min-width: 0; }
 .grside:empty { display: none; }
 .grcol { display: flex; flex-direction: column; gap: 28px; min-width: 0; }
@@ -1834,7 +1834,8 @@ a.ubr, button.ubr { cursor: pointer; } a.ubr:hover .t, button.ubr:hover .t { tex
     if (kb && (kb === true || kb.kb)) { const f = eraKeyOf(grSel) ? $("eraBack") : $("grTable").querySelector(`tr[data-id="${grSel}"]`); if (f) f.focus({ preventScroll: true }); } }
   function renderEra() {
     const box = $("eraSec"), EK = eraKeyOf(grSel), gl = $("growthSec").querySelector(".grleft"); box.hidden = !EK; gl.hidden = !!EK;
-    if (EK !== eraShown) { eraShown = EK; if (EK && motion()) { box.classList.remove("ein"); void box.offsetWidth; box.classList.add("ein"); } }
+    if (EK !== eraShown) { const back = !EK && eraShown; eraShown = EK; const an = EK ? box : back ? gl : null;   // sama liuku erittelyyn mentaessa ja taulukkoon palattaessa
+      if (an && motion()) { an.classList.remove("ein"); void an.offsetWidth; an.classList.add("ein"); } }
     $("grMore").classList.toggle("eraopen", !!EK);                   // erittelysivulla aiheen kaikki kuviot nakyvissa ilman Lisaa-taitetta
     if (!EK) { box.innerHTML = ""; return; }
     const E = set.detail[EK], mon = E.freq === "M", P = mon ? set.mperiods || [] : set.periods, SS = mon ? set.mseries || [] : set.series;   // kuukausierittely kuukausiakselilla
@@ -1896,7 +1897,7 @@ a.ubr, button.ubr { cursor: pointer; } a.ubr:hover .t, button.ubr:hover .t { tex
           return `<td class="hc${tt < 0.35 ? " lo" : ""}" style="--hc:${base};--hp:${Math.round(6 + (neu ? 30 : 40) * tt)}%;--hv:${Math.round(22 + 48 * tt)}%"${tip}>${+v.toFixed(1) > 0 ? "+" : ""}${fmtV(v, 1)}${rl}</td>`; }).join("") + "</tr>"; });
     const anyRev = rows.some(x => x.rv);
     if (grRev) note = (anyRev ? "Pieni luku: revisio eli muutos edelliseen julkaisuun. " : "Revisiot näkyvät, kun sarjaan julkaistaan seuraavan kerran uusi jakso. ") + note;
-    box.innerHTML = `<p class="eback"><button type="button" class="lnk" id="eraBack">← Kasvutaulukko</button></p>
+    box.innerHTML = `<p class="eback"><button type="button" class="lnk" id="eraBack">← Palaa</button></p>
       <div class="phead"><div><h2>${escH(E.title)}</h2><p class="grsub">${sub}</p></div>
         <div class="hmctl">${ctl}<div class="mini" role="group" aria-label="Revisiot"><button type="button" id="eraRev" aria-pressed="${grRev}" title="Näytä muutos edelliseen julkaisuun">Revisio</button></div></div></div>
       <div class="hmwrap"><table class="hm">${h}</tbody></table></div>
