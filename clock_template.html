@@ -233,6 +233,42 @@ body { font-variant-numeric: tabular-nums; background: var(--bg); min-height: 10
 .phx.f .phr:not(.on) { opacity: .3; }
 .phr:hover .nm { color: var(--fg); }
 .phr:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; }
+/* luonnos (?luonnos): suhdanneaalto. Horisontti = trenditaso, aurinko = kokonaisindikaattori (koko = etäisyys trendistä), neliöt = indikaattorit vaiheittain */
+:root { --sun: #f5b62a; --wvSr: var(--plot); --wvHi: .55; --wvLo: .14; }
+:root[data-theme="vapor"] { --sun: #ffc93d; --wvSr: #fff; --wvHi: .85; --wvLo: .2; }
+.wp-rec { --wvA: #c3cdec; --wvB: #e3d8ee; --wvC: #f7dcd0; --wvG: #ffd2b0; --wvGo: .7; }
+.wp-up { --wvA: #9fc8e6; --wvB: #c9e3ee; --wvC: #e3f2ea; --wvG: #ffffff; --wvGo: .85; }
+.wp-turn { --wvA: #c9c3e0; --wvB: #efcdb6; --wvC: #fbe4c8; --wvG: #ffd28f; --wvGo: .7; }
+.wp-down { --wvA: #aeb3cf; --wvB: #d3c4d6; --wvC: #efd3d2; --wvG: #ffbfa6; --wvGo: .7; }
+:root[data-theme="vapor"] .wp-rec { --wvA: #1a2146; --wvB: #2c2a4e; --wvC: #4a3047; --wvG: #ff9e6b; --wvGo: .28; }
+:root[data-theme="vapor"] .wp-up { --wvA: #0f2c47; --wvB: #15394a; --wvC: #1c4a47; --wvG: #9fe3d0; --wvGo: .28; }
+:root[data-theme="vapor"] .wp-turn { --wvA: #241f45; --wvB: #4a2f3a; --wvC: #6a3f26; --wvG: #ffb347; --wvGo: .28; }
+:root[data-theme="vapor"] .wp-down { --wvA: #0c0b1e; --wvB: #1c1430; --wvC: #3d1a2e; --wvG: #ff7a6b; --wvGo: .28; }
+.wv { display: block; width: 100%; height: auto; overflow: visible; }
+.wv .wvbg { fill: var(--plot); }
+.wv .wvph { stroke: var(--muted); stroke-opacity: .35; stroke-dasharray: 3 4; }
+.wv .wvhz { stroke: var(--muted); stroke-opacity: .7; stroke-width: 2.5; }
+.wv .wvc { fill: none; stroke: var(--fg); stroke-width: 5; stroke-linecap: round; stroke-opacity: var(--wvLo); }
+.wv .wvc.hi { stroke-opacity: var(--wvHi); }
+.wv .wvq { cursor: pointer; transition: opacity .15s; }
+.wv .wvq.new { stroke: var(--fg); stroke-width: 1.2; stroke-opacity: .55; }
+.wv .wvq.st { fill: none; stroke: var(--qc); stroke-width: 1.5; }
+.wv .wvq.dim { opacity: .18; }
+.wv .wvt { fill: var(--sun); }
+.wv .wvh { fill: var(--sun); opacity: .18; }
+.wv .wvd { fill: var(--sun); stroke: var(--wvSr); }
+.wv .wvold { transition: opacity 1s ease; } .wv .wvold.go { opacity: 0; }
+.wv.anim .wvq, .wv.anim .wvt { animation: wvIn .45s ease both; animation-delay: calc(300ms + var(--k, 0) * 30ms); }
+@keyframes wvIn { from { opacity: 0; } }
+.wvl { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); margin-top: 4px; }
+.wvb { font: inherit; font-size: 0.8125rem; color: var(--muted); background: none; border: 0; padding: 4px 0; border-radius: 6px; cursor: pointer; text-align: center; white-space: nowrap; }
+.wvb b { font-weight: 600; color: var(--qc); }
+.wvb.cur { color: var(--fg); font-weight: 600; }
+.wvx.f .wvb:not(.on) { opacity: .45; }
+.wvb:hover { color: var(--fg); } .wvb:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.wvn { font-size: 0.75rem; color: var(--muted); margin: 6px 0 0; }
+@media (max-width: 520px) { .wvb { font-size: 0.6875rem; } }
+@media (prefers-reduced-motion: reduce) { .wv.anim .wvq, .wv.anim .wvt { animation: none; } .wv .wvold { transition: none; } }
 .phn { font-size: 0.78rem; color: var(--muted); margin: 10px 0 0; display: flex; flex-wrap: wrap; align-items: center; gap: 6px 16px; min-height: 20px; }
 .phleg { display: inline-grid; place-items: center; width: 18px; height: 18px; margin-left: -4px; border: 0; background: none; padding: 0; border-radius: 4px; font: inherit; color: inherit; cursor: pointer; }
 .phleg svg { width: 10px; height: 10px; fill: none; stroke: currentColor; stroke-width: 1.6; stroke-linecap: round; stroke-linejoin: round; transition: transform .15s; }
@@ -1313,6 +1349,76 @@ a.ubr, button.ubr { cursor: pointer; } a.ubr:hover .t, button.ubr:hover .t { tex
   $("prev").onclick = () => { stopPlay(); if (idx > 0) { idx--; update(); } };
   $("next").onclick = () => { stopPlay(); if (idx < set.periods.length - 1) { idx++; update(); } };
 
+  /* ---------- luonnos: suhdanneaalto ---------- */
+  // paikka käyrällä = vaiheen kulma tason ja muutoksen tasossa (0 pohja, .25 trendin ylitys, .5 huippu, .75 trendin alitus); auringon koko = etäisyys origosta
+  const WV = { w: 600, h: 226, mid: 124, amp: 78 }, TAU = 2 * Math.PI, pmod = (a, m) => ((a % m) + m) % m;
+  const wvU = (l, c) => pmod(pmod(Math.atan2(l, c), TAU) - 1.5 * Math.PI, TAU) / TAU;
+  const wvX = u => u * WV.w, wvY = u => WV.mid + WV.amp * Math.cos(TAU * u);
+  const wvAt = (u, off) => { const dy = -Math.sin(TAU * u) * TAU * WV.amp / WV.w, L = Math.hypot(dy, 1); return [wvX(u) + dy / L * off, wvY(u) - off / L, Math.atan(dy) * 180 / Math.PI]; };   // off > 0: käyrän yläpuolelle
+  const wvR = s => Math.max(7, 14 * Math.sqrt(Math.min(s, 2) / 2));   // pinta-ala ~ etäisyys, katto 2
+  const fmt2 = v => (v > 0.005 ? "+" : v < -0.005 ? "−" : "") + Math.abs(v).toFixed(2).replace(".", ",");
+  let wvArc = null, wvLast = null, wvRaf = 0;
+  function wvArcLen() { if (wvArc) return wvArc; const N = 1200, S = new Float64Array(N + 1);
+    for (let i = 1; i <= N; i++) S[i] = S[i - 1] + Math.hypot(wvX(i / N) - wvX((i - 1) / N), wvY(i / N) - wvY((i - 1) / N));
+    return wvArc = { s: u => S[Math.round(Math.max(0, Math.min(1, u)) * N)], u: t => { let lo = 0, hi = N; while (lo < hi) { const m = (lo + hi) >> 1; if (S[m] < t) lo = m + 1; else hi = m; } return lo / N; } }; }
+  function wvSunAt(u, s) { const r = wvR(s), [x, y] = wvAt(u, 9 + r); return { x, y, r }; }
+  function waveBlock(o) {
+    const { w, h, mid } = WV, A = wvArcLen(), sq = 8, gap = 4, st = sq + gap, cq = o.cq;
+    let d = ""; for (let i = 0; i <= 240; i++) { const u = -.02 + 1.04 * i / 240; d += (i ? "L" : "M") + wvX(u).toFixed(1) + " " + wvY(u).toFixed(1); }
+    const sky = (id, q) => `<g class="wp-${q}"><linearGradient id="${id}" x1="0" y1="0" x2="0" y2="1"><stop offset="0" style="stop-color:var(--wvA)"/><stop offset=".5" style="stop-color:var(--wvB)"/><stop offset="1" style="stop-color:var(--wvC)"/></linearGradient></g>`;
+    const sun = wvSunAt(o.sun.u, o.sun.s), f0 = o.from ? wvSunAt(o.from.u, o.from.s) : sun;
+    let g = `<defs><clipPath id="wvK"><rect width="${w}" height="${h}" rx="12"/></clipPath><clipPath id="wvHa"><rect width="${w}" height="${mid}"/></clipPath><clipPath id="wvHb"><rect y="${mid}" width="${w}" height="${h - mid}"/></clipPath></defs>`;
+    g += sky("wvS1", cq) + (o.from && o.from.q !== cq ? sky("wvS0", o.from.q) : "");
+    g += `<g class="wp-${cq}"><radialGradient id="wvG" gradientUnits="userSpaceOnUse" cx="${f0.x.toFixed(1)}" cy="${f0.y.toFixed(1)}" r="190"><stop offset="0" style="stop-color:var(--wvG);stop-opacity:var(--wvGo)"/><stop offset="1" style="stop-color:var(--wvG);stop-opacity:0"/></radialGradient></g>`;
+    g += `<g clip-path="url(#wvK)"><rect class="wvbg" width="${w}" height="${h}"/><rect width="${w}" height="${mid}" fill="url(#wvS1)"/>`;
+    if (o.from && o.from.q !== cq) g += `<rect class="wvold" width="${w}" height="${mid}" fill="url(#wvS0)"/>`;
+    g += `<rect width="${w}" height="${mid}" fill="url(#wvG)"/>`;
+    [.25, .5, .75].forEach(u => g += `<line class="wvph" x1="${wvX(u)}" x2="${wvX(u)}" y1="0" y2="${h}"/>`);
+    g += `<line class="wvhz" x1="0" x2="${w}" y1="${mid}" y2="${mid}"/><path class="wvc" d="${d}" clip-path="url(#wvHb)"/><path class="wvc hi" d="${d}" clip-path="url(#wvHa)"/>`;
+    let k = 0;   // indikaattorit käyrän alle, vaiheittain tasavälein; ryhmä keskitetään jäsenten keskikohtaan, järjestys säilyy
+    [["rec", 0, .25], ["up", .25, .5], ["turn", .5, .75], ["down", .75, 1]].forEach(([q, a, b]) => {
+      const L = o.items.filter(x => x.q === q).sort((x, y) => x.u - y.u); if (!L.length) return;
+      const span = L.length * st - gap, m = L.reduce((t, x) => t + A.s(Math.min(b, Math.max(a, x.u))), 0) / L.length;
+      const s0 = Math.max(A.s(a) + 6, Math.min(A.s(b) - 6 - span, m - span / 2));
+      L.forEach((x, j) => { const u = A.u(s0 + j * st + sq / 2), [cx, cy, ang] = wvAt(u, -12);
+        g += `<rect class="wvq${x.cls}" data-id="${x.id}" data-tip="${escH(x.label)}" data-sub="${escH(x.sub)}" data-qc="${qcol(q)}" style="--qc:${qcol(q)};--k:${k++}" fill="${qcol(q)}" x="${(cx - sq / 2).toFixed(1)}" y="${(cy - sq / 2).toFixed(1)}" width="${sq}" height="${sq}" rx="1.5" transform="rotate(${ang.toFixed(1)} ${cx.toFixed(1)} ${cy.toFixed(1)})"/>`; }); });
+    o.trail.forEach((t, j, T) => { const r = Math.max(1.6, .45 * wvR(t.s)), [x, y] = wvAt(t.u, 9 + r);
+      g += `<circle class="wvt" style="--k:${k + j};opacity:${(.2 + .55 * (j + 1) / T.length).toFixed(2)}" cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="${r.toFixed(1)}"/>`; });
+    g += `<g class="wvsun" data-tip="Kokonaisindikaattori ${escH(o.sun.per)}" data-sub="${escH(o.sun.sub)}" data-qc="${qcol(cq)}" transform="translate(${f0.x.toFixed(1)} ${f0.y.toFixed(1)})"><circle class="wvh" r="${(f0.r * 1.9).toFixed(1)}"/><circle class="wvd" r="${f0.r.toFixed(1)}" stroke-width="${f0.r < 8 ? 2 : 3}"/></g></g>`;
+    const lbl = `Suhdanneaalto ${o.sun.per}: kokonaisindikaattori vaiheessa ${Q[cq].short.toLowerCase()}, etäisyys trendistä ${o.sun.s.toFixed(2).replace(".", ",")}. Indikaattoreita vaiheittain: ${QORDER.map(q => Q[q].short.toLowerCase() + " " + o.counts[q]).join(", ")}.`;
+    return `<svg class="wv${o.anim ? " anim" : ""}" viewBox="0 0 ${w} ${h}" role="img" aria-label="${escH(lbl)}">${g}</svg>`
+      + `<div class="wvl">${["rec", "up", "turn", "down"].map(q => `<button type="button" class="wvb${q === cq ? " cur" : ""}${o.qf === q ? " on" : ""}" data-q="${q}" style="--qc:${qcol(q)}" aria-pressed="${o.qf === q}" aria-label="${Q[q].name}: ${o.counts[q]}. Klikkaa suodattaaksesi.">${Q[q].short} <b>${o.counts[q]}</b></button>`).join("")}</div>`
+      + `<p class="wvn">Aurinko: kokonaisindikaattori, koko kuvaa etäisyyttä trendistä.${o.trail.length ? ` Pisteet: ${o.trail.length} edellistä ${set.freq === "M" ? "kuukautta" : "neljännestä"}.` : ""}</p>`;
+  }
+  function wvPlay(o) {                                                // aurinko ja valo liukuvat edellisestä kohdasta, vanha taivas häipyy
+    cancelAnimationFrame(wvRaf); const svg = $("summary").querySelector("svg.wv"); if (!svg) return;
+    const old = svg.querySelector(".wvold"); if (old) requestAnimationFrame(() => requestAnimationFrame(() => old.classList.add("go")));
+    if (!o.from) return;
+    const sg = svg.querySelector(".wvsun"), [h1, d1] = sg.querySelectorAll("circle"), gl = svg.querySelector("#wvG"), t0 = performance.now(), D = 900;
+    const step = now => { const t = Math.min(1, (now - t0) / D), e = 1 - Math.pow(1 - t, 3);
+      const p = wvSunAt(o.from.u + (o.sun.u - o.from.u) * e, o.from.s + (o.sun.s - o.from.s) * e);
+      sg.setAttribute("transform", `translate(${p.x.toFixed(1)} ${p.y.toFixed(1)})`); h1.setAttribute("r", (p.r * 1.9).toFixed(1)); d1.setAttribute("r", p.r.toFixed(1)); d1.setAttribute("stroke-width", p.r < 8 ? 2 : 3);
+      gl.setAttribute("cx", p.x.toFixed(1)); gl.setAttribute("cy", p.y.toFixed(1)); if (t < 1) wvRaf = requestAnimationFrame(step); };
+    wvRaf = requestAnimationFrame(step);
+  }
+  function waveData(stay, mv, counts, cq, cp) {
+    const C = comp(), P = set.periods, ok = k => C.level[k] != null && C.change[k] != null, sOf = k => Math.hypot(C.level[k], C.change[k]);
+    const hist = []; let k0 = -1; for (let k = 0; k <= cp.i; k++) if (ok(k)) { hist.push(sOf(k)); if (k0 < 0) k0 = k; }
+    const s = Math.hypot(cp.l, cp.c), srt = hist.slice().sort((a, b) => a - b), med = srt[Math.floor((srt.length - 1) / 2)];
+    const trail = []; for (let k = Math.max(0, cp.i - set.tail); k < cp.i; k++) if (ok(k)) trail.push({ u: wvU(C.level[k], C.change[k]), s: sOf(k), per: fmtP(P[k]) });
+    const items = [];
+    QORDER.forEach(q => { stay[q].forEach(x => { const p = at(x.s, idx);
+        items.push({ id: x.s.id, label: x.s.label, q, u: wvU(p.l, p.c), cls: (x.st >= 0 ? " st" : "") + (picked.size && !picked.has(x.s.id) ? " dim" : "") + (qf && qf !== q ? " dim" : ""), sub: Q[q].short + (x.st >= 0 ? `\nviimeisin ${fmtP(P[x.st])}` : "") }); });
+      mv[q].forEach(x => { const p = at(x.s, idx);
+        items.push({ id: x.s.id, label: x.s.label, q, u: wvU(p.l, p.c), cls: " new" + (picked.size && !picked.has(x.s.id) ? " dim" : "") + (qf && qf !== q ? " dim" : ""), sub: `${Q[x.q0].short} → ${Q[q].short.toLowerCase()} ${fmtP(P[idx])}` }); }); });
+    const anim = motion() && !playT && (!wvLast || wvLast.set !== set || wvLast.idx !== idx);
+    let from = null; if (anim) from = wvLast && wvLast.set === set ? wvLast.sun : (trail.length ? { u: trail[trail.length - 1].u, s: trail[trail.length - 1].s, q: quad(C.level[cp.i - 1] ?? cp.l, C.change[cp.i - 1] ?? cp.c) } : null);
+    const sun = { u: wvU(cp.l, cp.c), s, q: cq, per: fmtP(P[cp.i]),
+      sub: `${Q[cq].short}\nTaso ${fmt2(cp.l)}, muutos ${fmt2(cp.c)}\nEtäisyys trendistä ${s.toFixed(2).replace(".", ",")} (${s <= srt[0] + 1e-9 ? `pienin ${fmtP(P[k0])} alkaen` : `mediaani ${med.toFixed(2).replace(".", ",")}`})` };
+    wvLast = { set, idx, sun: { u: sun.u, s, q: cq } };
+    return { items, counts, cq, sun, trail, from, anim, qf };
+  }
+
   /* ---------- yhteenveto ja luettelo ---------- */
   let phLeg = false, panLast = null;
   function renderPanel() {
@@ -1329,11 +1435,14 @@ a.ubr, button.ubr { cursor: pointer; } a.ubr:hover .t, button.ubr:hover .t { tex
       hdr = `<p class="phl">Suhdannevaihe</p><p class="phb" style="--qc:${qcol(cq)}"><b>${Q[cq].short}</b><em>${fmtP(set.periods[k])} alkaen</em></p>`; }
     $("hlead").innerHTML = "";
 
-    $("summary").innerHTML = `<div class="phx${qf ? " f" : ""}${QORDER.some(q => stay[q].concat(mv[q]).some(x => picked.has(x.s.id))) ? " pk" : ""}">${hdr}<div class="phrs">${QORDER.map(q => `<button type="button" class="phr${q === cq ? " cur" : ""}${qf === q ? " on" : ""}" data-q="${q}" style="--qc:${qcol(q)};--N:${Math.max(1, ...Object.values(counts))}" aria-pressed="${qf === q}" aria-label="${Q[q].name}: ${counts[q]}. Klikkaa suodattaaksesi."><span class="nm">${Q[q].short}</span><span class="sq">${stay[q].map(x => `<i data-id="${x.s.id}" data-tip="${escH(x.s.label)}"${x.st >= 0 ? ` data-sub="${fmtP(set.periods[x.st])}"` : ""}${picked.has(x.s.id) || x.st >= 0 ? ` class="${[picked.has(x.s.id) ? "pk" : "", x.st >= 0 ? "st" : ""].filter(Boolean).join(" ")}"` : ""}></i>`).join("")}${mv[q].map(x => `<i class="new${picked.has(x.s.id) ? " pk" : ""}" data-id="${x.s.id}" data-tip="${escH(x.s.label)}" data-sub="${Q[x.q0].short} → ${Q[q].short.toLowerCase()} ${fmtP(set.periods[idx])}"></i>`).join("")}</span><span class="n">${counts[q]}</span></button>`).join("")}</div><div class="phn"><button type="button" class="phleg" aria-expanded="${phLeg}" aria-controls="phLegB" aria-label="Selitteet" title="Selitteet"><svg viewBox="0 0 10 10" aria-hidden="true"><path d="M3.5 2 7 5l-3.5 3"/></svg></button><span class="phlb${phLeg ? "" : " off"}" id="phLegB"><span><i></i>muutos edellisestä ${set.freq === "M" ? "kuukaudesta" : "neljänneksestä"}</span><span><i class="st"></i>ei julkaistu</span></span></div></div>`;   // rivi aina paikallaan, ettei sivu hypi   // yksi neliö = yksi sarja
+    const WV_ON = LUONNOS && cp, wvd = WV_ON ? waveData(stay, mv, counts, cq, cp) : null;   // luonnos: suhdanneaalto neliörivien tilalle
+    $("summary").innerHTML = WV_ON ? `<div class="phx wvx${qf ? " f" : ""}">${hdr}${waveBlock(wvd)}</div>` : `<div class="phx${qf ? " f" : ""}${QORDER.some(q => stay[q].concat(mv[q]).some(x => picked.has(x.s.id))) ? " pk" : ""}">${hdr}<div class="phrs">${QORDER.map(q => `<button type="button" class="phr${q === cq ? " cur" : ""}${qf === q ? " on" : ""}" data-q="${q}" style="--qc:${qcol(q)};--N:${Math.max(1, ...Object.values(counts))}" aria-pressed="${qf === q}" aria-label="${Q[q].name}: ${counts[q]}. Klikkaa suodattaaksesi."><span class="nm">${Q[q].short}</span><span class="sq">${stay[q].map(x => `<i data-id="${x.s.id}" data-tip="${escH(x.s.label)}"${x.st >= 0 ? ` data-sub="${fmtP(set.periods[x.st])}"` : ""}${picked.has(x.s.id) || x.st >= 0 ? ` class="${[picked.has(x.s.id) ? "pk" : "", x.st >= 0 ? "st" : ""].filter(Boolean).join(" ")}"` : ""}></i>`).join("")}${mv[q].map(x => `<i class="new${picked.has(x.s.id) ? " pk" : ""}" data-id="${x.s.id}" data-tip="${escH(x.s.label)}" data-sub="${Q[x.q0].short} → ${Q[q].short.toLowerCase()} ${fmtP(set.periods[idx])}"></i>`).join("")}</span><span class="n">${counts[q]}</span></button>`).join("")}</div><div class="phn"><button type="button" class="phleg" aria-expanded="${phLeg}" aria-controls="phLegB" aria-label="Selitteet" title="Selitteet"><svg viewBox="0 0 10 10" aria-hidden="true"><path d="M3.5 2 7 5l-3.5 3"/></svg></button><span class="phlb${phLeg ? "" : " off"}" id="phLegB"><span><i></i>muutos edellisestä ${set.freq === "M" ? "kuukaudesta" : "neljänneksestä"}</span><span><i class="st"></i>ei julkaistu</span></span></div></div>`;   // rivi aina paikallaan, ettei sivu hypi   // yksi neliö = yksi sarja
     { const sqA = motion() && !playT && (!panLast || panLast.set !== set || panLast.idx !== idx); panLast = { set, idx };   // neliöt syttyvät porrastetusti, kun kuukausi vaihtuu (ei suodatuksessa eikä toistossa)
       const x = $("summary").querySelector(".phx"); if (sqA && x) { x.querySelectorAll(".sq i").forEach((e, k) => e.style.setProperty("--k", k)); x.classList.add("anim"); } }
+    if (WV_ON) { wvPlay(wvd); $("summary").querySelectorAll(".wvq").forEach(r => r.onclick = () => { const id = r.dataset.id;
+        if (sel === id && picked.size === 1) { clearPicks(); return; } qf = null; picked.clear(); sel = null; pick(id); }); }
     { const lb = $("summary").querySelector(".phleg");                 // selitteet nuolen takana; tila sailyy kuukautta vaihdettaessa
-      lb.onclick = () => { phLeg = !phLeg; lb.setAttribute("aria-expanded", String(phLeg)); $("phLegB").classList.toggle("off", !phLeg); }; }
+      if (lb) lb.onclick = () => { phLeg = !phLeg; lb.setAttribute("aria-expanded", String(phLeg)); $("phLegB").classList.toggle("off", !phLeg); }; }
     $("summary").querySelectorAll("[data-q]").forEach(b => b.onclick = e => {
       const sq = e.target.closest("i[data-id]");                       // yksittainen neliö: vain se sarja valituksi
       if (sq) { const id = sq.dataset.id; if (sel === id && picked.size === 1) { clearPicks(); return; } qf = null; picked.clear(); sel = null; pick(id); return; }
