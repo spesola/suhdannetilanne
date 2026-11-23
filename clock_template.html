@@ -246,7 +246,8 @@ body { font-variant-numeric: tabular-nums; background: var(--bg); min-height: 10
 :root[data-theme="vapor"] .wp-down { --wvGp: 28%; --wvA: #0c0b1e; --wvB: #1c1430; --wvC: #3d1a2e; --wvG: #ff7a6b; --wvGo: .28; }
 .wv { display: block; width: 100%; height: auto; overflow: visible; }
 .phx.wvx { width: 100%; }
-.hero.wvon .ubf { margin-top: 8px; }   /* linkki listan alle, taivaan puolelle */
+.hero.wvon .ubf { margin-top: 8px; }
+body:has(.hero.wvon) .topbar::after { display: none; }   /* vaiheviiva turha, kun taivas kertoo vaiheen */   /* linkki listan alle, taivaan puolelle */
 .hero.wvon { position: relative; isolation: isolate; }
 .wvsky { position: absolute; z-index: -1; left: var(--wvL, 0); width: var(--wvW, 100%); top: var(--wvT, 0); height: var(--wvH, 0); pointer-events: none;
   background: radial-gradient(440px 270px at var(--gx, 50%) var(--gy, 50%), color-mix(in srgb, var(--wvG) var(--wvGp), transparent), transparent 70%), linear-gradient(var(--wvA), var(--wvB) 55%, var(--wvC));
@@ -1845,7 +1846,7 @@ a.ubr, button.ubr { cursor: pointer; } a.ubr:hover .t, button.ubr:hover .t { tex
   // etusivun julkaisuaikajana: viimeksi päivittyneet (loki) jakajan yläpuolella, tulevat julkaisut alapuolella; jakajassa tämä päivä
   function renderUbox(on) {
     const el = $("ubox"); el.hidden = !on; if (!on) { el.innerHTML = ""; return; }
-    const W = ["su", "ma", "ti", "ke", "to", "pe", "la"], NP = 3, NF = 3, td = new Date(), today = td.toDateString();
+    const W = ["su", "ma", "ti", "ke", "to", "pe", "la"], NP = LUONNOS ? 2 : 3, NF = LUONNOS ? 2 : 3, td = new Date(), today = td.toDateString();
     const dl = d => `${W[d.getDay()]} ${d.getDate()}.${d.getMonth() + 1}.`;
     const past = [];                                                   // uusimmat ensin lokista, nimi kerran; näytetään vanhin ylimpänä
     for (const e of D.meta.log || []) { const d = new Date(e.date + "T12:00:00"), nm = new Set();
