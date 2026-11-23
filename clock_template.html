@@ -860,13 +860,14 @@ footer .flinks .lnk:hover { text-decoration-color: currentColor; }
   transform-origin: left; animation: phLine 1s cubic-bezier(.3, .6, .25, 1) .2s both; }
 @keyframes phLine { from { transform: scaleX(0); } }
 /* etusivun päivitykset: päivittyneet / tulossa, nuolilla vaihto (menneet vasemmalla, tulevat oikealla) */
-.ubox { align-self: end; min-width: 0; font-size: 0.84rem; }
+.ubox { align-self: stretch; min-width: 0; font-size: 0.84rem; display: flex; flex-direction: column; }   /* otsikko SUHDANNEVAIHE-tekstin tasolle, linkki alareunaan */
 .hero.haskpi .ubox { display: none; }
-.ubh { display: flex; align-items: center; gap: 6px; margin-bottom: 4px; }
+.ubh { display: flex; align-items: center; gap: 6px; margin: -4px 0 4px; }   /* otsikon teksti samalle perusviivalle kuin SUHDANNEVAIHE */
 .ubh .k { font-size: 0.7rem; font-weight: 600; letter-spacing: .09em; text-transform: uppercase; color: var(--muted); margin-right: auto; }
 .ubh .step { width: 24px; height: 24px; border-radius: 6px; }
 .ubh .step:disabled { opacity: .35; cursor: default; border-color: var(--line); }
 .ubl { min-height: calc(4 * 29px); }
+@media (min-width: 861px) { .ubl { min-height: calc(6 * 29px); } }
 .ubl.sw { animation: ubIn .26s ease-out; }
 .ubl.sw.bk { animation-name: ubInB; }
 @keyframes ubIn { from { opacity: 0; transform: translateX(10px); } }
@@ -882,7 +883,7 @@ a.ubr, button.ubr { cursor: pointer; } a.ubr:hover .t, button.ubr:hover .t { tex
 .ubr .t .fresh { margin: 0 0 0 7px; }
 .ubr .p { color: var(--muted); font-size: 0.76rem; white-space: nowrap; font-variant-numeric: tabular-nums; }
 .ubr .p.tm { color: var(--accent); }
-.ubf { display: flex; justify-content: flex-end; margin-top: 4px; }
+.ubf { display: flex; justify-content: flex-end; margin-top: auto; padding-top: 4px; }
 .ubf button { font: inherit; font-size: 0.76rem; color: var(--muted); background: none; border: 0; padding: 2px 0; cursor: pointer; }
 .ubf button:hover { color: var(--fg); }
 @media (max-width: 860px) { .ubox { align-self: stretch; margin-top: 8px; } }
@@ -1135,7 +1136,7 @@ a.ubr, button.ubr { cursor: pointer; } a.ubr:hover .t, button.ubr:hover .t { tex
     $("sub").textContent = `Päivitetty ${gen.toLocaleDateString("fi-FI")}.`;
     $("updOpen").onclick = openUpd;
     const box = $("sets"); box.querySelectorAll(":scope > button").forEach(b => b.remove());   // alleviiva jää paikalleen ja liukuu uuteen kohtaan
-    D.sets.forEach(s => { const b = document.createElement("button"); b.type = "button"; b.innerHTML = `<span class="lg">${s.label}</span><span class="sh">${SHORT[s.id] || s.label}</span>`;
+    D.sets.forEach(s => { const b = document.createElement("button"); b.type = "button"; b.innerHTML = `<span class="lg">${s.id === "suhdanne" ? SHORT.suhdanne : s.label}</span><span class="sh">${SHORT[s.id] || s.label}</span>`;
       b.setAttribute("aria-pressed", s.id === set.id); b.onclick = () => { if (s.id === set.id) return;
         stopPlay(); set = s; idx = defIdx(s); sel = null; picked.clear(); qf = null;
         if (s.growth) grSel = "bkt";
@@ -1704,7 +1705,9 @@ a.ubr, button.ubr { cursor: pointer; } a.ubr:hover .t, button.ubr:hover .t { tex
   const seenPeek = (sid, id) => { const k = sid + "/" + id, d = (D.meta.seen || {})[k]; if (!d) return false; let B = null;
     if (sid in SEENB) B = SEENB[sid]; else try { const o = (JSON.parse(localStorage.getItem("kaynnit") || "{}") || {})[sid]; B = o ? (Date.now() - o.t < 18e5 ? o.base : o.cur) : null; } catch (e) {}
     return B ? B[k] !== d : (Date.now() - new Date(d + "T12:00:00")) / 864e5 < 7; };
+  const UBN_ = () => matchMedia("(min-width: 861px)").matches ? 6 : 4;   // leveällä laatikko täyttää vaiheen korkeuden
   function renderUbox(on, dir) {
+    const UBN = UBN_();
     const el = $("ubox"); el.hidden = !on; if (!on) { el.innerHTML = ""; return; }
     const W = ["su", "ma", "ti", "ke", "to", "pe", "la"], today = new Date().toDateString();
     const dc = (d, show) => `<span class="d${d.toDateString() === today ? " now" : ""}">${show ? (d.toDateString() === today ? "tänään" : `${W[d.getDay()]} ${d.getDate()}.${d.getMonth() + 1}.`) : ""}</span>`;
@@ -1712,14 +1715,14 @@ a.ubr, button.ubr { cursor: pointer; } a.ubr:hover .t, button.ubr:hover .t { tex
     if (ubK === 0) {
       for (const e of D.meta.log || []) { const d = new Date(e.date + "T12:00:00"), nm = new Set(); let first = true;
         for (const u of e.upd || []) { let n = u.src.includes(": ") ? u.src.slice(u.src.indexOf(": ") + 2) : u.src; n = n.charAt(0).toUpperCase() + n.slice(1);
-          if (nm.has(n)) continue; nm.add(n); if (rows.length >= 4) break;
+          if (nm.has(n)) continue; nm.add(n); if (rows.length >= UBN) break;
           const s = D.sets.find(x => x.label === u.set), h = u.id ? targetOf(u.set, u.id) : null, fr = s && u.id && seenPeek(s.id, u.id);
           const inner = `${dc(d, first)}<span class="t">${escH(n)}${fr ? '<span class="fresh" title="Uusi edellisen käyntisi jälkeen"></span>' : ""}</span><span class="p">${escH(u.period || "")}</span>`;
           rows.push(h ? `<button type="button" class="ubr" data-go="${h}" title="Siirry kuvioon">${inner}</button>` : `<div class="ubr">${inner}</div>`); first = false; }
-        if (rows.length >= 4) break; }
+        if (rows.length >= UBN) break; }
     } else {
       const now = Date.now() - 6 * 36e5; let pk = null;
-      for (const r of (D.meta.upcoming || []).filter(r => new Date(r.date).getTime() >= now).slice(0, 4)) {
+      for (const r of (D.meta.upcoming || []).filter(r => new Date(r.date).getTime() >= now).slice(0, UBN)) {
         const d = new Date(r.date), k = d.toDateString(), tm = d.toLocaleTimeString("fi-FI", { hour: "2-digit", minute: "2-digit" });
         const m = r.title.replace(/\s\d{4}(?=,|$)/, "").match(/^(.*?),\s*(?:(?:tammi|helmi|maalis|huhti|touko|kesä|heinä|elo|syys|loka|marras|joulu)kuu|\d\. (?:vuosi)?neljännes)/);
         rows.push(`<a class="ubr" href="${r.url}" target="_blank" rel="noopener" title="${escH(r.title)}">${dc(d, k !== pk)}<span class="t">${escH(m ? m[1] : r.title)}</span><span class="p tm">${tm === "08.00" ? "" : "klo " + tm.replace(".00", "")}</span></a>`); pk = k; }
