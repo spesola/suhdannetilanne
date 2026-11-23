@@ -91,9 +91,18 @@ px_file <- function(base, s) {
   f <- tempfile(); writeLines(paste(base, s$table, toJSON(s$pick[order(names(s$pick))], auto_unbox = TRUE)), f)
   file.path(PX_DIR, paste0(unname(tools::md5sum(f)), ".csv"))
 }
+# lahteen ilmoittama taulukon paivitysaika (StatFin: kansiolistaus, Eurostat: vastauksen updated); sivulla vihjeessa sarjoille,
+# joiden uusimman havainnon ilmestymispaivaa ei ole lokissa (seuranta alkoi 11/2026)
+SRC_TUPD <- new.env()
+upd_day <- function(u) tryCatch({ u <- sub("\\.\\d+", "", u); m <- regmatches(u, regexec("^(\\d{4}-\\d{2}-\\d{2})T(\\d{2}:\\d{2}:\\d{2})(Z|[+-]\\d{2}:?\\d{2})?$", u))[[1]]
+  if (!length(m)) return(NA_character_)
+  t0 <- as.POSIXct(paste(m[2], m[3]), tz = "UTC"); z <- m[4]
+  if (nzchar(z) && z != "Z") { z <- gsub(":", "", z); t0 <- t0 - (as.integer(substr(z, 1, 1) == "+") * 2 - 1) * (as.integer(substr(z, 2, 3)) * 3600 + as.integer(substr(z, 4, 5)) * 60) }
+  format(t0, "%Y-%m-%d", tz = "Europe/Helsinki") }, error = function(e) NA_character_)
 fetch_statfin <- function(s) {
   base <- px_base_of(s)
-  upd <- if (identical(Sys.getenv("PX_FULL"), "1")) NULL else px_updated(base, s$table)
+  u0 <- px_updated(base, s$table); if (!is.null(u0)) SRC_TUPD[[paste0("px:", base, s$table)]] <- upd_day(u0)
+  upd <- if (identical(Sys.getenv("PX_FULL"), "1")) NULL else u0
   f <- px_file(base, s); fu <- paste0(f, ".u")
   if (!is.null(upd) && file.exists(f) && file.exists(fu)) {
     u <- readLines(fu, warn = FALSE)
@@ -148,6 +157,7 @@ fetch_eurostat <- function(s, geo = "FI") {
   qs <- paste(sprintf("%s=%s", names(pick), unlist(pick)), collapse = "&")
   js <- fromJSON(get_text(paste0(EUROSTAT, s$ds, "?format=JSON&lang=EN&", qs)),
                  simplifyVector = FALSE)
+  if (!is.null(js$updated)) SRC_TUPD[[paste0("es:", s$ds)]] <- upd_day(js$updated)
   extra <- setdiff(names(js$dimension), c("time", names(pick)))
   for (d in extra)
     if (length(js$dimension[[d]]$category$index) > 1)
@@ -1318,6 +1328,12 @@ for (k in names(log_state)) {
   log_state[[k]]$since <- sn
 }
 out$meta$seen <- lapply(Filter(function(a) !is.na(a$since), log_state), function(a) a$since)
+upd_walk <- function(x) { if (!is.list(x)) return(character()); r <- character()
+  if (identical(x$source, "statfin") && !is.null(x$table)) r <- c(r, SRC_TUPD[[paste0("px:", px_base_of(x), x$table)]])
+  if (identical(x$source, "eurostat") && !is.null(x$ds)) r <- c(r, SRC_TUPD[[paste0("es:", x$ds)]])
+  for (y in x) if (is.list(y)) r <- c(r, upd_walk(y)); r[!is.na(r)] }
+out$meta$srcupd <- Filter(Negate(is.null), lapply(Filter(function(a) is.na(a$since), log_state), function(a) {
+  s <- tryCatch(ser_cfg(a$id), error = function(e) NULL); r <- if (is.null(s)) character() else upd_walk(s); if (length(r)) max(r) else NULL }))
 dir.create(CACHE_DIR, showWarnings = FALSE)
 writeLines(toJSON(log_state, auto_unbox = TRUE, na = "null", null = "null"), LOG_STATE)
 writeLines(toJSON(log, auto_unbox = TRUE, na = "null", null = "null"), LOG_FILE)
