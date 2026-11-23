@@ -1050,6 +1050,7 @@ a.ubr, button.ubr { cursor: pointer; } a.ubr:hover .t, button.ubr:hover .t { tex
   const qcol = q => `var(${Q[q].v})`;
   /* ---------- liike (pois, jos käyttäjä on vähentänyt liikettä) ---------- */
   const RMQ = matchMedia("(prefers-reduced-motion: reduce)"), motion = () => !RMQ.matches;
+  const LUONNOS = new URLSearchParams(location.search).has("luonnos"); let PHMAP = null;   // luonnos (?luonnos): kokonaisindikaattorin laskuvaiheiden varjostus aikasarjoihin, ei vielä käytössä
   const ANIM = new Map();                                            // kerran animoidut: näkymä + kortin otsikko -> "done" tai "pend" (odottaa vieritystä; uudelleenpiirretty kortti perii tilan)
   let rvIO = null, animQ = 0;
   function pulse(svg) {                                              // uusin havainto: laajeneva rengas kerran
@@ -2247,6 +2248,7 @@ a.ubr, button.ubr { cursor: pointer; } a.ubr:hover .t, button.ubr:hover .t { tex
       scrollTo({ top: t.getBoundingClientRect().top + scrollY - bar - 16 }); }, 120); }
   // sivuston muutokset: uudet kuviot ja muut isommat lisaykset (kasin yllapidetty, uusin ensin); set + id -> linkki kuvioon
   const CHANGES = [
+    { d: "2026-11-23", t: "Kuvioissa viivojen nimet suoraan viivan päässä selitteen sijaan (2–5 viivaa)" },
     { d: "2026-11-23", t: "Erittelysivuille revisiot: muutos edelliseen julkaisuun (Revisio-valinta)", set: "Reaalitalous" },
     { d: "2026-11-23", t: "Erittelysivut myös kuluttajahinnoille hyödykeryhmittäin, asuntojen hinnoille alueittain ja julkisille kulutusmenoille alasektoreittain", set: "Reaalitalous" },
     { d: "2026-11-23", t: "Erittelysivut myös BKT:lle toimialoittain, työtunneille, työttömyysasteelle ja ansiotasolle; erittelysivulla aiheen kaikki kuviot näkyvissä", set: "Reaalitalous" },
@@ -2909,7 +2911,12 @@ a.ubr, button.ubr { cursor: pointer; } a.ubr:hover .t, button.ubr:hover .t { tex
       if (c.size === "tt" && !narrow) { c.w = c.w || 760; c.height = c.height || 300; }   // kaksi kolmasosaa leveydesta
       const W2 = c.w || (big ? 960 : half ? 560 : 420), H2 = c.height || (big ? 300 : half ? 270 : (c.wide ? 270 : 230)), fs = c.w ? 11 : big ? 11 : half ? 12 : 13;
       const Y2 = c.y2 || [], isY2 = k => Y2.includes(c.lines[k]);   // toissijainen (oikea) akseli eri tason sarjoille
-      const ml = big ? 44 : 52, mr = 10 + (c.bars || c.stack ? W2 / set.periods.length / 2 : 0) + (Y2.length ? 34 : 0), mt = 10, mb = big ? 33 : 39;
+      const ml = big ? 44 : 52; let mr = 10 + (c.bars || c.stack ? W2 / set.periods.length / 2 : 0) + (Y2.length ? 34 : 0), mt = 10, mb = big ? 33 : 39;
+      // viivojen nimet suoraan viivan paahan selitteen sijaan (2-5 viivaa, ei pinoja, palkkeja eika kahta akselia); oikea marginaali nimien levyiseksi.
+      // Kapealla ja hyvin pitkilla nimilla selite sailyy, ettei piirtoalue kavene liikaa.
+      const dlw = 10 + Math.max(...c.lines.map(id => lbl(id).length)) * fs * 0.56;
+      const direct = !narrow && !c.ts && c.lines.length >= 2 && c.lines.length <= 5 && !c.stack && !c.bars && !Y2.length && !c.lower && dlw < W2 * 0.3;
+      if (direct) mr += dlw;
       const svg = el("svg", { class: "fc", viewBox: `0 0 ${W2} ${H2}`, role: "img", "aria-label": c.title }, card); svg.dataset.wf = (ml / W2).toFixed(3);
       const fm = document.createElement("div"); fm.className = "fmeta";
       if (c.lines.length > 1 || c.bars || c.stack) {
@@ -2919,6 +2926,7 @@ a.ubr, button.ubr { cursor: pointer; } a.ubr:hover .t, button.ubr:hover .t { tex
           (c.stack || []).map((id, k) => `<span class="sq st${isRes(id) ? " hx" : ""}" style="--qc:${stCol(c, k)}">${ser(id).label}</span>`).join("") +
           (!c.bars ? "" : c.barsNeutral ? `<span style="--qc:var(--g3)">${ser(c.bars).label} (palkit)</span>`
             : `<span style="--qc:var(--q-up)">${(c.barsLegend || [])[0] || "Normaali käyrä"}</span><span style="--qc:var(--q-down)">${(c.barsLegend || [])[1] || "Käänteinen käyrä"}</span>`);
+        if (direct) lg.classList.add("hide");
         fm.appendChild(lg);
       }
       const db = document.createElement("button"); db.type = "button"; db.className = "dl"; db.textContent = "Lataa CSV"; db.title = "Lataa kuvan data";
@@ -2961,6 +2969,15 @@ a.ubr, button.ubr { cursor: pointer; } a.ubr:hover .t, button.ubr:hover .t { tex
         el("text", { x: ml - 6, y: ys(vv) + 4, "text-anchor": "end", "font-size": fs, fill: "var(--muted)" }, svg).textContent =
           c.ts && !c.rawv && !c.lvl && Number.isInteger(vv) ? tick(vv) : fmtV(vv, stepDec(step));
       }
+      if (LUONNOS && !c.ts && n > 40 && PHMAP) {                        // LUONNOS: kokonaisindikaattorin laskuvaiheet taustalle
+        const ph = per => PHMAP[per] || (/-Q\d$/.test(per) ? PHMAP[per.slice(0, 4) + "-" + String(+per.slice(6) * 3).padStart(2, "0")] : null);
+        const dx = (W2 - ml - mr) / (n - 1); let s0 = -1;
+        const k0 = P.findIndex(per => ph(per)); if (k0 > 0) { const xe = xs(k0) - dx / 2;   // ennen kokonaisindikaattorin alkua: ei luokitusta
+          el("text", { x: (ml + xe) / 2, y: mt + fs, "text-anchor": "middle", "font-size": fs - 1, fill: "var(--muted)" }, svg).textContent = xe - ml > 70 ? "ei vaiheluokitusta" : ""; }
+        for (let i = 0; i <= n; i++) { const on = i < n && ph(P[i]) === "down";
+          if (on && s0 < 0) s0 = i;
+          if (!on && s0 >= 0) { const x0 = Math.max(ml, xs(s0) - dx / 2), x1 = Math.min(W2 - mr, xs(i - 1) + dx / 2);
+            el("rect", { x: x0, y: mt, width: x1 - x0, height: pb - mt, fill: "var(--q-down)", "fill-opacity": 0.08 }, svg); s0 = -1; } } }
       if (c.ref != null) {                                                // kynnysviiva (esim. Sahmin saanto 0,5)
         el("line", { x1: ml, x2: W2 - mr, y1: ys(c.ref), y2: ys(c.ref), stroke: "var(--fg)", "stroke-opacity": 0.55, "stroke-dasharray": "4 3", "stroke-width": 1 }, svg);
         const rt = c.refLabel || `kynnys ${fmtV(c.ref, 1)}`, rw = rt.length * fs * 0.56, ry = ys(c.ref) - 5 - fs * 0.35;   // nimi siihen kohtaan, jossa viivat ovat kauimpana (ei päätepisteiden päälle)
@@ -3010,6 +3027,12 @@ a.ubr, button.ubr { cursor: pointer; } a.ubr:hover .t, button.ubr:hover .t { tex
           "stroke-linecap": (c.dot || []).includes(id) ? "round" : "butt", "stroke-linejoin": "round" }, svg); });
       const cur = el("line", { y1: mt, y2: H2 - mb, stroke: "var(--muted)", "stroke-width": 1, "stroke-dasharray": "2 3" }, svg);
       const dots = L.map((a, k) => el("circle", { r: big ? 3.5 : 4, fill: colOf[c.lines[k]], stroke: "var(--surface)", "stroke-width": 1.5 }, svg)); svg._ends = dots;
+      if (direct) {                                                     // nimet viivan paahan, paallekkaiset erotetaan pystysuunnassa
+        const lab = L.map((a, k) => { const j = lastNN(a); return j < 0 ? null : { k, y: ys(a[j]) }; }).filter(Boolean).sort((a, b) => a.y - b.y), gap = fs + 3;
+        for (let q = 1; q < lab.length; q++) lab[q].y = Math.max(lab[q].y, lab[q - 1].y + gap);   // alaspain vahintaan rivivali
+        const over = lab.length ? lab[lab.length - 1].y - (pb - 2) : 0; if (over > 0) lab.forEach(o => { o.y -= over; });
+        for (let q = lab.length - 2; q >= 0; q--) lab[q].y = Math.min(lab[q].y, lab[q + 1].y - gap);
+        lab.forEach(o => { el("text", { class: "dlab", x: W2 - mr + 10, y: o.y + fs * 0.35, "font-size": fs, "font-weight": 600, fill: colOf[c.lines[o.k]] }, svg).textContent = lbl(c.lines[o.k]); }); }
       let zpan = null;
       if (c.zside) { const row = document.createElement("div"); row.className = "zrow"; svg.before(row); row.appendChild(svg);
         zpan = document.createElement("div"); zpan.className = "zpanel"; zpan.setAttribute("aria-live", "polite"); row.appendChild(zpan); }
@@ -3074,8 +3097,8 @@ a.ubr, button.ubr { cursor: pointer; } a.ubr:hover .t, button.ubr:hover .t { tex
           let j = i; while (j > 0 && L.every(a => a[j] == null)) j--;
           if (valEl) valEl.innerHTML = "";                                   // pelkka selite kuten pylvaskuvioissa; arvot hoverissa kuvion sisalla
           subEl.classList.add("lgd");
-          subEl.innerHTML = c.lines.map(id => siTag(lbl(id) + ((c.y2 || []).includes(id) ? " (oik.)" : ""), colOf[id], (c.dash || []).includes(id) ? "ds" : "")).join(" ") +
-            (c.avg ? ` <span class="sunit">(neljänneksen keskiarvo)</span>` : "");
+          subEl.innerHTML = direct ? (c.avg ? `<span class="sunit">(neljänneksen keskiarvo)</span>` : "") : c.lines.map(id => siTag(lbl(id) + ((c.y2 || []).includes(id) ? " (oik.)" : ""), colOf[id], (c.dash || []).includes(id) ? "ds" : "")).join(" ") +
+            (c.avg ? ` <span class="sunit">(neljänneksen keskiarvo)</span>` : "");   // suorat nimet: selite pois
         } else {
           if (valEl) valEl.innerHTML = "";                                   // yksi viiva: ei arvoriviä, arvo hoverissa kuvion sisalla
           subEl.innerHTML = "";                                            // tyhja rivi jaa paikalleen: rinnakkaisten korttien rivit (subgrid) pysyvat linjassa
@@ -3245,7 +3268,8 @@ a.ubr, button.ubr { cursor: pointer; } a.ubr:hover .t, button.ubr:hover .t { tex
     b.onclick = () => { pn.hidden = !pn.hidden; b.setAttribute("aria-expanded", String(!pn.hidden)); b.setAttribute("aria-label", pn.hidden ? "Näytä selite" : "Piilota selite"); };
     pn.before(b); });
   { const s0 = D.sets.find(s => s.composite && s.indicators), sv = set;   // vaiheviiva yläpalkin alle: kokonaisindikaattorin nykyinen vaihe
-    if (s0) { set = s0; const p = at(comp(), defIdx(s0)); if (p) document.documentElement.style.setProperty("--phase", qcol(quad(p.l, p.c))); set = sv; } }
+    if (s0) { set = s0; const p = at(comp(), defIdx(s0)); if (p) document.documentElement.style.setProperty("--phase", qcol(quad(p.l, p.c)));
+      const C0 = comp(); PHMAP = {}; s0.periods.forEach((per, k) => { if (C0.level[k] != null && C0.change[k] != null) PHMAP[per] = quad(C0.level[k], C0.change[k]); }); set = sv; } }
   addEventListener("resize", () => { placeUL($("sets"), $("sets").querySelector('button[aria-pressed="true"]')); const nv = document.querySelector("#charts .secnav"); if (nv) placeUL(nv, nv.querySelector("button.on")); });
   applyHash(); renderFoot(); renderAll();
   if (document.fonts && document.fonts.ready) document.fonts.ready.then(() => { if (set.growth && set.view === "charts") drawCharts(); goCard(); }); else goCard();   // fontin latauksen jalkeen korkeudet uudelleen
