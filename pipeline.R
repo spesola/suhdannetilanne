@@ -151,6 +151,41 @@ fetch_statfin_net <- function(s, base) {
   data.frame(date = sub("Q", "-Q", sub("M", "-", ord)), value = as.numeric(unlist(v))[seq_along(ord)])
 }
 
+# Erittelysivut: monta luokkaa ja sisaltoa yhdella kyselylla (esim. 132h osaerat x volyymi/kaypa x tyopaivakorjattu/kausitasoitettu).
+# Palauttaa listan "<koodi>|<sisalto>" -> data.frame(date, value). Levyvalimuisti kuten fetch_statfin (taulukon updated-aika).
+fetch_px_multi <- function(table, dim, codes, ccs, base = STATFIN) {
+  upd <- if (identical(Sys.getenv("PX_FULL"), "1")) NULL else px_updated(base, table)
+  u0 <- px_updated(base, table); if (!is.null(u0)) SRC_TUPD[[paste0("px:", base, table)]] <- upd_day(u0)
+  f <- tempfile(); writeLines(paste(base, table, dim, paste(codes, collapse = ","), paste(ccs, collapse = ",")), f)
+  fc <- file.path(PX_DIR, paste0("m_", unname(tools::md5sum(f)), ".rds")); fu <- paste0(fc, ".u")
+  if (!is.null(upd) && file.exists(fc) && file.exists(fu)) { u <- readLines(fu, warn = FALSE)
+    if (identical(u[1], upd) && difftime(Sys.time(), as.POSIXct(u[2]), units = "days") < PX_MAX_D) { PX_N["levy"] <<- PX_N["levy"] + 1; return(readRDS(fc)) } }
+  if (is.null(.px_meta[[table]])) { Sys.sleep(0.8); .px_meta[[table]] <- fromJSON(get_text(paste0(base, table)), simplifyVector = FALSE)$variables }
+  vars <- .px_meta[[table]]; Sys.sleep(0.8)
+  q <- lapply(vars, function(v) { vals <- unlist(v$values)
+    if (is_time_px(vals)) return(list(code = v$code, selection = list(filter = "all", values = list("*"))))
+    sel <- if (v$code == dim) codes else if (v$code == "contentscode") ccs else vals[1]
+    miss <- setdiff(sel, vals); if (length(miss)) stop("StatFin ", table, ": ", v$code, " ei sisalla: ", paste(miss, collapse = ", "))
+    list(code = v$code, selection = list(filter = "item", values = as.list(sel))) })
+  body <- toJSON(list(query = q, response = list(format = "json-stat2")), auto_unbox = TRUE)
+  r <- RETRY("POST", paste0(base, table), body = body, content_type_json(), timeout(60), times = 5, pause_base = 5, pause_min = 11, quiet = TRUE)
+  stop_for_status(r); PX_N["haku"] <<- PX_N["haku"] + 1
+  js <- fromJSON(content(r, "text", encoding = "UTF-8"), simplifyVector = FALSE)
+  ids <- unlist(js$id); sz <- unlist(js$size)
+  cats <- lapply(ids, function(d) { ix <- unlist(js$dimension[[d]]$category$index); names(ix)[order(ix)] })
+  v <- js$value; v[vapply(v, is.null, logical(1))] <- NA; v <- as.numeric(unlist(v))
+  arr <- array(v, dim = rev(sz))                   # json-stat: viimeinen ulottuvuus nopeimmin vaihtuva
+  ti <- which(vapply(cats, is_time_px, logical(1))); di <- match(dim, ids); ci <- match("contentscode", ids)
+  dates <- sub("Q", "-Q", sub("M", "-", cats[[ti]]))
+  out <- list()
+  for (a in seq_along(cats[[di]])) for (b in seq_along(cats[[ci]])) {
+    idx <- as.list(rep(1, length(ids))); idx[[di]] <- a; idx[[ci]] <- b; idx[[ti]] <- seq_along(dates)
+    vals <- do.call(`[`, c(list(arr), rev(idx)))
+    out[[paste(cats[[di]][a], cats[[ci]][b], sep = "|")]] <- data.frame(date = dates, value = as.numeric(vals)) }
+  if (!is.null(upd)) { dir.create(PX_DIR, recursive = TRUE, showWarnings = FALSE); saveRDS(out, fc); writeLines(c(upd, format(Sys.time(), "%Y-%m-%d %H:%M:%S")), fu) }
+  out
+}
+
 fetch_eurostat <- function(s, geo = "FI") {
   if (!is.null(s$geo)) geo <- s$geo                  # vertailumaat (esim. SE, DE, EA)
   pick <- c(s$pick, geo = geo)
@@ -924,6 +959,15 @@ for (set in cfg$sets) {
         ser[[length(ser) + 1]] <- list(id = k, label = labs[[k]])
       }
     }
+    # erittelysivut (series.json: detail): rivin osaerat neljana versiona (volyymi ja kaypa, tyopaivakorjattu ja kausitasoitettu);
+    # sivulla v/v tyopaivakorjatusta, q/q kausitasoitetusta, hinta = kaypa / volyymi
+    DET_CC <- c("tyopvv2015", "tyopcp", "kausitvv2015", "kausitcp"); det_out <- list()
+    for (ek in names(set$detail)) { E <- set$detail[[ek]]; codes <- vapply(E$rows, function(r) r$code, "")
+      X <- tryCatch(fetch_px_multi(E$table, E$dim, codes, DET_CC), error = function(e) { message("  VAROITUS erittely ", ek, ": ", conditionMessage(e)); NULL })
+      if (is.null(X)) { CHECKS <- c(CHECKS, sprintf("Erittely %s: haku epaonnistui", ek)); next }
+      for (r in E$rows) for (cc in DET_CC) { k <- paste(r$code, cc, sep = "|"); if (is.null(X[[k]])) next
+        id <- paste0("d_", ek, "_", r$code, "_", cc); raws[[id]] <- X[[k]]; ser[[length(ser) + 1]] <- list(id = id, label = paste0(r$label, " (", cc, ")")) }
+      det_out[[ek]] <- E }
     last_i  <- max(vapply(members, function(s) max(per_idx(raws[[s$id]]$date, freq)), numeric(1)))
     start_i <- per_idx(if (freq == "M") sprintf("%d-01", from_y) else sprintf("%d-Q1", from_y), freq)
     periods <- idx_per(start_i:last_i, freq)
@@ -949,6 +993,7 @@ for (set in cfg$sets) {
       id = set$id, label = set$label, freq = freq, default = isTRUE(set$default), view = "charts",
       from = from_y, periods = periods, charts = set$charts, colors = set$colors, forecast = fc,
       growth = unname(rows), tabs = set$tabs, kpis = set$kpis,   # kasvunakyma: taulukko ja kuviot (ei karttaa), alavalilehdet
+      detail = if (length(det_out)) det_out else NULL,
       series = unname(lapply(ser, function(x) { r <- raws[[x$id]]
         list(id = x$id, label = x$label, last = r$date[max(which(!is.na(r$value)))], values = r3(r$value[match(periods, r$date)])) })),
       mperiods = mper, mseries = mser_out)

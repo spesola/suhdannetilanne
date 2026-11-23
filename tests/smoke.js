@@ -34,6 +34,11 @@ let file;
           if (!n) fails.push(`${w}px rivi ${id}: ei kuviota`);
           const sw = await p.evaluate(() => document.documentElement.scrollWidth);
           if (sw > w + 1) fails.push(`${w}px rivi ${id}: vaakavieritys ${sw}`);
+          if (await p.evaluate(() => !document.getElementById("eraSec").hidden)) {   // erittelysivu: taulukko ja paluu
+            const er = await p.evaluate(() => document.querySelectorAll("#eraSec td.hc").length);
+            if (er < 3) fails.push(`${w}px rivi ${id}: erittelytaulukko tyhja (${er})`);
+            await p.click("#eraBack"); await p.waitForTimeout(150);
+            if (await p.evaluate(() => document.querySelector("#growthSec .grleft").hidden)) fails.push(`${w}px rivi ${id}: paluu kasvutaulukkoon ei toimi`); }
         }
       }
     }

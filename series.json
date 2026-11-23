@@ -1591,6 +1591,164 @@
             ]
           }
         ]
+      },
+      "detail": {
+        "bkt_kulutus": {
+          "title": "Yksityinen kulutus",
+          "table": "ntp/132h.px",
+          "dim": "taloustoimi_1_20180101",
+          "note": "Kulutus Suomessa sisältää ulkomaalaisten kulutuksen Suomessa, kansallinen käsite suomalaisten kulutuksen ulkomailla.",
+          "rows": [
+            {
+              "code": "P3KS14_S15",
+              "label": "Yksityiset kulutusmenot",
+              "total": true
+            },
+            {
+              "code": "P31KNC",
+              "label": "Kotitaloudet"
+            },
+            {
+              "code": "P31KDC",
+              "label": "Kotitalouksien kulutus Suomessa",
+              "indent": 1
+            },
+            {
+              "code": "P31KCD",
+              "label": "Kestävät tavarat",
+              "indent": 2
+            },
+            {
+              "code": "P31KCSD",
+              "label": "Puolikestävät tavarat",
+              "indent": 2
+            },
+            {
+              "code": "P31KCND",
+              "label": "Lyhytikäiset tavarat",
+              "indent": 2
+            },
+            {
+              "code": "P31KCS",
+              "label": "Palvelut",
+              "indent": 2
+            },
+            {
+              "code": "P3KS15",
+              "label": "Kotitalouksia palvelevat yhteisöt"
+            }
+          ]
+        },
+        "bkt_inv": {
+          "title": "Investoinnit",
+          "table": "ntp/132h.px",
+          "dim": "taloustoimi_1_20180101",
+          "aliases": [
+            "inv_yks",
+            "inv_julk"
+          ],
+          "note": "Koneet ja laitteet sisältävät asejärjestelmät. Henkiset omaisuustuotteet ym.: tutkimus ja kehitys, ohjelmistot ja kasvatettavat varat.",
+          "rows": [
+            {
+              "code": "P51K",
+              "label": "Kiinteän pääoman bruttomuodostus",
+              "total": true
+            },
+            {
+              "code": "P51KN111_N112",
+              "label": "Rakennukset",
+              "indent": 1
+            },
+            {
+              "code": "P51KN111",
+              "label": "Asuinrakennukset",
+              "indent": 2
+            },
+            {
+              "code": "P51KN1121",
+              "label": "Muut talorakennukset",
+              "indent": 2
+            },
+            {
+              "code": "P51KN1122_N1123",
+              "label": "Maa- ja vesirakennukset",
+              "indent": 2
+            },
+            {
+              "code": "P51KN113_N114",
+              "label": "Koneet, laitteet ja kuljetusvälineet",
+              "indent": 1
+            },
+            {
+              "code": "P51KN1131",
+              "label": "Kuljetusvälineet",
+              "indent": 2
+            },
+            {
+              "code": "P51KN1132_N114",
+              "label": "Koneet ja laitteet",
+              "indent": 2
+            },
+            {
+              "code": "P51KN115_N117",
+              "label": "Henkiset omaisuustuotteet ym.",
+              "indent": 1
+            },
+            {
+              "code": "P51KXS13",
+              "label": "Yksityiset investoinnit",
+              "gap": true
+            },
+            {
+              "code": "P51KS13",
+              "label": "Julkiset investoinnit"
+            }
+          ]
+        },
+        "bkt_vienti": {
+          "title": "Vienti",
+          "table": "ntp/132h.px",
+          "dim": "taloustoimi_1_20180101",
+          "rows": [
+            {
+              "code": "P6K",
+              "label": "Tavaroiden ja palvelujen vienti",
+              "total": true
+            },
+            {
+              "code": "P61K",
+              "label": "Tavarat",
+              "indent": 1
+            },
+            {
+              "code": "P62K",
+              "label": "Palvelut",
+              "indent": 1
+            }
+          ]
+        },
+        "bkt_tuonti": {
+          "title": "Tuonti",
+          "table": "ntp/132h.px",
+          "dim": "taloustoimi_1_20180101",
+          "rows": [
+            {
+              "code": "P7R",
+              "label": "Tavaroiden ja palvelujen tuonti",
+              "total": true
+            },
+            {
+              "code": "P71R",
+              "label": "Tavarat",
+              "indent": 1
+            },
+            {
+              "code": "P72R",
+              "label": "Palvelut",
+              "indent": 1
+            }
+          ]
+        }
       }
     },
     {
