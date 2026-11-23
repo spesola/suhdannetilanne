@@ -1836,21 +1836,25 @@ a.ubr, button.ubr { cursor: pointer; } a.ubr:hover .t, button.ubr:hover .t { tex
     if (EK !== eraShown) { eraShown = EK; if (EK && motion()) { box.classList.remove("ein"); void box.offsetWidth; box.classList.add("ein"); } }
     $("grMore").classList.toggle("eraopen", !!EK);                   // erittelysivulla aiheen kaikki kuviot nakyvissa ilman Lisaa-taitetta
     if (!EK) { box.innerHTML = ""; return; }
-    const E = set.detail[EK], P = set.periods, val = id => (set.series.find(x => x.id === id) || {}).values || [];
+    const E = set.detail[EK], mon = E.freq === "M", P = mon ? set.mperiods || [] : set.periods, SS = mon ? set.mseries || [] : set.series;   // kuukausierittely kuukausiakselilla
+    const val = id => (SS.find(x => x.id === id) || {}).values || [];
     const btn = (k, on, tx) => `<button type="button" data-k="${k}" aria-pressed="${on}">${tx}</button>`;
     const MODE = { yy: "v/v", qq: "q/q" }, MODEL = { yy: "muutos vuodentakaisesta", qq: "muutos edellisestä neljänneksestä" };
     let rows, neu, inv = false, level = false, unit = "%", ctl, sub, note, setM, setY;
     if (E.measures) {                                                  // yleinen erittely: mittarit (esim. tunnit / tyolliset) ja muutostavat sarjan mukaan
       const st = eraSt[EK] || (eraSt[EK] = { m: E.measures[0].k, md: Object.keys(E.measures[0].modes)[0] });
       const M = E.measures.find(x => x.k === st.m) || E.measures[0]; if (!M.modes[st.md]) st.md = Object.keys(M.modes)[0];
-      const lag = st.md === "qq" ? 1 : set.freq === "M" ? 12 : 4;
+      const lag = st.md === "qq" ? 1 : mon ? 12 : 4;
       level = M.calc === "level"; inv = !!M.invert; neu = !!M.neutral; unit = M.unit || "%";
+      // calc: pct (muutos %), diff (erotus), given (sarja on jo muutos, esim. KHI:n vuosimuutos), level (taso ilman varia); rivin from: arvot vasta tasta jaksosta (sarjakatko)
       rows = E.rows.map((r, i) => { const a = val(`d_${EK}_${M.k}_${st.md}_${i}`);
-        return { r, v: level ? a : a.map((x, k) => k >= lag && x != null && a[k - lag] != null ? (M.calc === "diff" ? x - a[k - lag] : a[k - lag] ? 100 * (x / a[k - lag] - 1) : null) : null) }; });
+        let v = level || M.calc === "given" ? a : a.map((x, k) => k >= lag && x != null && a[k - lag] != null ? (M.calc === "diff" ? x - a[k - lag] : a[k - lag] ? 100 * (x / a[k - lag] - 1) : null) : null);
+        if (r.from) v = v.map((x, k) => P[k] < r.from ? null : x);
+        return { r, v }; });
       const md = Object.keys(M.modes);
       ctl = (E.measures.length > 1 ? `<div class="mini" role="group" aria-label="Mittari" id="eraM">${E.measures.map(x => btn(x.k, x.k === M.k, x.label)).join("")}</div>` : "") +
         (md.length > 1 ? `<div class="mini" role="group" aria-label="Muutos" id="eraY">${md.map(k => btn(k, k === st.md, MODE[k])).join("")}</div>` : "");
-      sub = (M.sub || M.label) + (level ? `, ${unit}` : `, ${MODEL[st.md]}, ${unit}`);
+      sub = (M.sub || M.label) + (level ? `, ${unit}` : M.calc === "given" ? `, ${unit}` : `, ${MODEL[st.md]}, ${unit}`);
       note = `${level ? "" : "Värin voimakkuus suhteessa sarjan keskihajontaan (pl. 2020–2021), täysi väri kahdesta keskihajonnasta. "}${E.note ? escH(E.note) + " " : ""}Lähde: ${escH(E.src || "Tilastokeskus")}.`;
       setM = k => { st.m = k; }; setY = k => { st.md = k; };
     } else {                                                           // kansantalouden tilinpito: volyymi, arvo ja hinta; v/v tyopaivakorjatusta, q/q kausitasoitetusta
@@ -2232,6 +2236,7 @@ a.ubr, button.ubr { cursor: pointer; } a.ubr:hover .t, button.ubr:hover .t { tex
       scrollTo({ top: t.getBoundingClientRect().top + scrollY - bar - 16 }); }, 120); }
   // sivuston muutokset: uudet kuviot ja muut isommat lisaykset (kasin yllapidetty, uusin ensin); set + id -> linkki kuvioon
   const CHANGES = [
+    { d: "2026-11-23", t: "Erittelysivut myös kuluttajahinnoille hyödykeryhmittäin, asuntojen hinnoille alueittain ja julkisille kulutusmenoille alasektoreittain", set: "Reaalitalous" },
     { d: "2026-11-23", t: "Erittelysivut myös BKT:lle toimialoittain, työtunneille, työttömyysasteelle ja ansiotasolle; erittelysivulla aiheen kaikki kuviot näkyvissä", set: "Reaalitalous" },
     { d: "2026-11-23", t: "Erittelysivut: yksityisen kulutuksen, investointien, viennin ja tuonnin osaerät avautuvat kasvutaulukon riviltä", set: "Reaalitalous" },
     { d: "2026-11-23", t: "Tietoa sivusta -osio alapalkkiin; vaihevärit varattu vain suhdannevaiheille; kolme päällekkäistä kuviota poistettu; taulukoiden parikuvioiden korkeus sovitettu taulukkoon" },

@@ -2177,6 +2177,329 @@
               }
             }
           ]
+        },
+        "inflaatio": {
+          "title": "Kuluttajahinnat hyödykeryhmittäin",
+          "table": "khi/15b5.px",
+          "freq": "M",
+          "note": "Kuluttajahintaindeksi (2025=100), COICOP 2018 -pääryhmät. Vaikutus: ryhmän osuus kokonaisinflaatiosta, %-yksikköä; vaikutukset summautuvat kokonaismuutokseen. Vaikutukset julkaistaan uudella luokituksella vuoden 2026 alusta.",
+          "src": "Tilastokeskus, kuluttajahintaindeksi (khi/15b5)",
+          "base": {
+            "coicop_46_20231201": "SSS",
+            "contentscode": "vm_khi"
+          },
+          "measures": [
+            {
+              "k": "m",
+              "label": "Vuosimuutos",
+              "sub": "Vuosimuutos",
+              "calc": "given",
+              "neutral": true,
+              "unit": "%",
+              "pick": {
+                "contentscode": "vm_khi"
+              },
+              "modes": {
+                "yy": {}
+              }
+            },
+            {
+              "k": "v",
+              "label": "Vaikutus",
+              "sub": "Vaikutus inflaatioon",
+              "calc": "given",
+              "neutral": true,
+              "unit": "%-yks.",
+              "pick": {
+                "contentscode": "vv_khi"
+              },
+              "modes": {
+                "yy": {}
+              }
+            }
+          ],
+          "rows": [
+            {
+              "label": "Kuluttajahintaindeksi",
+              "pick": {
+                "coicop_46_20231201": "SSS"
+              },
+              "total": true
+            },
+            {
+              "label": "Elintarvikkeet ja alkoholittomat juomat",
+              "pick": {
+                "coicop_46_20231201": "01"
+              }
+            },
+            {
+              "label": "Alkoholijuomat ja tupakka",
+              "pick": {
+                "coicop_46_20231201": "02"
+              }
+            },
+            {
+              "label": "Vaatetus ja jalkineet",
+              "pick": {
+                "coicop_46_20231201": "03"
+              }
+            },
+            {
+              "label": "Asuminen, vesi, sähkö ja polttoaineet",
+              "pick": {
+                "coicop_46_20231201": "04"
+              }
+            },
+            {
+              "label": "Kalusteet, kodinkoneet ja kodinhoito",
+              "pick": {
+                "coicop_46_20231201": "05"
+              }
+            },
+            {
+              "label": "Terveys",
+              "pick": {
+                "coicop_46_20231201": "06"
+              }
+            },
+            {
+              "label": "Liikenne",
+              "pick": {
+                "coicop_46_20231201": "07"
+              }
+            },
+            {
+              "label": "Informaatio ja viestintä",
+              "pick": {
+                "coicop_46_20231201": "08"
+              }
+            },
+            {
+              "label": "Kulttuuri, urheilu ja vapaa-aika",
+              "pick": {
+                "coicop_46_20231201": "09"
+              }
+            },
+            {
+              "label": "Koulutus",
+              "pick": {
+                "coicop_46_20231201": "10"
+              }
+            },
+            {
+              "label": "Ravintolat ja majoitus",
+              "pick": {
+                "coicop_46_20231201": "11"
+              }
+            },
+            {
+              "label": "Vakuutus- ja rahoituspalvelut",
+              "pick": {
+                "coicop_46_20231201": "12"
+              }
+            },
+            {
+              "label": "Muut tavarat ja palvelut",
+              "pick": {
+                "coicop_46_20231201": "13"
+              }
+            }
+          ]
+        },
+        "asuntohinnat": {
+          "title": "Asuntojen hinnat alueittain",
+          "table": "ashi/15it.px",
+          "note": "Vanhat osakeasunnot, kaikki talotyypit. Reaalihinta: hinta kuluttajahintaindeksillä deflatoituna. Alkuperäinen (kausitasoittamaton) sarja, joten vertailu vuodentakaiseen neljännekseen.",
+          "src": "Tilastokeskus, osakeasuntojen hinnat (ashi/15it)",
+          "base": {
+            "talotyyppi_5_20111209": "0",
+            "huoneluku_1_20111212": "00",
+            "alue_43_20260625": "SSS",
+            "contentscode": "ashivq_realindeksi_2015"
+          },
+          "measures": [
+            {
+              "k": "r",
+              "label": "Reaalihinta",
+              "calc": "pct",
+              "pick": {
+                "contentscode": "ashivq_realindeksi_2015"
+              },
+              "modes": {
+                "yy": {}
+              }
+            },
+            {
+              "k": "n",
+              "label": "Nimellinen",
+              "calc": "pct",
+              "pick": {
+                "contentscode": "ashivq_indeksi_2015"
+              },
+              "modes": {
+                "yy": {}
+              }
+            }
+          ],
+          "rows": [
+            {
+              "label": "Koko maa",
+              "pick": {
+                "alue_43_20260625": "SSS"
+              },
+              "total": true
+            },
+            {
+              "label": "Pääkaupunkiseutu",
+              "pick": {
+                "alue_43_20260625": "pks"
+              }
+            },
+            {
+              "label": "Kehyskunnat",
+              "pick": {
+                "alue_43_20260625": "keh"
+              }
+            },
+            {
+              "label": "Muu Suomi",
+              "pick": {
+                "alue_43_20260625": "msu"
+              }
+            },
+            {
+              "label": "Helsinki",
+              "pick": {
+                "alue_43_20260625": "091"
+              },
+              "gap": true
+            },
+            {
+              "label": "Espoo ja Kauniainen",
+              "pick": {
+                "alue_43_20260625": "049"
+              }
+            },
+            {
+              "label": "Vantaa",
+              "pick": {
+                "alue_43_20260625": "092"
+              }
+            },
+            {
+              "label": "Tampere",
+              "pick": {
+                "alue_43_20260625": "837"
+              }
+            },
+            {
+              "label": "Turku",
+              "pick": {
+                "alue_43_20260625": "853"
+              }
+            },
+            {
+              "label": "Oulu",
+              "pick": {
+                "alue_43_20260625": "564"
+              }
+            },
+            {
+              "label": "Jyväskylä",
+              "pick": {
+                "alue_43_20260625": "179"
+              }
+            },
+            {
+              "label": "Kuopio",
+              "pick": {
+                "alue_43_20260625": "297"
+              }
+            },
+            {
+              "label": "Lahti",
+              "pick": {
+                "alue_43_20260625": "398"
+              }
+            }
+          ]
+        },
+        "bkt_julk": {
+          "title": "Julkiset kulutusmenot alasektoreittain",
+          "table": "jtume/11zf.px",
+          "note": "Käyvin hinnoin; volyymia ei julkaista alasektoreittain neljännesvuosittain. V/v alkuperäisestä, q/q kausitasoitetusta sarjasta. Sosiaali- ja terveyspalvelut siirtyivät kunnilta hyvinvointialueille vuoden 2023 alussa, joten kuntien ja hyvinvointialueiden muutokset alkavat vuodesta 2024.",
+          "src": "Tilastokeskus, julkisyhteisöjen neljännesvuositilinpito (jtume/11zf)",
+          "base": {
+            "taloustoimi_1_20180101": "P3K",
+            "sektoriluokitus_7_20230101": "S13",
+            "contentscode": "jtume-TASM"
+          },
+          "measures": [
+            {
+              "k": "c",
+              "label": "Arvo",
+              "sub": "Kulutusmenot käyvin hinnoin",
+              "calc": "pct",
+              "modes": {
+                "yy": {
+                  "pick": {
+                    "contentscode": "jtume-TASM"
+                  }
+                },
+                "qq": {
+                  "pick": {
+                    "contentscode": "jtume-KAUSIT"
+                  }
+                }
+              }
+            }
+          ],
+          "rows": [
+            {
+              "label": "Julkisyhteisöt",
+              "pick": {
+                "sektoriluokitus_7_20230101": "S13"
+              },
+              "total": true
+            },
+            {
+              "label": "Valtionhallinto",
+              "pick": {
+                "sektoriluokitus_7_20230101": "S1311"
+              },
+              "indent": 1
+            },
+            {
+              "label": "Paikallishallinto",
+              "pick": {
+                "sektoriluokitus_7_20230101": "S1313"
+              },
+              "indent": 1
+            },
+            {
+              "label": "Kunnat",
+              "pick": {
+                "sektoriluokitus_7_20230101": "S13131"
+              },
+              "indent": 2,
+              "from": "2024-Q1"
+            },
+            {
+              "label": "Hyvinvointialueet",
+              "pick": {
+                "sektoriluokitus_7_20230101": "S13132"
+              },
+              "indent": 2,
+              "from": "2024-Q1"
+            },
+            {
+              "label": "Sosiaaliturvarahastot pl. työeläkelaitokset",
+              "pick": {
+                "sektoriluokitus_7_20230101": "S13149"
+              },
+              "indent": 1
+            }
+          ]
         }
       }
     },
