@@ -254,7 +254,7 @@ body { font-variant-numeric: tabular-nums; background: var(--bg); min-height: 10
 .ubnk { font: inherit; font-size: 0.78rem; color: var(--muted); background: none; border: 0; padding: 4px 0 0; cursor: pointer; } .ubnk:hover { color: var(--fg); text-decoration: underline; }
 @media (max-width: 860px) { .hero.wvon .ubox { position: static; align-items: flex-start; text-align: left; max-width: none; } .hero.wvon .wvx > .phl, .hero.wvon .wvx > .phb { margin-right: 0; } }
 body:has(.hero.wvon) .topbar::after { display: none; }
-:root[data-theme="vapor"] body:has(.hero.wvon)::before { display: none; }   /* teeman koristeaurinko pois, kun taivas on näkyvissä */   /* vaiheviiva turha, kun taivas kertoo vaiheen */   /* linkki listan alle, taivaan puolelle */
+:root[data-theme="vapor"] body:has(.hero.wvon)::before, :root[data-theme="vapor"] body:has(> .pgsky)::before { display: none; }   /* teeman koristeaurinko pois, kun taivas on näkyvissä */   /* vaiheviiva turha, kun taivas kertoo vaiheen */   /* linkki listan alle, taivaan puolelle */
 .hero.wvon { position: relative; isolation: isolate; }
 .wvsky { position: absolute; z-index: -1; left: var(--wvL, 0); width: var(--wvW, 100%); top: var(--wvT, 0); height: var(--wvH, 0); pointer-events: none;
   background: radial-gradient(440px 270px at var(--gx, 50%) var(--gy, 50%), color-mix(in srgb, var(--wvG) var(--wvGp), transparent), transparent 70%), linear-gradient(var(--wvA), var(--wvB) 55%, var(--wvC));
@@ -279,6 +279,13 @@ body:has(.hero.wvon) .topbar::after { display: none; }
 .wv .wvq.st { opacity: .4; }
 .wv .wvq.dim { opacity: .18; } .wv .wvq.st.dim { opacity: .1; }
 .wv .wvt { fill: var(--sun); }
+ .wv .wvq.hl { stroke: var(--fg); stroke-width: 2px; vector-effect: non-scaling-stroke; } .wv.hlon .wvq:not(.hl) { opacity: .25; }   /* kytketty korostus kartan ja luettelon kanssa */
+.pgsky { position: absolute; left: 0; right: 0; top: 0; height: 300px; z-index: -1; pointer-events: none; opacity: .75; background: linear-gradient(var(--wvA), var(--wvB) 55%, var(--wvC));
+  -webkit-mask: linear-gradient(transparent 30px, #000 90px, #000 40%, transparent); mask: linear-gradient(transparent 30px, #000 90px, #000 40%, transparent); }   /* muilla välilehdillä hento vaiheen taivas */
+:root[data-theme="vapor"] .pgsky { opacity: .7; }
+body:has(> .pgsky) { isolation: isolate; }   /* taivas body-taustan päälle mutta sisällön alle */
+body:has(.hero.wvon) .pgsky { display: none; } body:has(.pgsky) .topbar::after { display: none; }
+body:has(.hero.wvon) #topSec > .card { border-top-color: var(--line); }   /* pehmeä siirtymä taivaasta karttaan ja luetteloon */
 :root:not([data-theme="vapor"]) .wv .wvt { fill: color-mix(in srgb, var(--sun) 70%, #8a5200); }   /* jälki erottuu vaaleaa taivasta vasten */
 .wv .wvh { fill: var(--sun); opacity: .18; }
 .wv .wvd { fill: var(--sun); stroke: var(--wvSr); }
@@ -1409,7 +1416,7 @@ a.ubr, button.ubr { cursor: pointer; } a.ubr:hover .t, button.ubr:hover .t { tex
         g += `<rect class="wvq${x.cls}${fin ? " fin" : ""}" data-id="${x.id}" data-tip="${escH(x.label)}" data-sub="${escH(x.sub)}" data-qc="${qcol(q)}" style="--qc:${qcol(q)};--k:${k++}" fill="${qcol(q)}" x="${(-sq / 2).toFixed(2)}" y="${(-sq / 2).toFixed(2)}" width="${sq.toFixed(2)}" height="${sq.toFixed(2)}" rx="${(1.6 / WV.k).toFixed(2)}" transform="translate(${cx.toFixed(1)} ${cy.toFixed(1)}) rotate(${ang.toFixed(1)})"/>`; }); });
     const src = o.move && pv && o.step === 1 ? pv.tr.concat([{ u: pv.sun.u, s: pv.sun.s }]) : null;   // kuukausi eteenpäin: pisteet liukuvat yhden pykälän, vanha aurinko jäljen uusimmaksi
     o.trail.forEach((tt, j, T) => { const t = { u: tt.u, s: tt.s }, f = src && src[j + src.length - T.length] || t, p = wvTrP(f); plan.tr.push({ f, t });
-      g += `<circle class="wvt" style="--k:${k + j};opacity:${(.2 + .55 * (j + 1) / T.length).toFixed(2)}" cx="${p.x.toFixed(1)}" cy="${p.y.toFixed(1)}" r="${p.r.toFixed(1)}"/>`; });
+      g += `<circle class="wvt" data-tip="Kokonaisindikaattori ${tt.per}" data-sub="${Q[tt.q].short}\nEtäisyys trendistä ${tt.s.toFixed(2).replace(".", ",")}" data-qc="${qcol(tt.q)}" style="--k:${k + j};opacity:${(.2 + .55 * (j + 1) / T.length).toFixed(2)}" cx="${p.x.toFixed(1)}" cy="${p.y.toFixed(1)}" r="${p.r.toFixed(1)}"/>`; });
     g += `<g class="wvsun" data-tip="Kokonaisindikaattori ${escH(o.sun.per)}" data-sub="${escH(o.sun.sub)}" data-qc="${qcol(cq)}" transform="translate(${f0.x.toFixed(1)} ${f0.y.toFixed(1)})"><circle class="wvh" r="${(f0.r * 1.9).toFixed(1)}"/><circle class="wvd" r="${f0.r.toFixed(1)}" stroke-width="${f0.r < 8 ? 2 : 3}"/></g></g>`;
     const lbl = `Suhdanneaalto ${o.sun.per}: kokonaisindikaattori vaiheessa ${Q[cq].short.toLowerCase()}, etäisyys trendistä ${o.sun.s.toFixed(2).replace(".", ",")}. Indikaattoreita vaiheittain: ${QORDER.map(q => Q[q].short.toLowerCase() + " " + o.counts[q]).join(", ")}.`;
     const fq = o.sunF.q && o.sunF.q !== cq ? o.sunF.q : null, nt = o.trail.length, per = set.freq === "M" ? "kuukautta" : "neljännestä";
@@ -1461,7 +1468,7 @@ a.ubr, button.ubr { cursor: pointer; } a.ubr:hover .t, button.ubr:hover .t { tex
     const C = comp(), P = set.periods, ok = k => C.level[k] != null && C.change[k] != null, sOf = k => Math.hypot(C.level[k], C.change[k]);
     const hist = []; let k0 = -1; for (let k = 0; k <= cp.i; k++) if (ok(k)) { hist.push(sOf(k)); if (k0 < 0) k0 = k; }
     const s = Math.hypot(cp.l, cp.c), srt = hist.slice().sort((a, b) => a - b), med = srt[Math.floor((srt.length - 1) / 2)];
-    const trail = []; for (let k = Math.max(0, cp.i - set.tail); k < cp.i; k++) if (ok(k)) trail.push({ u: wvU(C.level[k], C.change[k]), s: sOf(k), per: fmtP(P[k]) });
+    const trail = []; for (let k = Math.max(0, cp.i - set.tail); k < cp.i; k++) if (ok(k)) trail.push({ u: wvU(C.level[k], C.change[k]), s: sOf(k), per: fmtP(P[k]), q: quad(C.level[k], C.change[k]) });
     const items = [];
     QORDER.forEach(q => { stay[q].forEach(x => { const p = at(x.s, idx);
         items.push({ id: x.s.id, label: x.s.label, q, u: wvU(p.l, p.c), cls: (x.st >= 0 ? " st" : "") + (picked.size && !picked.has(x.s.id) ? " dim" : "") + (qf && qf !== q ? " dim" : ""), sub: Q[q].short + (x.st >= 0 ? `\nviimeisin ${fmtP(P[x.st])}` : "") }); });
@@ -1497,7 +1504,8 @@ a.ubr, button.ubr { cursor: pointer; } a.ubr:hover .t, button.ubr:hover .t { tex
     $("summary").innerHTML = WV_ON ? `<div class="phx wvx${qf ? " f" : ""}">${hdr}${waveBlock(wvd)}</div>` : `<div class="phx${qf ? " f" : ""}${QORDER.some(q => stay[q].concat(mv[q]).some(x => picked.has(x.s.id))) ? " pk" : ""}">${hdr}<div class="phrs">${QORDER.map(q => `<button type="button" class="phr${q === cq ? " cur" : ""}${qf === q ? " on" : ""}" data-q="${q}" style="--qc:${qcol(q)};--N:${Math.max(1, ...Object.values(counts))}" aria-pressed="${qf === q}" aria-label="${Q[q].name}: ${counts[q]}. Klikkaa suodattaaksesi."><span class="nm">${Q[q].short}</span><span class="sq">${stay[q].map(x => `<i data-id="${x.s.id}" data-tip="${escH(x.s.label)}"${x.st >= 0 ? ` data-sub="${fmtP(set.periods[x.st])}"` : ""}${picked.has(x.s.id) || x.st >= 0 ? ` class="${[picked.has(x.s.id) ? "pk" : "", x.st >= 0 ? "st" : ""].filter(Boolean).join(" ")}"` : ""}></i>`).join("")}${mv[q].map(x => `<i class="new${picked.has(x.s.id) ? " pk" : ""}" data-id="${x.s.id}" data-tip="${escH(x.s.label)}" data-sub="${Q[x.q0].short} → ${Q[q].short.toLowerCase()} ${fmtP(set.periods[idx])}"></i>`).join("")}</span><span class="n">${counts[q]}</span></button>`).join("")}</div><div class="phn"><button type="button" class="phleg" aria-expanded="${phLeg}" aria-controls="phLegB" aria-label="Selitteet" title="Selitteet"><svg viewBox="0 0 10 10" aria-hidden="true"><path d="M3.5 2 7 5l-3.5 3"/></svg></button><span class="phlb${phLeg ? "" : " off"}" id="phLegB"><span><i></i>muutos edellisestä ${set.freq === "M" ? "kuukaudesta" : "neljänneksestä"}</span><span><i class="st"></i>ei julkaistu</span></span></div></div>`;   // rivi aina paikallaan, ettei sivu hypi   // yksi neliö = yksi sarja
     { const sqA = motion() && !playT && (!panLast || panLast.set !== set || panLast.idx !== idx); panLast = { set, idx };   // neliöt syttyvät porrastetusti, kun kuukausi vaihtuu (ei suodatuksessa eikä toistossa)
       const x = $("summary").querySelector(".phx"); if (sqA && x) { x.querySelectorAll(".sq i").forEach((e, k) => e.style.setProperty("--k", k)); x.classList.add("anim"); } }
-    wvLayout(); if (WV_ON) { wvPlay(wvd); $("summary").querySelectorAll(".wvq").forEach(r => r.onclick = () => { const id = r.dataset.id;
+    wvLayout(); if (WV_ON) { wvPlay(wvd); $("summary").querySelectorAll(".wvq").forEach(r => { r.onmouseenter = () => { hlPoints([r.dataset.id]); hlRow(r.dataset.id); }; r.onmouseleave = () => { hlPoints([]); hlRow(null); }; });
+      $("summary").querySelectorAll(".wvq").forEach(r => r.onclick = () => { const id = r.dataset.id;
         if (sel === id && picked.size === 1) { clearPicks(); return; } qf = null; picked.clear(); sel = null; pick(id); }); }
     { const lb = $("summary").querySelector(".phleg");                 // selitteet nuolen takana; tila sailyy kuukautta vaihdettaessa
       if (lb) lb.onclick = () => { phLeg = !phLeg; lb.setAttribute("aria-expanded", String(phLeg)); $("phLegB").classList.toggle("off", !phLeg); }; }
@@ -1551,7 +1559,7 @@ a.ubr, button.ubr { cursor: pointer; } a.ubr:hover .t, button.ubr:hover .t { tex
     set.groups.forEach((g, gi) => {
       const all = set.indicators.filter(s => s.group === g && !isLead(s)), mem = all.filter(pass); if (!mem.length) return;
       const box = document.createElement("div"); box.className = "grp";
-      const h = document.createElement("button"); h.type = "button"; h.className = "gh";
+      const h = document.createElement("button"); h.type = "button"; h.className = "gh"; h.dataset.g = g;
       h.style.setProperty("--gc", `var(${GVARS[gi % GVARS.length]})`);
       const gp = all.length > 1 ? at(grp(g), idx) : null, gq = gp ? quad(gp.l, gp.c) : null;
       // ryhma auki: kayttaja avasi, vaihesuodatin paalla tai ryhman sarja valittuna
@@ -1601,10 +1609,31 @@ a.ubr, button.ubr { cursor: pointer; } a.ubr:hover .t, button.ubr:hover .t { tex
     svg.querySelectorAll(".pt.hl").forEach(g => g.classList.remove("hl"));
     ids.forEach(id => { const g = svg.querySelector(`.pt[data-id="${CSS.escape(id)}"]`); if (g) { g.classList.add("hl"); svg.appendChild(g); } });
     declutter([...svg.querySelectorAll(".pt.hl .lbl, .pt.sel .lbl")]);   // nakyvat nimet eivat mene paallekkain
+    hlWave(ids);
+  }
+  function phFavicon(q) {                                              // luonnos: välilehden kuvakkeessa nykyisen vaiheen neliö korostettuna
+    try { const src = document.querySelector("#lgBtn svg"); if (!src) return; const sv = src.cloneNode(true);
+      sv.querySelectorAll(".lv").forEach(n => n.remove()); sv.setAttribute("xmlns", "http://www.w3.org/2000/svg"); sv.removeAttribute("class"); sv.setAttribute("width", 64); sv.setAttribute("height", 64);
+      const rs = sv.querySelectorAll(".lg g[filter] rect"), ord = ["up", "turn", "down", "rec"];   // logon järjestys: oikea ylä, vasen ylä, vasen ala, oikea ala
+      rs.forEach((r, i) => { if (ord[i] === q) { const x = +r.getAttribute("x"), y = +r.getAttribute("y"); r.setAttribute("x", x - 6); r.setAttribute("y", y - 6); r.setAttribute("width", 20); r.setAttribute("height", 20); r.setAttribute("rx", 4.5); }
+        else r.setAttribute("opacity", .22); });
+      sv.querySelectorAll(".lg > path").forEach(a => a.setAttribute("opacity", .35));
+      const url = "data:image/svg+xml," + encodeURIComponent(new XMLSerializer().serializeToString(sv));
+      document.querySelectorAll('link[rel="icon"]').forEach(l => l.remove()); const l = document.createElement("link"); l.rel = "icon"; l.type = "image/svg+xml"; l.href = url; document.head.appendChild(l);
+    } catch (e) { }
+  }
+  function hlWave(ids) {                                               // luonnos: aallon neliöt mukaan kytkentään
+    const svg = $("summary") && $("summary").querySelector("svg.wv"); if (!svg) return;
+    svg.querySelectorAll(".wvq.hl").forEach(r => r.classList.remove("hl"));
+    ids.forEach(id => { const r = svg.querySelector(`.wvq[data-id="${CSS.escape(id)}"]`); if (r) r.classList.add("hl"); });
+    svg.classList.toggle("hlon", !!svg.querySelector(".wvq.hl"));
   }
   function hlRow(id) {
-    document.querySelectorAll("#list .ind.hl").forEach(r => r.classList.remove("hl"));
-    if (id) { const r = document.querySelector(`#list .ind[data-id="${CSS.escape(id)}"]`); if (r) r.classList.add("hl"); }
+    hlWave(id ? [id] : []);
+    document.querySelectorAll("#list .ind.hl, #list .gh.hl").forEach(r => r.classList.remove("hl"));
+    if (id) { const r = document.querySelector(`#list .ind[data-id="${CSS.escape(id)}"]`);
+      if (r && r.offsetParent) r.classList.add("hl");
+      else { const v = (set.indicators || []).find(x => x.id === id), h = v && document.querySelector(`#list .gh[data-g="${CSS.escape(v.group)}"]`); if (h) h.classList.add("hl"); } }   // ryhmä kiinni: korostetaan ryhmän rivi
   }
 
   // sarjan valinta lisaa tai poistaa sen kartan korostuksista; aikasarjakuvio nayttaa viimeksi valitun
@@ -3433,6 +3462,7 @@ a.ubr, button.ubr { cursor: pointer; } a.ubr:hover .t, button.ubr:hover .t { tex
     pn.before(b); });
   { const s0 = D.sets.find(s => s.composite && s.indicators), sv = set;   // vaiheviiva yläpalkin alle: kokonaisindikaattorin nykyinen vaihe
     if (s0) { set = s0; const p = at(comp(), defIdx(s0)); if (p) document.documentElement.style.setProperty("--phase", qcol(quad(p.l, p.c)));
+      if (p && LUONNOS) { const q = quad(p.l, p.c), ps = document.createElement("div"); ps.className = "pgsky wp-" + q; ps.setAttribute("aria-hidden", "true"); document.body.prepend(ps); phFavicon(q); }
       const C0 = comp(); PHMAP = {}; s0.periods.forEach((per, k) => { if (C0.level[k] != null && C0.change[k] != null) PHMAP[per] = quad(C0.level[k], C0.change[k]); }); set = sv; } }
   addEventListener("resize", () => { placeUL($("sets"), $("sets").querySelector('button[aria-pressed="true"]')); const nv = document.querySelector("#charts .secnav"); if (nv) placeUL(nv, nv.querySelector("button.on")); });
   applyHash(); renderFoot(); renderAll();
