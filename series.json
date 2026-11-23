@@ -248,7 +248,8 @@
           "from": 2010,
           "note": "Kausitasoitetut, %. Lähde: Tilastokeskus."
         }
-      }
+      },
+      "charts": []
     },
     {
       "id": "bkt",
@@ -773,7 +774,7 @@
                 ],
                 "colors": {
                   "tm_tyoll": "var(--accent)",
-                  "tm_tyottom": "var(--q-down)"
+                  "tm_tyottom": "var(--g6)"
                 },
                 "labels": {
                   "tm_tyoll": "Työllisyysaste, 15–64-v.",
@@ -869,7 +870,7 @@
                 ],
                 "colors": {
                   "x_nl_s11": "var(--accent)",
-                  "x_nl_s13": "var(--q-down)",
+                  "x_nl_s13": "var(--g6)",
                   "x_nl_s14": "var(--g3)",
                   "x_nl_s2": "var(--fg)"
                 },
@@ -926,7 +927,7 @@
                   "x_ps_tot": "var(--fg)",
                   "x_ps_yks": "var(--accent)",
                   "x_ps_julk": "var(--g3)",
-                  "x_ps_real": "var(--q-down)"
+                  "x_ps_real": "var(--g6)"
                 },
                 "dash": [
                   "x_ps_real"
@@ -1047,7 +1048,7 @@
                   "x_tp_x": "var(--fg)",
                   "x_tp_xg": "var(--accent)",
                   "x_tp_xs": "var(--g3)",
-                  "x_tp_m": "var(--q-down)"
+                  "x_tp_m": "var(--g6)"
                 },
                 "dash": [
                   "x_tp_m"
@@ -1065,7 +1066,7 @@
                 ],
                 "colors": {
                   "x_px": "var(--accent)",
-                  "x_pm": "var(--q-down)",
+                  "x_pm": "var(--g6)",
                   "x_tot": "var(--fg)"
                 },
                 "dash": [
@@ -1198,7 +1199,7 @@
                 ],
                 "colors": {
                   "x_px": "var(--accent)",
-                  "x_pm": "var(--q-down)",
+                  "x_pm": "var(--g6)",
                   "x_tot": "var(--fg)"
                 },
                 "dash": [
@@ -1352,7 +1353,7 @@
                   "x_rlv_43"
                 ],
                 "colors": {
-                  "x_rlv_41": "var(--q-down)",
+                  "x_rlv_41": "var(--g6)",
                   "x_rlv_42": "var(--g3)",
                   "x_rlv_43": "var(--accent)"
                 },
@@ -1805,7 +1806,8 @@
             "20 v",
             "30 v"
           ],
-          "note": "AAA-luokiteltujen valtionlainojen spot-korot. Lähde: EKP."
+          "note": "AAA-luokiteltujen valtionlainojen spot-korot. Lähde: EKP.",
+          "height": 500
         },
         {
           "id": "lyhyt",
@@ -1962,7 +1964,8 @@
           ],
           "unit": "",
           "dec": 1,
-          "note": "Kuukausikeskiarvo. Nimellinen, 40 kauppakumppania, 1999 Q1 = 100. Lähde: EKP."
+          "note": "Kuukausikeskiarvo. Nimellinen, 40 kauppakumppania, 1999 Q1 = 100. Lähde: EKP.",
+          "height": 390
         },
         {
           "id": "t_raaka",
@@ -2036,26 +2039,8 @@
             "wbi_agri": "Maataloustuotteet",
             "wbi_prec": "Jalometallit"
           },
-          "note": "Dollarimääräiset hinnat. Lähde: Maailmanpankki (Pink Sheet), CC BY 4.0."
-        },
-        {
-          "id": "lainakorot",
-          "section": "Luotonanto",
-          "title": "Uusien lainojen korot",
-          "size": "half",
-          "unit": "%",
-          "dec": 2,
-          "from": 2010,
-          "lines": [
-            "asuntokorko",
-            "yrityskorko",
-            "euribor3m"
-          ],
-          "labels": {
-            "asuntokorko": "Asuntolainat",
-            "yrityskorko": "Yritys- ja taloyhtiölainat"
-          },
-          "note": "Lähde: Suomen Pankki."
+          "note": "Dollarimääräiset hinnat. Lähde: Maailmanpankki (Pink Sheet), CC BY 4.0.",
+          "height": 524
         },
         {
           "id": "uudet",
@@ -2070,21 +2055,6 @@
           "note": "Sisältää uudelleenneuvotellut lainat. Lähde: Suomen Pankki.",
           "size": "half",
           "from": 2010
-        },
-        {
-          "id": "kanta",
-          "title": "Lainakannan kasvu, %",
-          "unit": "%",
-          "dec": 1,
-          "lines": [
-            "kanta_kotit",
-            "kanta_yrit",
-            "kanta_taloy"
-          ],
-          "note": "Lähde: Suomen Pankki.",
-          "from": 2010,
-          "section": "Luotonanto",
-          "size": "half"
         },
         {
           "id": "ea_raha",
@@ -2103,6 +2073,22 @@
             "ea_lkt": "var(--g3)"
           },
           "note": "Kausitasoitettu. Lähde: EKP."
+        },
+        {
+          "id": "kanta",
+          "title": "Lainakannan kasvu, %",
+          "unit": "%",
+          "dec": 1,
+          "lines": [
+            "kanta_kotit",
+            "kanta_yrit",
+            "kanta_taloy"
+          ],
+          "note": "Lähde: Suomen Pankki.",
+          "from": 2010,
+          "section": "Luotonanto",
+          "size": "half",
+          "more": true
         },
         {
           "id": "velka",
@@ -2140,9 +2126,9 @@
           ],
           "colors": {
             "bls_e_st": "var(--accent)",
-            "bls_h_st": "var(--q-down)",
+            "bls_h_st": "var(--g6)",
             "bls_e_d": "var(--accent)",
-            "bls_h_d": "var(--q-down)"
+            "bls_h_d": "var(--g6)"
           },
           "note": "Nettoprosentti, neljän neljänneksen liukuva keskiarvo. Lähde: EKP.",
           "more": true
@@ -2186,8 +2172,8 @@
           "colors": {
             "epu": "var(--fg)",
             "tpu": "var(--accent)",
-            "gpr": "var(--q-turn)",
-            "gpr_fin": "var(--q-down)"
+            "gpr": "var(--g6)",
+            "gpr_fin": "var(--g5)"
           },
           "dash": [
             "gpr_fin"
@@ -2240,11 +2226,11 @@
       ],
       "colors": {
         "euribor3m": "var(--fg)",
-        "dfr": "var(--q-turn)",
-        "us10y": "#b5523b",
+        "dfr": "var(--g3)",
+        "us10y": "var(--g6)",
         "fwd1y": "var(--accent)",
         "fwd2y": "var(--g2)",
-        "fed": "#b5523b",
+        "fed": "var(--g6)",
         "asuntokorko": "var(--accent)",
         "uudet_asunto": "var(--accent)",
         "kanta_kotit": "var(--accent)",
@@ -2410,24 +2396,6 @@
           }
         },
         {
-          "id": "jt_trte",
-          "section": "Rahoitusasema",
-          "title": "Tulot ja menot, % BKT:stä",
-          "unit": "%",
-          "dec": 1,
-          "lines": [
-            "jt_te",
-            "jt_tr"
-          ],
-          "connect": true,
-          "from": 2000,
-          "size": "half",
-          "colors": {
-            "jt_tr": "var(--accent)"
-          },
-          "note": "Julkisyhteisöt, neljän neljänneksen liukuva summa suhteessa BKT:hen. Erotus on rahoitusasema. Lähde: Tilastokeskus."
-        },
-        {
           "id": "jt_trteyy",
           "section": "Rahoitusasema",
           "title": "Tulot ja menot, vuosimuutos %",
@@ -2439,12 +2407,12 @@
           ],
           "connect": true,
           "from": 2000,
-          "size": "half",
           "colors": {
             "jt_te_yy": "var(--fg)",
             "jt_tr_yy": "var(--accent)"
           },
-          "note": "Julkisyhteisöjen tulot ja menot käyvin hinnoin, neljän neljänneksen liukuvan summan muutos vuodentakaisesta. Lähde: Tilastokeskus."
+          "note": "Julkisyhteisöjen tulot ja menot käyvin hinnoin, neljän neljänneksen liukuvan summan muutos vuodentakaisesta. Lähde: Tilastokeskus.",
+          "size": "half"
         },
         {
           "id": "jt_tel",
@@ -2467,8 +2435,7 @@
           "colors": {
             "jt_tel_ret": "var(--fg)"
           },
-          "note": "Työeläkelaitosten ylijäämä syntyy pääosin sijoitustuotoista. Neljän neljänneksen summa, % edellisen neljänneksen rahoitusvaroista. Arvonmuutokset: rahoitusvarojen muutos vähennettynä nettosijoituksilla. Omaisuustulot: korot, osingot ja muut omaisuustulot (D.4). Kansantalouden tilinpitoon perustuva arvio, joka poikkeaa Telan julkaisemasta tuotosta kattavuuden ja laskentatavan vuoksi (esim. 2025: arvio 5,5 %, Tela 7,4 %). Lähde: Tilastokeskus, oma laskelma.",
-          "more": true
+          "note": "Työeläkelaitosten ylijäämä syntyy pääosin sijoitustuotoista. Neljän neljänneksen summa, % edellisen neljänneksen rahoitusvaroista. Arvonmuutokset: rahoitusvarojen muutos vähennettynä nettosijoituksilla. Omaisuustulot: korot, osingot ja muut omaisuustulot (D.4). Kansantalouden tilinpitoon perustuva arvio, joka poikkeaa Telan julkaisemasta tuotosta kattavuuden ja laskentatavan vuoksi (esim. 2025: arvio 5,5 %, Tela 7,4 %). Lähde: Tilastokeskus, oma laskelma."
         },
         {
           "id": "jt_vk_tab",
@@ -2766,7 +2733,7 @@
           "colors": {
             "jt_trt_palk": "var(--accent)",
             "jt_trt_elak": "var(--g2)",
-            "jt_trt_tt": "var(--q-down)"
+            "jt_trt_tt": "var(--g6)"
           },
           "y2": [
             "jt_trt_tt"
@@ -2798,7 +2765,7 @@
             "var(--g3)",
             "color-mix(in srgb, var(--g3) 55%, var(--plot))",
             "var(--g2)",
-            "var(--q-down)",
+            "var(--g6)",
             "color-mix(in srgb, var(--fg) 22%, var(--plot))"
           ],
           "resid": [
@@ -2914,7 +2881,7 @@
           "colors": {
             "jt_velka": "var(--accent)",
             "jt_nv": "var(--fg)",
-            "jt_nv_ptel": "var(--q-turn)"
+            "jt_nv_ptel": "var(--g6)"
           },
           "dash": [
             "jt_velka"
@@ -2950,20 +2917,6 @@
           "note": "Muutos vuodentakaisesta. Perusjäämä: rahoitusasema ilman korkomenoja (alijäämä kasvattaa velkaa). Kasvu: nimellisen BKT:n kasvun vaikutus. Virta-varantokorjaus: velan muutoksen ja alijäämän erotus, mm. rahoitusvarojen hankinta (työeläkelaitosten ylijäämän sijoitukset, kassavarat). Lähde: Tilastokeskus, oma laskelma."
         },
         {
-          "id": "jt_korkobkt",
-          "section": "Velka",
-          "title": "Korkomenot, % BKT:stä",
-          "unit": "%",
-          "dec": 1,
-          "lines": [
-            "jt_korko_bkt"
-          ],
-          "connect": true,
-          "from": 2000,
-          "size": "half",
-          "note": "Julkisyhteisöjen korkomenot, neljän neljänneksen liukuva summa. Lähde: Tilastokeskus."
-        },
-        {
           "id": "jt_korko",
           "section": "Velka",
           "title": "Velan korko, %",
@@ -2976,7 +2929,6 @@
           ],
           "connect": true,
           "from": 2004,
-          "size": "half",
           "colors": {
             "jt_irate": "var(--fg)",
             "jt_vk_korko": "var(--accent)",
@@ -2990,7 +2942,8 @@
             "jt_vk_korko": "Valtionvelan keskikorko",
             "jt_fi10y": "10 v valtionlainan korko"
           },
-          "note": "Implisiittinen korko: korkomenot 4 nelj. / velka vuotta aiemmin. Keskikorko: budjettitalouden velan korkomenot 12 kk / keskimääräinen velka. Lähteet: Tilastokeskus, Valtiokonttori, EKP."
+          "note": "Implisiittinen korko: korkomenot 4 nelj. / velka vuotta aiemmin. Keskikorko: budjettitalouden velan korkomenot 12 kk / keskimääräinen velka. Lähteet: Tilastokeskus, Valtiokonttori, EKP.",
+          "size": "half"
         },
         {
           "id": "jt_mat",
@@ -3010,8 +2963,7 @@
             "jt_vk_dur": "var(--accent)",
             "jt_vk_fix": "var(--g2)"
           },
-          "note": "Keskimaturiteetti: velan keskimääräinen jäljellä oleva laina-aika. Lähde: Valtiokonttori.",
-          "more": true
+          "note": "Keskimaturiteetti: velan keskimääräinen jäljellä oleva laina-aika. Lähde: Valtiokonttori."
         },
         {
           "id": "jt_eraant",
