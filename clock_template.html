@@ -1390,17 +1390,17 @@ a.ubr, button.ubr { cursor: pointer; } a.ubr:hover .t, button.ubr:hover .t { tex
   const wvU = (l, c) => pmod(pmod(Math.atan2(l, c), TAU) - 1.5 * Math.PI, TAU) / TAU;
   const wvX = u => u * WV.w, wvY = u => WV.mid + WV.amp * Math.cos(TAU * u);
   const wvAt = (u, off) => { const dy = -Math.sin(TAU * u) * TAU * WV.amp / WV.w, L = Math.hypot(dy, 1); return [wvX(u) + dy / L * off, wvY(u) - off / L, Math.atan(dy) * 180 / Math.PI]; };   // off > 0: käyrän yläpuolelle
-  const wvR = s => Math.max(9, 20 * Math.sqrt(Math.min(s, 2) / 2)) / WV.k;   // pinta-ala ~ etäisyys (katto 2); koko näyttöpikseleinä, ei kuvan yksiköissä
+  const wvR = s => Math.max(12, 24 * Math.sqrt(Math.min(s, 2) / 2)) / WV.k;   // pinta-ala ~ etäisyys (katto 2); koko näyttöpikseleinä, ei kuvan yksiköissä
   const fmt2 = v => (v > 0.005 ? "+" : v < -0.005 ? "−" : "") + Math.abs(v).toFixed(2).replace(".", ",");
   let wvArc = null, wvCur = null, wvRaf = 0, wvMt = 0, wvGeo = null;
   function wvArcLen() { if (wvArc) return wvArc; const N = 1200, S = new Float64Array(N + 1);
     for (let i = 1; i <= N; i++) S[i] = S[i - 1] + Math.hypot(wvX(i / N) - wvX((i - 1) / N), wvY(i / N) - wvY((i - 1) / N));
     return wvArc = { s: u => S[Math.round(Math.max(0, Math.min(1, u)) * N)], u: t => { let lo = 0, hi = N; while (lo < hi) { const m = (lo + hi) >> 1; if (S[m] < t) lo = m + 1; else hi = m; } return lo / N; } }; }
-  const wvTrP = t => { const r = Math.max(1.6, .45 * wvR(t.s)), [x, y] = wvAt(t.u, 9 + r); return { x, y, r }; };
+  const wvTrP = t => { const r = Math.max(2 / WV.k, .42 * wvR(t.s)), [x, y] = wvAt(t.u, 16 / WV.k + .5 * wvR(t.s)); return { x, y, r }; };
   const wvLu = (a, b, e) => pmod(a + (pmod(b - a + .5, 1) - .5) * e, 1);   // lyhin reitti syklin ympäri: laskusta elpymiseen eteenpäin reunan yli
-  function wvSunAt(u, s) { const r = wvR(s), [x, y] = wvAt(u, 9 + r); return { x, y, r }; }
+  function wvSunAt(u, s) { const r = wvR(s), [x, y] = wvAt(u, 16 / WV.k + r); return { x, y, r }; }   // irti käyrästä 16 px
   function waveBlock(o) {
-    const { w, h, mid } = WV, A = wvArcLen(), sq = WV.sq, gap = 3.5 / WV.k, st = sq + gap, cq = o.cq;
+    const { w, h, mid } = WV, A = wvArcLen(), sq = WV.sq, gap = (WV.w < 600 ? 3 : 4) / WV.k, st = sq + gap, cq = o.cq;
     let d = ""; for (let i = 0; i <= 240; i++) { const u = -.02 + 1.04 * i / 240; d += (i ? "L" : "M") + wvX(u).toFixed(1) + " " + wvY(u).toFixed(1); }
     const pv = o.prev, f0 = wvSunAt(o.sunF.u, o.sunF.s), plan = o.plan = { sq: [], tr: [] };
     let g = `<defs><linearGradient id="wvFg"><stop offset="0" stop-color="#fff" stop-opacity="0"/><stop offset=".06" stop-color="#fff"/><stop offset=".94" stop-color="#fff"/><stop offset="1" stop-color="#fff" stop-opacity="0"/></linearGradient><mask id="wvF" maskUnits="userSpaceOnUse" x="-20" y="-80" width="${w + 40}" height="${h + 160}"><rect y="-80" width="${w}" height="${h + 160}" fill="url(#wvFg)"/></mask><clipPath id="wvHa"><rect y="-40" width="${w}" height="${mid + 40}"/></clipPath><clipPath id="wvHb"><rect y="${mid}" width="${w}" height="${h - mid + 20}"/></clipPath></defs><g>`;
@@ -1464,7 +1464,7 @@ a.ubr, button.ubr { cursor: pointer; } a.ubr:hover .t, button.ubr:hover .t { tex
   const wvCw = () => { const sm = $("summary"); return sm && sm.clientWidth || Math.min(1180, document.documentElement.clientWidth - 32); };
   const wvWant = () => { const cw = wvCw(); return cw >= 1000 ? 1180 : cw >= 680 ? 780 : cw >= 520 ? 600 : 420; };   // kapealla jyrkempi aalto, jotta merkit pysyvät isoina   // piilossa (leveys 0) arvio sisältöpalstasta   // leveässä palstassa loivempi ja leveämpi aalto
   function waveData(stay, mv, counts, cq, cp) {
-    { const nw = wvWant(); if (nw !== WV.w) { WV.w = nw; wvArc = null; } WV.k = wvCw() / WV.w; WV.sq = 9 / WV.k; WV.so = -(WV.sq / 2 + 7 / WV.k); }   // merkit näyttöpikseleinä
+    { const nw = wvWant(); if (nw !== WV.w) { WV.w = nw; wvArc = null; } WV.k = wvCw() / WV.w; WV.sq = (wvCw() < 520 ? 9.5 : 11) / WV.k;   /* kapealla 10 neliötä mahtuu vaiheeseensa */ WV.so = -(WV.sq / 2 + 7 / WV.k); }   // merkit näyttöpikseleinä
     const C = comp(), P = set.periods, ok = k => C.level[k] != null && C.change[k] != null, sOf = k => Math.hypot(C.level[k], C.change[k]);
     const hist = []; let k0 = -1; for (let k = 0; k <= cp.i; k++) if (ok(k)) { hist.push(sOf(k)); if (k0 < 0) k0 = k; }
     const s = Math.hypot(cp.l, cp.c), srt = hist.slice().sort((a, b) => a - b), med = srt[Math.floor((srt.length - 1) / 2)];
