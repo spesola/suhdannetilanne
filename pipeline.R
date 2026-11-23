@@ -978,7 +978,8 @@ for (set in cfg$sets) {
         sel <- setNames(lapply(vs, function(v) unique(unlist(lapply(cb, function(x) x$pick[[v]])))), vs)
         C <- tryCatch(fetch_px_cube(E$table, sel), error = function(e) { message("  VAROITUS erittely ", ek, ": ", conditionMessage(e)); NULL })
         if (is.null(C)) { CHECKS <- c(CHECKS, sprintf("Erittely %s: haku epaonnistui", ek)); next }
-        for (x in cb) { raws[[x$id]] <- px_extract(C, x$pick)       # kuukausierittely (freq M) kuukausiakselille
+        for (x in cb) { d0 <- px_extract(C, x$pick); if (all(is.na(d0$value))) next   # julkaisematon yhdistelma (esim. kausitasoitus uusille alasektoreille)
+          raws[[x$id]] <- d0                                          # kuukausierittely (freq M) kuukausiakselille
           if (identical(E$freq, "M")) mser[[length(mser) + 1]] <- list(id = x$id, label = x$label) else ser[[length(ser) + 1]] <- list(id = x$id, label = x$label) }
         det_out[[ek]] <- E; next }
       X <- tryCatch(fetch_px_multi(E$table, E$dim, codes, DET_CC, nz(E$base, list())), error = function(e) { message("  VAROITUS erittely ", ek, ": ", conditionMessage(e)); NULL })

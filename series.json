@@ -2427,7 +2427,7 @@
         "bkt_julk": {
           "title": "Julkiset kulutusmenot alasektoreittain",
           "table": "jtume/11zf.px",
-          "note": "Käyvin hinnoin; volyymia ei julkaista alasektoreittain neljännesvuosittain. V/v alkuperäisestä, q/q kausitasoitetusta sarjasta. Sosiaali- ja terveyspalvelut siirtyivät kunnilta hyvinvointialueille vuoden 2023 alussa, joten kuntien ja hyvinvointialueiden muutokset alkavat vuodesta 2024.",
+          "note": "Käyvin hinnoin; volyymia ei julkaista alasektoreittain neljännesvuosittain. V/v alkuperäisestä, q/q kausitasoitetusta sarjasta. Sosiaali- ja terveyspalvelut siirtyivät kunnilta hyvinvointialueille vuoden 2023 alussa, joten kuntien ja hyvinvointialueiden muutokset alkavat vuodesta 2024. Niiden kausitasoitettuja sarjoja ei julkaista, joten q/q-näkymässä rivit ovat tyhjiä.",
           "src": "Tilastokeskus, julkisyhteisöjen neljännesvuositilinpito (jtume/11zf)",
           "base": {
             "taloustoimi_1_20180101": "P3K",
