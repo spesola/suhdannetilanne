@@ -1290,11 +1290,9 @@ a.ubr, button.ubr { cursor: pointer; } a.ubr:hover .t, button.ubr:hover .t { tex
       if (pts.length > 1) {
         // pehmeä käyrä (Catmull-Rom), joka ohenee ja haalistuu menneisyyteen päin; ei välipisteitä
         const n = pts.length, P0 = j => pts[Math.max(0, Math.min(n - 1, j))], f = v => v.toFixed(1), top = s.comp ? 0.7 : hi(s) ? 0.75 : 0.5, wMax = (s.comp ? 2.6 : hi(s) ? 2.4 : 1.9) * K;
-        const cr = (a, b, c, d, t) => [0, 1].map(i => 0.5 * (2 * b[i] + (c[i] - a[i]) * t + (2 * a[i] - 5 * b[i] + 4 * c[i] - d[i]) * t * t + (3 * b[i] - a[i] - 3 * c[i] + d[i]) * t * t * t));
-        const SUB = 4, sm = []; for (let j = 0; j < n - 1; j++) for (let q = 0; q < SUB; q++) sm.push(cr(P0(j - 1), P0(j), P0(j + 1), P0(j + 2), q / SUB)); sm.push(pts[n - 1]);
-        for (let j = 0; j < sm.length - 1; j++) { const t = (j + 1) / (sm.length - 1);   // paksuus ja peittävyys kasvavat tasaisesti kohti nykyhetkeä
-          el("path", { ...(glide ? { class: "fd" } : {}), d: `M${f(sm[j][0])} ${f(sm[j][1])}L${f(sm[j + 1][0])} ${f(sm[j + 1][1])}`,
-            fill: "none", stroke: tailCol, "stroke-width": ((0.45 + 0.55 * t) * wMax).toFixed(2), "stroke-opacity": (0.06 + (top - 0.06) * t * t).toFixed(2), "stroke-linecap": "butt" }, g); }
+        for (let j = 0; j < n - 1; j++) { const a = P0(j - 1), b = P0(j), c = P0(j + 1), d = P0(j + 2), t = (j + 1) / (n - 1);   // yksi Bezier-pala kuukautta kohden (kevyt toistossa)
+          el("path", { ...(glide && j === n - 2 ? { class: "fd" } : {}), d: `M${f(b[0])} ${f(b[1])}C${f(b[0] + (c[0] - a[0]) / 6)} ${f(b[1] + (c[1] - a[1]) / 6)} ${f(c[0] - (d[0] - b[0]) / 6)} ${f(c[1] - (d[1] - b[1]) / 6)} ${f(c[0])} ${f(c[1])}`,
+            fill: "none", stroke: tailCol, "stroke-width": ((0.45 + 0.55 * t) * wMax).toFixed(2), "stroke-opacity": (0.07 + (top - 0.07) * t * t).toFixed(2), "stroke-linecap": "butt" }, g); }   // toistossa vain uusin kuukausi häivytetään esiin
       }
       const [hx, hy] = pts[pts.length - 1];
       const r = ((s.comp ? 11 : s.isGroup ? 7 : 4.5) + (hi(s) ? 1.5 : 0)) * K;   // kokonaisindikaattori: kehän säde (nimen paikka)
