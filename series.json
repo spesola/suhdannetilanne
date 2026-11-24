@@ -789,6 +789,40 @@
                 "contrib": "tyottomat"
               },
               {
+                "title": "Työttömät työnhakijat ja pitkäaikaistyöttömät, tuhatta",
+                "monthly": true,
+                "lines": [
+                  "tm_tt",
+                  "tm_pt1",
+                  "tm_pt2"
+                ],
+                "colors": {
+                  "tm_tt": "var(--fg)",
+                  "tm_pt1": "var(--accent)",
+                  "tm_pt2": "var(--g6)"
+                },
+                "unit": "",
+                "dec": 1,
+                "from": 2009,
+                "note": "Kuukauden lopun tilanne, alkuperäiset (kausitasoittamattomat) luvut. Pitkäaikaistyöttömät: yhtäjaksoisesti vähintään vuoden työttömänä olleet. Yli kaksi vuotta: työttömyyden kesto yli 104 viikkoa. Lähde: KEHA-keskus, työnvälitystilasto (Tilastokeskuksen tietokanta)."
+              },
+              {
+                "title": "Pitkäaikaistyöttömien osuus työttömistä työnhakijoista, %",
+                "monthly": true,
+                "lines": [
+                  "tm_pt1o",
+                  "tm_pt2o"
+                ],
+                "colors": {
+                  "tm_pt1o": "var(--accent)",
+                  "tm_pt2o": "var(--g6)"
+                },
+                "unit": "%",
+                "dec": 1,
+                "from": 2009,
+                "note": "Kuukauden lopun tilanne. Lähde: KEHA-keskus, työnvälitystilasto (Tilastokeskuksen tietokanta)."
+              },
+              {
                 "title": "Avoimet työpaikat, tuhatta",
                 "lines": [
                   "tm_atp",
@@ -7574,6 +7608,172 @@
         },
         "to_quarter": true,
         "stl": true
+      }
+    },
+    {
+      "id": "tm_tt",
+      "label": "Työttömät työnhakijat",
+      "set": "bkt",
+      "chart_only": true,
+      "monthly": true,
+      "source": "statfin",
+      "table": "tyonv/12r5.px",
+      "pick": {
+        "Alue": "SSS",
+        "contentscode": "TYOTTOMATLOPUSSA"
+      },
+      "mult": 0.001
+    },
+    {
+      "id": "tm_pt1",
+      "label": "Yli vuoden työttömänä",
+      "set": "bkt",
+      "chart_only": true,
+      "monthly": true,
+      "source": "statfin",
+      "table": "tyonv/12r5.px",
+      "pick": {
+        "Alue": "SSS",
+        "contentscode": "PITKAAIKAISTYOTTOMAT"
+      },
+      "mult": 0.001
+    },
+    {
+      "id": "tm_pt2",
+      "label": "Yli kaksi vuotta työttömänä",
+      "set": "bkt",
+      "chart_only": true,
+      "monthly": true,
+      "source": "sum",
+      "parts": [
+        {
+          "source": "statfin",
+          "table": "tyonv/12ta.px",
+          "pick": {
+            "Alue": "SSS",
+            "Sukupuoli": "SSS",
+            "Ikäryhmitys": "SSS",
+            "Työllisyyskoodin kesto": "11",
+            "contentscode": "TYOTTOMATLOPUSSA"
+          }
+        },
+        {
+          "source": "statfin",
+          "table": "tyonv/12ta.px",
+          "pick": {
+            "Alue": "SSS",
+            "Sukupuoli": "SSS",
+            "Ikäryhmitys": "SSS",
+            "Työllisyyskoodin kesto": "12",
+            "contentscode": "TYOTTOMATLOPUSSA"
+          }
+        },
+        {
+          "source": "statfin",
+          "table": "tyonv/12ta.px",
+          "pick": {
+            "Alue": "SSS",
+            "Sukupuoli": "SSS",
+            "Ikäryhmitys": "SSS",
+            "Työllisyyskoodin kesto": "13",
+            "contentscode": "TYOTTOMATLOPUSSA"
+          }
+        },
+        {
+          "source": "statfin",
+          "table": "tyonv/12ta.px",
+          "pick": {
+            "Alue": "SSS",
+            "Sukupuoli": "SSS",
+            "Ikäryhmitys": "SSS",
+            "Työllisyyskoodin kesto": "14",
+            "contentscode": "TYOTTOMATLOPUSSA"
+          }
+        }
+      ],
+      "mult": 0.001
+    },
+    {
+      "id": "tm_pt1o",
+      "label": "Yli vuoden työttömänä",
+      "set": "bkt",
+      "chart_only": true,
+      "monthly": true,
+      "source": "statfin",
+      "table": "tyonv/12r5.px",
+      "pick": {
+        "Alue": "SSS",
+        "contentscode": "PITKAAIKAISTYOTTOMAT"
+      },
+      "div": {
+        "source": "statfin",
+        "table": "tyonv/12r5.px",
+        "pick": {
+          "Alue": "SSS",
+          "contentscode": "TYOTTOMATLOPUSSA"
+        }
+      }
+    },
+    {
+      "id": "tm_pt2o",
+      "label": "Yli kaksi vuotta työttömänä",
+      "set": "bkt",
+      "chart_only": true,
+      "monthly": true,
+      "source": "sum",
+      "parts": [
+        {
+          "source": "statfin",
+          "table": "tyonv/12ta.px",
+          "pick": {
+            "Alue": "SSS",
+            "Sukupuoli": "SSS",
+            "Ikäryhmitys": "SSS",
+            "Työllisyyskoodin kesto": "11",
+            "contentscode": "TYOTTOMATLOPUSSA"
+          }
+        },
+        {
+          "source": "statfin",
+          "table": "tyonv/12ta.px",
+          "pick": {
+            "Alue": "SSS",
+            "Sukupuoli": "SSS",
+            "Ikäryhmitys": "SSS",
+            "Työllisyyskoodin kesto": "12",
+            "contentscode": "TYOTTOMATLOPUSSA"
+          }
+        },
+        {
+          "source": "statfin",
+          "table": "tyonv/12ta.px",
+          "pick": {
+            "Alue": "SSS",
+            "Sukupuoli": "SSS",
+            "Ikäryhmitys": "SSS",
+            "Työllisyyskoodin kesto": "13",
+            "contentscode": "TYOTTOMATLOPUSSA"
+          }
+        },
+        {
+          "source": "statfin",
+          "table": "tyonv/12ta.px",
+          "pick": {
+            "Alue": "SSS",
+            "Sukupuoli": "SSS",
+            "Ikäryhmitys": "SSS",
+            "Työllisyyskoodin kesto": "14",
+            "contentscode": "TYOTTOMATLOPUSSA"
+          }
+        }
+      ],
+      "div": {
+        "source": "statfin",
+        "table": "tyonv/12r5.px",
+        "pick": {
+          "Alue": "SSS",
+          "contentscode": "TYOTTOMATLOPUSSA"
+        }
       }
     },
     {
