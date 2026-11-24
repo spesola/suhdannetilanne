@@ -1878,7 +1878,7 @@ a.ubr, button.ubr { cursor: pointer; } a.ubr:hover .t, button.ubr:hover .t { tex
     const lastK = s => { const a = (raw ? s.raw : s.level) || []; for (let k = a.length - 1; k >= 0; k--) if (a[k] != null) return k; return -1; };
     const updTxt = (s, k) => { if (s.comp || k !== lastK(s)) return ""; const key = set.id + "/" + s.id, d = (D.meta.seen || {})[key], u = (D.meta.srcupd || {})[key];   // ilmestymispäivä lokista, muuten lähteen päivitysaika
       const f = x => new Date(x + "T12:00:00").toLocaleDateString("fi-FI");
-      return d ? `${f(d)}\n` : u ? `Lähde päivitetty ${f(u)}\n` : ""; };
+      return d ? `${f(d)}\n` : u ? `${f(u)}\n` : ""; };
     const esc = x => String(x).replace(/&/g, "&amp;").replace(/"/g, "&quot;").replace(/</g, "&lt;");
     const tipA = (s, k, sub) => ` data-tip="${esc(s.label)}" data-sub="${esc(updTxt(s, k) + sub)}"`;   // uusimmassa solussa ensin paivityspaiva
     let anyNw = false;
