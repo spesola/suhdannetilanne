@@ -56,9 +56,13 @@ jobs:
         timeout-minutes: 10
         with: { use-public-rspm: true }
 
+      # curl-paketti kaannetaan lahdekoodista, jos RSPM:ssa ei ole binaaria (esim. uusi versio): tarvitsee libcurl-otsakkeet
       - name: R-paketit
         if: ${{ !inputs.pika }}
-        run: Rscript -e 'install.packages(c("httr", "jsonlite", "readxl"))'
+        run: |
+          sudo apt-get install -y --no-install-recommends libcurl4-openssl-dev || echo "libcurl-dev: asennus epaonnistui"
+          Rscript -e 'install.packages(c("httr", "jsonlite", "readxl"))'
+          Rscript -e 'for (p in c("curl", "httr", "jsonlite", "readxl")) if (!requireNamespace(p, quietly = TRUE)) stop("R-paketti puuttuu: ", p)'
 
       - name: Valimuisti (edelliset onnistuneet haut)
         if: ${{ !inputs.pika }}
