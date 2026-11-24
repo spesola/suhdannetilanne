@@ -23,6 +23,12 @@ let file;
         charts: document.querySelectorAll("#charts .fcard, #grCharts .fcard").length }));
       if (r.sw > r.iw + 1) fails.push(`${w}px ${h}: vaakavieritys ${r.sw} > ${r.iw}`);
       if (h === "#suhdanne" && r.pts < 5) fails.push(`${w}px ${h}: kartalla vain ${r.pts} pistetta`);
+      if (h === "#suhdanne") {                                         // suhdanneaalto: neliöt, aurinko, taivas ja vaihenimet
+        const wv = await p.evaluate(() => ({ q: document.querySelectorAll("svg.wv .wvq").length, sun: !!document.querySelector("svg.wv .wvsun"),
+          sky: (() => { const k = document.querySelector(".hero > .wvsky"); return !!k && k.getBoundingClientRect().height > 50; })(), lbl: document.querySelectorAll(".wvl .wvb").length }));
+        if (wv.q < 5 || !wv.sun || !wv.sky || wv.lbl !== 4) fails.push(`${w}px ${h}: suhdanneaalto puutteellinen ${JSON.stringify(wv)}`);
+      }
+      if (h !== "#suhdanne" && await p.evaluate(() => { const k = document.querySelector(".hero > .wvsky"); return !!k && getComputedStyle(k).display !== "none"; })) fails.push(`${w}px ${h}: aallon taivas näkyy väärällä välilehdellä`);
       if (h === "#reaalitalous" && r.rows < 5) fails.push(`${w}px ${h}: taulukossa vain ${r.rows} rivia`);
       if (h === "#rahoitus" && r.charts < 5) fails.push(`${w}px ${h}: vain ${r.charts} kuviota`);
       if (h === "#julkinen-talous" && r.charts < 5) fails.push(`${w}px ${h}: vain ${r.charts} kuviota`);

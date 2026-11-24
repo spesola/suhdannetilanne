@@ -1138,7 +1138,7 @@ a.ubr, button.ubr { cursor: pointer; } a.ubr:hover .t, button.ubr:hover .t { tex
   const qcol = q => `var(${Q[q].v})`;
   /* ---------- liike (pois, jos käyttäjä on vähentänyt liikettä) ---------- */
   const RMQ = matchMedia("(prefers-reduced-motion: reduce)"), motion = () => !RMQ.matches;
-  const LUONNOS = new URLSearchParams(location.search).has("luonnos"), VAIHEET = new URLSearchParams(location.search).has("vaiheet"); let PHMAP = null;   // luonnos (?luonnos): kokonaisindikaattorin laskuvaiheiden varjostus aikasarjoihin, ei vielä käytössä
+  const LUONNOS = !new URLSearchParams(location.search).has("vanha"),   /* suhdanneaalto käyttöön 24.11.2026; ?vanha näyttää edellisen etusivun */ VAIHEET = new URLSearchParams(location.search).has("vaiheet"); let PHMAP = null;   // luonnos (?luonnos): kokonaisindikaattorin laskuvaiheiden varjostus aikasarjoihin, ei vielä käytössä
   const ANIM = new Map();                                            // kerran animoidut: näkymä + kortin otsikko -> "done" tai "pend" (odottaa vieritystä; uudelleenpiirretty kortti perii tilan)
   let rvIO = null, animQ = 0;
   function pulse(svg) {                                              // uusin havainto: laajeneva rengas kerran
@@ -2479,6 +2479,9 @@ a.ubr, button.ubr { cursor: pointer; } a.ubr:hover .t, button.ubr:hover .t { tex
       scrollTo({ top: t.getBoundingClientRect().top + scrollY - bar - 16 }); }, 120); }
   // sivuston muutokset: uudet kuviot ja muut isommat lisaykset (kasin yllapidetty, uusin ensin); set + id -> linkki kuvioon
   const CHANGES = [
+    { d: "2026-11-24", t: "Uusi etusivu: suhdanneaalto, jossa aurinko kuvaa kokonaisindikaattoria ja taivas suhdannevaihetta" },
+    { d: "2026-11-24", t: "Työttömyyden erittelyyn pitkäaikaistyöttömyys (yli vuoden ja yli kaksi vuotta työttömänä olleet)" },
+    { d: "2026-11-24", t: "Suhdannekartan kulku pehmeänä käyränä pisteen värissä" },
     { d: "2026-11-23", t: "Etusivulle julkaisuaikajana: viimeksi päivittyneet ja tulevat julkaisut samalla janalla, jakajana tämä päivä", set: "Suhdannetilanne" },
     { d: "2026-11-23", t: "Kuvioissa viivojen nimet suoraan viivan päässä selitteen sijaan (2–5 viivaa)" },
     { d: "2026-11-23", t: "Erittelysivuille revisiot: muutos edelliseen julkaisuun (Revisio-valinta)", set: "Reaalitalous" },
