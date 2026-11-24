@@ -307,6 +307,8 @@ body:has(.hero.wvon) #topSec > .card { border-top-color: var(--line); }   /* peh
 :root:not([data-theme="vapor"]) .wv .wvt { fill: color-mix(in srgb, var(--sun) 70%, #8a5200); }   /* jälki erottuu vaaleaa taivasta vasten */
 .wv .wvh { fill: var(--sun); opacity: .18; }
 .wv .wvd { fill: var(--sun); stroke: var(--wvSr); }
+.wv .wvsun.sp-rec { --sun: #f7a07a; } .wv .wvsun.sp-up { --sun: #ffd23f; } .wv .wvsun.sp-turn { --sun: #f28c1c; } .wv .wvsun.sp-down { --sun: #d9452f; }   /* auringon väri vuorokaudenajan mukaan: aamu, päivä, ilta, lasku */
+:root[data-theme="vapor"] .wv .wvsun.sp-rec { --sun: #ff9e7a; } :root[data-theme="vapor"] .wv .wvsun.sp-up { --sun: #ffe066; } :root[data-theme="vapor"] .wv .wvsun.sp-turn { --sun: #ff9a2e; } :root[data-theme="vapor"] .wv .wvsun.sp-down { --sun: #ff5a4a; }
 .wv.anim .wvq, .wv.anim .wvt { animation: wvIn .45s ease both; animation-delay: calc(300ms + var(--k, 0) * 30ms); }
 @keyframes wvIn { from { opacity: 0; } }
 .wv .wvq.fin { animation: wvIn .3s ease both; }
@@ -1438,7 +1440,7 @@ a.ubr, button.ubr { cursor: pointer; } a.ubr:hover .t, button.ubr:hover .t { tex
     const src = o.move && pv && o.step === 1 ? pv.tr.concat([{ u: pv.sun.u, s: pv.sun.s }]) : null;   // kuukausi eteenpäin: pisteet liukuvat yhden pykälän, vanha aurinko jäljen uusimmaksi
     o.trail.forEach((tt, j, T) => { const t = { u: tt.u, s: tt.s }, f = src && src[j + src.length - T.length] || t, p = wvTrP(f); plan.tr.push({ f, t });
       g += `<circle class="wvt" data-tip="Kokonaisindikaattori ${tt.per}" data-sub="${Q[tt.q].short}\nEtäisyys trendistä ${tt.s.toFixed(2).replace(".", ",")}" data-qc="${qcol(tt.q)}" style="--k:${k + j};opacity:${(.2 + .55 * (j + 1) / T.length).toFixed(2)}" cx="${p.x.toFixed(1)}" cy="${p.y.toFixed(1)}" r="${p.r.toFixed(1)}"/>`; });
-    g += `<g class="wvsun" data-tip="Kokonaisindikaattori ${escH(o.sun.per)}" data-sub="${escH(o.sun.sub)}" data-qc="${qcol(cq)}" transform="translate(${f0.x.toFixed(1)} ${f0.y.toFixed(1)})"><circle class="wvh" r="${(f0.r * 1.9).toFixed(1)}"/><circle class="wvd" r="${f0.r.toFixed(1)}" stroke-width="${f0.r < 8 ? 2 : 3}"/></g></g>`;
+    g += `<g class="wvsun sp-${cq}" data-tip="Kokonaisindikaattori ${escH(o.sun.per)}" data-sub="${escH(o.sun.sub)}" data-qc="${qcol(cq)}" transform="translate(${f0.x.toFixed(1)} ${f0.y.toFixed(1)})"><circle class="wvh" r="${(f0.r * 1.9).toFixed(1)}"/><circle class="wvd" r="${f0.r.toFixed(1)}" stroke-width="${f0.r < 8 ? 2 : 3}"/></g></g>`;
     const lbl = `Suhdanneaalto ${o.sun.per}: kokonaisindikaattori vaiheessa ${Q[cq].short.toLowerCase()}, etäisyys trendistä ${o.sun.s.toFixed(2).replace(".", ",")}. Indikaattoreita vaiheittain: ${QORDER.map(q => Q[q].short.toLowerCase() + " " + o.counts[q]).join(", ")}.`;
     const fq = o.sunF.q && o.sunF.q !== cq ? o.sunF.q : null, nt = o.trail.length, per = set.freq === "M" ? "kuukautta" : "neljännestä";
     return `<div class="wvw" style="margin-top:${wvMt}px"><svg class="wv${o.anim ? " anim" : ""}" viewBox="0 0 ${w} ${h}" role="img" aria-label="${escH(lbl)}">${g}</svg></div>`
