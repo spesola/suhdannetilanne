@@ -1407,7 +1407,7 @@ a.ubr, button.ubr { cursor: pointer; } a.ubr:hover .t, button.ubr:hover .t { tex
 
   /* ---------- luonnos: suhdanneaalto ---------- */
   // paikka käyrällä = vaiheen kulma tason ja muutoksen tasossa (0 pohja, .25 trendin ylitys, .5 huippu, .75 trendin alitus); auringon koko = etäisyys origosta
-  const WV = { w: 600, h: 226, mid: 124, amp: 78, k: 1, sq: 9, so: -12 }, TAU = 2 * Math.PI, pmod = (a, m) => ((a % m) + m) % m;
+  const WV = { w: 600, h: 262, mid: 132, amp: 96, k: 1, sq: 9, so: -12 }, TAU = 2 * Math.PI, pmod = (a, m) => ((a % m) + m) % m;
   const wvU = (l, c) => pmod(pmod(Math.atan2(l, c), TAU) - 1.5 * Math.PI, TAU) / TAU;
   const wvX = u => u * WV.w, wvY = u => WV.mid + WV.amp * Math.cos(TAU * u);
   const wvAt = (u, off) => { const dy = -Math.sin(TAU * u) * TAU * WV.amp / WV.w, L = Math.hypot(dy, 1); return [wvX(u) + dy / L * off, wvY(u) - off / L, Math.atan(dy) * 180 / Math.PI]; };   // off > 0: käyrän yläpuolelle
