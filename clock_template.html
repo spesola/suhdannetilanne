@@ -3488,7 +3488,7 @@ a.ubr, button.ubr { cursor: pointer; } a.ubr:hover .t, button.ubr:hover .t { tex
   { const s0 = D.sets.find(s => s.composite && s.indicators), sv = set;   // vaiheviiva yläpalkin alle: kokonaisindikaattorin nykyinen vaihe
     if (s0) { set = s0; const p = at(comp(), defIdx(s0)); if (p) document.documentElement.style.setProperty("--phase", qcol(quad(p.l, p.c)));
       if (p && LUONNOS) { const q = quad(p.l, p.c), ps = document.createElement("div"); ps.className = "pgsky wp-" + q; ps.setAttribute("aria-hidden", "true"); document.body.prepend(ps);
-        const pgTop = () => { const h = document.querySelector("header"); if (h) ps.style.top = (h.getBoundingClientRect().bottom + scrollY - 30) + "px"; }; pgTop(); addEventListener("resize", pgTop); phFavicon(q); }   // pgTop: taivas alkaa ylätunnisteen alta
+        const pgTop = () => { const h = document.querySelector("header"); if (h) ps.style.top = (h.offsetHeight - 30) + "px"; }; pgTop(); addEventListener("resize", pgTop); phFavicon(q); }   // pgTop: taivas alkaa ylätunnisteen alta
       const C0 = comp(); PHMAP = {}; s0.periods.forEach((per, k) => { if (C0.level[k] != null && C0.change[k] != null) PHMAP[per] = quad(C0.level[k], C0.change[k]); }); set = sv; } }
   addEventListener("resize", () => { placeUL($("sets"), $("sets").querySelector('button[aria-pressed="true"]')); const nv = document.querySelector("#charts .secnav"); if (nv) placeUL(nv, nv.querySelector("button.on")); });
   applyHash(); renderFoot(); renderAll();
