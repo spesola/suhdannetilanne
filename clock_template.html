@@ -257,6 +257,8 @@ body { font-variant-numeric: tabular-nums; background: var(--bg); min-height: 10
 .ubl.ubm > li.past .p { display: none; }
 .ubl.ubm > li.past .t { color: var(--muted); }
 .ubl.ubm .ubr .p.tm { font-size: inherit; color: var(--muted); }
+.ubl.ubm > li.sep { height: 1px; margin: 5px 0; background: color-mix(in srgb, var(--accent) 35%, transparent); }
+.ubl.ubm > li.tdy .d { color: var(--accent); font-weight: 600; } .ubl.ubm > li.past.tdy .t { color: var(--fg); }   /* tänään julkaistu */
 .ubl.ubm > li.now { padding: 2px 0; }
 .ubl.ubm > li.now > span { margin-left: 0; font-size: 0.75rem; gap: 0; } .ubl.ubm > li.now > span::after { margin-left: 8px; } .ubl.ubm > li.now .wd, .ubl.ubm > li.now .dn { flex: none; }
 .ubl.ubm > li.now > span::before { display: none; }
@@ -1953,12 +1955,12 @@ a.ubr, button.ubr { cursor: pointer; } a.ubr:hover .t, button.ubr:hover .t { tex
     past.reverse();
     const now = Date.now() - 6 * 36e5, fut = (D.meta.upcoming || []).filter(r => new Date(r.date).getTime() >= now).slice(0, NF);
     let pk = null, h = "";
-    const pastRow = ({ d, n, u }) => { const k = d.toDateString(), s = D.sets.find(x => x.label === u.set), go = u.id ? targetOf(u.set, u.id) : null, fr = s && u.id && seenPeek(s.id, u.id);
+    const pastRow = ({ d, n, u }) => { const k = d.toDateString(), tdy = LUONNOS && k === today ? " tdy" : "", s = D.sets.find(x => x.label === u.set), go = u.id ? targetOf(u.set, u.id) : null, fr = s && u.id && seenPeek(s.id, u.id);
       const inner = `<span class="d">${k !== pk ? dl(d) : ""}</span><span class="t">${escH(n)}${fr ? '<span class="fresh" title="Uusi edellisen käyntisi jälkeen"></span>' : ""}</span><span class="p">${escH(u.period || "")}</span>`;
-      h += go ? `<li class="past"><button type="button" class="ubr" data-go="${go}" title="Siirry kuvioon">${inner}</button></li>` : `<li class="past"><div class="ubr">${inner}</div></li>`; pk = k; };
-    past.filter(x => x.d.toDateString() !== today).forEach(pastRow);   // tänään julkaistut tämän päivän viivan alle, päivämäärä vain kerran
-    h += `<li class="now" aria-label="Tänään ${dt(td)}"><span>${dl(td)}</span></li>`; pk = today;
-    past.filter(x => x.d.toDateString() === today).forEach(pastRow);
+      h += go ? `<li class="past${tdy}"><button type="button" class="ubr" data-go="${go}" title="Siirry kuvioon">${inner}</button></li>` : `<li class="past${tdy}"><div class="ubr">${inner}</div></li>`; pk = k; };
+    past.forEach(pastRow);
+    // uusi etusivu: kaksi julkaistua, ohut viiva (nyt), kaksi tulevaa; tänään julkaistut korostettuina, päivämäärä aina näkyvissä viivan yläpuolella
+    h += LUONNOS ? `<li class="sep" aria-hidden="true"></li>` : `<li class="now" aria-label="Tänään ${dt(td)}"><span>${dl(td)}</span></li>`; pk = LUONNOS ? null : today;
     fut.forEach(r => { const d = new Date(r.date), k = d.toDateString(), tm = d.toLocaleTimeString("fi-FI", { hour: "2-digit", minute: "2-digit" });
       const m = r.title.replace(/\s\d{4}(?=,|$)/, "").match(/^(.*?),\s*(?:(?:tammi|helmi|maalis|huhti|touko|kesä|heinä|elo|syys|loka|marras|joulu)kuu|\d\. (?:vuosi)?neljännes)/);
       h += `<li class="fu"><a class="ubr" href="${r.url}" target="_blank" rel="noopener" title="${escH(r.title)}"><span class="d">${k !== pk ? dl(d) : ""}</span><span class="t">${escH(m ? m[1] : r.title)}</span><span class="p tm">${tm === "08.00" ? "" : "klo " + tm.replace(".00", "")}</span></a></li>`; pk = k; });
