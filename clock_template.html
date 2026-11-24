@@ -302,7 +302,9 @@ body:has(.hero.wvon) .pgsky { display: none; } body:has(.pgsky) .topbar::after {
 body:has(.hero.wvon) #topSec > .card { border-top-color: var(--line); }   /* pehmeä siirtymä taivaasta karttaan ja luetteloon */
 /* sivun alaosa: päivä kuluu iltaan ja yöhön (vieritettäessä uusi liukuma, alatunniste yötaivaalla) */
 .ngsky { position: absolute; left: 0; right: 0; z-index: -1; pointer-events: none; display: none; }
-:root:not([data-theme="vapor"]) .ngsky { display: block; background: linear-gradient(transparent 0, #f7eee8 160px, #f2dcd2 470px, #e8c6c1 760px, #cfa3ab 860px, #4f5878 935px, #262c45 1040px, #1d2238 100%); }
+:root:not([data-theme="vapor"]) .ngsky { display: block; background: linear-gradient(transparent 0, #f7eee8 110px, #f2dcd2 320px, #e8c6c1 510px, #cfa3ab 600px, #4f5878 685px, #262c45 790px, #1d2238 100%); }
+.ngsky .ngl { position: absolute; left: 0; right: 0; top: 632px; height: 2px; background: linear-gradient(90deg, transparent, rgba(255,255,255,.75) 18%, rgba(255,255,255,.75) 82%, transparent); }   /* horisontti illan ja yön rajalla */
+.ngsky .ngd { position: absolute; top: 629px; width: 8px; height: 8px; margin-left: -4px; border-radius: 50%; background: #fff; box-shadow: 0 0 12px 6px rgba(255,255,255,.28); }   /* piste nykyvaiheen kohdalla kuten aurinko yläosassa */
 :root:not([data-theme="vapor"]) body:has(> .ngsky) { isolation: isolate; }
 :root:not([data-theme="vapor"]) footer { color: #c3c8d8; border-top-color: transparent; } :root:not([data-theme="vapor"]) footer .fh { color: #9198b2; } :root:not([data-theme="vapor"]) footer .fbrand { color: #fff; }
 :root:not([data-theme="vapor"]) footer .flinks .lnk, :root:not([data-theme="vapor"]) footer a { color: #fff; text-decoration-color: rgba(255,255,255,.35); }
@@ -2537,7 +2539,7 @@ a.ubr, button.ubr { cursor: pointer; } a.ubr:hover .t, button.ubr:hover .t { tex
       scrollTo({ top: t.getBoundingClientRect().top + scrollY - bar - 16 }); }, 120); }
   // sivuston muutokset: uudet kuviot ja muut isommat lisaykset (kasin yllapidetty, uusin ensin); set + id -> linkki kuvioon
   const CHANGES = [
-    { d: "2026-11-24", t: "Sivun alaosa liukuu iltaan, alatunniste yötaivaalla." },
+    { d: "2026-11-24", t: "Sivun alaosa liukuu iltaan, alatunniste yötaivaalla; horisonttiviivan piste nykyvaiheen kohdalla." },
     { d: "2026-11-24", t: "Vaiheen taivas ulottuu yläreunaan asti kaikilla välilehdillä, yläpalkki läpinäkyvä. Kevyemmät painikkeet ja yhtenäinen uuden tiedon merkki." },
     { d: "2026-11-24", t: "Uusi värimaailma: pastellisävyiset vaihevärit ja vaiheen mukaan vaihtuva taivas etusivulla. Petrooli-teema poistettu." },
     { d: "2026-11-24", t: "Ennusteisiin valinta: BKT:n lisäksi huoltotaseen erät ja julkisyhteisöjen rahoitusasema ennustajittain", set: "Reaalitalous" },
@@ -3564,16 +3566,18 @@ a.ubr, button.ubr { cursor: pointer; } a.ubr:hover .t, button.ubr:hover .t { tex
     b.setAttribute("aria-label", "Näytä selite"); b.innerHTML = '<svg viewBox="0 0 10 10" aria-hidden="true"><path d="M3.5 2 7 5l-3.5 3"/></svg>';
     b.onclick = () => { pn.hidden = !pn.hidden; b.setAttribute("aria-expanded", String(!pn.hidden)); b.setAttribute("aria-label", pn.hidden ? "Näytä selite" : "Piilota selite"); };
     pn.before(b); });
+  let NGU = null;   // kokonaisindikaattorin kohta aallolla (0..1) alatunnisteen pistettä varten
   { const s0 = D.sets.find(s => s.composite && s.indicators), sv = set;   // vaiheviiva yläpalkin alle: kokonaisindikaattorin nykyinen vaihe
-    if (s0) { set = s0; const p = at(comp(), defIdx(s0)); if (p) document.documentElement.style.setProperty("--phase", qcol(quad(p.l, p.c)));
+    if (s0) { set = s0; const p = at(comp(), defIdx(s0)); if (p) { document.documentElement.style.setProperty("--phase", qcol(quad(p.l, p.c))); NGU = wvU(p.l, p.c); }
       if (p && LUONNOS) { const q = quad(p.l, p.c), ps = document.createElement("div"); ps.className = "pgsky wp-" + q; ps.setAttribute("aria-hidden", "true"); document.body.prepend(ps);
         const pgTop = () => { const h = document.querySelector("header"); if (h) ps.style.top = (h.offsetHeight - 30) + "px"; }; pgTop(); addEventListener("resize", pgTop); phFavicon(q); }   // pgTop: taivas alkaa ylätunnisteen alta
       const C0 = comp(); PHMAP = {}; s0.periods.forEach((per, k) => { if (C0.level[k] != null && C0.change[k] != null) PHMAP[per] = quad(C0.level[k], C0.change[k]); }); set = sv; } }
   addEventListener("resize", () => { placeUL($("sets"), $("sets").querySelector('button[aria-pressed="true"]')); const nv = document.querySelector("#charts .secnav"); if (nv) placeUL(nv, nv.querySelector("button.on")); });
   applyHash(); renderFoot(); renderAll();
-  { const ng = document.createElement("div"); ng.className = "ngsky"; ng.setAttribute("aria-hidden", "true"); document.body.prepend(ng);   // ilta- ja yötaivas alatunnisteen taakse
-    const ngPos = () => { const f = $("foot"); if (!f) return; const r = f.getBoundingClientRect(), bs = getComputedStyle(document.body), t = r.top + scrollY - 900;
-      ng.style.top = t + "px"; ng.style.height = (r.bottom + scrollY + parseFloat(bs.paddingBottom) + parseFloat(bs.marginBottom) - t) + "px"; };
+  { const ng = document.createElement("div"); ng.className = "ngsky"; ng.setAttribute("aria-hidden", "true"); ng.innerHTML = '<div class="ngl"></div>' + (NGU != null ? '<div class="ngd"></div>' : ""); document.body.prepend(ng);   // ilta- ja yötaivas alatunnisteen taakse
+    const ngPos = () => { const f = $("foot"); if (!f) return; const r = f.getBoundingClientRect(), bs = getComputedStyle(document.body), t = r.top + scrollY - 650;
+      ng.style.top = t + "px"; ng.style.height = (r.bottom + scrollY + parseFloat(bs.paddingBottom) + parseFloat(bs.marginBottom) - t) + "px";
+      const d = ng.querySelector(".ngd"); if (d) d.style.left = (r.left + NGU * r.width) + "px"; };
     ngPos(); addEventListener("resize", ngPos); if (window.ResizeObserver) new ResizeObserver(ngPos).observe(document.body); }
   if (document.fonts && document.fonts.ready) document.fonts.ready.then(() => { if (set.growth && set.view === "charts") drawCharts(); goCard(); }); else goCard();   // fontin latauksen jalkeen korkeudet uudelleen
 })();
