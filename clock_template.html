@@ -304,6 +304,23 @@ body:has(.hero.wvon) .topbar::after { display: none; }
 body:has(> .pgsky) { isolation: isolate; }   /* taivas body-taustan päälle mutta sisällön alle */
 body:has(.hero.wvon) .pgsky { display: none; } body:has(.pgsky) .topbar::after { display: none; }
 body:has(.hero.wvon) #topSec > .card { border-top-color: var(--line); }   /* pehmeä siirtymä taivaasta karttaan ja luetteloon */
+/* luonnos ?luonnos: kylläinen vaihetaivas (tumma yläosa, vaalea keskikohta, vastakkainen sävy horisontissa) ja sisältö valkoisina kortteina */
+:root.lu2:not([data-theme="vapor"]) .wp-rec { --g1: #3d5aa8; --g2: #8fa3d8; --g3: #f6e8e2; --g4: #f2b598; --g5: #fbeee6; --wvG: #fff4ec; --wvGp: 60%; }
+:root.lu2:not([data-theme="vapor"]) .wp-up { --g1: #2f86c0; --g2: #97cbe6; --g3: #f3f9f8; --g4: #a3d4c2; --g5: #e9f4ef; --wvG: #ffffff; --wvGp: 70%; }
+:root.lu2:not([data-theme="vapor"]) .wp-turn { --g1: #dc7448; --g2: #eeaa85; --g3: #f6e2d4; --g4: #aed2de; --g5: #e5f0f4; --wvG: #ffffff; --wvGp: 55%; }
+:root.lu2:not([data-theme="vapor"]) .wp-down { --g1: #b0503f; --g2: #d9927f; --g3: #eedfdb; --g4: #8d9dc1; --g5: #e3e7f0; --wvG: #ffe6dc; --wvGp: 50%; }
+:root.lu2:not([data-theme="vapor"]) .wvsky { height: calc(var(--wvH, 0px) + 300px); -webkit-mask-image: linear-gradient(#000 80%, transparent); mask-image: linear-gradient(#000 80%, transparent); }
+:root.lu2:not([data-theme="vapor"]) .wvsky > .wsl { background: linear-gradient(var(--g1) 0, var(--g2) calc(var(--wvH, 300px) * .5), var(--g3) calc(var(--wvH, 300px) * .8), var(--g4) calc(var(--wvH, 300px) + 70px), var(--g5) calc(var(--wvH, 300px) + 210px), var(--bg) calc(var(--wvH, 300px) + 300px)); }
+:root.lu2:not([data-theme="vapor"]) .wvsky::after { bottom: 299px; background: #fff; opacity: .75; }
+:root.lu2:not([data-theme="vapor"]) .hero.wvon .hsum .phl { color: rgba(255,255,255,.88); } :root.lu2:not([data-theme="vapor"]) .hero.wvon .hsum .phb b { color: #fff; } :root.lu2:not([data-theme="vapor"]) .hero.wvon .hsum .phb em { color: rgba(255,255,255,.92); font-weight: 600; }
+:root.lu2:not([data-theme="vapor"]) .hero.wvon .hsum { text-shadow: 0 1px 12px rgba(60,30,20,.12); }
+@media (min-width: 700px) { :root.lu2:not([data-theme="vapor"]) .hero.wvon .ubox, :root.lu2:not([data-theme="vapor"]) .hero.wvon .ubox * { color: rgba(255,255,255,.94); border-color: rgba(255,255,255,.45); } :root.lu2:not([data-theme="vapor"]) .hero.wvon .ubox { text-shadow: 0 1px 3px rgba(40,30,30,.22); } }
+:root.lu2:not([data-theme="vapor"]) .wv .wvc { stroke: #fff; stroke-opacity: .95; filter: drop-shadow(0 1px 2px rgba(40,40,60,.22)); } :root.lu2:not([data-theme="vapor"]) .wv .wvc:not(.hi) { stroke-opacity: .55; }
+:root.lu2:not([data-theme="vapor"]) .wv .wvq > rect:first-child { stroke: #fff; stroke-width: 1.4px; vector-effect: non-scaling-stroke; }
+:root.lu2:not([data-theme="vapor"]) .wv .wvh { fill: #fff; opacity: .4; } :root.lu2:not([data-theme="vapor"]) .wv .wvph { stroke: #fff; stroke-opacity: .55; }
+:root.lu2:not([data-theme="vapor"]) .pgsky { opacity: .9; background: linear-gradient(var(--g2), var(--g3) 60%, var(--bg)); }
+:root.lu2:not([data-theme="vapor"]) .wrap > section.card, :root.lu2:not([data-theme="vapor"]) #topSec > .card { background: #fff; border: 0; border-radius: 22px; box-shadow: 0 12px 40px rgba(30,40,60,.07); padding: 18px 22px; }
+:root.lu2:not([data-theme="vapor"]) #topSec { position: relative; z-index: 1; }
 :root:not([data-theme="vapor"]) .wv .wvt { fill: color-mix(in srgb, var(--sun) 70%, #8a5200); }   /* jälki erottuu vaaleaa taivasta vasten */
 .wv .wvh { fill: var(--sun); opacity: .18; }
 .wv .wvd { fill: var(--sun); stroke: var(--wvSr); }
@@ -1144,6 +1161,7 @@ a.ubr, button.ubr { cursor: pointer; } a.ubr:hover .t, button.ubr:hover .t { tex
   const qcol = q => `var(${Q[q].v})`;
   /* ---------- liike (pois, jos käyttäjä on vähentänyt liikettä) ---------- */
   const RMQ = matchMedia("(prefers-reduced-motion: reduce)"), motion = () => !RMQ.matches;
+  if (new URLSearchParams(location.search).has("luonnos")) document.documentElement.classList.add("lu2");   // ?luonnos: uusi taivas ja kortit kokeiltavaksi
   const LUONNOS = !new URLSearchParams(location.search).has("vanha"),   /* suhdanneaalto käyttöön 24.11.2026; ?vanha näyttää edellisen etusivun */ VAIHEET = new URLSearchParams(location.search).has("vaiheet"); let PHMAP = null;   // luonnos (?luonnos): kokonaisindikaattorin laskuvaiheiden varjostus aikasarjoihin, ei vielä käytössä
   const ANIM = new Map();                                            // kerran animoidut: näkymä + kortin otsikko -> "done" tai "pend" (odottaa vieritystä; uudelleenpiirretty kortti perii tilan)
   let rvIO = null, animQ = 0;
