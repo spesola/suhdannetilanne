@@ -846,6 +846,87 @@ curve_data <- function(c) {
          list(label = r$label, date = r$row$date, values = round(unname(unlist(r$row[unlist(c$maturities)])), 4))))
 }
 
+# ---------------------------------------------------------------------
+# Ennustetaulukko (series.json: forecast.table): huoltotase, alijaama, tyottomyys ja inflaatio ennustajittain.
+# Kotimaiset ennusteet kasin julkaistuista taulukoista; komissio (AMECO), OECD (Economic Outlook) ja IMF (WEO) rajapinnoista.
+# Toteutunut vuosi Tilastokeskukselta. Puuttuva arvo jaa puuttuvaksi (ei arvioita).
+# ---------------------------------------------------------------------
+FC_VARS_AMECO <- list(bkt = c("AMECO_CHAPTER06-01", "OVGD", "0", "g"), yks = c("AMECO_CHAPTER02-01", "OCPH", "0", "g"), julk = c("AMECO_CHAPTER02-05", "OCTG", "0", "g"),
+  inv = c("AMECO_CHAPTER03-01", "OIGT", "0", "g"), vienti = c("AMECO_CHAPTER09-01", "OXGS", "0", "g"), tuonti = c("AMECO_CHAPTER09-02", "OMGS", "0", "g"),
+  rah = c("AMECO_CHAPTER16-03", "UBLG", "319", "l"), tyott = c("AMECO_CHAPTER01-03", "ZUTN", "0", "l"), ykhi = c("AMECO_CHAPTER02-04", "ZCPIH", "0", "g"))
+fc_ameco <- function(ys) {
+  upd <- NULL
+  v <- lapply(FC_VARS_AMECO, function(a) {
+    x <- fromJSON(get_text(paste0(AMECO_API, a[1], "?lang=EN&ref_area=FIN&item=", a[2], "&unit=", a[3], "&transformation=1")), simplifyVector = FALSE)
+    upd <<- substr(x$updated, 1, 10)
+    ids <- unlist(x$id); sz <- unlist(x$size); tp <- names(x$dimension$TIME_PERIOD$category$index); TT <- length(tp)
+    cat <- lapply(ids, function(k) names(x$dimension[[k]]$category$index)); names(cat) <- ids
+    blk <- list(); for (k in names(x$value)) { i <- as.integer(k); b <- i %/% TT; blk[[as.character(b)]][[tp[i %% TT + 1]]] <- as.numeric(x$value[[k]]) }
+    ref0 <- NULL                                                    # yhdistelma, jossa REFERENCE = 0 (ei vertailua muihin maihin)
+    for (b in names(blk)) { rem <- as.integer(b); comb <- list()
+      for (j in rev(seq_len(length(ids) - 1))) { comb[[ids[j]]] <- cat[[ids[j]]][rem %% sz[j] + 1]; rem <- rem %/% sz[j] }
+      if (identical(comb$REFERENCE, "0")) { ref0 <- blk[[b]]; break } }
+    if (is.null(ref0)) ref0 <- blk[[1]]
+    vapply(ys, function(y) { a1 <- ref0[[as.character(y)]]; a0 <- ref0[[as.character(y - 1)]]
+      if (is.null(a1)) NA_real_ else if (a[4] == "l") a1 else if (is.null(a0)) NA_real_ else 100 * (a1 / a0 - 1) }, 0) })
+  list(v = v, vintage = upd)
+}
+fc_oecd <- function(ys) {
+  ms <- c(bkt = "GDPV_ANNPCT", yks = "CPV_ANNPCT", julk = "CGV_ANNPCT", inv = "ITV_ANNPCT", vienti = "XGSV_ANNPCT", tuonti = "MGSV_ANNPCT", rah = "NLGQ", tyott = "UNR", ykhi = "CPIH_YTYPCT")
+  x <- read.csv(text = get_text(sprintf("https://sdmx.oecd.org/public/rest/data/OECD.ECO.MAD,DSD_EO@DF_EO,/FIN.%s.A?startPeriod=%d&endPeriod=%d&format=csvfile",
+                                        paste(ms, collapse = "+"), min(ys), max(ys))), stringsAsFactors = FALSE)
+  df <- get_text("https://sdmx.oecd.org/public/rest/dataflow/OECD.ECO.MAD/DSD_EO@DF_EO/latest")
+  vin <- regmatches(df, regexpr("Economic Outlook [0-9]+", df))
+  v <- lapply(ms, function(m) vapply(ys, function(y) { z <- x$OBS_VALUE[x$MEASURE == m & x$TIME_PERIOD == y]; if (length(z)) as.numeric(z[1]) else NA_real_ }, 0))
+  list(v = v, vintage = if (length(vin)) vin else NULL)
+}
+fc_imf <- function(ys) {
+  ms <- c(bkt = "NGDP_RPCH", rah = "GGXCNL_NGDP", tyott = "LUR", ykhi = "PCPIPCH")
+  v <- lapply(ms, function(m) { x <- fromJSON(get_text(sprintf("https://www.imf.org/external/datamapper/api/v1/%s/FIN", m)), simplifyVector = FALSE)
+    f <- x$values[[m]]$FIN; vapply(ys, function(y) { z <- f[[as.character(y)]]; if (is.null(z)) NA_real_ else as.numeric(z) }, 0) })
+  ind <- fromJSON(get_text("https://www.imf.org/external/datamapper/api/v1/indicators"), simplifyVector = FALSE)
+  list(v = v, vintage = ind$indicators$NGDP_RPCH$source)
+}
+fc_actual <- function(y) {                                           # toteutunut vuosi Tilastokeskukselta
+  g <- function(code) { d <- fetch_series(list(id = paste0("fca_", code), source = "statfin", table = "ntp/132h.px", pick = list(taloustoimi_1_20180101 = code, contentscode = "tasmvv2015")))
+    s <- tapply(d$value, substr(d$date, 1, 4), function(v) if (sum(!is.na(v)) == 4) sum(v) else NA); a1 <- s[as.character(y)]; a0 <- s[as.character(y - 1)]
+    if (is.na(a1) || is.na(a0)) NA_real_ else unname(100 * (a1 / a0 - 1)) }
+  out <- list(bkt = g("B1GMH"), yks = g("P3KS14_S15"), julk = g("P3KS13"), inv = g("P51K"), vienti = g("P6K"), tuonti = g("P7R"))
+  nl <- Filter(function(x) x$id == "x_nl_s13", cfg$series)
+  out$rah <- tryCatch({ d <- fetch_series(nl[[1]]); v <- d$value[d$date == paste0(y, "-Q4")]; if (length(v)) v else NA_real_ }, error = function(e) NA_real_)
+  pxy <- function(table, sel, y) {                                    # vuositaulukko (aikamuuttuja timeperiod_y): yksi arvo suoraan
+    q <- list(query = c(lapply(names(sel), function(k) list(code = k, selection = list(filter = "item", values = list(sel[[k]])))),
+                        list(list(code = "timeperiod_y", selection = list(filter = "item", values = list(as.character(y)))))), response = list(format = "json-stat2"))
+    r <- RETRY("POST", paste0(STATFIN, table), body = toJSON(q, auto_unbox = TRUE), content_type_json(), timeout(40), times = 5, pause_base = 5, pause_min = 11, quiet = TRUE)
+    stop_for_status(r); x <- fromJSON(content(r, "text", encoding = "UTF-8"), simplifyVector = FALSE); v <- x$value[[1]]; if (is.null(v)) NA_real_ else as.numeric(v) }
+  out$tyott <- tryCatch(pxy("tyti/15bm.px", list(sukupuoli_9_20180101 = "SSS", syntypera_101_20180101 = "SSS", contentscode = "tyti-Tyottomyysaste"), y), error = function(e) NA_real_)
+  out$khi <- tryCatch(pxy("khi/122q.px", list(contentscode = "Vuosimuutos"), y), error = function(e) NA_real_)
+  out$ykhi <- tryCatch({ d <- fetch_series(list(id = "fca_ykhi", source = "statfin", table = "khi/15b7.px", pick = list(coicop_46_20231201 = "SSS", contentscode = "ip_ykhi")))
+    a1 <- d$value[substr(d$date, 1, 4) == as.character(y)]; a0 <- d$value[substr(d$date, 1, 4) == as.character(y - 1)]
+    if (length(a1) == 12 && length(a0) == 12) 100 * (mean(a1) / mean(a0) - 1) else NA_real_ }, error = function(e) NA_real_)   # vuosikeskiarvojen muutos
+  lapply(out, function(v) if (is.na(v)) NULL else round(v, 2))
+}
+fc_table <- function(T) {
+  ys <- unlist(T$years); vf <- file.path(CACHE_DIR, "fc_auto.json"); dir.create(CACHE_DIR, showWarnings = FALSE)
+  seen <- if (file.exists(vf)) fromJSON(vf, simplifyVector = FALSE) else list()
+  rows <- T$rows
+  for (a in T$auto) {
+    f <- switch(a$src, ameco = fc_ameco, oecd = fc_oecd, imf = fc_imf); cf <- file.path(CACHE_DIR, paste0("fc_", a$src, ".json"))
+    r <- tryCatch(f(ys), error = function(e) { message("  VAROITUS ennuste ", a$src, ": ", conditionMessage(e)); NULL })
+    if (is.null(r) && file.exists(cf)) r <- fromJSON(cf, simplifyVector = FALSE)
+    if (is.null(r)) next
+    write(toJSON(r, auto_unbox = TRUE, digits = NA, null = "null", na = "null"), cf)
+    vin <- if (is.null(r$vintage)) "" else as.character(r$vintage)
+    dt <- if (identical(vin, a$vintage)) a$date else if (!is.null(seen[[a$src]]) && identical(seen[[a$src]]$vintage, vin)) seen[[a$src]]$date else format(Sys.Date())   # uusi ennustekierros: havaintopaiva
+    seen[[a$src]] <- list(vintage = vin, date = dt)
+    vv <- lapply(r$v, function(x) lapply(unlist(x), function(z) if (is.null(z) || is.na(z)) NULL else round(as.numeric(z), 2)))
+    rows[[length(rows) + 1]] <- list(who = a$who, date = dt, url = a$url, auto = TRUE, v = vv)
+  }
+  write(toJSON(seen, auto_unbox = TRUE), vf)
+  T$rows <- rows; T$actual <- tryCatch(fc_actual(T$ay), error = function(e) { message("  VAROITUS ennusteen toteuma: ", conditionMessage(e)); NULL })
+  T$auto <- NULL; T
+}
+
 for (set in cfg$sets) {
   freq <- set$freq
   members <- Filter(function(s) identical(s$set, set$id) && !isFALSE(s$enabled) && !isTRUE(s$tile) && !isTRUE(s$contrib) && is.null(s$decomp) && !isTRUE(s$validation) && !isTRUE(s$chart_only) && !isTRUE(s$table_only), cfg$series)
@@ -1001,6 +1082,7 @@ for (set in cfg$sets) {
       fc$actual <- list(years = as.integer(names(g)), values = round(unname(as.numeric(g)), 2))
       nd <- max(as.Date(vapply(fc$rows, function(r) r$date, "")))
       if (as.numeric(Sys.Date() - nd) > 60) CHECKS <- c(CHECKS, sprintf("BKT-ennusteet: uusin ennuste %s, päivitä series.json", format(nd, "%d.%m.%Y")))
+      if (!is.null(fc$table)) fc$table <- fc_table(fc$table)
     }
     mper <- NULL; mser_out <- NULL
     if (length(mser)) {

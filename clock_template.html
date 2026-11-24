@@ -765,6 +765,19 @@ tr.pick:hover th.rl .ego, tr.pick:focus-visible th.rl .ego { opacity: 1; }
 .grmore.eraopen > .fgrid { margin-top: 0; }
 .fcsec .fcard.tt { grid-column: 1 / span 4; }
 .fcsec .tcard { grid-column: 5 / span 2; }
+.fcsec .fctab { grid-column: 1 / -1; }
+.fctab .fhead { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; }
+.fctw { overflow-x: auto; margin-top: 8px; }
+.fctw table { width: 100%; border-collapse: collapse; font-size: 0.8125rem; font-variant-numeric: tabular-nums; white-space: nowrap; }
+.fctw th, .fctw td { padding: 6px 8px; text-align: right; border-bottom: 1px solid var(--line); }
+.fctw tbody th { text-align: left; font-weight: 500; position: sticky; left: 0; background: var(--surface); padding-left: 0; }
+.fctw thead th { font-weight: 600; font-size: 0.75rem; vertical-align: bottom; }
+.fctw thead th span { display: block; font-weight: 400; color: var(--muted); font-size: 0.6875rem; }
+.fctw thead th a { color: inherit; text-decoration: none; } .fctw thead th a:hover { text-decoration: underline; }
+.fctw .ac { color: var(--muted); } .fctw .md { font-weight: 700; color: var(--accent); background: color-mix(in srgb, var(--accent) 6%, transparent); }
+.fctw .old { opacity: .45; }
+@media (max-width: 600px) { .fctw tbody th { white-space: normal; min-width: 7.5em; max-width: 8.5em; line-height: 1.3; } .fctw th, .fctw td { padding: 6px 5px; } .fctw thead th { white-space: normal; } }   /* puhelimessa nimet rivittyvät, jotta mediaani näkyy heti */
+.fctw tr.grp th { font-size: 0.6875rem; font-weight: 600; letter-spacing: .06em; text-transform: uppercase; color: var(--muted); padding-top: 14px; border-bottom: 0; }
 @media (max-width: 980px) { .fcsec .fcard.tt, .fcsec .tcard { grid-column: 1 / -1; } }
 .snap.fct th, .snap.fct td { padding-top: 4px; padding-bottom: 4px; }
 .snap.fct thead th:nth-child(3), .snap.fct tbody td:nth-child(3) { display: table-cell; }
@@ -2269,6 +2282,31 @@ a.ubr, button.ubr { cursor: pointer; } a.ubr:hover .t, button.ubr:hover .t { tex
       (F.src_url ? `<p class="fnote"><a href="${F.src_url}" target="_blank" rel="noopener">Finanssialan ennustekoonti</a></p>` : "");
     box.appendChild(tc);
     menuize(card);
+    if (F.table) renderFcTable(F.table, box);
+  }
+  // ennustetaulukko: huoltotase, alijäämä, työttömyys ja inflaatio ennustajittain; valittu vuosi, mediaani tuoreista ennusteista
+  let fcYear = 0;
+  function renderFcTable(T, box) {
+    const SH = { "Valtiovarainministeriö": "VM", "Suomen Pankki": "SP", "Euroopan komissio": "Komissio" }, sh = w => SH[w] || w;
+    const now = new Date(), old = r => (now - new Date(r.date)) / 864e5 > (T.max_age || 120);
+    const rows = [...T.rows].sort((a, b) => (old(a) - old(b)) || (!!a.auto - !!b.auto) || (a.date < b.date ? 1 : -1));
+    const k = Math.min(fcYear, T.years.length - 1), Y = T.years[k], A = T.actual || {};
+    const f1 = v => v == null ? "" : (Math.round(v * 10) / 10).toFixed(1).replace(".", ",").replace(/^-/, "−");
+    const med = a => { const b = a.filter(x => x != null).sort((x, y) => x - y), n = b.length; return n ? (n % 2 ? b[(n - 1) / 2] : (b[n / 2 - 1] + b[n / 2]) / 2) : null; };
+    const dd = d => `${+d.slice(8, 10)}.${+d.slice(5, 7)}.`;
+    const c = document.createElement("div"); c.className = "card fcard fctab";
+    let h = `<div class="fhead"><h3>${T.title}</h3><div class="mini" role="group" aria-label="Ennustevuosi">${T.years.map((y, i) => `<button type="button" data-k="${i}" aria-pressed="${i === k}">${y}</button>`).join("")}</div></div>`;
+    h += `<div class="fctw"><table><thead><tr><th></th><th class="ac">Toteutunut<span>${T.ay}</span></th><th class="md">Mediaani<span>${Y}</span></th>` +
+      rows.map(r => `<th class="${old(r) ? "old" : ""}" title="${escH(r.who)}, julkaistu ${dd(r.date)}${r.date.slice(0, 4)}${old(r) ? " (yli neljä kuukautta vanha, ei mediaanissa)" : ""}">${r.url ? `<a href="${r.url}" target="_blank" rel="noopener">${sh(r.who)}</a>` : sh(r.who)}<span>${dd(r.date)}</span></th>`).join("") + `</tr></thead><tbody>`;
+    T.vars.forEach(v => {
+      if (v.grp) h += `<tr class="grp"><th colspan="${rows.length + 3}">${v.grp}</th></tr>`;
+      const vals = rows.map(r => { const x = r.v[v.k]; return x == null ? null : Array.isArray(x) ? x[k] : null; });
+      const m = med(vals.filter((x, i) => !old(rows[i]))), sp = vals.filter((x, i) => x != null && !old(rows[i]));
+      h += `<tr><th>${v.label}</th><td class="ac">${f1(A[v.k])}</td><td class="md" title="${sp.length ? `${sp.length} ennustetta, vaihteluväli ${f1(Math.min(...sp))}…${f1(Math.max(...sp))}` : ""}">${f1(m)}</td>` +
+        vals.map((x, i) => `<td class="${old(rows[i]) ? "old" : ""}">${f1(x)}</td>`).join("") + `</tr>`; });
+    h += `</tbody></table></div><p class="fnote">${T.note || ""} Toteutunut: Tilastokeskus.</p>`;
+    c.innerHTML = h; box.appendChild(c);
+    c.querySelectorAll(".fhead .mini button").forEach(b => b.onclick = () => { fcYear = +b.dataset.k; c.remove(); renderFcTable(T, box); });
   }
 
   /* ---------- markkinaruudut: paivittaiset sarjat ---------- */
@@ -2487,6 +2525,7 @@ a.ubr, button.ubr { cursor: pointer; } a.ubr:hover .t, button.ubr:hover .t { tex
       scrollTo({ top: t.getBoundingClientRect().top + scrollY - bar - 16 }); }, 120); }
   // sivuston muutokset: uudet kuviot ja muut isommat lisaykset (kasin yllapidetty, uusin ensin); set + id -> linkki kuvioon
   const CHANGES = [
+    { d: "2026-11-24", t: "BKT:n ennusteiden alle talousennustetaulukko: huoltotase, julkisyhteisöjen rahoitusasema, työttömyys ja inflaatio kahdeksalta ennustajalta", set: "Reaalitalous" },
     { d: "2026-11-24", t: "Uusi etusivu: suhdanneaalto, jossa aurinko kuvaa kokonaisindikaattoria ja taivas suhdannevaihetta" },
     { d: "2026-11-24", t: "Työttömyyden erittelyyn pitkäaikaistyöttömyys (yli vuoden ja yli kaksi vuotta työttömänä olleet)" },
     { d: "2026-11-24", t: "Suhdannekartan kulku pehmeänä käyränä pisteen värissä" },

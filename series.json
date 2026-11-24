@@ -1474,6 +1474,15 @@
         "src_url": "https://finanssiala.fi/en/publications/latest-forecasts-for-the-finnish-economy",
         "rows": [
           {
+            "who": "Euroopan komissio",
+            "date": "2026-11-17",
+            "v": [
+              1.6,
+              1.6
+            ],
+            "url": "https://www.sttinfo.fi/tiedote/72510420/syksyn-2026-talousennuste-eun-talouskasvu-jatkuu-kiihtyneesta-inflaatiosta-huolimatta-suomen-talouskasvu-on-piristynyt?publisherId=66001268"
+          },
+          {
             "who": "OP",
             "date": "2026-10-14",
             "v": [
@@ -1615,16 +1624,287 @@
               0.8,
               1.2
             ]
-          },
-          {
-            "who": "Euroopan komissio",
-            "date": "2026-05-21",
-            "v": [
-              0.8,
-              1.4
-            ]
           }
-        ]
+        ],
+        "table": {
+          "title": "Talousennusteet",
+          "years": [
+            2026,
+            2027
+          ],
+          "ay": 2025,
+          "max_age": 120,
+          "vars": [
+            {
+              "k": "bkt",
+              "label": "BKT",
+              "grp": "Volyymin muutos, %"
+            },
+            {
+              "k": "yks",
+              "label": "Yksityinen kulutus"
+            },
+            {
+              "k": "julk",
+              "label": "Julkinen kulutus"
+            },
+            {
+              "k": "inv",
+              "label": "Investoinnit"
+            },
+            {
+              "k": "vienti",
+              "label": "Vienti"
+            },
+            {
+              "k": "tuonti",
+              "label": "Tuonti"
+            },
+            {
+              "k": "rah",
+              "label": "Julkisyhteisöjen rahoitusasema, % BKT:sta",
+              "grp": "Muut"
+            },
+            {
+              "k": "tyott",
+              "label": "Työttömyysaste, %"
+            },
+            {
+              "k": "khi",
+              "label": "Inflaatio, KHI, %"
+            },
+            {
+              "k": "ykhi",
+              "label": "Inflaatio, YKHI, %"
+            }
+          ],
+          "rows": [
+            {
+              "who": "Valtiovarainministeriö",
+              "date": "2026-09-21",
+              "url": "https://urn.fi/URN:ISBN:978-952-367-415-8",
+              "v": {
+                "bkt": [
+                  1.6,
+                  1.8
+                ],
+                "yks": [
+                  1.1,
+                  1.6
+                ],
+                "julk": [
+                  -0.4,
+                  0.1
+                ],
+                "inv": [
+                  7.8,
+                  4.4
+                ],
+                "vienti": [
+                  2.1,
+                  1.6
+                ],
+                "tuonti": [
+                  4.0,
+                  1.7
+                ],
+                "rah": [
+                  -4.2,
+                  -4.5
+                ],
+                "tyott": [
+                  10.3,
+                  9.9
+                ],
+                "khi": [
+                  2.0,
+                  1.9
+                ],
+                "ykhi": [
+                  2.5,
+                  1.4
+                ]
+              }
+            },
+            {
+              "who": "Suomen Pankki",
+              "date": "2026-09-15",
+              "url": "https://www.eurojatalous.fi/artikkeli/ennuste/2026/suomen-talouden-hyva-vire-jatkuu/",
+              "v": {
+                "bkt": [
+                  1.7,
+                  1.6
+                ],
+                "tyott": [
+                  10.4,
+                  9.8
+                ],
+                "ykhi": [
+                  2.4,
+                  1.4
+                ]
+              },
+              "note": "Väliennuste: vain BKT, työttömyys ja inflaatio."
+            },
+            {
+              "who": "Etla",
+              "date": "2026-09-17",
+              "url": "https://www.etla.fi/wp-content/uploads/Etla-Suhdanne-Ennuste-Syksy-2026.pdf",
+              "v": {
+                "bkt": [
+                  1.7,
+                  1.9
+                ],
+                "yks": [
+                  1.3,
+                  1.4
+                ],
+                "julk": [
+                  0.6,
+                  0.3
+                ],
+                "inv": [
+                  5.4,
+                  9.1
+                ],
+                "vienti": [
+                  3.7,
+                  3.0
+                ],
+                "tuonti": [
+                  5.4,
+                  5.6
+                ],
+                "rah": [
+                  -3.8,
+                  -4.1
+                ],
+                "tyott": [
+                  10.5,
+                  10.0
+                ],
+                "khi": [
+                  2.0,
+                  2.1
+                ]
+              }
+            },
+            {
+              "who": "PTT",
+              "date": "2026-09-10",
+              "url": "https://www.ptt.fi/suomen-talous-kasvaa-mutta-kasvun-jatkuvuus-on-hataralla-pohjalla/",
+              "v": {
+                "bkt": [
+                  1.4,
+                  1.5
+                ],
+                "yks": [
+                  0.8,
+                  0.7
+                ],
+                "julk": [
+                  -0.2,
+                  0.0
+                ],
+                "inv": [
+                  5.5,
+                  3.8
+                ],
+                "vienti": [
+                  4.9,
+                  4.1
+                ],
+                "tuonti": [
+                  7.0,
+                  4.0
+                ],
+                "rah": [
+                  -4.2,
+                  -4.4
+                ],
+                "tyott": [
+                  10.4,
+                  9.9
+                ],
+                "khi": [
+                  1.7,
+                  1.9
+                ],
+                "ykhi": [
+                  2.3,
+                  1.9
+                ]
+              }
+            },
+            {
+              "who": "Labore",
+              "date": "2026-09-17",
+              "url": "https://labore.fi/wp-content/uploads/2026/09/Ennuste170926.pdf",
+              "v": {
+                "bkt": [
+                  1.7,
+                  1.6
+                ],
+                "yks": [
+                  1.3,
+                  1.5
+                ],
+                "julk": [
+                  0.2,
+                  -0.6
+                ],
+                "inv": [
+                  4.5,
+                  4.3
+                ],
+                "vienti": [
+                  4.7,
+                  2.5
+                ],
+                "tuonti": [
+                  5.0,
+                  2.3
+                ],
+                "rah": [
+                  -3.8,
+                  -4.2
+                ],
+                "tyott": [
+                  10.4,
+                  9.8
+                ],
+                "khi": [
+                  1.9,
+                  2.2
+                ]
+              }
+            }
+          ],
+          "auto": [
+            {
+              "who": "Euroopan komissio",
+              "src": "ameco",
+              "date": "2026-11-17",
+              "vintage": "2026-11-17",
+              "url": "https://economy-finance.ec.europa.eu/economic-surveillance-eu-member-states/country-pages-including-country-reports/finland/economic-forecast-finland_en"
+            },
+            {
+              "who": "OECD",
+              "src": "oecd",
+              "date": "2026-06-03",
+              "vintage": "Economic Outlook 119",
+              "url": "https://www.oecd.org/en/topics/sub-issues/economic-outlook.html"
+            },
+            {
+              "who": "IMF",
+              "src": "imf",
+              "date": "2026-10-12",
+              "vintage": "World Economic Outlook (October 2026)",
+              "url": "https://www.imf.org/external/datamapper/profile/FIN"
+            }
+          ],
+          "note": "Inflaatio: KHI = kansallinen kuluttajahintaindeksi, YKHI = yhdenmukaistettu kuluttajahintaindeksi; ennustajat julkaisevat eri indeksejä. Tyhjä solu: ennustaja ei julkaise erää. Komission, OECD:n ja IMF:n luvut haetaan rajapinnoista ja pyöristetään yhteen desimaaliin. Yli neljä kuukautta vanhat ennusteet himmeinä eivätkä mukana mediaanissa."
+        }
       },
       "detail": {
         "bkt_kulutus": {
