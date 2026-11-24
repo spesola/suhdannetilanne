@@ -1627,7 +1627,6 @@
           }
         ],
         "table": {
-          "title": "Talousennusteet",
           "years": [
             2026,
             2027
@@ -1637,8 +1636,7 @@
           "vars": [
             {
               "k": "bkt",
-              "label": "BKT",
-              "grp": "Volyymin muutos, %"
+              "label": "BKT"
             },
             {
               "k": "yks",
@@ -1662,20 +1660,9 @@
             },
             {
               "k": "rah",
-              "label": "Julkisyhteisöjen rahoitusasema, % BKT:sta",
-              "grp": "Muut"
-            },
-            {
-              "k": "tyott",
-              "label": "Työttömyysaste, %"
-            },
-            {
-              "k": "khi",
-              "label": "Inflaatio, KHI, %"
-            },
-            {
-              "k": "ykhi",
-              "label": "Inflaatio, YKHI, %"
+              "label": "Julkinen alijäämä",
+              "t": "Julkisyhteisöjen rahoitusasema: toteutunut ja ennusteet",
+              "unit": "% BKT:sta"
             }
           ],
           "rows": [
@@ -1711,40 +1698,8 @@
                 "rah": [
                   -4.2,
                   -4.5
-                ],
-                "tyott": [
-                  10.3,
-                  9.9
-                ],
-                "khi": [
-                  2.0,
-                  1.9
-                ],
-                "ykhi": [
-                  2.5,
-                  1.4
                 ]
               }
-            },
-            {
-              "who": "Suomen Pankki",
-              "date": "2026-09-15",
-              "url": "https://www.eurojatalous.fi/artikkeli/ennuste/2026/suomen-talouden-hyva-vire-jatkuu/",
-              "v": {
-                "bkt": [
-                  1.7,
-                  1.6
-                ],
-                "tyott": [
-                  10.4,
-                  9.8
-                ],
-                "ykhi": [
-                  2.4,
-                  1.4
-                ]
-              },
-              "note": "Väliennuste: vain BKT, työttömyys ja inflaatio."
             },
             {
               "who": "Etla",
@@ -1778,14 +1733,6 @@
                 "rah": [
                   -3.8,
                   -4.1
-                ],
-                "tyott": [
-                  10.5,
-                  10.0
-                ],
-                "khi": [
-                  2.0,
-                  2.1
                 ]
               }
             },
@@ -1821,18 +1768,6 @@
                 "rah": [
                   -4.2,
                   -4.4
-                ],
-                "tyott": [
-                  10.4,
-                  9.9
-                ],
-                "khi": [
-                  1.7,
-                  1.9
-                ],
-                "ykhi": [
-                  2.3,
-                  1.9
                 ]
               }
             },
@@ -1868,14 +1803,6 @@
                 "rah": [
                   -3.8,
                   -4.2
-                ],
-                "tyott": [
-                  10.4,
-                  9.8
-                ],
-                "khi": [
-                  1.9,
-                  2.2
                 ]
               }
             }
@@ -1903,7 +1830,9 @@
               "url": "https://www.imf.org/external/datamapper/profile/FIN"
             }
           ],
-          "note": "Inflaatio: KHI = kansallinen kuluttajahintaindeksi, YKHI = yhdenmukaistettu kuluttajahintaindeksi; ennustajat julkaisevat eri indeksejä. Tyhjä solu: ennustaja ei julkaise erää. Komission, OECD:n ja IMF:n luvut haetaan rajapinnoista ja pyöristetään yhteen desimaaliin. Yli neljä kuukautta vanhat ennusteet himmeinä eivätkä mukana mediaanissa."
+          "note": "Ennusteiden keskiarvo ja vaihteluväli alle neljä kuukautta vanhoista ennusteista. Komission, OECD:n ja IMF:n luvut haetaan rajapinnoista. Kaikki ennustajat eivät julkaise kaikkia eriä. Lähteet: Tilastokeskus, ennustelaitokset.",
+          "from": 2019,
+          "note_rah": "Julkisyhteisöjen rahoitusasema (alijäämä negatiivinen), % BKT:sta. Ennusteiden keskiarvo ja vaihteluväli alle neljä kuukautta vanhoista ennusteista. Lähteet: Tilastokeskus, ennustelaitokset."
         }
       },
       "detail": {

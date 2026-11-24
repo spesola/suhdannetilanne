@@ -887,24 +887,16 @@ fc_imf <- function(ys) {
   ind <- fromJSON(get_text("https://www.imf.org/external/datamapper/api/v1/indicators"), simplifyVector = FALSE)
   list(v = v, vintage = ind$indicators$NGDP_RPCH$source)
 }
-fc_actual <- function(y) {                                           # toteutunut vuosi Tilastokeskukselta
+fc_hist <- function(from, to) {                                     # toteutuneet vuodet Tilastokeskukselta: huoltotaseen erien volyymimuutos ja julkinen rahoitusasema
   g <- function(code) { d <- fetch_series(list(id = paste0("fca_", code), source = "statfin", table = "ntp/132h.px", pick = list(taloustoimi_1_20180101 = code, contentscode = "tasmvv2015")))
-    s <- tapply(d$value, substr(d$date, 1, 4), function(v) if (sum(!is.na(v)) == 4) sum(v) else NA); a1 <- s[as.character(y)]; a0 <- s[as.character(y - 1)]
-    if (is.na(a1) || is.na(a0)) NA_real_ else unname(100 * (a1 / a0 - 1)) }
+    s <- tapply(d$value, substr(d$date, 1, 4), function(v) if (sum(!is.na(v)) == 4) sum(v) else NA)
+    yy <- from:to; v <- vapply(yy, function(y) { a1 <- s[as.character(y)]; a0 <- s[as.character(y - 1)]; if (length(a1) && length(a0) && !is.na(a1) && !is.na(a0)) unname(100 * (a1 / a0 - 1)) else NA_real_ }, 0)
+    list(years = yy, values = v) }
   out <- list(bkt = g("B1GMH"), yks = g("P3KS14_S15"), julk = g("P3KS13"), inv = g("P51K"), vienti = g("P6K"), tuonti = g("P7R"))
   nl <- Filter(function(x) x$id == "x_nl_s13", cfg$series)
-  out$rah <- tryCatch({ d <- fetch_series(nl[[1]]); v <- d$value[d$date == paste0(y, "-Q4")]; if (length(v)) v else NA_real_ }, error = function(e) NA_real_)
-  pxy <- function(table, sel, y) {                                    # vuositaulukko (aikamuuttuja timeperiod_y): yksi arvo suoraan
-    q <- list(query = c(lapply(names(sel), function(k) list(code = k, selection = list(filter = "item", values = list(sel[[k]])))),
-                        list(list(code = "timeperiod_y", selection = list(filter = "item", values = list(as.character(y)))))), response = list(format = "json-stat2"))
-    r <- RETRY("POST", paste0(STATFIN, table), body = toJSON(q, auto_unbox = TRUE), content_type_json(), timeout(40), times = 5, pause_base = 5, pause_min = 11, quiet = TRUE)
-    stop_for_status(r); x <- fromJSON(content(r, "text", encoding = "UTF-8"), simplifyVector = FALSE); v <- x$value[[1]]; if (is.null(v)) NA_real_ else as.numeric(v) }
-  out$tyott <- tryCatch(pxy("tyti/15bm.px", list(sukupuoli_9_20180101 = "SSS", syntypera_101_20180101 = "SSS", contentscode = "tyti-Tyottomyysaste"), y), error = function(e) NA_real_)
-  out$khi <- tryCatch(pxy("khi/122q.px", list(contentscode = "Vuosimuutos"), y), error = function(e) NA_real_)
-  out$ykhi <- tryCatch({ d <- fetch_series(list(id = "fca_ykhi", source = "statfin", table = "khi/15b7.px", pick = list(coicop_46_20231201 = "SSS", contentscode = "ip_ykhi")))
-    a1 <- d$value[substr(d$date, 1, 4) == as.character(y)]; a0 <- d$value[substr(d$date, 1, 4) == as.character(y - 1)]
-    if (length(a1) == 12 && length(a0) == 12) 100 * (mean(a1) / mean(a0) - 1) else NA_real_ }, error = function(e) NA_real_)   # vuosikeskiarvojen muutos
-  lapply(out, function(v) if (is.na(v)) NULL else round(v, 2))
+  out$rah <- tryCatch({ d <- fetch_series(nl[[1]]); yy <- from:to                                  # liukuva neljan neljanneksen osuus: Q4 = vuosi
+    list(years = yy, values = vapply(yy, function(y) { v <- d$value[d$date == paste0(y, "-Q4")]; if (length(v)) v else NA_real_ }, 0)) }, error = function(e) NULL)
+  lapply(Filter(Negate(is.null), out), function(x) { k <- !is.na(x$values); list(years = as.integer(x$years[k]), values = round(x$values[k], 2)) })
 }
 fc_table <- function(T) {
   ys <- unlist(T$years); vf <- file.path(CACHE_DIR, "fc_auto.json"); dir.create(CACHE_DIR, showWarnings = FALSE)
@@ -923,7 +915,8 @@ fc_table <- function(T) {
     rows[[length(rows) + 1]] <- list(who = a$who, date = dt, url = a$url, auto = TRUE, v = vv)
   }
   write(toJSON(seen, auto_unbox = TRUE), vf)
-  T$rows <- rows; T$actual <- tryCatch(fc_actual(T$ay), error = function(e) { message("  VAROITUS ennusteen toteuma: ", conditionMessage(e)); NULL })
+  ks <- vapply(T$vars, function(v) v$k, ""); rows <- lapply(rows, function(r) { r$v <- r$v[names(r$v) %in% ks]; r })   # vain valittavat muuttujat
+  T$rows <- rows; T$hist <- tryCatch(fc_hist(T$from, T$ay), error = function(e) { message("  VAROITUS ennusteen toteuma: ", conditionMessage(e)); NULL })
   T$auto <- NULL; T
 }
 
