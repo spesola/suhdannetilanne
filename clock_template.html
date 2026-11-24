@@ -295,6 +295,7 @@ body:has(.hero.wvon) .topbar::after { display: none; }
 .wv .wvq.new { stroke: var(--fg); stroke-width: 1.2; stroke-opacity: .55; }
 .wv .wvq.st { opacity: .4; }
 .wv .wvq.dim { opacity: .18; } .wv .wvq.st.dim { opacity: .1; }
+:root[data-theme="vapor"] .wv .wvq.dim, :root[data-theme="vapor"] .wv.hlon .wvq:not(.hl) { opacity: .42; } :root[data-theme="vapor"] .wv .wvq.st.dim { opacity: .28; }   /* tummalla taustalla himmennetyt neliöt jäävät näkyviin */
 .wv .wvt { fill: var(--sun); }
  .wv .wvq.hl { stroke: var(--fg); stroke-width: 2px; vector-effect: non-scaling-stroke; } .wv.hlon .wvq:not(.hl) { opacity: .25; }   /* kytketty korostus kartan ja luettelon kanssa */
 .pgsky { position: absolute; left: 0; right: 0; top: 0; height: 300px; z-index: -1; pointer-events: none; opacity: .75; background: linear-gradient(var(--wvA), var(--wvB) 55%, var(--wvC));
@@ -1354,7 +1355,7 @@ a.ubr, button.ubr { cursor: pointer; } a.ubr:hover .t, button.ubr:hover .t { tex
     const placed = [];
     (fixed || []).forEach(t => { try { const b = t.getBBox(); placed.push({ x0: b.x, x1: b.x + b.width, y0: b.y, y1: b.y + b.height }); } catch (e) {} });   // jo sijoitetut nimet pysyvat paikallaan
     labels.map(t => ({ t, h: head(t), w: (() => { try { return t.getComputedTextLength(); } catch (e) { return t.textContent.length * 7; } })() || t.textContent.length * 7 }))
-      .filter(o => o.h).sort((a, b) => a.h.y - b.h.y)
+      .filter(o => o.h).sort((a, b) => (b.t.parentNode.classList.contains("comp") - a.t.parentNode.classList.contains("comp")) || a.h.y - b.h.y)   // kokonaisindikaattori ensin, muut sen ohi
       .forEach(o => {
         const isC = o.t.parentNode.classList.contains("comp"), { x, y, r } = o.h, w = o.w + 4, d = r + 5 + (isC ? 14 : 0);   // kokonaisindikaattorin nimi kauemmas, viiva pisteeseen
         const C = [[x + d, y - 6, "start"], [x - d, y - 6, "end"], [x + d, y + 14, "start"], [x - d, y + 14, "end"],
@@ -1362,7 +1363,7 @@ a.ubr, button.ubr { cursor: pointer; } a.ubr:hover .t, button.ubr:hover .t { tex
                    [x + d, y - 20, "start"], [x - d, y - 20, "end"], [x + d, y + 28, "start"], [x - d, y + 28, "end"]];
         let best = null, bs = Infinity;
         C.forEach(([lx, ly, a], k) => {
-          const x0 = a === "start" ? lx : a === "end" ? lx - w : lx - w / 2, bx = { x0, x1: x0 + w, y0: ly - 11, y1: ly + 3 };
+          const x0 = a === "start" ? lx : a === "end" ? lx - w : lx - w / 2, bx = { x0: x0 - 3, x1: x0 + w + 3, y0: ly - 13, y1: ly + 5 };   // väljyys: nimien väliin vähintään muutama pikseli (tekstin reunus 4 px)
           let sc = k * 0.5;                                                // lahimmat paikat ensin
           if (bx.x0 < M || bx.x1 > W - M || bx.y0 < M || bx.y1 > W - M) sc += 5000;
           placed.forEach(b => sc += 40 * ov(bx, b)); obst.forEach(b => sc += 12 * ov(bx, b));
