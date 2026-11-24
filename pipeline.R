@@ -102,7 +102,8 @@ upd_day <- function(u) tryCatch({ u <- sub("\\.\\d+", "", u); m <- regmatches(u,
 fetch_statfin <- function(s) {
   base <- px_base_of(s)
   u0 <- px_updated(base, s$table); if (!is.null(u0)) SRC_TUPD[[paste0("px:", base, s$table)]] <- upd_day(u0)
-  upd <- if (identical(Sys.getenv("PX_FULL"), "1")) NULL else u0
+  # tyonv: taulukon paivityspaiva ei aina muutu uuden kuukauden tullessa (24.11.2026: 12r5 sai lokakuun, paivays 16.10.), joten aina uusi haku
+  upd <- if (identical(Sys.getenv("PX_FULL"), "1") || grepl("^tyonv/", s$table)) NULL else u0
   f <- px_file(base, s); fu <- paste0(f, ".u")
   if (!is.null(upd) && file.exists(f) && file.exists(fu)) {
     u <- readLines(fu, warn = FALSE)
