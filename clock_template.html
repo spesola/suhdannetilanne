@@ -1280,7 +1280,7 @@ a.ubr, button.ubr { cursor: pointer; } a.ubr:hover .t, button.ubr:hover .t { tex
       // vari: vaihevari, paitsi valintatilassa valitsemattomat neutraalin harmaina; yksittaisen valitun polku sen vaihevarilla
       const single = !(sel && sel.startsWith("g:"));   // yksitellen valitut: kullekin oma polku; koko ryhma vain Kulku-kytkimella
       if (!s.comp) col = !selMode || hi(s) ? qcol(quad(p.l, p.c)) : "var(--dim)"; else col = qcol(quad(p.l, p.c));   // kokonaisindikaattori ja sen polku vaihevärissä
-      const tailCol = s.comp ? col : hi(s) && single ? col : "var(--muted)";
+      const tailCol = s.comp || (hi(s) && single) || !selMode ? col : "var(--muted)";   // polku pisteen värissä; valintatilassa valitsemattomat harmaina
       const off = qf && (quad(p.l, p.c) !== qf || (!s.comp && !s.isGroup && !s.in_composite)) && !hi(s);
       const dim = false;                                                // valitsemattomat neutraalin harmaina (vari yllä), ei himmennysta
       const g = el("g", { class: "pt" + (s.comp ? " comp" : "") + (hi(s) ? " sel" : "") + (off ? " off" : "") + (dim ? " dim" : ""), tabindex: -1, "data-id": s.id }, svg);   // kaikki pisteet samanlaisia; vanha havainto ja kokonaisindikaattorin ulkopuolisuus kerrotaan vihjeessa
@@ -1288,9 +1288,13 @@ a.ubr, button.ubr { cursor: pointer; } a.ubr:hover .t, button.ubr:hover .t { tex
       for (let k = from; k <= p.i; k++)
         if (s.level[k] != null && s.change[k] != null) pts.push([X(s.change[k]), Y(s.level[k])]);
       if (pts.length > 1) {
-        el("polyline", { ...(glide ? { class: "fd" } : {}), points: pts.map(q => q.join(",")).join(" "), fill: "none", stroke: tailCol,
-          "stroke-width": s.comp || s.isGroup ? 1.2 : 1.1, "stroke-opacity": s.comp ? 0.45 : 0.4, "stroke-linejoin": "round", "stroke-linecap": "round" }, g);
-        pts.slice(0, -1).forEach((q, k) => el("circle", { cx: q[0], cy: q[1], r: (s.comp ? 1.7 : 1.6) * K, fill: tailCol, "fill-opacity": 0.2 + 0.4 * k / pts.length }, g));
+        // pehmeä käyrä (Catmull-Rom), joka ohenee ja haalistuu menneisyyteen päin; ei välipisteitä
+        const n = pts.length, P0 = j => pts[Math.max(0, Math.min(n - 1, j))], f = v => v.toFixed(1), top = s.comp ? 0.7 : hi(s) ? 0.75 : 0.5, wMax = (s.comp ? 2.6 : hi(s) ? 2.4 : 1.9) * K;
+        const cr = (a, b, c, d, t) => [0, 1].map(i => 0.5 * (2 * b[i] + (c[i] - a[i]) * t + (2 * a[i] - 5 * b[i] + 4 * c[i] - d[i]) * t * t + (3 * b[i] - a[i] - 3 * c[i] + d[i]) * t * t * t));
+        const SUB = 4, sm = []; for (let j = 0; j < n - 1; j++) for (let q = 0; q < SUB; q++) sm.push(cr(P0(j - 1), P0(j), P0(j + 1), P0(j + 2), q / SUB)); sm.push(pts[n - 1]);
+        for (let j = 0; j < sm.length - 1; j++) { const t = (j + 1) / (sm.length - 1);   // paksuus ja peittävyys kasvavat tasaisesti kohti nykyhetkeä
+          el("path", { ...(glide ? { class: "fd" } : {}), d: `M${f(sm[j][0])} ${f(sm[j][1])}L${f(sm[j + 1][0])} ${f(sm[j + 1][1])}`,
+            fill: "none", stroke: tailCol, "stroke-width": ((0.45 + 0.55 * t) * wMax).toFixed(2), "stroke-opacity": (0.06 + (top - 0.06) * t * t).toFixed(2), "stroke-linecap": "butt" }, g); }
       }
       const [hx, hy] = pts[pts.length - 1];
       const r = ((s.comp ? 11 : s.isGroup ? 7 : 4.5) + (hi(s) ? 1.5 : 0)) * K;   // kokonaisindikaattori: kehän säde (nimen paikka)
