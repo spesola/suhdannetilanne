@@ -257,9 +257,10 @@ body:has(.hero.wvon) .topbar::after { display: none; }
 :root[data-theme="vapor"] body:has(.hero.wvon)::before, :root[data-theme="vapor"] body:has(> .pgsky)::before { display: none; }   /* teeman koristeaurinko pois, kun taivas on näkyvissä */   /* vaiheviiva turha, kun taivas kertoo vaiheen */   /* linkki listan alle, taivaan puolelle */
 .hero.wvon { position: relative; isolation: isolate; }
 .wvsky { position: absolute; z-index: -1; left: var(--wvL, 0); width: var(--wvW, 100%); top: var(--wvT, 0); height: var(--wvH, 0); pointer-events: none;
-  background: radial-gradient(440px 270px at var(--gx, 50%) var(--gy, 50%), color-mix(in srgb, var(--wvG) var(--wvGp), transparent), transparent 70%), linear-gradient(var(--wvA), var(--wvB) 55%, var(--wvC));
   -webkit-mask: linear-gradient(transparent, #000 64px); mask: linear-gradient(transparent, #000 64px); }
-.wvsky0 { position: absolute; inset: 0; background: linear-gradient(var(--wvA), var(--wvB) 55%, var(--wvC)); transition: opacity 1s ease; } .wvsky0.go { opacity: 0; }
+.wvsky > .wsl { position: absolute; inset: 0; background: linear-gradient(var(--wvA), var(--wvB) 55%, var(--wvC)); opacity: 0; transition: opacity .8s ease .8s; }   /* pysyvät kerrokset: uusi häivyttyy vanhan päälle, vanha pois vasta sen jälkeen */
+.wvsky > .wsl.on { opacity: 1; z-index: 1; transition-delay: 0s; }
+.wvsky > .wsg { position: absolute; inset: 0; z-index: 2; background: radial-gradient(440px 270px at var(--gx, 50%) var(--gy, 50%), color-mix(in srgb, var(--wvG) var(--wvGp), transparent), transparent 70%); }
 .wvsky::after { content: ""; position: absolute; left: 0; right: 0; bottom: -1px; height: 2px; background: var(--muted); opacity: .55; }
 :root:not([data-theme="vapor"]) .hero.wvon .phb b { color: color-mix(in srgb, var(--qc) 78%, #000); }   /* taivasta vasten riittävä kontrasti */
 .wvx .phn i.wl-sun { width: 11px; height: 11px; border-radius: 50%; background: var(--sun); box-shadow: none; }
@@ -292,7 +293,6 @@ body:has(.hero.wvon) #topSec > .card { border-top-color: var(--line); }   /* peh
 .wv.anim .wvq, .wv.anim .wvt { animation: wvIn .45s ease both; animation-delay: calc(300ms + var(--k, 0) * 30ms); }
 @keyframes wvIn { from { opacity: 0; } }
 .wv .wvq.fin { animation: wvIn .3s ease both; }
-.wvsky0.fast { transition-duration: .35s; }
 .wvlr { position: relative; } .wvlr > .phleg { position: absolute; right: -4px; top: 50%; transform: translateY(-50%); margin: 0; }   /* selitenuoli vaihenimien riville */
 .wvx .phn { margin-top: 0; min-height: 0; }
 .wvl { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); margin-top: 4px; }
@@ -303,7 +303,7 @@ body:has(.hero.wvon) #topSec > .card { border-top-color: var(--line); }   /* peh
 .wvb.on { color: var(--fg); text-decoration: underline 2px var(--qc); text-underline-offset: 7px; }   /* suodatettu vaihe alleviivattuna */
 .wvb:hover { color: var(--fg); } .wvb:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
 @media (max-width: 520px) { .wvb { font-size: 0.6875rem; } }
-@media (prefers-reduced-motion: reduce) { .wv.anim .wvq, .wv.anim .wvt, .wv .wvq.fin { animation: none; } .wvsky0 { transition: none; } }
+@media (prefers-reduced-motion: reduce) { .wv.anim .wvq, .wv.anim .wvt, .wv .wvq.fin { animation: none; } .wvsky > .wsl { transition: none; } }
 .phn { font-size: 0.78rem; color: var(--muted); margin: 10px 0 0; display: flex; flex-wrap: wrap; align-items: center; gap: 6px 16px; min-height: 20px; }
 .phleg { display: inline-grid; place-items: center; width: 18px; height: 18px; margin-left: -4px; border: 0; background: none; padding: 0; border-radius: 4px; font: inherit; color: inherit; cursor: pointer; }
 .phleg svg { width: 10px; height: 10px; fill: none; stroke: currentColor; stroke-width: 1.6; stroke-linecap: round; stroke-linejoin: round; transition: transform .15s; }
@@ -1420,8 +1420,7 @@ a.ubr, button.ubr { cursor: pointer; } a.ubr:hover .t, button.ubr:hover .t { tex
     g += `<g class="wvsun" data-tip="Kokonaisindikaattori ${escH(o.sun.per)}" data-sub="${escH(o.sun.sub)}" data-qc="${qcol(cq)}" transform="translate(${f0.x.toFixed(1)} ${f0.y.toFixed(1)})"><circle class="wvh" r="${(f0.r * 1.9).toFixed(1)}"/><circle class="wvd" r="${f0.r.toFixed(1)}" stroke-width="${f0.r < 8 ? 2 : 3}"/></g></g>`;
     const lbl = `Suhdanneaalto ${o.sun.per}: kokonaisindikaattori vaiheessa ${Q[cq].short.toLowerCase()}, etäisyys trendistä ${o.sun.s.toFixed(2).replace(".", ",")}. Indikaattoreita vaiheittain: ${QORDER.map(q => Q[q].short.toLowerCase() + " " + o.counts[q]).join(", ")}.`;
     const fq = o.sunF.q && o.sunF.q !== cq ? o.sunF.q : null, nt = o.trail.length, per = set.freq === "M" ? "kuukautta" : "neljännestä";
-    return `<div class="wvsky wp-${cq}" aria-hidden="true">${fq ? `<div class="wvsky0 wp-${fq}"></div>` : ""}</div>`
-      + `<div class="wvw" style="margin-top:${wvMt}px"><svg class="wv${o.anim ? " anim" : ""}" viewBox="0 0 ${w} ${h}" role="img" aria-label="${escH(lbl)}">${g}</svg></div>`
+    return `<div class="wvw" style="margin-top:${wvMt}px"><svg class="wv${o.anim ? " anim" : ""}" viewBox="0 0 ${w} ${h}" role="img" aria-label="${escH(lbl)}">${g}</svg></div>`
       + `<div class="wvlr"><div class="wvl">${["rec", "up", "turn", "down"].map(q => `<button type="button" class="wvb${q === cq ? " cur" : ""}${o.qf === q ? " on" : ""}" data-q="${q}" style="--qc:${qcol(q)}" aria-pressed="${o.qf === q}" aria-label="${Q[q].name}: ${o.counts[q]}. Klikkaa suodattaaksesi.">${Q[q].short} <b>${o.counts[q]}</b></button>`).join("")}</div><button type="button" class="phleg" aria-expanded="${phLeg}" aria-controls="phLegB" aria-label="Selitteet" title="Selitteet"><svg viewBox="0 0 10 10" aria-hidden="true"><path d="M3.5 2 7 5l-3.5 3"/></svg></button></div>`
       + `<div class="phn"><span class="phlb${phLeg ? "" : " off"}" id="phLegB"><span><i class="wl-sun"></i>kokonaisindikaattori, koko kuvaa etäisyyttä trendistä</span>${nt ? `<span><i class="wl-tr"></i>${nt} edellistä ${per}</span>` : ""}<span><i class="wl-hz"></i>trenditaso</span><span><i class="wl-new"></i>vaihe muuttunut edellisestä ${set.freq === "M" ? "kuukaudesta" : "neljänneksestä"}</span><span><i class="st"></i>ei julkaistu</span></span></div>`;
   }
@@ -1442,24 +1441,47 @@ a.ubr, button.ubr { cursor: pointer; } a.ubr:hover .t, button.ubr:hover .t { tex
   { let q = 0; const ro = new ResizeObserver(() => { cancelAnimationFrame(q); q = requestAnimationFrame(() => { const hero = document.querySelector(".hero"); if (hero && hero.classList.contains("wvon") && wvWant() !== WV.w) update(); else wvLayout(); }); });
     const obs = () => { const hero = document.querySelector(".hero"), ub = $("ubox"); if (hero) ro.observe(hero); if (ub) ro.observe(ub); };
     if (document.readyState === "loading") addEventListener("DOMContentLoaded", obs); else obs(); }
-  function wvPlay(o) {                                                // aurinko, valo, neliöt ja jälki liukuvat edellisestä kohdasta; vanha taivas häipyy
-    cancelAnimationFrame(wvRaf); const svg = $("summary").querySelector("svg.wv"); if (!svg) return;
-    const old = $("summary").querySelector(".wvsky0"); if (old) { if (o.fast) old.classList.add("fast"); requestAnimationFrame(() => requestAnimationFrame(() => old.classList.add("go"))); }
-    const P = o.plan, rs = new Map([...svg.querySelectorAll(".wvq")].map(r => [r.dataset.id, r])), ts = svg.querySelectorAll(".wvt");
-    const sg = svg.querySelector(".wvsun"), [h1, d1] = sg.querySelectorAll("circle"), L = (a, b, e) => a + (b - a) * e;
-    const cur = wvCur = { set, w: WV.w, idx, sun: { u: o.sunF.u, s: o.sunF.s, q: o.cq }, sq: new Map(), tr: [] };
-    const apply = e => {
-      P.sq.forEach(z => { const u = wvLu(z.f, z.t, e), [x, y, a] = wvAt(u, WV.so); cur.sq.set(z.id, u);
-        rs.get(z.id).setAttribute("transform", `translate(${x.toFixed(1)} ${y.toFixed(1)}) rotate(${a.toFixed(1)})`); });
-      P.tr.forEach((z, j) => { const q = { u: wvLu(z.f.u, z.t.u, e), s: L(z.f.s, z.t.s, e) }, p = wvTrP(q); cur.tr[j] = q;
-        ts[j].setAttribute("cx", p.x.toFixed(1)); ts[j].setAttribute("cy", p.y.toFixed(1)); ts[j].setAttribute("r", p.r.toFixed(1)); });
-      const u = wvLu(o.sunF.u, o.sun.u, e), sv = L(o.sunF.s, o.sun.s, e), p = wvSunAt(u, sv); cur.sun = { u, s: sv, q: o.cq };
-      sg.setAttribute("transform", `translate(${p.x.toFixed(1)} ${p.y.toFixed(1)})`); h1.setAttribute("r", (p.r * 1.9).toFixed(1)); d1.setAttribute("r", p.r.toFixed(1)); d1.setAttribute("stroke-width", p.r < 8 ? 2 : 3);
-      wvGlow(p); };
-    if (!o.move) { apply(1); return; }
-    const t0 = performance.now(), D = o.fast ? 150 : 900;                // toistossa lineaarinen ja yhtä pitkä kuin askel, jolloin liike on jatkuvaa
-    const step = now => { const t = Math.min(1, (now - t0) / D); apply(o.fast ? t : 1 - Math.pow(1 - t, 3)); if (t < 1) wvRaf = requestAnimationFrame(step); };
-    apply(0); wvRaf = requestAnimationFrame(step);
+  function wvSky(cq) {                                                // pysyvä taivas heron taustalla; ei luoda uudelleen joka päivityksellä
+    const hero = document.querySelector(".hero"); if (!hero) return; let sk = hero.querySelector(":scope > .wvsky");
+    if (!cq) { if (sk) sk.remove(); return; }
+    if (!sk) { sk = document.createElement("div"); sk.className = "wvsky"; sk.setAttribute("aria-hidden", "true");
+      sk.innerHTML = QORDER.map(q => `<div class="wsl wp-${q}" data-q="${q}"></div>`).join("") + `<div class="wsg"></div>`; hero.prepend(sk);
+      sk.querySelector(`.wsl[data-q="${cq}"]`).classList.add("on"); sk.offsetWidth; }
+    sk.querySelectorAll(".wsl").forEach(l => l.classList.toggle("on", l.dataset.q === cq)); sk.querySelector(".wsg").className = "wsg wp-" + cq;
+  }
+  let wvFol = null;
+  function wvPlay(o) {                                                // aurinko, valo, neliöt ja jälki liukuvat edellisestä kohdasta uuteen
+    const svg = $("summary").querySelector("svg.wv"); if (!svg) return; wvSky(o.cq);
+    const P = o.plan, el = { sq: new Map([...svg.querySelectorAll(".wvq")].map(r => [r.dataset.id, r])), tr: svg.querySelectorAll(".wvt"), sg: svg.querySelector(".wvsun") };
+    [el.h1, el.d1] = el.sg.querySelectorAll("circle");
+    const from = { sun: { u: o.sunF.u, s: o.sunF.s }, sq: new Map(P.sq.map(z => [z.id, z.f])), tr: P.tr.map(z => z.f) };
+    const to = { sun: { u: o.sun.u, s: o.sun.s }, sq: new Map(P.sq.map(z => [z.id, z.t])), tr: P.tr.map(z => z.t) };
+    const draw = st => {                                               // tila (paikat käyrällä) -> DOM; tila talteen seuraavan päivityksen lähtökohdaksi
+      st.sq.forEach((u, id) => { const r = el.sq.get(id); if (!r) return; const [x, y, a] = wvAt(u, WV.so); r.setAttribute("transform", `translate(${x.toFixed(1)} ${y.toFixed(1)}) rotate(${a.toFixed(1)})`); });
+      st.tr.forEach((q, j) => { const c = el.tr[j]; if (!c) return; const p = wvTrP(q); c.setAttribute("cx", p.x.toFixed(1)); c.setAttribute("cy", p.y.toFixed(1)); c.setAttribute("r", p.r.toFixed(1)); });
+      const p = wvSunAt(st.sun.u, st.sun.s); el.sg.setAttribute("transform", `translate(${p.x.toFixed(1)} ${p.y.toFixed(1)})`);
+      el.h1.setAttribute("r", (p.r * 1.9).toFixed(1)); el.d1.setAttribute("r", p.r.toFixed(1)); el.d1.setAttribute("stroke-width", p.r < 8 ? 2 : 3); wvGlow(p);
+      wvCur = { set, w: WV.w, idx, sun: { u: st.sun.u, s: st.sun.s, q: o.cq }, sq: new Map(st.sq), tr: st.tr.map(q => ({ u: q.u, s: q.s })) }; };
+    if (o.fast && wvFol) { Object.assign(wvFol, { to, el, draw }); draw(wvFol.st); return; }   // toisto käynnissä: vain uusi tavoite, silmukka jatkuu katkeamatta
+    cancelAnimationFrame(wvRaf);
+    if (o.fast) {                                                      // toisto: näkyvä tila jahtaa tavoitetta tasaisesti, ei pysähdystä joka kuukausi
+      wvFol = { to, st: from, el, draw, t: performance.now() }; draw(from);
+      const TAU = 300, du = (a, b) => pmod(b - a + .5, 1) - .5;
+      const loop = now => { const F = wvFol; if (!F) return; const k = 1 - Math.exp(-Math.min(64, now - F.t) / TAU); F.t = now; let mx = 0;
+        const mv = (a, b) => { const d = du(a, b); mx = Math.max(mx, Math.abs(d)); return pmod(a + d * k, 1); };
+        F.st.sun = { u: mv(F.st.sun.u, F.to.sun.u), s: F.st.sun.s + (F.to.sun.s - F.st.sun.s) * k };
+        F.to.sq.forEach((t, id) => F.st.sq.set(id, mv(F.st.sq.has(id) ? F.st.sq.get(id) : t, t))); [...F.st.sq.keys()].forEach(id => { if (!F.to.sq.has(id)) F.st.sq.delete(id); });
+        F.st.tr = F.to.tr.map((t, j) => { const a = F.st.tr[j] || t; return { u: mv(a.u, t.u), s: a.s + (t.s - a.s) * k }; });
+        F.draw(F.st); if (playT || mx > 2e-4) wvRaf = requestAnimationFrame(loop); else wvFol = null; };
+      wvRaf = requestAnimationFrame(loop); return;
+    }
+    wvFol = null;
+    const L = (a, b, e) => a + (b - a) * e, mix = e => ({ sun: { u: wvLu(from.sun.u, to.sun.u, e), s: L(from.sun.s, to.sun.s, e) },
+      sq: new Map([...to.sq].map(([id, t]) => [id, wvLu(from.sq.get(id), t, e)])), tr: to.tr.map((t, j) => ({ u: wvLu(from.tr[j].u, t.u, e), s: L(from.tr[j].s, t.s, e) })) });
+    if (!o.move) { draw(to); return; }
+    const t0 = performance.now(), D = 900;
+    const step = now => { const t = Math.min(1, (now - t0) / D); draw(mix(1 - Math.pow(1 - t, 3))); if (t < 1) wvRaf = requestAnimationFrame(step); };
+    draw(from); wvRaf = requestAnimationFrame(step);
   }
   const wvCw = () => { const sm = $("summary"); return sm && sm.clientWidth || Math.min(1180, document.documentElement.clientWidth - 32); };
   const wvWant = () => { const cw = wvCw(); return cw >= 1000 ? 1180 : cw >= 680 ? 780 : cw >= 520 ? 600 : 420; };   // kapealla jyrkempi aalto, jotta merkit pysyvät isoina   // piilossa (leveys 0) arvio sisältöpalstasta   // leveässä palstassa loivempi ja leveämpi aalto
@@ -1504,7 +1526,7 @@ a.ubr, button.ubr { cursor: pointer; } a.ubr:hover .t, button.ubr:hover .t { tex
     $("summary").innerHTML = WV_ON ? `<div class="phx wvx${qf ? " f" : ""}">${hdr}${waveBlock(wvd)}</div>` : `<div class="phx${qf ? " f" : ""}${QORDER.some(q => stay[q].concat(mv[q]).some(x => picked.has(x.s.id))) ? " pk" : ""}">${hdr}<div class="phrs">${QORDER.map(q => `<button type="button" class="phr${q === cq ? " cur" : ""}${qf === q ? " on" : ""}" data-q="${q}" style="--qc:${qcol(q)};--N:${Math.max(1, ...Object.values(counts))}" aria-pressed="${qf === q}" aria-label="${Q[q].name}: ${counts[q]}. Klikkaa suodattaaksesi."><span class="nm">${Q[q].short}</span><span class="sq">${stay[q].map(x => `<i data-id="${x.s.id}" data-tip="${escH(x.s.label)}"${x.st >= 0 ? ` data-sub="${fmtP(set.periods[x.st])}"` : ""}${picked.has(x.s.id) || x.st >= 0 ? ` class="${[picked.has(x.s.id) ? "pk" : "", x.st >= 0 ? "st" : ""].filter(Boolean).join(" ")}"` : ""}></i>`).join("")}${mv[q].map(x => `<i class="new${picked.has(x.s.id) ? " pk" : ""}" data-id="${x.s.id}" data-tip="${escH(x.s.label)}" data-sub="${Q[x.q0].short} → ${Q[q].short.toLowerCase()} ${fmtP(set.periods[idx])}"></i>`).join("")}</span><span class="n">${counts[q]}</span></button>`).join("")}</div><div class="phn"><button type="button" class="phleg" aria-expanded="${phLeg}" aria-controls="phLegB" aria-label="Selitteet" title="Selitteet"><svg viewBox="0 0 10 10" aria-hidden="true"><path d="M3.5 2 7 5l-3.5 3"/></svg></button><span class="phlb${phLeg ? "" : " off"}" id="phLegB"><span><i></i>muutos edellisestä ${set.freq === "M" ? "kuukaudesta" : "neljänneksestä"}</span><span><i class="st"></i>ei julkaistu</span></span></div></div>`;   // rivi aina paikallaan, ettei sivu hypi   // yksi neliö = yksi sarja
     { const sqA = motion() && !playT && (!panLast || panLast.set !== set || panLast.idx !== idx); panLast = { set, idx };   // neliöt syttyvät porrastetusti, kun kuukausi vaihtuu (ei suodatuksessa eikä toistossa)
       const x = $("summary").querySelector(".phx"); if (sqA && x) { x.querySelectorAll(".sq i").forEach((e, k) => e.style.setProperty("--k", k)); x.classList.add("anim"); } }
-    wvLayout(); if (WV_ON) { wvPlay(wvd); $("summary").querySelectorAll(".wvq").forEach(r => { r.onmouseenter = () => { hlPoints([r.dataset.id]); hlRow(r.dataset.id); }; r.onmouseleave = () => { hlPoints([]); hlRow(null); }; });
+    wvLayout(); if (!WV_ON) wvSky(null); if (WV_ON) { wvPlay(wvd); $("summary").querySelectorAll(".wvq").forEach(r => { r.onmouseenter = () => { hlPoints([r.dataset.id]); hlRow(r.dataset.id); }; r.onmouseleave = () => { hlPoints([]); hlRow(null); }; });
       $("summary").querySelectorAll(".wvq").forEach(r => r.onclick = () => { const id = r.dataset.id;
         if (sel === id && picked.size === 1) { clearPicks(); return; } qf = null; picked.clear(); sel = null; pick(id); }); }
     { const lb = $("summary").querySelector(".phleg");                 // selitteet nuolen takana; tila sailyy kuukautta vaihdettaessa
@@ -2612,7 +2634,7 @@ a.ubr, button.ubr { cursor: pointer; } a.ubr:hover .t, button.ubr:hover .t { tex
     const end = set.periods.length - 1;
     if (end - idx < 6) { const f = set.composite.level.findIndex(v => v != null); idx = Math.max(0, f); update(); }   // lopussa: alusta
     $("play").innerHTML = "&#10074;&#10074;"; $("play").setAttribute("aria-label", "Pysäytä");
-    playT = setInterval(() => { if (idx >= end) return stopPlay(); idx++; update(); }, set.freq === "M" ? 160 : 450);
+    playT = setInterval(() => { if (idx >= end) return stopPlay(); idx++; update(); }, set.freq === "M" ? (LUONNOS ? 240 : 160) : 450);   // luonnos: hitaampi, jotta aallon liikettä ehtii seurata
   };
 
   // rahoitusolot yhdella silmayksella: viimeisin arvo, muutos 3 ja 12 kk, sijoitus historiaan
