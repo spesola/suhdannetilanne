@@ -300,6 +300,12 @@ body:has(.hero.wvon) .topbar::after { display: none; }
 body:has(> .pgsky) { isolation: isolate; }   /* taivas body-taustan päälle mutta sisällön alle */
 body:has(.hero.wvon) .pgsky { display: none; } body:has(.pgsky) .topbar::after { display: none; }
 body:has(.hero.wvon) #topSec > .card { border-top-color: var(--line); }   /* pehmeä siirtymä taivaasta karttaan ja luetteloon */
+/* sivun alaosa: päivä kuluu iltaan ja yöhön (vieritettäessä uusi liukuma, alatunniste yötaivaalla) */
+.ngsky { position: absolute; left: 0; right: 0; z-index: -1; pointer-events: none; display: none; }
+:root:not([data-theme="vapor"]) .ngsky { display: block; background: linear-gradient(transparent 0, #f7eee8 160px, #f2dcd2 470px, #e8c6c1 760px, #cfa3ab 860px, #4f5878 935px, #262c45 1040px, #1d2238 100%); }
+:root:not([data-theme="vapor"]) body:has(> .ngsky) { isolation: isolate; }
+:root:not([data-theme="vapor"]) footer { color: #c3c8d8; border-top-color: transparent; } :root:not([data-theme="vapor"]) footer .fh { color: #9198b2; } :root:not([data-theme="vapor"]) footer .fbrand { color: #fff; }
+:root:not([data-theme="vapor"]) footer .flinks .lnk, :root:not([data-theme="vapor"]) footer a { color: #fff; text-decoration-color: rgba(255,255,255,.35); }
 /* yläpalkki taivaan päällä: läpinäkyvä ja valkoinen teksti, vierittäessä vaalea lasi */
 :root:not([data-theme="vapor"]) body:is(:has(.hero.wvon), :has(> .pgsky)) .topbar:not(.scr)::before { background: transparent; border-bottom-color: transparent; -webkit-backdrop-filter: none; backdrop-filter: none; }
 :root:not([data-theme="vapor"]) body:is(:has(.hero.wvon), :has(> .pgsky)) .topbar:not(.scr) .brand { color: #fff; }
@@ -2531,6 +2537,7 @@ a.ubr, button.ubr { cursor: pointer; } a.ubr:hover .t, button.ubr:hover .t { tex
       scrollTo({ top: t.getBoundingClientRect().top + scrollY - bar - 16 }); }, 120); }
   // sivuston muutokset: uudet kuviot ja muut isommat lisaykset (kasin yllapidetty, uusin ensin); set + id -> linkki kuvioon
   const CHANGES = [
+    { d: "2026-11-24", t: "Sivun alaosa liukuu iltaan, alatunniste yötaivaalla." },
     { d: "2026-11-24", t: "Vaiheen taivas ulottuu yläreunaan asti kaikilla välilehdillä, yläpalkki läpinäkyvä. Kevyemmät painikkeet ja yhtenäinen uuden tiedon merkki." },
     { d: "2026-11-24", t: "Uusi värimaailma: pastellisävyiset vaihevärit ja vaiheen mukaan vaihtuva taivas etusivulla. Petrooli-teema poistettu." },
     { d: "2026-11-24", t: "Ennusteisiin valinta: BKT:n lisäksi huoltotaseen erät ja julkisyhteisöjen rahoitusasema ennustajittain", set: "Reaalitalous" },
@@ -3564,6 +3571,10 @@ a.ubr, button.ubr { cursor: pointer; } a.ubr:hover .t, button.ubr:hover .t { tex
       const C0 = comp(); PHMAP = {}; s0.periods.forEach((per, k) => { if (C0.level[k] != null && C0.change[k] != null) PHMAP[per] = quad(C0.level[k], C0.change[k]); }); set = sv; } }
   addEventListener("resize", () => { placeUL($("sets"), $("sets").querySelector('button[aria-pressed="true"]')); const nv = document.querySelector("#charts .secnav"); if (nv) placeUL(nv, nv.querySelector("button.on")); });
   applyHash(); renderFoot(); renderAll();
+  { const ng = document.createElement("div"); ng.className = "ngsky"; ng.setAttribute("aria-hidden", "true"); document.body.prepend(ng);   // ilta- ja yötaivas alatunnisteen taakse
+    const ngPos = () => { const f = $("foot"); if (!f) return; const r = f.getBoundingClientRect(), bs = getComputedStyle(document.body), t = r.top + scrollY - 900;
+      ng.style.top = t + "px"; ng.style.height = (r.bottom + scrollY + parseFloat(bs.paddingBottom) + parseFloat(bs.marginBottom) - t) + "px"; };
+    ngPos(); addEventListener("resize", ngPos); if (window.ResizeObserver) new ResizeObserver(ngPos).observe(document.body); }
   if (document.fonts && document.fonts.ready) document.fonts.ready.then(() => { if (set.growth && set.view === "charts") drawCharts(); goCard(); }); else goCard();   // fontin latauksen jalkeen korkeudet uudelleen
 })();
 </script>
