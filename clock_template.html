@@ -248,7 +248,19 @@ body { font-variant-numeric: tabular-nums; background: var(--bg); min-height: 10
 .phx.wvx { width: 100%; }
 .hero.wvon .ubf { margin-top: 8px; }
 .hero.wvon { grid-template-columns: minmax(0, 1fr); }   /* aalto koko leveydelle, seuraava julkaisu oikeaan yläkulmaan */
-.hero.wvon .ubox { position: absolute; top: 4px; right: 0; width: auto; max-width: 300px; align-items: flex-end; text-align: right; }
+.hero.wvon .ubox { position: absolute; top: 4px; right: 0; width: 290px; max-width: 290px; }
+/* luonnos: pelkistetty julkaisuaikajana; yksi fonttikoko, ei pisteitä eikä jaksosaraketta */
+.ubl.ubm { padding: 0; } .ubl.ubm::before, .ubl.ubm > li::before { display: none; }
+.ubl.ubm .ubr { grid-template-columns: 64px minmax(0, 1fr) auto; gap: 10px; padding: 2px 0; font-size: 0.8125rem; line-height: 1.5; }
+.ubl.ubm .ubr .d { font-size: inherit; }
+.ubl.ubm > li.past .p { display: none; }
+.ubl.ubm > li.past .t { color: var(--muted); }
+.ubl.ubm .ubr .p.tm { font-size: inherit; color: var(--muted); }
+.ubl.ubm > li.now { padding: 5px 0; }
+.ubl.ubm > li.now span { margin-left: 0; font-size: 0.8125rem; gap: 10px; }
+.ubl.ubm > li.now span::before { display: none; }
+.ubl.ubm > li.now span::after { background: color-mix(in srgb, var(--accent) 35%, transparent); }
+.hero.wvon .ubf { justify-content: flex-start; padding-top: 4px; } .hero.wvon .ubf button { font-size: 0.8125rem; }
 .hero.wvon .wvx > .phl, .hero.wvon .wvx > .phb { margin-right: min(320px, 32%); }
 .ubnx { color: var(--fg); text-decoration: none; margin-top: 2px; } .ubnx:hover { text-decoration: underline; } .ubnx .d { color: var(--muted); margin-right: 6px; font-variant-numeric: tabular-nums; }
 .ubnk { font: inherit; font-size: 0.78rem; color: var(--muted); background: none; border: 0; padding: 4px 0 0; cursor: pointer; } .ubnk:hover { color: var(--fg); text-decoration: underline; }
@@ -1946,8 +1958,7 @@ a.ubr, button.ubr { cursor: pointer; } a.ubr:hover .t, button.ubr:hover .t { tex
       const m = r.title.replace(/\s\d{4}(?=,|$)/, "").match(/^(.*?),\s*(?:(?:tammi|helmi|maalis|huhti|touko|kesä|heinä|elo|syys|loka|marras|joulu)kuu|\d\. (?:vuosi)?neljännes)/);
       h += `<li class="fu"><a class="ubr" href="${r.url}" target="_blank" rel="noopener" title="${escH(r.title)}"><span class="d">${k !== pk ? dl(d) : ""}</span><span class="t">${escH(m ? m[1] : r.title)}</span><span class="p tm">${tm === "08.00" ? "" : "klo " + tm.replace(".00", "")}</span></a></li>`; pk = k; });
     if (!fut.length) h += `<li class="fu"><div class="ubr"><span class="d"></span><span class="t" style="color:var(--muted)">Ei tiedossa olevia julkaisuja</span><span></span></div></li>`;
-    if (LUONNOS) { const r = fut[0], d = r && new Date(r.date), m = r && r.title.replace(/\s\d{4}(?=,|$)/, "").match(/^(.*?),\s*(?:(?:tammi|helmi|maalis|huhti|touko|kesä|heinä|elo|syys|loka|marras|joulu)kuu|\d\. (?:vuosi)?neljännes)/);   // luonnos: vain seuraava julkaisu
-      el.innerHTML = `<p class="ubh">Seuraava julkaisu</p>${r ? `<a class="ubnx" href="${r.url}" target="_blank" rel="noopener" title="${escH(r.title)}"><span class="d">${dl(d)}</span>${escH(m ? m[1] : r.title)}</a>` : `<span class="ubnx" style="color:var(--muted)">Ei tiedossa</span>`}<button type="button" id="ubAll" class="ubnk">Kaikki julkaisut →</button>`; }
+    if (LUONNOS) el.innerHTML = `<p class="ubh">Julkaisut</p><ol class="ubl ubm">${h}</ol><div class="ubf"><button type="button" id="ubAll">Kaikki julkaisut →</button></div>`;   // luonnos: pelkistetty aikajana
     else el.innerHTML = `<p class="ubh">Julkaisut</p><ol class="ubl">${h}</ol><div class="ubf"><button type="button" id="ubAll">Kaikki julkaisut →</button></div>`;
     el.querySelectorAll("[data-go]").forEach(b => b.onclick = () => goTo(b.dataset.go));
     $("ubAll").onclick = () => { updK = 1; openUpd(); };
