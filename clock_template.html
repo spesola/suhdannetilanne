@@ -283,7 +283,7 @@ body:has(.hero.wvon) .topbar::after { display: none; }
 .wvx .phn i.wl-tr { width: 5px; height: 5px; border-radius: 50%; background: var(--sun); box-shadow: 7px 0 0 0 color-mix(in srgb, var(--sun) 55%, transparent); margin-right: 14px; vertical-align: 1px; }
 .wvx .phn i.wl-hz { width: 14px; height: 2px; border-radius: 1px; background: var(--muted); box-shadow: none; vertical-align: 3px; }
 .wvx .phn i.st { background: var(--muted); opacity: .4; box-shadow: none; }
-.wvx .phn i.wl-new { width: 9px; height: 9px; margin: 0 7px 0 3px; box-shadow: 0 0 0 1.2px color-mix(in srgb, var(--fg) 55%, transparent); }
+.wvx .phn i.wl-new { width: 9px; height: 9px; margin: 0 8px 0 4px; box-shadow: 0 0 0 2px var(--surface), 0 0 0 3.5px color-mix(in srgb, var(--fg) 80%, transparent); }
 .wvx .phlb { position: static; flex-direction: row; flex-wrap: wrap; gap: 4px 18px; padding: 0 0 0 10px; transform: none; }   /* selitteet virrassa, ei kartan päällä */
 .wvx .phlb.off { display: none; }
 .wv .wvbg { fill: var(--plot); }
@@ -292,12 +292,12 @@ body:has(.hero.wvon) .topbar::after { display: none; }
 .wv .wvc { fill: none; stroke: var(--fg); stroke-width: 5; stroke-linecap: round; stroke-opacity: var(--wvLo); }
 .wv .wvc.hi { stroke-opacity: var(--wvHi); }
 .wv .wvq { cursor: pointer; transition: opacity .15s; }
-.wv .wvq.new { stroke: var(--fg); stroke-width: 1.2; stroke-opacity: .55; }
+.wv .wvq .wvr { fill: none; stroke: var(--fg); stroke-width: 1.5px; vector-effect: non-scaling-stroke; stroke-opacity: .8; }
 .wv .wvq.st { opacity: .4; }
 .wv .wvq.dim { opacity: .18; } .wv .wvq.st.dim { opacity: .1; }
 :root[data-theme="vapor"] .wv .wvq.dim, :root[data-theme="vapor"] .wv.hlon .wvq:not(.hl) { opacity: .42; } :root[data-theme="vapor"] .wv .wvq.st.dim { opacity: .28; }   /* tummalla taustalla himmennetyt neliöt jäävät näkyviin */
 .wv .wvt { fill: var(--sun); }
- .wv .wvq.hl { stroke: var(--fg); stroke-width: 2px; vector-effect: non-scaling-stroke; } .wv.hlon .wvq:not(.hl) { opacity: .25; }   /* kytketty korostus kartan ja luettelon kanssa */
+ .wv .wvq.hl > rect:first-child { stroke: var(--fg); stroke-width: 2px; vector-effect: non-scaling-stroke; } .wv.hlon .wvq:not(.hl) { opacity: .25; }   /* kytketty korostus kartan ja luettelon kanssa */
 .pgsky { position: absolute; left: 0; right: 0; top: 0; height: 300px; z-index: -1; pointer-events: none; opacity: .75; background: linear-gradient(var(--wvA), var(--wvB) 55%, var(--wvC));
   -webkit-mask: linear-gradient(transparent 30px, #000 90px, #000 40%, transparent); mask: linear-gradient(transparent 30px, #000 90px, #000 40%, transparent); }   /* muilla välilehdillä hento vaiheen taivas */
 :root[data-theme="vapor"] .pgsky { opacity: .7; }
@@ -1423,7 +1423,7 @@ a.ubr, button.ubr { cursor: pointer; } a.ubr:hover .t, button.ubr:hover .t { tex
   const wvLu = (a, b, e) => pmod(a + (pmod(b - a + .5, 1) - .5) * e, 1);   // lyhin reitti syklin ympäri: laskusta elpymiseen eteenpäin reunan yli
   function wvSunAt(u, s) { const r = wvR(s), [x, y] = wvAt(u, 16 / WV.k + r); return { x, y, r }; }   // irti käyrästä 16 px
   function waveBlock(o) {
-    const { w, h, mid } = WV, A = wvArcLen(), sq = WV.sq, gap = (WV.w < 600 ? 3 : 4) / WV.k, st = sq + gap, cq = o.cq;
+    const { w, h, mid } = WV, A = wvArcLen(), sq = WV.sq, gap = (WV.w < 600 ? 3.5 : 5.5) / WV.k, st = sq + gap, cq = o.cq;
     let d = ""; for (let i = 0; i <= 240; i++) { const u = -.02 + 1.04 * i / 240; d += (i ? "L" : "M") + wvX(u).toFixed(1) + " " + wvY(u).toFixed(1); }
     const pv = o.prev, f0 = wvSunAt(o.sunF.u, o.sunF.s), plan = o.plan = { sq: [], tr: [] };
     let g = `<defs><linearGradient id="wvFg"><stop offset="0" stop-color="#fff" stop-opacity="0"/><stop offset=".06" stop-color="#fff"/><stop offset=".94" stop-color="#fff"/><stop offset="1" stop-color="#fff" stop-opacity="0"/></linearGradient><mask id="wvF" maskUnits="userSpaceOnUse" x="-20" y="-80" width="${w + 40}" height="${h + 160}"><rect y="-80" width="${w}" height="${h + 160}" fill="url(#wvFg)"/></mask><clipPath id="wvHa"><rect y="-40" width="${w}" height="${mid + 40}"/></clipPath><clipPath id="wvHb"><rect y="${mid}" width="${w}" height="${h - mid + 20}"/></clipPath></defs><g>`;
@@ -1436,7 +1436,8 @@ a.ubr, button.ubr { cursor: pointer; } a.ubr:hover .t, button.ubr:hover .t { tex
       const s0 = Math.max(A.s(a) + 6, Math.min(A.s(b) - 6 - span, m - span / 2));
       L.forEach((x, j) => { const t = A.u(s0 + j * st + sq / 2), f = o.move && pv && pv.sq.has(x.id) ? pv.sq.get(x.id) : t, fin = pv && !pv.sq.has(x.id), [cx, cy, ang] = wvAt(f, WV.so);
         plan.sq.push({ id: x.id, f, t });   // paikka käyrällä (u); liike käyrää pitkin edellisestä kohdasta uuteen
-        g += `<rect class="wvq${x.cls}${fin ? " fin" : ""}" data-id="${x.id}" data-tip="${escH(x.label)}" data-sub="${escH(x.sub)}" data-qc="${qcol(q)}" style="--qc:${qcol(q)};--k:${k++}" fill="${qcol(q)}" x="${(-sq / 2).toFixed(2)}" y="${(-sq / 2).toFixed(2)}" width="${sq.toFixed(2)}" height="${sq.toFixed(2)}" rx="${(1.6 / WV.k).toFixed(2)}" transform="translate(${cx.toFixed(1)} ${cy.toFixed(1)}) rotate(${ang.toFixed(1)})"/>`; }); });
+        const gp = 2.2 / WV.k, ring = / new/.test(x.cls) ? `<rect class="wvr" x="${(-sq / 2 - gp).toFixed(2)}" y="${(-sq / 2 - gp).toFixed(2)}" width="${(sq + 2 * gp).toFixed(2)}" height="${(sq + 2 * gp).toFixed(2)}" rx="${(2.6 / WV.k).toFixed(2)}"/>` : "";   // vaihe vaihtunut: rengas raon päähän
+        g += `<g class="wvq${x.cls}${fin ? " fin" : ""}" data-id="${x.id}" data-tip="${escH(x.label)}" data-sub="${escH(x.sub)}" data-qc="${qcol(q)}" style="--qc:${qcol(q)};--k:${k++}" transform="translate(${cx.toFixed(1)} ${cy.toFixed(1)}) rotate(${ang.toFixed(1)})"><rect fill="${qcol(q)}" x="${(-sq / 2).toFixed(2)}" y="${(-sq / 2).toFixed(2)}" width="${sq.toFixed(2)}" height="${sq.toFixed(2)}" rx="${(1.6 / WV.k).toFixed(2)}"/>${ring}</g>`; }); });
     const src = o.move && pv && o.step === 1 ? pv.tr.concat([{ u: pv.sun.u, s: pv.sun.s }]) : null;   // kuukausi eteenpäin: pisteet liukuvat yhden pykälän, vanha aurinko jäljen uusimmaksi
     o.trail.forEach((tt, j, T) => { const t = { u: tt.u, s: tt.s }, f = src && src[j + src.length - T.length] || t, p = wvTrP(f); plan.tr.push({ f, t });
       g += `<circle class="wvt" data-tip="Kokonaisindikaattori ${tt.per}" data-sub="${Q[tt.q].short}\nEtäisyys trendistä ${tt.s.toFixed(2).replace(".", ",")}" data-qc="${qcol(tt.q)}" style="--k:${k + j};opacity:${(.2 + .55 * (j + 1) / T.length).toFixed(2)}" cx="${p.x.toFixed(1)}" cy="${p.y.toFixed(1)}" r="${p.r.toFixed(1)}"/>`; });
