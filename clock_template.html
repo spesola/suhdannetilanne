@@ -479,6 +479,9 @@ footer#foot .ngd { position: absolute; top: -23px; width: 8px; height: 8px; marg
 .hero .timebar.tb-hero .perax { left: 10px; right: 10px; top: 20px; }
 .hero .timebar.tb-hero .perax i { height: 4px; opacity: .35; } .hero .timebar.tb-hero .perax i.l { height: 6px; opacity: .55; }
 .hero .timebar.tb-hero .perax b { display: block; position: absolute; top: 9px; transform: translateX(-50%); font: 500 0.68rem/1 var(--font-data); color: var(--muted); letter-spacing: .02em; }
+.hero .timebar.tb-hero .perax i, .hero .timebar.tb-hero .perax b:not(.ae) { display: none; }   /* vain alku- ja loppuvuosi */
+.hero .timebar.tb-hero .perax b.ae { transform: none; } .hero .timebar.tb-hero .perax b.s { left: -10px; } .hero .timebar.tb-hero .perax b.e { right: -10px; }
+.perax b.ae { display: none; }
 .timebar > label { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); }
 /* aikajana: kuljettu osa tumma, loppu vaalea; alla vuosimerkit (#perAx) kahvan keskipisteen liikealueella */
 .pertrk { position: relative; flex: 1 1 200px; min-width: 0; align-self: center; }
@@ -1471,7 +1474,7 @@ a.ubr, button.ubr { cursor: pointer; } a.ubr:hover .t, button.ubr:hover .t { tex
     const P = set.periods, n = P.length - 1, w = ax.clientWidth, key = set.id + "|" + n + "|" + w; if (key === axKey) return; axKey = key;
     const ys = P.map((p, i) => [p, i]).filter(([p]) => /-01$|Q1$/.test(p)).map(([p, i]) => [+p.slice(0, 4), i]);
     if (!ys.length || !n || !w) { ax.innerHTML = ""; return; }
-    ax.innerHTML = ys.map(([y, i]) => `<i${y % 10 === 0 ? ' class="l"' : ""} style="left:${(i / n * 100).toFixed(2)}%"></i>` + (y % 5 === 0 ? `<b style="left:${(i / n * 100).toFixed(2)}%">${y}</b>` : "")).join("");
+    ax.innerHTML = ys.map(([y, i]) => `<i${y % 10 === 0 ? ' class="l"' : ""} style="left:${(i / n * 100).toFixed(2)}%"></i>` + (y % 5 === 0 ? `<b style="left:${(i / n * 100).toFixed(2)}%">${y}</b>` : "")).join("") + `<b class="ae s">${P[0].slice(0, 4)}</b><b class="ae e">${P[n].slice(0, 4)}</b>`;   // alku ja loppu (etusivun aikavalitsin)
   }
   addEventListener("resize", () => renderAx());
   $("tails").addEventListener("change", e => { showTails = e.target.checked; update(); });
