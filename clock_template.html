@@ -300,7 +300,7 @@ body:has(.hero.wvon) .pgsky { display: none; } body:has(.pgsky) .topbar::after {
 body:has(.hero.wvon) #topSec > .card { border-top-color: var(--line); }   /* pehmeä siirtymä taivaasta karttaan ja luetteloon */
 /* sivun alaosa: päivä kuluu iltaan ja yöhön (vieritettäessä uusi liukuma, alatunniste yötaivaalla) */
 .ngsky { position: absolute; left: 0; right: 0; z-index: -1; pointer-events: none; display: none; }
-:root:not([data-theme="vapor"]) .ngsky { display: block; background: linear-gradient(transparent 0, #f7eee8 110px, #f2dcd2 320px, #e8c6c1 510px, #cfa3ab 600px, #4f5878 685px, #262c45 790px, #1d2238 100%); }
+:root:not([data-theme="vapor"]) .ngsky { display: block; background: linear-gradient(transparent 0, #fbf6f3 180px, #f7ece6 390px, #efd8d1 530px, #d9b0b4 610px, #4f5878 685px, #262c45 790px, #1d2238 100%); }
 .ngsky .ngl { position: absolute; left: 0; right: 0; top: 632px; height: 2px; background: linear-gradient(90deg, transparent, rgba(255,255,255,.75) 18%, rgba(255,255,255,.75) 82%, transparent); }   /* horisontti illan ja yön rajalla */
 .ngsky .ngd { position: absolute; top: 629px; width: 8px; height: 8px; margin-left: -4px; border-radius: 50%; background: #fff; box-shadow: 0 0 12px 6px rgba(255,255,255,.28); }   /* piste nykyvaiheen kohdalla kuten aurinko yläosassa */
 :root:not([data-theme="vapor"]) body:has(> .ngsky) { isolation: isolate; }
