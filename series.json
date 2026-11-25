@@ -4170,7 +4170,8 @@
           "note": "Budjettitalouden nykyisen velan kuoletukset vuosittain ilman uutta lainanottoa. Kuluvan vuoden luku sisältää vain jäljellä olevat kuoletukset. Lähde: Valtiokonttori.",
           "more": true
         }
-      ]
+      ],
+      "topics": true
     }
   ],
   "series": [

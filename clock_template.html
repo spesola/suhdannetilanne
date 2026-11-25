@@ -776,6 +776,8 @@ tr.pick:hover th.rl .ego, tr.pick:focus-visible th.rl .ego { opacity: 1; }
 .era .eback { margin: 0 0 10px; font-size: 0.875rem; }
 .era .eback .lnk { font: inherit; color: var(--muted); background: none; border: 0; padding: 0; cursor: pointer; text-decoration: none; }
 .era .eback .lnk:hover { color: var(--fg); }
+.tback { grid-column: 1 / -1; margin-bottom: -12px; } .tback .eback { margin: 0 0 6px; font-size: 0.875rem; } .tback .lnk { font: inherit; color: var(--muted); background: none; border: 0; padding: 0; cursor: pointer; } .tback .lnk:hover { color: var(--fg); }
+.tback h2 { margin: 0; font-size: 1.25rem; font-weight: 600; letter-spacing: -0.01em; }   /* aihesivun otsikko (julkinen talous) */
 .era .hm th.rl { white-space: normal; line-height: 1.25; }
 .era tr.fp > th.rl { cursor: pointer; } .era .efold { font: inherit; border: 0; background: none; padding: 0; margin: 0 0 0 5px; color: var(--muted); cursor: pointer; vertical-align: -1px; line-height: 0; }   /* avattavat alaryhmät */
 .era .efold svg { fill: none; stroke: currentColor; stroke-width: 1.6; stroke-linecap: round; stroke-linejoin: round; transition: transform .15s; } .era .efold[aria-expanded="true"] svg { transform: rotate(90deg); }
@@ -2565,7 +2567,7 @@ a.ubr, button.ubr { cursor: pointer; } a.ubr:hover .t, button.ubr:hover .t { tex
       scrollTo({ top: t.getBoundingClientRect().top + scrollY - bar - 16 }); }, 120); }
   // sivuston muutokset: uudet kuviot ja muut isommat lisaykset (kasin yllapidetty, uusin ensin); set + id -> linkki kuvioon
   const CHANGES = [
-    { d: "2026-11-25", t: "Julkisen talouden taulukon rivit vievät aiheen osioon (rahoitusasema, tulot, menot, velka)." },
+    { d: "2026-11-25", t: "Julkinen talous: yleiskuvana taulukko, rivistä aukeaa aiheen oma erittelysivu (rahoitusasema, tulot, menot, velka) kaikkine kuvioineen." },
     { d: "2026-11-25", t: "Reaalitalouden BKT-näkymästä poistettu lisäkuviot, jotka ovat BKT:n erittelysivulla." },
     { d: "2026-11-25", t: "Kuvioiden hover sujuvaksi (raskaat CSS-valitsimet korvattu)." },
     { d: "2026-11-25", t: "BKT:n toimialaerittelyssä teollisuuden ja palveluiden alatoimialat avattavina." },
@@ -2820,7 +2822,7 @@ a.ubr, button.ubr { cursor: pointer; } a.ubr:hover .t, button.ubr:hover .t { tex
       const v = ser(r.id).values, k0 = qi.find(k => v[k] != null && v[k] !== 0) ?? 0;
       const hx = qi.filter(k => k >= k0 && v[k] != null && !/^202[01]/.test(P[k]) && (!c.meanFrom || P[k] >= String(c.meanFrom))).map(k => v[k]), mu = hx.reduce((s, x) => s + x, 0) / Math.max(1, hx.length);
       const sd = Math.sqrt(hx.reduce((s, x) => s + (x - mu) ** 2, 0) / Math.max(1, hx.length - 1)) || 1, dec = r.dec ?? c.dec ?? 1, yd = k => k >= 12 && v[k - 12] != null ? v[k] - v[k - 12] : null;
-      h += `<tr class="pick${r.tot ? " tot" : ""}" data-id="${r.id}"${r.sec ? ` data-sec="${escH(r.sec)}"` : ""} tabindex="0" title="${r.sec ? "Siirry osioon " + escH(r.sec) : "Näytä kuvio"}"><th class="rl${r.sub ? " sub" : ""}">${r.label}<span class="ego" aria-hidden="true">›</span></th>` + js.map(k => {
+      h += `<tr class="pick${r.tot ? " tot" : ""}" data-id="${r.id}"${r.sec ? ` data-sec="${escH(r.sec)}"` : ""} tabindex="0" title="${r.sec ? "Avaa erittely: " + escH(r.sec) : "Näytä kuvio"}"><th class="rl${r.sub ? " sub" : ""}">${r.label}<span class="ego" aria-hidden="true">›</span></th>` + js.map(k => {
         if (v[k] == null) return `<td class="na"></td>`;
         const e = v[k] - mu, tt = Math.min(1, Math.abs(e) / (2 * sd)), d = yd(k);
         const base = r.neutral ? "var(--accent)" : (e >= 0) !== !!r.inv ? "var(--q-up)" : "var(--q-down)";
@@ -2831,12 +2833,12 @@ a.ubr, button.ubr { cursor: pointer; } a.ubr:hover .t, button.ubr:hover .t { tex
     card.innerHTML = h + "</tbody></table></div>";
     const wr = card.querySelector(".hmwrap"); requestAnimationFrame(() => { wr.scrollLeft = wr.scrollWidth; });
     card.querySelectorAll("tr.pick").forEach(tr => { const go = () => {
-        if (tr.dataset.sec) { const nb = [...document.querySelectorAll("#charts .secnav button")].find(b => b.textContent === tr.dataset.sec); if (nb) { nb.click(); return; } }   // rivi vie osioon, jossa kaikki aiheen kuviot (kuten reaalitalouden erittely)
+        if (tr.dataset.sec && set.topics) return topicGo(tr.dataset.sec);   // rivi avaa aiheen erittelysivun (kuten reaalitaloudessa)
         const id = tr.dataset.id, find = vis => [...document.querySelectorAll(".fcard")].find(x => x !== card && (!vis || x.offsetParent) && x._zc && [...(x._zc.lines || []), ...(x._zc.stack || [])].includes(id));
         let tg = find(true);
         if (!tg) { const hid = find(false), h = hid && hid.closest(".smore"); if (h) { h.querySelector(".rfold").click(); setTimeout(go, 120); } return; }   // kuvio taitettuna: avaa Lisää ja yritä uudelleen
         tg.scrollIntoView({ behavior: REDUCED.matches ? "auto" : "smooth", block: "center" }); tg.classList.remove("flash"); void tg.offsetWidth; tg.classList.add("flash"); };
-      tr.onclick = go; tr.onkeydown = e => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); go(); } }; });
+      tr.onclick = go; tr.onkeydown = e => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); if (tr.dataset.sec && set.topics) topicGo(tr.dataset.sec, true); else go(); } }; });
     const fm = document.createElement("div"); fm.className = "fmeta";
     const db = document.createElement("button"); db.type = "button"; db.className = "dl"; db.textContent = "Lataa CSV";
     db.onclick = () => saveFile(`suhdannetilanne-${slug(c.title)}.csv`, toCSV([["Sarja", ...js.map(fq)], ...rows.map(r => [r.label, ...js.map(k => ser(r.id).values[k])])]));
@@ -3164,6 +3166,11 @@ a.ubr, button.ubr { cursor: pointer; } a.ubr:hover .t, button.ubr:hover .t { tex
       if (used + w > 6) flush(); row.push(c); used += w; if (used >= 6) flush(); });
     flush();
   }
+  function topicGo(sec, kb) {                                          // aihesivulle ja takaisin yleiskuvaan
+    openSec[set.id] = sec || secFirst[set.id]; writeHash(); drawCharts();
+    const box = $("charts"), y = box.getBoundingClientRect().top + scrollY - (parseFloat(getComputedStyle(document.documentElement).getPropertyValue("--barv")) || 60) - 20;
+    scrollTo({ top: Math.max(0, y), behavior: "auto" });
+    if (kb) { const f = sec ? box.querySelector(".tback .lnk") : box.querySelector(`.qcard tr[data-sec]`); if (f) f.focus({ preventScroll: true }); } }
   function renderCharts0(box = $("charts"), only = null) {
     box.innerHTML = ""; chartHooks = [];
     const ser = id => set.series.find(x => x.id === id);
@@ -3198,6 +3205,16 @@ a.ubr, button.ubr { cursor: pointer; } a.ubr:hover .t, button.ubr:hover .t { tex
     charts.forEach(c => { if (!c.lines) return; if (c.colors) Object.assign(colOf, c.colors); else if (c.lineColor) colOf[c.lines[0]] = c.lineColor; });
     charts.forEach(c => (c.lines || []).forEach((id, k) => { if (!(id in colOf)) colOf[id] = LINE_COLS[k % LINE_COLS.length]; }));
     let lastSec = null, nth = 0;
+    // aihesivut (series.json: topics): ensimmäinen osio on yleiskuva, muut osiot omina erittelysivuinaan (taulukon rivistä, takaisin ← Palaa)
+    const TOP = !!(set.topics && !only && !col); let topCur = null, topFirst = null;
+    if (TOP) { const ss = [...new Set(charts.map(c => c.section).filter(Boolean))]; topFirst = ss[0]; secFirst[set.id] = topFirst;
+      if (secWant[set.id]) { const w = ss.find(x => slug1(x) === secWant[set.id]); delete secWant[set.id]; if (w) openSec[set.id] = w; }
+      topCur = ss.includes(openSec[set.id]) ? openSec[set.id] : topFirst; openSec[set.id] = topCur;
+      charts = charts.filter(c => (c.section || topFirst) === topCur).map(c => topCur !== topFirst && c.more ? { ...c, more: false } : c);
+      if (topCur !== topFirst) { const hd = document.createElement("div"); hd.className = "tback";
+        hd.innerHTML = `<p class="eback"><button type="button" class="lnk">← Palaa</button></p><h2>${escH(topCur)}</h2>`;
+        hd.querySelector("button").onclick = e => topicGo(null, !e.detail); box.appendChild(hd); }
+      lastSec = topCur; }
     const secs = [...new Set(charts.map(c => c.section).filter(Boolean))];
     if (secs.length > 2) {                                               // pitka sivu: osioiden pikalinkit, kiinnittyy ylareunaan
       const nav = document.createElement("nav"); nav.className = "secnav"; nav.setAttribute("aria-label", "Osiot");

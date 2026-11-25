@@ -16,7 +16,7 @@ let file;
     const p = await b.newPage({ viewport: { width: w, height: 900 } });
     p.on("pageerror", e => fails.push(`${w}px: JS-virhe: ${e.message}`));
     p.on("console", m => { if (m.type() === "error" && !/fonts\.g/.test(m.text())) fails.push(`${w}px: konsoli: ${m.text()}`); });
-    for (const h of ["#suhdanne", "#reaalitalous", "#rahoitus", "#julkinen-talous"]) {
+    for (const h of ["#suhdanne", "#reaalitalous", "#rahoitus", "#julkinen-talous", "#julkinen-talous/velka"]) {
       await p.goto(file + h); await p.waitForTimeout(800);
       const r = await p.evaluate(() => ({ sw: document.documentElement.scrollWidth, iw: innerWidth,
         pts: document.querySelectorAll("#clock g.pt").length, rows: document.querySelectorAll("#grTable tr.pick").length,
@@ -31,7 +31,8 @@ let file;
       if (h !== "#suhdanne" && await p.evaluate(() => { const k = document.querySelector(".hero > .wvsky"); return !!k && getComputedStyle(k).display !== "none"; })) fails.push(`${w}px ${h}: aallon taivas näkyy väärällä välilehdellä`);
       if (h === "#reaalitalous" && r.rows < 5) fails.push(`${w}px ${h}: taulukossa vain ${r.rows} rivia`);
       if (h === "#rahoitus" && r.charts < 5) fails.push(`${w}px ${h}: vain ${r.charts} kuviota`);
-      if (h === "#julkinen-talous" && r.charts < 5) fails.push(`${w}px ${h}: vain ${r.charts} kuviota`);
+      if (h === "#julkinen-talous" && r.charts < 1) fails.push(`${w}px ${h}: yleiskuvan taulukko puuttuu`);
+      if (h === "#julkinen-talous/velka" && r.charts < 4) fails.push(`${w}px ${h}: aihesivulla vain ${r.charts} kuviota`);
       if (h === "#reaalitalous") {
         const ids = await p.$$eval("#grTable tr.pick", e => e.map(x => x.dataset.id));
         for (const id of ids) {
