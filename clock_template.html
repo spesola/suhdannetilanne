@@ -812,6 +812,8 @@ tr.pick:hover th.rl .ego, tr.pick:focus-visible th.rl .ego { opacity: 1; }
 .rfold + .fgrid { margin-top: 26px; }
 .grmore.folded > .fgrid, .fcsec.folded > .fgrid { display: none; }
 .grmore.eraopen > .rfold { display: none; }
+.grmore .elink { display: none; } .grmore.tolink > .rfold, .grmore.tolink > .fgrid { display: none !important; }
+.grmore.tolink .elink { display: flex; align-items: center; gap: 8px; cursor: pointer; } .grmore.tolink .elink span { color: var(--muted); transition: transform .15s; } .grmore.tolink .elink:hover span { transform: translateX(3px); color: var(--fg); }
 .grmore.eraopen.folded > .fgrid { display: grid; }
 .grmore.eraopen > .fgrid { margin-top: 0; }
 .fcsec .fcard.tt { grid-column: 1 / span 4; }
@@ -1107,7 +1109,7 @@ a.ubr, button.ubr { cursor: pointer; } a.ubr:hover .t, button.ubr:hover .t { tex
     </div></div>
     <div class="grrow"><div class="grcol" id="grCharts"></div><div class="grside" id="grSide"></div></div>
   </section>
-  <section class="grmore" id="grMore" hidden><h2 class="fsec rfold" data-k="more" role="button" tabindex="0" aria-expanded="false"><span class="chev" aria-hidden="true"><svg viewBox="0 0 12 12" width="14" height="14"><path d="M4 2.5 7.5 6 4 9.5"/></svg></span>Lisää<span class="fcnt" id="grMoreN"></span></h2><div class="fgrid" id="grMoreGrid"></div></section>
+  <section class="grmore" id="grMore" hidden><h2 class="fsec rfold" data-k="more" role="button" tabindex="0" aria-expanded="false"><span class="chev" aria-hidden="true"><svg viewBox="0 0 12 12" width="14" height="14"><path d="M4 2.5 7.5 6 4 9.5"/></svg></span>Lisää<span class="fcnt" id="grMoreN"></span></h2><div class="fgrid" id="grMoreGrid"></div><h2 class="fsec elink" id="grMoreLink" role="button" tabindex="0">Toimialat ja lisäkuviot<span aria-hidden="true">→</span></h2></section>
   <section class="fcsec" id="fcSec" hidden><h2 class="fsec rfold" data-k="fc" role="button" tabindex="0" aria-expanded="false"><span class="chev" aria-hidden="true"><svg viewBox="0 0 12 12" width="14" height="14"><path d="M4 2.5 7.5 6 4 9.5"/></svg></span>Ennusteet</h2><div class="fgrid" id="fcGrid"></div></section>
   <section class="card" id="finSum" hidden></section>
   <section class="fgrid" id="charts" hidden></section>
@@ -2126,7 +2128,8 @@ a.ubr, button.ubr { cursor: pointer; } a.ubr:hover .t, button.ubr:hover .t { tex
     const box = $("eraSec"), EK = eraKeyOf(grSel), gl = $("growthSec").querySelector(".grleft"); box.hidden = !EK; gl.hidden = !!EK;
     if (EK !== eraShown) { const back = !EK && eraShown; eraShown = EK; const an = EK ? box : back ? gl : null;   // sama liuku erittelyyn mentaessa ja taulukkoon palattaessa
       if (an && motion()) { an.classList.remove("ein"); void an.offsetWidth; an.classList.add("ein"); } }
-    $("grMore").classList.toggle("eraopen", !!EK);                   // erittelysivulla aiheen kaikki kuviot nakyvissa ilman Lisaa-taitetta
+    $("grMore").classList.toggle("eraopen", !!EK);
+    $("grMore").classList.toggle("tolink", !EK && grSel === "bkt" && eraHas("bkt"));   // BKT:n lisäkuviot ovat erittelysivulla: pääsivulla vain linkki sinne                   // erittelysivulla aiheen kaikki kuviot nakyvissa ilman Lisaa-taitetta
     if (!EK) { box.innerHTML = ""; return; }
     const E = set.detail[EK], mon = E.freq === "M", P = mon ? set.mperiods || [] : set.periods, SS = mon ? set.mseries || [] : set.series;   // kuukausierittely kuukausiakselilla
     const val = id => (SS.find(x => x.id === id) || {}).values || [];
@@ -2563,6 +2566,7 @@ a.ubr, button.ubr { cursor: pointer; } a.ubr:hover .t, button.ubr:hover .t { tex
       scrollTo({ top: t.getBoundingClientRect().top + scrollY - bar - 16 }); }, 120); }
   // sivuston muutokset: uudet kuviot ja muut isommat lisaykset (kasin yllapidetty, uusin ensin); set + id -> linkki kuvioon
   const CHANGES = [
+    { d: "2026-11-25", t: "Reaalitalouden BKT-näkymässä lisäkuviot korvattu linkillä erittelysivulle, jossa samat kuviot ovat." },
     { d: "2026-11-25", t: "Kuvioiden hover sujuvaksi (raskaat CSS-valitsimet korvattu)." },
     { d: "2026-11-25", t: "BKT:n toimialaerittelyssä teollisuuden ja palveluiden alatoimialat avattavina." },
     { d: "2026-11-25", t: "Alatunnisteen yötaivas sidottu alatunnisteeseen (ei enää katoa), enemmän tilaa ennen alatunnistetta. Aikavalitsin ei enää mene jaksolle, jolta kokonaisindikaattorin muutos puuttuu." },
@@ -3543,6 +3547,7 @@ a.ubr, button.ubr { cursor: pointer; } a.ubr:hover .t, button.ubr:hover .t { tex
       h.onclick = tog; h.onkeydown = e => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); tog(); } }; });
     sync();
   })();
+  { const l = $("grMoreLink"), go = e => eraGo("bkt", { kb: !e.detail }); l.onclick = go; l.onkeydown = e => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); eraGo("bkt", { kb: true }); } }; }
   const HASH = { suhdanne: "suhdanne", bkt: "reaalitalous", rahoitus: "rahoitus", julkinen: "julkinen-talous" };
   // osoite: #nakyma/valinta~kuvio; valinta = reaalitalouden rivi, suhdannenakyman sarja tai ryhma, tai osio (rahoitus, julkinen talous)
   const hashFor = () => { let t = "";
