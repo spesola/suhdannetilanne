@@ -300,11 +300,15 @@ body:has(> .pgsky) { isolation: isolate; }   /* taivas body-taustan päälle mut
 body:has(.hero.wvon) .pgsky { display: none; } body:has(.pgsky) .topbar::after { display: none; }
 body:has(.hero.wvon) #topSec > .card { border-top-color: var(--line); }   /* pehmeä siirtymä taivaasta karttaan ja luetteloon */
 /* sivun alaosa: päivä kuluu iltaan ja yöhön (vieritettäessä uusi liukuma, alatunniste yötaivaalla) */
-.ngsky { position: absolute; left: 0; right: 0; z-index: -1; pointer-events: none; display: none; }
-:root:not([data-theme="vapor"]) .ngsky { display: block; background: linear-gradient(transparent 0, #fbf6f3 180px, #f7ece6 390px, #efd8d1 530px, #d9b0b4 610px, #4f5878 685px, #262c45 790px, #1d2238 100%); }
-.ngsky .ngl { position: absolute; left: 0; right: 0; top: 632px; height: 2px; background: linear-gradient(90deg, transparent, rgba(255,255,255,.75) 18%, rgba(255,255,255,.75) 82%, transparent); }   /* horisontti illan ja yön rajalla */
-.ngsky .ngd { position: absolute; top: 629px; width: 8px; height: 8px; margin-left: -4px; border-radius: 50%; background: #fff; box-shadow: 0 0 12px 6px rgba(255,255,255,.28); }   /* piste nykyvaiheen kohdalla kuten aurinko yläosassa */
-:root body:has(> .ngsky) { isolation: isolate; }
+/* sivun alaosa: ilta ja yö alatunnisteen taakse, sidottu alatunnisteeseen pelkällä CSS:llä (ei sijainnin laskentaa) */
+body { overflow-x: clip; } body:has(> .wrap > #foot) { isolation: isolate; }
+footer#foot { position: relative; margin-top: 150px; padding-top: 46px; }
+footer#foot::before { content: ""; position: absolute; z-index: -1; pointer-events: none; left: calc(50% - 50vw); width: 100vw; top: -500px; bottom: -64px;
+  background: linear-gradient(transparent 0, #fbf6f3 130px, #f7ece6 300px, #efd8d1 405px, #d9b0b4 465px, #4f5878 540px, #262c45 645px, #1d2238 100%); }
+footer#foot::after { content: ""; position: absolute; pointer-events: none; left: calc(50% - 50vw); width: 100vw; top: -20px; height: 2px; background: linear-gradient(90deg, transparent, rgba(255,255,255,.75) 18%, rgba(255,255,255,.75) 82%, transparent); }   /* horisontti */
+footer#foot .ngd { position: absolute; top: -23px; width: 8px; height: 8px; margin-left: -4px; border-radius: 50%; background: #fff; box-shadow: 0 0 12px 6px rgba(255,255,255,.28); pointer-events: none; }   /* nykyvaihe kuten aurinko yläosassa */
+:root[data-theme="vapor"] footer#foot::before { background: linear-gradient(transparent 0, transparent 170px, #140b26 320px, #3a1442 420px, #9a3474 474px, #ff8fbf 481px, #3a1650 493px, #170c2c 590px, #07050d 100%); }
+:root[data-theme="vapor"] footer#foot .ngd { box-shadow: 0 0 14px 6px rgba(255,143,191,.45); }
 :root footer { color: #c3c8d8; border-top-color: transparent; } :root footer .fh { color: #9198b2; } :root footer .fbrand { color: #fff; }
 :root footer .flinks .lnk, :root footer a { color: #fff; text-decoration-color: rgba(255,255,255,.35); }
 /* yläpalkki taivaan päällä: läpinäkyvä ja valkoinen teksti, vierittäessä vaalea lasi */
@@ -330,8 +334,6 @@ body:has(.hero.wvon) #topSec > .card { border-top-color: var(--line); }   /* peh
 :root[data-theme="vapor"] .wvsky > .wsl { background: linear-gradient(var(--g1) 0, var(--g2) calc(var(--wvH, 300px) * .55), var(--g3) calc(var(--wvH, 300px) * .82), var(--g4) var(--wvH, 300px), var(--g5) calc(var(--wvH, 300px) + 110px), var(--bg) calc(var(--wvH, 300px) + 250px)); }
 :root[data-theme="vapor"] .pgsky { opacity: 1; background: linear-gradient(var(--g1) 0, var(--g1) 20px, var(--g2) 110px, var(--bg) 290px); }
 @media (max-width: 699px) { :root[data-theme="vapor"] .pgsky { background: linear-gradient(var(--g1) 0, var(--g1) 70px, var(--g2) 160px, var(--bg) 310px); } }
-:root[data-theme="vapor"] .ngsky { display: block; background: linear-gradient(transparent 0, transparent 300px, #140b26 470px, #3a1442 575px, #9a3474 626px, #ff8fbf 633px, #3a1650 645px, #170c2c 740px, #07050d 100%); }
-:root[data-theme="vapor"] .ngsky .ngd { box-shadow: 0 0 14px 6px rgba(255,143,191,.45); }
 :root:not([data-theme="vapor"]) .wp-rec { --g1: #7f96d0; --g2: #c2cdee; --g3: #f8eee8; --g4: #f2cc9c; --g5: #faf2e6; --wvG: #fff4e6; --wvGp: 60%; }   /* pastelli P2: aamu, kultainen horisontti */
 :root:not([data-theme="vapor"]) .wp-up { --g1: #6fafd4; --g2: #b4d8ea; --g3: #f5fafa; --g4: #b5dcc9; --g5: #eef6f2; --wvG: #ffffff; --wvGp: 70%; }
 :root:not([data-theme="vapor"]) .wp-turn { --g1: #e5916c; --g2: #f0b99c; --g3: #f9e6da; --g4: #a9cfdb; --g5: #eaf3f6; --wvG: #ffffff; --wvGp: 55%; }
@@ -1445,10 +1447,11 @@ a.ubr, button.ubr { cursor: pointer; } a.ubr:hover .t, button.ubr:hover .t { tex
   }
   addEventListener("resize", () => renderAx());
   $("tails").addEventListener("change", e => { showTails = e.target.checked; update(); });
-  $("per").addEventListener("input", e => { stopPlay(); idx = +e.target.value; e.target.style.setProperty("--pct", idx / e.target.max * 100 + "%"); update(); });
+  const minIdx = () => { const C = set.composite && set.indicators ? comp() : null; if (!C) return 0; const k = set.periods.findIndex((_, i) => C.level[i] != null && C.change[i] != null); return Math.max(0, k); };   // alku: kokonaisindikaattorin muutos puuttuu ensimmäiseltä jaksolta
+  $("per").addEventListener("input", e => { stopPlay(); idx = Math.max(minIdx(), +e.target.value); e.target.value = idx; e.target.style.setProperty("--pct", idx / e.target.max * 100 + "%"); update(); });
   document.querySelectorAll(".xbtn[data-x]").forEach(b => b.onclick = () => { const p = $(b.dataset.x); p.hidden = !p.hidden;
     b.setAttribute("aria-expanded", String(!p.hidden)); b.title = p.hidden ? "Näytä selite" : "Piilota selite"; b.setAttribute("aria-label", b.title); });
-  $("prev").onclick = () => { stopPlay(); if (idx > 0) { idx--; update(); } };
+  $("prev").onclick = () => { stopPlay(); if (idx > minIdx()) { idx--; update(); } };
   $("next").onclick = () => { stopPlay(); if (idx < set.periods.length - 1) { idx++; update(); } };
 
   /* ---------- luonnos: suhdanneaalto ---------- */
@@ -1960,7 +1963,7 @@ a.ubr, button.ubr { cursor: pointer; } a.ubr:hover .t, button.ubr:hover .t { tex
 
   function renderFoot() {
     const logo = document.querySelector(".brand svg.logo");
-    $("foot").innerHTML = `<div><div class="fbrand">${logo ? logo.outerHTML : ""}Suhdannetilanne</div><nav class="flinks" aria-label="Sivuston tiedot"><button type="button" class="lnk" data-info="about">Tietoa sivusta</button><button type="button" class="lnk" data-info="met">Menetelmä</button><button type="button" class="lnk" data-info="src">Lähteet</button><button type="button" class="lnk" id="updOpen2">Julkaisut</button><button type="button" class="lnk" id="chgOpen">Muutokset</button></nav></div>
+    $("foot").innerHTML = (NGU != null ? `<i class="ngd" aria-hidden="true" style="left:${(NGU * 100).toFixed(1)}%"></i>` : "") + `<div><div class="fbrand">${logo ? logo.outerHTML : ""}Suhdannetilanne</div><nav class="flinks" aria-label="Sivuston tiedot"><button type="button" class="lnk" data-info="about">Tietoa sivusta</button><button type="button" class="lnk" data-info="met">Menetelmä</button><button type="button" class="lnk" data-info="src">Lähteet</button><button type="button" class="lnk" id="updOpen2">Julkaisut</button><button type="button" class="lnk" id="chgOpen">Muutokset</button></nav></div>
       <div><p class="fh">Huomioitavaa</p><p>Suomen talouden suhdannetilanne avoimista tilastoista. Päivittyy arkisin.</p><p>Luvut haetaan automaattisesti avoimista tilastolähteistä, eikä niitä ole tarkoitettu sijoitusneuvoiksi. Tilastot tarkentuvat jälkikäteen, joten aiemmin esitetyt luvut voivat muuttua.</p></div>
       <div><p class="fh">Tietolähteet</p><p>${(D.meta.sources || []).map(x => x.name).join(", ")}.</p><p>Laskelmat ja esitystapa ovat omia.</p></div>`;
     INFO.about = { t: "Tietoa sivusta", h: `<p>Suhdannetilanne.fi kokoaa Suomen talouden suhdannetta kuvaavat avoimet tilastot yhdelle sivulle. Sivu päivittyy automaattisesti arkisin, kun tilastolähteet julkaisevat uusia lukuja.</p>
@@ -2549,6 +2552,7 @@ a.ubr, button.ubr { cursor: pointer; } a.ubr:hover .t, button.ubr:hover .t { tex
       scrollTo({ top: t.getBoundingClientRect().top + scrollY - bar - 16 }); }, 120); }
   // sivuston muutokset: uudet kuviot ja muut isommat lisaykset (kasin yllapidetty, uusin ensin); set + id -> linkki kuvioon
   const CHANGES = [
+    { d: "2026-11-25", t: "Alatunnisteen yötaivas sidottu alatunnisteeseen (ei enää katoa), enemmän tilaa ennen alatunnistetta. Aikavalitsin ei enää mene jaksolle, jolta kokonaisindikaattorin muutos puuttuu." },
     { d: "2026-11-25", t: "Asuntojen hinnat myös kuukausittain (ennakkotieto). Kartan toiston animaatio sujuvammaksi." },
     { d: "2026-11-25", t: "Vaporwave-teema uuteen ilmeeseen: vaiheen synthwave-taivas yläreunasta asti, läpinäkyvä yläpalkki ja yötaivas alatunnisteessa." },
     { d: "2026-11-25", t: "Uusi logo: suhdanneaalto ja aurinko, joka näyttää nykyisen vaiheen myös välilehden kuvakkeessa." },
@@ -2729,7 +2733,7 @@ a.ubr, button.ubr { cursor: pointer; } a.ubr:hover .t, button.ubr:hover .t { tex
   $("play").onclick = () => {
     if (playT) return stopPlay();
     const end = set.periods.length - 1;
-    if (end - idx < 6) { const f = set.composite.level.findIndex(v => v != null); idx = Math.max(0, f); update(); }   // lopussa: alusta
+    if (end - idx < 6) { idx = minIdx(); update(); }   // lopussa: alusta
     $("play").innerHTML = "&#10074;&#10074;"; $("play").setAttribute("aria-label", "Pysäytä");
     playT = setInterval(() => { if (idx >= end) return stopPlay(); idx++; update(); }, set.freq === "M" ? (LUONNOS ? 240 : 160) : 450);   // luonnos: hitaampi, jotta aallon liikettä ehtii seurata
   };
@@ -3587,11 +3591,6 @@ a.ubr, button.ubr { cursor: pointer; } a.ubr:hover .t, button.ubr:hover .t { tex
       const C0 = comp(); PHMAP = {}; s0.periods.forEach((per, k) => { if (C0.level[k] != null && C0.change[k] != null) PHMAP[per] = quad(C0.level[k], C0.change[k]); }); set = sv; } }
   addEventListener("resize", () => { placeUL($("sets"), $("sets").querySelector('button[aria-pressed="true"]')); const nv = document.querySelector("#charts .secnav"); if (nv) placeUL(nv, nv.querySelector("button.on")); });
   applyHash(); renderFoot(); renderAll();
-  { const ng = document.createElement("div"); ng.className = "ngsky"; ng.setAttribute("aria-hidden", "true"); ng.innerHTML = '<div class="ngl"></div>' + (NGU != null ? '<div class="ngd"></div>' : ""); document.body.prepend(ng);   // ilta- ja yötaivas alatunnisteen taakse
-    const ngPos = () => { const f = $("foot"); if (!f) return; const r = f.getBoundingClientRect(), bs = getComputedStyle(document.body), t = r.top + scrollY - 650;
-      ng.style.top = t + "px"; ng.style.height = (r.bottom + scrollY + parseFloat(bs.paddingBottom) + parseFloat(bs.marginBottom) - t) + "px";
-      const d = ng.querySelector(".ngd"); if (d) d.style.left = (r.left + NGU * r.width) + "px"; };
-    ngPos(); addEventListener("resize", ngPos); if (window.ResizeObserver) new ResizeObserver(ngPos).observe(document.body); }
   if (document.fonts && document.fonts.ready) document.fonts.ready.then(() => { if (set.growth && set.view === "charts") drawCharts(); goCard(); }); else goCard();   // fontin latauksen jalkeen korkeudet uudelleen
 })();
 </script>
