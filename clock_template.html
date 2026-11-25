@@ -789,6 +789,8 @@ tr.pick:hover th.rl .ego, tr.pick:focus-visible th.rl .ego { opacity: 1; }
 @media (max-width: 560px) { .grpair .era .hm th.rl { min-width: 128px; max-width: 150px; } .grpair .era .hm th.rl.sub2 { padding-left: 18px; } }
 .era.ein, .grleft.ein { animation: eraIn .35s ease-out; }
 @keyframes eraIn { from { opacity: 0; transform: translateY(6px); } }
+#charts.tin > * { animation: eraIn .38s cubic-bezier(.2,.7,.3,1) both; animation-delay: calc(var(--ti, 0) * 45ms); }   /* aihesivun vaihto: kortit nousevat porrastetusti */
+@media (prefers-reduced-motion: reduce) { #charts.tin > * { animation: none; } }
 @media (prefers-reduced-motion: reduce) { .era.ein, .grleft.ein { animation: none; } }
 .grleft, .grside { display: flex; flex-direction: column; gap: 40px; min-width: 0; }
 .grside:empty { display: none; }
@@ -2569,6 +2571,7 @@ a.ubr, button.ubr { cursor: pointer; } a.ubr:hover .t, button.ubr:hover .t { tex
       scrollTo({ top: t.getBoundingClientRect().top + scrollY - bar - 16 }); }, 120); }
   // sivuston muutokset: uudet kuviot ja muut isommat lisaykset (kasin yllapidetty, uusin ensin); set + id -> linkki kuvioon
   const CHANGES = [
+    { d: "2026-11-25", t: "Julkisen talouden yleiskuvan ja aihesivujen välillä siirtymäanimaatio." },
     { d: "2026-11-25", t: "Suhdannekartan toistopainike poistettu; aikaa selataan liukusäätimellä." },
     { d: "2026-11-25", t: "Taulukoiden nimisarake läpinäkyvä taustan liukumaa vasten (peittävä vain vaakavieritettäessä)." },
     { d: "2026-11-25", t: "Julkinen talous: yleiskuvana taulukko, rivistä aukeaa aiheen oma erittelysivu (rahoitusasema, tulot, menot, velka) kaikkine kuvioineen." },
@@ -3170,6 +3173,7 @@ a.ubr, button.ubr { cursor: pointer; } a.ubr:hover .t, button.ubr:hover .t { tex
       if (used + w > 6) flush(); row.push(c); used += w; if (used >= 6) flush(); });
     flush();
   }
+  const topLast = {};
   function topicGo(sec, kb) {                                          // aihesivulle ja takaisin yleiskuvaan
     openSec[set.id] = sec || secFirst[set.id]; writeHash(); drawCharts();
     const box = $("charts"), y = box.getBoundingClientRect().top + scrollY - (parseFloat(getComputedStyle(document.documentElement).getPropertyValue("--barv")) || 60) - 20;
@@ -3214,6 +3218,10 @@ a.ubr, button.ubr { cursor: pointer; } a.ubr:hover .t, button.ubr:hover .t { tex
     if (TOP) { const ss = [...new Set(charts.map(c => c.section).filter(Boolean))]; topFirst = ss[0]; secFirst[set.id] = topFirst;
       if (secWant[set.id]) { const w = ss.find(x => slug1(x) === secWant[set.id]); delete secWant[set.id]; if (w) openSec[set.id] = w; }
       topCur = ss.includes(openSec[set.id]) ? openSec[set.id] : topFirst; openSec[set.id] = topCur;
+      if (topLast[set.id] !== undefined && topLast[set.id] !== topCur && motion()) requestAnimationFrame(() => {   // siirtymä yleiskuvan ja aihesivun välillä
+        box.classList.remove("tin"); void box.offsetWidth; [...box.children].forEach((c, i) => c.style.setProperty("--ti", Math.min(i, 8))); box.classList.add("tin");
+        clearTimeout(box._tinT); box._tinT = setTimeout(() => box.classList.remove("tin"), 900); });
+      topLast[set.id] = topCur;
       charts = charts.filter(c => (c.section || topFirst) === topCur).map(c => topCur !== topFirst && c.more ? { ...c, more: false } : c);
       if (topCur !== topFirst) { const hd = document.createElement("div"); hd.className = "tback";
         hd.innerHTML = `<p class="eback"><button type="button" class="lnk">← Palaa</button></p><h2>${escH(topCur)}</h2>`;
