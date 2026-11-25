@@ -1600,7 +1600,7 @@ a.ubr, button.ubr { cursor: pointer; } a.ubr:hover .t, button.ubr:hover .t { tex
     if (prev) { move = mot && prev.idx !== idx; if (move) sunF = prev.sun; }
     else if (mot && trail.length) { const tl = trail[trail.length - 1]; sunF = { u: tl.u, s: tl.s, q: quad(C.level[cp.i - 1] ?? cp.l, C.change[cp.i - 1] ?? cp.c) }; move = true; }   // ensimmäinen piirto: edellisestä kuukaudesta
     const sun = { u: wvU(cp.l, cp.c), s, q: cq, per: fmtP(P[cp.i]),
-      sub: `${Q[cq].short}\nTaso ${fmt2(cp.l)}, muutos ${fmt2(cp.c)}\nEtäisyys trendistä ${s.toFixed(2).replace(".", ",")} (${s <= srt[0] + 1e-9 ? `pienin ${fmtP(P[k0])} alkaen` : `mediaani ${med.toFixed(2).replace(".", ",")}`})` };
+      sub: `${Q[cq].short}\nTaso ${fmt2(cp.l)}, muutos ${fmt2(cp.c)}` };
     return { items, counts, cq, sun, trail, sunF, move, prev, step: prev ? idx - prev.idx : 0, fast: !!playT, anim: mot && !prev, qf };
   }
 
