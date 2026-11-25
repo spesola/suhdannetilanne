@@ -2565,6 +2565,7 @@ a.ubr, button.ubr { cursor: pointer; } a.ubr:hover .t, button.ubr:hover .t { tex
       scrollTo({ top: t.getBoundingClientRect().top + scrollY - bar - 16 }); }, 120); }
   // sivuston muutokset: uudet kuviot ja muut isommat lisaykset (kasin yllapidetty, uusin ensin); set + id -> linkki kuvioon
   const CHANGES = [
+    { d: "2026-11-25", t: "Julkisen talouden taulukon rivit vievät aiheen osioon (rahoitusasema, tulot, menot, velka)." },
     { d: "2026-11-25", t: "Reaalitalouden BKT-näkymästä poistettu lisäkuviot, jotka ovat BKT:n erittelysivulla." },
     { d: "2026-11-25", t: "Kuvioiden hover sujuvaksi (raskaat CSS-valitsimet korvattu)." },
     { d: "2026-11-25", t: "BKT:n toimialaerittelyssä teollisuuden ja palveluiden alatoimialat avattavina." },
@@ -2819,7 +2820,7 @@ a.ubr, button.ubr { cursor: pointer; } a.ubr:hover .t, button.ubr:hover .t { tex
       const v = ser(r.id).values, k0 = qi.find(k => v[k] != null && v[k] !== 0) ?? 0;
       const hx = qi.filter(k => k >= k0 && v[k] != null && !/^202[01]/.test(P[k]) && (!c.meanFrom || P[k] >= String(c.meanFrom))).map(k => v[k]), mu = hx.reduce((s, x) => s + x, 0) / Math.max(1, hx.length);
       const sd = Math.sqrt(hx.reduce((s, x) => s + (x - mu) ** 2, 0) / Math.max(1, hx.length - 1)) || 1, dec = r.dec ?? c.dec ?? 1, yd = k => k >= 12 && v[k - 12] != null ? v[k] - v[k - 12] : null;
-      h += `<tr class="pick${r.tot ? " tot" : ""}" data-id="${r.id}" tabindex="0" title="Näytä kuvio"><th class="rl${r.sub ? " sub" : ""}">${r.label}</th>` + js.map(k => {
+      h += `<tr class="pick${r.tot ? " tot" : ""}" data-id="${r.id}"${r.sec ? ` data-sec="${escH(r.sec)}"` : ""} tabindex="0" title="${r.sec ? "Siirry osioon " + escH(r.sec) : "Näytä kuvio"}"><th class="rl${r.sub ? " sub" : ""}">${r.label}<span class="ego" aria-hidden="true">›</span></th>` + js.map(k => {
         if (v[k] == null) return `<td class="na"></td>`;
         const e = v[k] - mu, tt = Math.min(1, Math.abs(e) / (2 * sd)), d = yd(k);
         const base = r.neutral ? "var(--accent)" : (e >= 0) !== !!r.inv ? "var(--q-up)" : "var(--q-down)";
@@ -2830,6 +2831,7 @@ a.ubr, button.ubr { cursor: pointer; } a.ubr:hover .t, button.ubr:hover .t { tex
     card.innerHTML = h + "</tbody></table></div>";
     const wr = card.querySelector(".hmwrap"); requestAnimationFrame(() => { wr.scrollLeft = wr.scrollWidth; });
     card.querySelectorAll("tr.pick").forEach(tr => { const go = () => {
+        if (tr.dataset.sec) { const nb = [...document.querySelectorAll("#charts .secnav button")].find(b => b.textContent === tr.dataset.sec); if (nb) { nb.click(); return; } }   // rivi vie osioon, jossa kaikki aiheen kuviot (kuten reaalitalouden erittely)
         const id = tr.dataset.id, find = vis => [...document.querySelectorAll(".fcard")].find(x => x !== card && (!vis || x.offsetParent) && x._zc && [...(x._zc.lines || []), ...(x._zc.stack || [])].includes(id));
         let tg = find(true);
         if (!tg) { const hid = find(false), h = hid && hid.closest(".smore"); if (h) { h.querySelector(".rfold").click(); setTimeout(go, 120); } return; }   // kuvio taitettuna: avaa Lisää ja yritä uudelleen

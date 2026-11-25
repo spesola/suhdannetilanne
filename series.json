@@ -3482,58 +3482,68 @@
               "id": "jt_b9",
               "label": "Rahoitusasema",
               "tot": true,
-              "sign": true
+              "sign": true,
+              "sec": "Rahoitusasema"
             },
             {
               "id": "jt_b9_val",
               "label": "Valtionhallinto",
               "sub": true,
-              "sign": true
+              "sign": true,
+              "sec": "Rahoitusasema"
             },
             {
               "id": "jt_b9_kun",
               "label": "Kuntahallinto",
               "sub": true,
-              "sign": true
+              "sign": true,
+              "sec": "Rahoitusasema"
             },
             {
               "id": "jt_b9_hva",
               "label": "Hyvinvointialuehallinto",
               "sub": true,
-              "sign": true
+              "sign": true,
+              "sec": "Rahoitusasema"
             },
             {
               "id": "jt_b9_ssr",
               "label": "Sosiaaliturvarahastot",
               "sub": true,
               "sign": true,
-              "gap_after": true
+              "gap_after": true,
+              "sec": "Rahoitusasema"
             },
             {
               "id": "jt_tr",
               "label": "Tulot",
-              "neutral": true
+              "neutral": true,
+              "sec": "Tulot"
             },
             {
               "id": "jt_te",
               "label": "Menot",
-              "inv": true
+              "inv": true,
+              "sec": "Menot"
             },
             {
               "id": "jt_veroaste",
               "label": "Veroaste",
               "neutral": true,
-              "gap_after": true
+              "gap_after": true,
+              "sec": "Tulot"
             },
             {
               "id": "jt_velka",
               "label": "Velka (EDP)",
-              "inv": true
+              "inv": true,
+              "sec": "Velka"
             },
             {
               "id": "jt_korko_bkt",
               "label": "Korkomenot",
-              "inv": true
+              "inv": true,
+              "sec": "Velka"
             }
           ],
           "note": "Neljän neljänneksen liukuvat summat suhteessa BKT:hen, velka neljänneksen lopussa. Väri kertoo, onko taso julkisen talouden kannalta parempi vai heikompi kuin sarjan keskiarvo vuodesta 2000. Kuntahallinto sisältää Helsingin sosiaali- ja terveyspalvelut. Klikkaa riviä nähdäksesi kuvion. Lähde: Tilastokeskus.",
