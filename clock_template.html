@@ -270,7 +270,8 @@ body:has(.hero.wvon) .topbar::after { display: none; }
 .hero:not(.wvon) > .wvsky { display: none; }   /* muilla välilehdillä (sama hero-osio) ei aallon taivasta */
 .wvsky > .wsl { position: absolute; inset: 0; background: linear-gradient(var(--wvA), var(--wvB) 55%, var(--wvC)); opacity: 0; transition: opacity .8s ease .8s; }   /* pysyvät kerrokset: uusi häivyttyy vanhan päälle, vanha pois vasta sen jälkeen */
 .wvsky > .wsl.on { opacity: 1; z-index: 1; transition-delay: 0s; }
-.wvsky > .wsg { position: absolute; inset: 0; z-index: 2; background: radial-gradient(440px 270px at var(--gx, 50%) var(--gy, 50%), color-mix(in srgb, var(--wvG) var(--wvGp), transparent), transparent 70%); }
+.wvsky > .wsg { position: absolute; left: -440px; top: -270px; width: 880px; height: 540px; z-index: 2; will-change: transform; background: radial-gradient(440px 270px at 50% 50%, color-mix(in srgb, var(--wvG) var(--wvGp), transparent), transparent 70%); }   /* valo liikkuu transformilla: ei koko taivaan uudelleenpiirtoa joka ruudulla */
+.wvsky { overflow: hidden; } .wvsky > .wsl { will-change: opacity; }
 .wvsky::after { content: ""; position: absolute; z-index: 3; left: 0; right: 0; bottom: 55px; height: 1.5px; background: var(--muted); opacity: .45; }   /* horisontti = trenditaso, taivaskerrosten päällä */
 :root:not([data-theme="vapor"]) .hero.wvon .phb b { color: color-mix(in srgb, var(--qc) 78%, #000); }   /* taivasta vasten riittävä kontrasti */
 .wvx .phn i.wl-sun { width: 11px; height: 11px; border-radius: 50%; background: var(--sun); box-shadow: none; }
@@ -339,12 +340,12 @@ body:has(.hero.wvon) #topSec > .card { border-top-color: var(--line); }   /* peh
 :root:not([data-theme="vapor"]) .hero.wvon .hsum .phl { color: rgba(255,255,255,.88); } :root:not([data-theme="vapor"]) .hero.wvon .hsum .phb b { color: #fff; } :root:not([data-theme="vapor"]) .hero.wvon .hsum .phb em { color: rgba(255,255,255,.92); font-weight: 600; }
 :root:not([data-theme="vapor"]) .hero.wvon .hsum { text-shadow: 0 1px 12px rgba(60,30,20,.12); }
 @media (min-width: 700px) { :root:not([data-theme="vapor"]) .hero.wvon .ubox, :root:not([data-theme="vapor"]) .hero.wvon .ubox * { color: rgba(255,255,255,.94); border-color: rgba(255,255,255,.45); } :root:not([data-theme="vapor"]) .hero.wvon .ubox { text-shadow: 0 1px 3px rgba(40,30,30,.22); } }
-:root:not([data-theme="vapor"]) .wv .wvc { stroke: #fff; stroke-opacity: .95; filter: drop-shadow(0 1px 2px rgba(40,40,60,.22)); } :root:not([data-theme="vapor"]) .wv .wvc:not(.hi) { stroke-opacity: .55; }
+:root:not([data-theme="vapor"]) .wv .wvc { stroke: #fff; stroke-opacity: .95; } :root:not([data-theme="vapor"]) .wv .wvc:not(.hi) { stroke-opacity: .55; }
 :root:not([data-theme="vapor"]) .wv .wvq > rect:first-child { stroke: #fff; stroke-width: 1.4px; vector-effect: non-scaling-stroke; }
 :root:not([data-theme="vapor"]) .wv .wvh { fill: #fff; opacity: .4; } :root:not([data-theme="vapor"]) .wv .wvph { stroke: #fff; stroke-opacity: .55; }
 :root .pgsky { top: 0 !important; height: 300px; opacity: 1; -webkit-mask: none; mask: none; background: linear-gradient(var(--g1) 0, var(--g1) 20px, var(--g2) 95px, var(--g3) 175px, var(--bg) 290px); }   /* muilla välilehdillä sama taivas yläreunassa, häipyy ennen sisältöä */
 @media (max-width: 699px) { :root .pgsky { height: 320px; background: linear-gradient(var(--g1) 0, var(--g1) 70px, var(--g2) 135px, var(--g3) 205px, var(--bg) 310px); } }
-:root .wvsky { height: calc(var(--wvH, 0px) + 250px); -webkit-mask-image: linear-gradient(#000 72%, transparent); mask-image: linear-gradient(#000 72%, transparent); }
+:root .wvsky { height: calc(var(--wvH, 0px) + 250px); -webkit-mask: none; mask: none; }   /* liukuma päättyy taustaväriin, maskia ei tarvita (raskas animaation aikana) */
 :root .wvsky::after { bottom: 249px; }
 :root .wvsky > .wsl { background: linear-gradient(var(--g1) 0, var(--g2) calc(var(--wvH, 300px) * .5), var(--g3) calc(var(--wvH, 300px) * .78), var(--g4) calc(var(--wvH, 300px) + 80px), var(--g5) calc(var(--wvH, 300px) + 185px), var(--bg) calc(var(--wvH, 300px) + 250px)); }
 :root:not([data-theme="vapor"]) .wv .wvt { fill: color-mix(in srgb, var(--sun) 70%, #8a5200); }   /* jälki erottuu vaaleaa taivasta vasten */
@@ -1504,7 +1505,7 @@ a.ubr, button.ubr { cursor: pointer; } a.ubr:hover .t, button.ubr:hover .t { tex
     wvGeo = { x: r.left, y: r.top - top, k }; wvGlow();
   }
   function wvGlow(p) { const hero = document.querySelector(".hero"); p = p || wvGlow.p; if (!hero || !wvGeo || !p) return; wvGlow.p = p;
-    hero.style.setProperty("--gx", (wvGeo.x + p.x * wvGeo.k).toFixed(1) + "px"); hero.style.setProperty("--gy", (wvGeo.y + p.y * wvGeo.k).toFixed(1) + "px"); }
+    const g = hero.querySelector(":scope > .wvsky > .wsg"); if (g) g.style.transform = `translate(${(wvGeo.x + p.x * wvGeo.k).toFixed(1)}px, ${(wvGeo.y + p.y * wvGeo.k).toFixed(1)}px)`; }
   { let q = 0; const ro = new ResizeObserver(() => { cancelAnimationFrame(q); q = requestAnimationFrame(() => { const hero = document.querySelector(".hero"); if (hero && hero.classList.contains("wvon") && wvWant() !== WV.w) update(); else wvLayout(); }); });
     const obs = () => { const hero = document.querySelector(".hero"), ub = $("ubox"); if (hero) ro.observe(hero); if (ub) ro.observe(ub); };
     if (document.readyState === "loading") addEventListener("DOMContentLoaded", obs); else obs(); }
@@ -1513,7 +1514,7 @@ a.ubr, button.ubr { cursor: pointer; } a.ubr:hover .t, button.ubr:hover .t { tex
     if (!cq) { if (sk) sk.remove(); return; }
     if (!sk) { sk = document.createElement("div"); sk.className = "wvsky"; sk.setAttribute("aria-hidden", "true");
       sk.innerHTML = QORDER.map(q => `<div class="wsl wp-${q}" data-q="${q}"></div>`).join("") + `<div class="wsg"></div>`; hero.prepend(sk);
-      sk.querySelector(`.wsl[data-q="${cq}"]`).classList.add("on"); sk.offsetWidth; }
+      sk.querySelector(`.wsl[data-q="${cq}"]`).classList.add("on"); sk.offsetWidth; wvGlow(); }
     sk.querySelectorAll(".wsl").forEach(l => l.classList.toggle("on", l.dataset.q === cq)); sk.querySelector(".wsg").className = "wsg wp-" + cq;
   }
   let wvFol = null;
@@ -2548,6 +2549,7 @@ a.ubr, button.ubr { cursor: pointer; } a.ubr:hover .t, button.ubr:hover .t { tex
       scrollTo({ top: t.getBoundingClientRect().top + scrollY - bar - 16 }); }, 120); }
   // sivuston muutokset: uudet kuviot ja muut isommat lisaykset (kasin yllapidetty, uusin ensin); set + id -> linkki kuvioon
   const CHANGES = [
+    { d: "2026-11-25", t: "Asuntojen hinnat myös kuukausittain (ennakkotieto). Kartan toiston animaatio sujuvammaksi." },
     { d: "2026-11-25", t: "Vaporwave-teema uuteen ilmeeseen: vaiheen synthwave-taivas yläreunasta asti, läpinäkyvä yläpalkki ja yötaivas alatunnisteessa." },
     { d: "2026-11-25", t: "Uusi logo: suhdanneaalto ja aurinko, joka näyttää nykyisen vaiheen myös välilehden kuvakkeessa." },
     { d: "2026-11-24", t: "Sivun alaosa liukuu iltaan, alatunniste yötaivaalla; horisonttiviivan piste nykyvaiheen kohdalla." },

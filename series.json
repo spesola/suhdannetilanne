@@ -698,6 +698,24 @@
                 "note": "Kuluttajahintaindeksillä deflatoidut, kaikki talotyypit. Lähde: Tilastokeskus."
               },
               {
+                "title": "Vanhojen osakeasuntojen hinnat kuukausittain, vuosimuutos %",
+                "monthly": true,
+                "lines": [
+                  "as_kk_kok",
+                  "as_kk_pks",
+                  "as_kk_msu"
+                ],
+                "colors": {
+                  "as_kk_kok": "var(--fg)",
+                  "as_kk_pks": "var(--accent)",
+                  "as_kk_msu": "var(--g2)"
+                },
+                "unit": "%",
+                "dec": 1,
+                "from": 2021,
+                "note": "Nimellinen hintaindeksi, kaikki talotyypit. Kuukausitiedot ovat ennakkotietoja ja tarkentuvat; vertailukelpoiset neljännesvuosiluvut ovat yllä ja kasvutaulukossa. Vuoteen 2025 indeksi 2020=100, sen jälkeen 2025=100. Lähde: Tilastokeskus."
+              },
+              {
                 "title": "Asuntokaupat, liukuva vuosisumma (2015=100)",
                 "lines": [
                   "as_kaupat_kok",
@@ -5770,6 +5788,93 @@
         "huoneluku_1_20111212": "00",
         "contentscode": "ashivq_realindeksi_2015"
       }
+    },
+    {
+      "id": "as_kk_kok",
+      "label": "Koko maa",
+      "set": "bkt",
+      "chart_only": true,
+      "monthly": true,
+      "source": "splice",
+      "parts": [
+        {
+          "db": "StatFin_Passiivi",
+          "table": "ashi/statfin_pas_13ms.px",
+          "pick": {
+            "alue_43_20220407": "ksu",
+            "talotyyppi_5_20111209": "0",
+            "contentscode": "vmuut_P_QA_T"
+          },
+          "to": "2025-12"
+        },
+        {
+          "table": "ashi/15iq.px",
+          "pick": {
+            "alue_43_20260625": "SSS",
+            "talotyyppi_5_20111209": "0",
+            "contentscode": "ashivm_indeksi_vmuutos_2025"
+          },
+          "from": "2026-01"
+        }
+      ]
+    },
+    {
+      "id": "as_kk_pks",
+      "label": "Pääkaupunkiseutu",
+      "set": "bkt",
+      "chart_only": true,
+      "monthly": true,
+      "source": "splice",
+      "parts": [
+        {
+          "db": "StatFin_Passiivi",
+          "table": "ashi/statfin_pas_13ms.px",
+          "pick": {
+            "alue_43_20220407": "pks",
+            "talotyyppi_5_20111209": "0",
+            "contentscode": "vmuut_P_QA_T"
+          },
+          "to": "2025-12"
+        },
+        {
+          "table": "ashi/15iq.px",
+          "pick": {
+            "alue_43_20260625": "pks",
+            "talotyyppi_5_20111209": "0",
+            "contentscode": "ashivm_indeksi_vmuutos_2025"
+          },
+          "from": "2026-01"
+        }
+      ]
+    },
+    {
+      "id": "as_kk_msu",
+      "label": "Muu Suomi",
+      "set": "bkt",
+      "chart_only": true,
+      "monthly": true,
+      "source": "splice",
+      "parts": [
+        {
+          "db": "StatFin_Passiivi",
+          "table": "ashi/statfin_pas_13ms.px",
+          "pick": {
+            "alue_43_20220407": "msu",
+            "talotyyppi_5_20111209": "0",
+            "contentscode": "vmuut_P_QA_T"
+          },
+          "to": "2025-12"
+        },
+        {
+          "table": "ashi/15iq.px",
+          "pick": {
+            "alue_43_20260625": "msu",
+            "talotyyppi_5_20111209": "0",
+            "contentscode": "ashivm_indeksi_vmuutos_2025"
+          },
+          "from": "2026-01"
+        }
+      ]
     },
     {
       "id": "as_kaupat_kok",
