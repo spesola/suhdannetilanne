@@ -462,6 +462,23 @@ footer#foot .ngd { position: absolute; top: -23px; width: 8px; height: 8px; marg
 .tb-top .step svg { width: 10px; height: 10px; }
 .tb-top output { font-size: 0.78rem; min-width: 6ch; }
 .cfoot { display: flex; justify-content: flex-end; margin-top: 6px; }
+/* aikavalitsin aallon alla (etusivu): leveämpi ura, valkoinen kahva, vuosiluvut */
+.perax b { display: none; }
+.hero:not(.wvon) > .tb-hero { display: none; }
+.hero > .tb-hero { grid-column: 1 / -1; justify-self: center; width: min(640px, 54%); margin: 26px 0 0; gap: 12px; flex-wrap: nowrap; position: relative; z-index: 3; padding-bottom: 14px; }
+@media (max-width: 699px) { .hero > .tb-hero { width: 100%; margin-top: 14px; } }
+.hero .timebar.tb-hero .step { width: 30px; height: 30px; color: var(--muted); border-radius: 50%; } .hero .timebar.tb-hero .step:hover { color: var(--fg); }
+.hero .timebar.tb-hero output { font-size: 1rem; min-width: 7ch; letter-spacing: -0.01em; }
+.hero .timebar.tb-hero input[type=range] { height: 24px; }
+.hero .timebar.tb-hero input[type=range]::-webkit-slider-runnable-track { height: 4px; border-radius: 2px; background: linear-gradient(90deg, var(--fg) var(--pct, 100%), color-mix(in srgb, var(--fg) 14%, transparent) var(--pct, 100%)); }
+.hero .timebar.tb-hero input[type=range]::-moz-range-track { height: 4px; border-radius: 2px; background: color-mix(in srgb, var(--fg) 14%, transparent); }
+.hero .timebar.tb-hero input[type=range]::-moz-range-progress { height: 4px; border-radius: 2px; background: var(--fg); }
+.hero .timebar.tb-hero input[type=range]::-webkit-slider-thumb { width: 20px; height: 20px; margin-top: -8px; background: #fff; border: 0; box-shadow: 0 0 0 1.5px color-mix(in srgb, var(--fg) 85%, transparent), 0 2px 10px rgba(20,25,45,.22); transition: transform .15s; }
+.hero .timebar.tb-hero input[type=range]::-moz-range-thumb { width: 20px; height: 20px; background: #fff; border: 0; box-shadow: 0 0 0 1.5px color-mix(in srgb, var(--fg) 85%, transparent), 0 2px 10px rgba(20,25,45,.22); }
+.hero .timebar.tb-hero input[type=range]:hover::-webkit-slider-thumb, .hero .timebar.tb-hero input[type=range]:active::-webkit-slider-thumb { transform: scale(1.12); }
+.hero .timebar.tb-hero .perax { left: 10px; right: 10px; top: 20px; }
+.hero .timebar.tb-hero .perax i { height: 4px; opacity: .35; } .hero .timebar.tb-hero .perax i.l { height: 6px; opacity: .55; }
+.hero .timebar.tb-hero .perax b { display: block; position: absolute; top: 9px; transform: translateX(-50%); font: 500 0.68rem/1 var(--font-data); color: var(--muted); letter-spacing: .02em; }
 .timebar > label { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); }
 /* aikajana: kuljettu osa tumma, loppu vaalea; alla vuosimerkit (#perAx) kahvan keskipisteen liikealueella */
 .pertrk { position: relative; flex: 1 1 200px; min-width: 0; align-self: center; }
@@ -1454,7 +1471,7 @@ a.ubr, button.ubr { cursor: pointer; } a.ubr:hover .t, button.ubr:hover .t { tex
     const P = set.periods, n = P.length - 1, w = ax.clientWidth, key = set.id + "|" + n + "|" + w; if (key === axKey) return; axKey = key;
     const ys = P.map((p, i) => [p, i]).filter(([p]) => /-01$|Q1$/.test(p)).map(([p, i]) => [+p.slice(0, 4), i]);
     if (!ys.length || !n || !w) { ax.innerHTML = ""; return; }
-    ax.innerHTML = ys.map(([y, i]) => `<i${y % 10 === 0 ? ' class="l"' : ""} style="left:${(i / n * 100).toFixed(2)}%"></i>`).join("");
+    ax.innerHTML = ys.map(([y, i]) => `<i${y % 10 === 0 ? ' class="l"' : ""} style="left:${(i / n * 100).toFixed(2)}%"></i>` + (y % 5 === 0 ? `<b style="left:${(i / n * 100).toFixed(2)}%">${y}</b>` : "")).join("");
   }
   addEventListener("resize", () => renderAx());
   $("tails").addEventListener("change", e => { showTails = e.target.checked; update(); });
@@ -1603,7 +1620,8 @@ a.ubr, button.ubr { cursor: pointer; } a.ubr:hover .t, button.ubr:hover .t { tex
       hdr = `<p class="phl">Suhdannevaihe</p><p class="phb" style="--qc:${qcol(cq)}"><b>${Q[cq].short}</b><em>${fmtP(set.periods[k])} alkaen</em></p>`; }
     $("hlead").innerHTML = "";
 
-    const WV_ON = LUONNOS && cp; if (WV_ON) { document.querySelector(".hero").classList.add("wvon"); document.body.classList.add("bwv"); }   // asettelu ennen leveyden mittausta
+    const WV_ON = LUONNOS && cp; if (WV_ON) { document.querySelector(".hero").classList.add("wvon"); document.body.classList.add("bwv");
+    const tb = document.querySelector("#topSec .timebar"); if (tb) { tb.classList.replace("tb-top", "tb-hero"); document.querySelector(".hero").insertBefore(tb, $("ubox")); } }   // aikavalitsin aallon alle: ohjaa koko näkymää   // asettelu ennen leveyden mittausta
     const wvd = WV_ON ? waveData(stay, mv, counts, cq, cp) : null;   // luonnos: suhdanneaalto neliörivien tilalle
     $("summary").innerHTML = WV_ON ? `<div class="phx wvx${qf ? " f" : ""}">${hdr}${waveBlock(wvd)}</div>` : `<div class="phx${qf ? " f" : ""}${QORDER.some(q => stay[q].concat(mv[q]).some(x => picked.has(x.s.id))) ? " pk" : ""}">${hdr}<div class="phrs">${QORDER.map(q => `<button type="button" class="phr${q === cq ? " cur" : ""}${qf === q ? " on" : ""}" data-q="${q}" style="--qc:${qcol(q)};--N:${Math.max(1, ...Object.values(counts))}" aria-pressed="${qf === q}" aria-label="${Q[q].name}: ${counts[q]}. Klikkaa suodattaaksesi."><span class="nm">${Q[q].short}</span><span class="sq">${stay[q].map(x => `<i data-id="${x.s.id}" data-tip="${escH(x.s.label)}"${x.st >= 0 ? ` data-sub="${fmtP(set.periods[x.st])}"` : ""}${picked.has(x.s.id) || x.st >= 0 ? ` class="${[picked.has(x.s.id) ? "pk" : "", x.st >= 0 ? "st" : ""].filter(Boolean).join(" ")}"` : ""}></i>`).join("")}${mv[q].map(x => `<i class="new${picked.has(x.s.id) ? " pk" : ""}" data-id="${x.s.id}" data-tip="${escH(x.s.label)}" data-sub="${Q[x.q0].short} → ${Q[q].short.toLowerCase()} ${fmtP(set.periods[idx])}"></i>`).join("")}</span><span class="n">${counts[q]}</span></button>`).join("")}</div><div class="phn"><button type="button" class="phleg" aria-expanded="${phLeg}" aria-controls="phLegB" aria-label="Selitteet" title="Selitteet"><svg viewBox="0 0 10 10" aria-hidden="true"><path d="M3.5 2 7 5l-3.5 3"/></svg></button><span class="phlb${phLeg ? "" : " off"}" id="phLegB"><span><i></i>muutos edellisestä ${set.freq === "M" ? "kuukaudesta" : "neljänneksestä"}</span><span><i class="st"></i>ei julkaistu</span></span></div></div>`;   // rivi aina paikallaan, ettei sivu hypi   // yksi neliö = yksi sarja
     { const sqA = motion() && !playT && (!panLast || panLast.set !== set || panLast.idx !== idx); panLast = { set, idx };   // neliöt syttyvät porrastetusti, kun kuukausi vaihtuu (ei suodatuksessa eikä toistossa)
@@ -2571,6 +2589,7 @@ a.ubr, button.ubr { cursor: pointer; } a.ubr:hover .t, button.ubr:hover .t { tex
       scrollTo({ top: t.getBoundingClientRect().top + scrollY - bar - 16 }); }, 120); }
   // sivuston muutokset: uudet kuviot ja muut isommat lisaykset (kasin yllapidetty, uusin ensin); set + id -> linkki kuvioon
   const CHANGES = [
+    { d: "2026-11-25", t: "Aikavalitsin siirretty aallon alle (ohjaa koko näkymää), uusi ulkoasu ja vuosiluvut." },
     { d: "2026-11-25", t: "Julkisen talouden yleiskuvan ja aihesivujen välillä siirtymäanimaatio." },
     { d: "2026-11-25", t: "Suhdannekartan toistopainike poistettu; aikaa selataan liukusäätimellä." },
     { d: "2026-11-25", t: "Taulukoiden nimisarake läpinäkyvä taustan liukumaa vasten (peittävä vain vaakavieritettäessä)." },
