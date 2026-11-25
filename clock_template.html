@@ -1068,7 +1068,7 @@ a.ubr, button.ubr { cursor: pointer; } a.ubr:hover .t, button.ubr:hover .t { tex
       <div class="phead"><span class="ph2"><h2 id="clockTitle">Suhdannekartta</h2><button type="button" class="xbtn" data-x="clockDesc" aria-expanded="false" aria-label="Näytä selite" title="Näytä selite"><svg viewBox="0 0 16 16" width="16" height="16" aria-hidden="true"><circle cx="3" cy="8" r="1.5"/><circle cx="8" cy="8" r="1.5"/><circle cx="13" cy="8" r="1.5"/></svg></button></span>
       <div class="timebar tb-top">
         <label for="per">Ajankohta</label>
-        <button class="step play" id="play" type="button" aria-label="Toista ajassa" title="Toista ajassa">&#9654;</button>
+        <button class="step play" id="play" type="button" aria-label="Toista ajassa" title="Toista ajassa" hidden>&#9654;</button>
         <button class="step" id="prev" type="button" aria-label="Edellinen jakso"><svg width="12" height="12" viewBox="0 0 12 12" aria-hidden="true"><path d="M7.5 2.5L4 6l3.5 3.5" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
         <div class="pertrk"><input type="range" id="per" min="0" max="0" value="0"><div class="perax" id="perAx" aria-hidden="true"></div></div>
         <button class="step" id="next" type="button" aria-label="Seuraava jakso"><svg width="12" height="12" viewBox="0 0 12 12" aria-hidden="true"><path d="M4.5 2.5L8 6l-3.5 3.5" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
@@ -2569,6 +2569,7 @@ a.ubr, button.ubr { cursor: pointer; } a.ubr:hover .t, button.ubr:hover .t { tex
       scrollTo({ top: t.getBoundingClientRect().top + scrollY - bar - 16 }); }, 120); }
   // sivuston muutokset: uudet kuviot ja muut isommat lisaykset (kasin yllapidetty, uusin ensin); set + id -> linkki kuvioon
   const CHANGES = [
+    { d: "2026-11-25", t: "Suhdannekartan toistopainike poistettu; aikaa selataan liukusäätimellä." },
     { d: "2026-11-25", t: "Taulukoiden nimisarake läpinäkyvä taustan liukumaa vasten (peittävä vain vaakavieritettäessä)." },
     { d: "2026-11-25", t: "Julkinen talous: yleiskuvana taulukko, rivistä aukeaa aiheen oma erittelysivu (rahoitusasema, tulot, menot, velka) kaikkine kuvioineen." },
     { d: "2026-11-25", t: "Reaalitalouden BKT-näkymästä poistettu lisäkuviot, jotka ovat BKT:n erittelysivulla." },
