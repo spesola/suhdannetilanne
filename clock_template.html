@@ -252,7 +252,8 @@ body { font-variant-numeric: tabular-nums; background: var(--bg); min-height: 10
 .ubl.ubm > li.past .t { color: var(--muted); }
 .ubl.ubm .ubr .p.tm { font-size: inherit; color: var(--muted); }
 .ubl.ubm > li.sep { height: 1px; margin: 5px 0; background: color-mix(in srgb, var(--accent) 35%, transparent); }
-.ubl.ubm > li.tdy .d { color: var(--accent); font-weight: 600; } .ubl.ubm > li.past.tdy .t { color: var(--fg); }   /* tänään julkaistu */
+.ubl.ubm > li.tdy .d { font-weight: inherit; } .ubl.ubm > li.tdy .d .wd, .ubl.ubm > li.tdy .d .dn { text-decoration: underline; text-decoration-thickness: 1px; text-underline-offset: 3px; text-decoration-color: color-mix(in srgb, currentColor 45%, transparent); }   /* tänään: kevyt alleviivaus lihavoinnin sijaan */
+.hero .ubl.ubm .fresh { width: 5px; height: 5px; margin-left: 6px; opacity: .45; box-shadow: none !important; background: currentColor !important; }   /* uusi-merkki himmeänä pisteenä */
 .ubl.ubm > li.now { padding: 2px 0; }
 .ubl.ubm > li.now > span { margin-left: 0; font-size: 0.75rem; gap: 0; } .ubl.ubm > li.now > span::after { margin-left: 8px; } .ubl.ubm > li.now .wd, .ubl.ubm > li.now .dn { flex: none; }
 .ubl.ubm > li.now > span::before { display: none; }
