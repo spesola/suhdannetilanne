@@ -252,8 +252,6 @@ body { font-variant-numeric: tabular-nums; background: var(--bg); min-height: 10
 .ubl.ubm > li.past .t { color: var(--muted); }
 .ubl.ubm .ubr .p.tm { font-size: inherit; color: var(--muted); }
 .ubl.ubm > li.sep { height: 1px; margin: 5px 0; background: color-mix(in srgb, var(--accent) 35%, transparent); }
-.ubl.ubm > li.tdy .d { font-weight: inherit; } .ubl.ubm > li.tdy .d .wd, .ubl.ubm > li.tdy .d .dn { text-decoration: underline; text-decoration-thickness: 1px; text-underline-offset: 3px; text-decoration-color: color-mix(in srgb, currentColor 45%, transparent); }   /* tänään: kevyt alleviivaus lihavoinnin sijaan */
-.hero .ubl.ubm .fresh { width: 5px; height: 5px; margin-left: 6px; opacity: .45; box-shadow: none !important; background: currentColor !important; }   /* uusi-merkki himmeänä pisteenä */
 .ubl.ubm > li.now { padding: 2px 0; }
 .ubl.ubm > li.now > span { margin-left: 0; font-size: 0.75rem; gap: 0; } .ubl.ubm > li.now > span::after { margin-left: 8px; } .ubl.ubm > li.now .wd, .ubl.ubm > li.now .dn { flex: none; }
 .ubl.ubm > li.now > span::before { display: none; }
@@ -329,6 +327,14 @@ footer#foot .ngd { position: absolute; top: -23px; width: 8px; height: 8px; marg
 /* vaihetaivas (pastelli, 24.11.2026): kylläinen yläosa (tumma yläosa, vaalea keskikohta, vastakkainen sävy horisontissa) ja sisältö valkoisina kortteina */
 :root:not([data-theme="vapor"]) .wv .wvsun.sp-rec { --sun: #f4a887; } :root:not([data-theme="vapor"]) .wv .wvsun.sp-up { --sun: #f5cf5a; } :root:not([data-theme="vapor"]) .wv .wvsun.sp-turn { --sun: #ec9a4a; } :root:not([data-theme="vapor"]) .wv .wvsun.sp-down { --sun: #d9685a; }
 @media (min-width: 700px) { :root:not([data-theme="vapor"]) .hero.wvon:not(.hdown) .ubox, :root:not([data-theme="vapor"]) .hero.wvon:not(.hdown) .ubox * { color: var(--fg); border-color: rgba(22,27,34,.18); text-shadow: none; } :root:not([data-theme="vapor"]) .hero.wvon:not(.hdown) .ubox li.sep ~ li * { color: var(--muted); } }   /* julkaisut tummina, paitsi laskun tummalla taivaalla */
+/* julkaisulista: tulevat pääosassa, julkaistut ja päivämäärät himmeinä, ei erillisiä merkkejä */
+.hero .ubox { text-shadow: none !important; }
+.hero .ubox .ubl.ubm .fresh { display: none; }
+.hero .ubox .ubl.ubm li .d { opacity: .55; font-weight: 500 !important; }
+.hero .ubox .ubl.ubm li.past .t { opacity: .6; }
+.hero .ubox .ubl.ubm li.fu .t { color: var(--fg) !important; opacity: 1; } .hero .ubox .ubl.ubm li.fu .d { opacity: .7; }
+.hero .ubox .ubl.ubm li.sep { border: 0 !important; height: 10px !important; background: none !important; margin: 0 !important; }
+.hero .ubox .ubl.ubm li.sep::before { content: ""; display: block; height: 1px; margin-top: 5px; background: linear-gradient(90deg, currentColor, transparent); opacity: .25; }
 /* vaporwave: sama rakenne kuin vaaleassa teemassa, synthwave-taivaat (tumma yläosa, hehku horisontissa, yö alhaalla) */
 :root[data-theme="vapor"] .wp-rec { --g1: #0d0b24; --g2: #251d55; --g3: #5a3a86; --g4: #b8628f; --g5: #150f2c; }
 :root[data-theme="vapor"] .wp-up { --g1: #071628; --g2: #0f3352; --g3: #1d5f7a; --g4: #3aa79c; --g5: #0a1a24; }
@@ -2595,7 +2601,7 @@ a.ubr, button.ubr { cursor: pointer; } a.ubr:hover .t, button.ubr:hover .t { tex
       scrollTo({ top: t.getBoundingClientRect().top + scrollY - bar - 16 }); }, 120); }
   // sivuston muutokset: uudet kuviot ja muut isommat lisaykset (kasin yllapidetty, uusin ensin); set + id -> linkki kuvioon
   const CHANGES = [
-    { d: "2026-11-26", t: "Etusivun julkaisulistassa kolme julkaistua ja viisi tulevaa." },
+    { d: "2026-11-26", t: "Etusivun julkaisulistassa kolme julkaistua ja viisi tulevaa; tulevat korostettuina." },
     { d: "2026-11-25", t: "Aikavalitsin siirretty aallon alle (ohjaa koko näkymää), uusi ulkoasu ja vuosiluvut." },
     { d: "2026-11-25", t: "Julkisen talouden yleiskuvan ja aihesivujen välillä siirtymäanimaatio." },
     { d: "2026-11-25", t: "Suhdannekartan toistopainike poistettu; aikaa selataan liukusäätimellä." },
