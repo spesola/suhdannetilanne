@@ -469,6 +469,8 @@ footer#foot .ngd { position: absolute; top: -23px; width: 8px; height: 8px; marg
 @media (max-width: 699px) { .hero > .tb-hero { width: 100%; margin-top: 14px; } }
 .hero .timebar.tb-hero .step { width: 30px; height: 30px; color: var(--muted); border-radius: 50%; } .hero .timebar.tb-hero .step:hover { color: var(--fg); }
 .hero .timebar.tb-hero output { font-family: var(--font-body); font-size: 0.875rem; font-weight: 600; min-width: 6.5ch; font-variant-numeric: tabular-nums; }
+.hero .timebar.tb-hero output { position: absolute; left: 100%; top: 0; height: 24px; display: flex; align-items: center; margin-left: 4px; text-align: left; }   /* päivämäärä säätimen ulkopuolelle: ura ja nuolet symmetrisesti sivun keskellä */
+@media (max-width: 699px) { .hero .timebar.tb-hero output { position: static; height: auto; margin-left: 0; } }
 .hero .timebar.tb-hero input[type=range] { height: 24px; }
 .hero .timebar.tb-hero input[type=range]::-webkit-slider-runnable-track { height: 4px; border-radius: 2px; background: linear-gradient(90deg, var(--fg) var(--pct, 100%), color-mix(in srgb, var(--fg) 14%, transparent) var(--pct, 100%)); }
 .hero .timebar.tb-hero input[type=range]::-moz-range-track { height: 4px; border-radius: 2px; background: color-mix(in srgb, var(--fg) 14%, transparent); }
