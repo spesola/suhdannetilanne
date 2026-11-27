@@ -1880,7 +1880,7 @@ a.ubr, button.ubr { cursor: pointer; } a.ubr:hover .t, button.ubr:hover .t { tex
       const ind = set.indicators.find(x => x.id === id.slice(4)); if (!ind) return;
       set.series = (set.series || []).filter(x => x.id !== id).concat([{ id, label: ind.label, values: ind.raw }]); });
     $("tsGrid").classList.toggle("solo", !cc);
-    if (cc) renderCharts($("tsContrib"), [{ ...cc, wide: true, w: 560, height: 300, defIdx: idx, ts: true, rawv: cc.id.startsWith("raw_") }]); else $("tsContrib").innerHTML = "";
+    if (cc) renderCharts($("tsContrib"), [{ ...cc, wide: true, w: 560, height: 300, defIdx: idx === defIdx(set) ? null : idx, ts: true, rawv: cc.id.startsWith("raw_") }]);   // oletuksena uusin havainto; valittu kuukausi vain, jos aikaa on siirretty else $("tsContrib").innerHTML = "";
     const p = at(s, idx);
     $("tsNow").innerHTML = p && !s.comp ? `<i style="--qc:${qcol(quad(p.l, p.c))}"></i>${Q[quad(p.l, p.c)].name} ${fmtP(set.periods[p.i])}. Taso ${fmtN(p.l)}, muutos ${fmtN(p.c)}.` : "";
     const svg = $("ts"); svg.innerHTML = "";
@@ -2601,6 +2601,7 @@ a.ubr, button.ubr { cursor: pointer; } a.ubr:hover .t, button.ubr:hover .t { tex
       scrollTo({ top: t.getBoundingClientRect().top + scrollY - bar - 16 }); }, 120); }
   // sivuston muutokset: uudet kuviot ja muut isommat lisaykset (kasin yllapidetty, uusin ensin); set + id -> linkki kuvioon
   const CHANGES = [
+    { d: "2026-11-27", t: "Indikaattorin kuvio näyttää oletuksena uusimman havainnon (ei kokonaisindikaattorin viimeistä kuukautta)." },
     { d: "2026-11-26", t: "Etusivun julkaisulistassa kolme julkaistua ja viisi tulevaa; tulevat korostettuina." },
     { d: "2026-11-25", t: "Aikavalitsin siirretty aallon alle (ohjaa koko näkymää), uusi ulkoasu ja vuosiluvut." },
     { d: "2026-11-25", t: "Julkisen talouden yleiskuvan ja aihesivujen välillä siirtymäanimaatio." },
