@@ -491,6 +491,19 @@ footer#foot .ngd { position: absolute; top: -23px; width: 8px; height: 8px; marg
 .hero .timebar.tb-hero .perax i, .hero .timebar.tb-hero .perax b:not(.ae) { display: none; }   /* vain alku- ja loppuvuosi */
 .hero .timebar.tb-hero .perax b.ae { transform: none; } .hero .timebar.tb-hero .perax b.s { left: -10px; } .hero .timebar.tb-hero .perax b.e { right: -10px; }
 .perax b.ae { display: none; }
+/* aikavalitsin: päivämäärä valkoisessa pillerinupissa, kapeampi */
+.perpill { display: none; }
+.hero > .tb-hero { width: min(544px, 46%); }
+.hero .timebar.tb-hero output { position: absolute !important; left: 0 !important; margin: 0 !important; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+.hero .timebar.tb-hero input[type=range] { height: 30px; }
+.hero .timebar.tb-hero input[type=range]::-webkit-slider-runnable-track { height: 4px; }
+.hero .timebar.tb-hero input[type=range]::-webkit-slider-thumb { width: 62px; height: 28px; margin-top: -12px; border-radius: 14px; background: transparent; border: 0; box-shadow: none; transform: none !important; }
+.hero .timebar.tb-hero input[type=range]::-moz-range-thumb { width: 62px; height: 28px; border-radius: 14px; background: transparent; border: 0; box-shadow: none; }
+.hero .timebar.tb-hero input[type=range]:focus-visible + .perpill { box-shadow: 0 0 0 2px var(--accent), 0 3px 12px rgba(30,30,50,.2); }
+.hero .timebar.tb-hero .perax { left: 0; right: 0; top: 26px; } .hero .timebar.tb-hero .perax b.s { left: 0; } .hero .timebar.tb-hero .perax b.e { right: 0; }
+.hero .timebar.tb-hero .perpill { display: flex; position: absolute; top: 1px; height: 28px; padding: 0 12px; transform: translateX(-50%); align-items: center; border-radius: 14px; background: #fff; color: #161b22; font: 600 0.8rem/1 var(--font-body); font-variant-numeric: tabular-nums; box-shadow: 0 0 0 .5px rgba(0,0,0,.1), 0 3px 12px rgba(30,30,50,.2); pointer-events: none; white-space: nowrap; transition: box-shadow .15s; }
+.hero .timebar.tb-hero .pertrk:hover .perpill { box-shadow: 0 0 0 .5px rgba(0,0,0,.12), 0 4px 16px rgba(30,30,50,.28); }
+@media (max-width: 699px) { .hero > .tb-hero { width: 100%; } }
 .timebar > label { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); }
 /* aikajana: kuljettu osa tumma, loppu vaalea; alla vuosimerkit (#perAx) kahvan keskipisteen liikealueella */
 .pertrk { position: relative; flex: 1 1 200px; min-width: 0; align-self: center; }
@@ -1468,12 +1481,17 @@ a.ubr, button.ubr { cursor: pointer; } a.ubr:hover .t, button.ubr:hover .t { tex
   }
 
   /* ---------- aikavalitsin ---------- */
+  function updPill() {                                                // päivämäärä nupissa (etusivun aikavalitsin)
+    const pl = document.querySelector(".tb-hero .perpill"), r = $("per"); if (!pl || !set.periods) return;
+    const q = +r.max > 0 ? +r.value / +r.max : 1; pl.textContent = fmtP(set.periods[+r.value] || set.periods[idx]);
+    pl.style.left = `calc(${(q * 100).toFixed(3)}% + ${((0.5 - q) * 62).toFixed(1)}px)`; }
   function renderTime() {
     $("tailsTg").title = `Näytä pisteiden kulku ${set.tail} ${set.freq === "M" ? "kuukauden" : "neljänneksen"} ajalta`;
     $("tailsLbl").textContent = `Kulku ${set.tail} ${set.freq === "M" ? "kk" : "nelj."}`;
     const r = $("per"); r.max = set.periods.length - 1; r.value = idx;
     r.style.setProperty("--pct", (r.max > 0 ? idx / r.max * 100 : 100) + "%");
     $("perOut").textContent = fmtP(set.periods[idx]);
+    updPill();
     renderAx();
   }
   // vuosimerkit aikajanan alle, vuosikymmenet pidempinä
@@ -1633,7 +1651,7 @@ a.ubr, button.ubr { cursor: pointer; } a.ubr:hover .t, button.ubr:hover .t { tex
     $("hlead").innerHTML = "";
 
     const WV_ON = LUONNOS && cp; if (WV_ON) { document.querySelector(".hero").classList.add("wvon"); document.body.classList.add("bwv");
-    const tb = document.querySelector("#topSec .timebar"); if (tb) { tb.classList.replace("tb-top", "tb-hero"); document.querySelector(".hero").insertBefore(tb, $("ubox")); } }   // aikavalitsin aallon alle: ohjaa koko näkymää   // asettelu ennen leveyden mittausta
+    const tb = document.querySelector("#topSec .timebar"); if (tb) { tb.classList.replace("tb-top", "tb-hero"); { const pl = document.createElement("span"); pl.className = "perpill"; pl.setAttribute("aria-hidden", "true"); tb.querySelector(".pertrk").appendChild(pl); updPill(); } document.querySelector(".hero").insertBefore(tb, $("ubox")); } }   // aikavalitsin aallon alle: ohjaa koko näkymää   // asettelu ennen leveyden mittausta
     const wvd = WV_ON ? waveData(stay, mv, counts, cq, cp) : null;   // luonnos: suhdanneaalto neliörivien tilalle
     $("summary").innerHTML = WV_ON ? `<div class="phx wvx${qf ? " f" : ""}">${hdr}${waveBlock(wvd)}</div>` : `<div class="phx${qf ? " f" : ""}${QORDER.some(q => stay[q].concat(mv[q]).some(x => picked.has(x.s.id))) ? " pk" : ""}">${hdr}<div class="phrs">${QORDER.map(q => `<button type="button" class="phr${q === cq ? " cur" : ""}${qf === q ? " on" : ""}" data-q="${q}" style="--qc:${qcol(q)};--N:${Math.max(1, ...Object.values(counts))}" aria-pressed="${qf === q}" aria-label="${Q[q].name}: ${counts[q]}. Klikkaa suodattaaksesi."><span class="nm">${Q[q].short}</span><span class="sq">${stay[q].map(x => `<i data-id="${x.s.id}" data-tip="${escH(x.s.label)}"${x.st >= 0 ? ` data-sub="${fmtP(set.periods[x.st])}"` : ""}${picked.has(x.s.id) || x.st >= 0 ? ` class="${[picked.has(x.s.id) ? "pk" : "", x.st >= 0 ? "st" : ""].filter(Boolean).join(" ")}"` : ""}></i>`).join("")}${mv[q].map(x => `<i class="new${picked.has(x.s.id) ? " pk" : ""}" data-id="${x.s.id}" data-tip="${escH(x.s.label)}" data-sub="${Q[x.q0].short} → ${Q[q].short.toLowerCase()} ${fmtP(set.periods[idx])}"></i>`).join("")}</span><span class="n">${counts[q]}</span></button>`).join("")}</div><div class="phn"><button type="button" class="phleg" aria-expanded="${phLeg}" aria-controls="phLegB" aria-label="Selitteet" title="Selitteet"><svg viewBox="0 0 10 10" aria-hidden="true"><path d="M3.5 2 7 5l-3.5 3"/></svg></button><span class="phlb${phLeg ? "" : " off"}" id="phLegB"><span><i></i>muutos edellisestä ${set.freq === "M" ? "kuukaudesta" : "neljänneksestä"}</span><span><i class="st"></i>ei julkaistu</span></span></div></div>`;   // rivi aina paikallaan, ettei sivu hypi   // yksi neliö = yksi sarja
     { const sqA = motion() && !playT && (!panLast || panLast.set !== set || panLast.idx !== idx); panLast = { set, idx };   // neliöt syttyvät porrastetusti, kun kuukausi vaihtuu (ei suodatuksessa eikä toistossa)
@@ -2601,6 +2619,7 @@ a.ubr, button.ubr { cursor: pointer; } a.ubr:hover .t, button.ubr:hover .t { tex
       scrollTo({ top: t.getBoundingClientRect().top + scrollY - bar - 16 }); }, 120); }
   // sivuston muutokset: uudet kuviot ja muut isommat lisaykset (kasin yllapidetty, uusin ensin); set + id -> linkki kuvioon
   const CHANGES = [
+    { d: "2026-11-27", t: "Aikavalitsimen päivämäärä nupissa, valitsin kapeampi." },
     { d: "2026-11-27", t: "Indikaattorin kuvio näyttää oletuksena uusimman havainnon (ei kokonaisindikaattorin viimeistä kuukautta)." },
     { d: "2026-11-26", t: "Etusivun julkaisulistassa kolme julkaistua ja viisi tulevaa; tulevat korostettuina." },
     { d: "2026-11-25", t: "Aikavalitsin siirretty aallon alle (ohjaa koko näkymää), uusi ulkoasu ja vuosiluvut." },
